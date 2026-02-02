@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body{
+            background: linear-gradient(to right, #ff512f, #dd2476);
+            text-align: center;
+        }
+        form{
+            padding: 10px;
+            margin-left: 32%;
+            margin-top: 10%;
+            width: 30%;
+            height: 60vh;
+            background: grey;
+            border-radius: 25%;
+            color: white;
+        }
+        h1{
+            padding: 3px;
+            font-style: oblique;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            cursor: pointer;
+        }
+        h1 a{
+            color: white;
+            text-decoration: none;
+        }
+        form label{
+            padding: 10px;
+            font-size: 18px;
+        }
+        input{
+            margin: 11px;
+            width: 250px;
+            height: 4vh;
+            border-radius: 10px;
+            border: 1px;
+        }
+        input:hover{
+            width: 252px;
+            background: white;
+        }
+        .role{
+            margin-left: -8px;
+        }
+        #role{
+            margin-left: 48px;
+        }
+        button{
+            padding: 6px;
+            margin: 10px;
+            width: 35%;
+            font-size: 19px;
+            background: white;
+            border: none;
+            border-radius: 25px;
+ 
+        }
+        button:hover{
+            width: 36%;
+            cursor: pointer;
+            background: linear-gradient(to right, #b65f4e, #b65a83);
+            color: white;
+            font-size: 21px;
+        }
+        </style>
+</head>
+<body>
+    <form action="Login" method="post">
+        <h1>Login</h1>
+        <label for="name">Username :<input type="text" name="username"></label>
+        <label for="Password">Password :  <input type="password" name="password"></label>
+        <button>login</button>
+    </form>
+</body>
+</html>

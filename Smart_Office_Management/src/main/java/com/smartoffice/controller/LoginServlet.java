@@ -1,5 +1,84 @@
 package com.smartoffice.controller;
 
-public class LoginServlet {
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.smartoffice.utils.DBConnectionUtil;
+
+@SuppressWarnings("serial")
+public class LoginServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
+
+        try (Connection con = DBConnectionUtil.getConnection()) {
+
+            String sql = "SELECT role FROM users WHERE username = ? AND password = ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+
+            ps.setString(1, username);
+            ps.setString(2, password);
+            
+            PrintWriter out = res.getWriter();
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                String role = rs.getString("role");
+                out.println("User role: " + role);
+
+                // create session
+                HttpSession session = req.getSession();
+                session.setAttribute("username", username);
+                session.setAttribute("role", role);
+
+                // role based redirect
+                switch (role.toLowerCase()) {
+
+                case "user":
+                    res.sendRedirect("user.jsp");
+                    break;
+
+                case "manager":
+                    res.sendRedirect("manager.jsp");
+                    break;
+
+                case "admin":
+                    res.sendRedirect("admin.jsp");
+                    break;
+
+                default:
+                    res.sendRedirect("index.html?error=invalidRole");
+            }
+
+
+            } else {
+                res.sendRedirect("index.html?error=invalid");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.sendRedirect("index.html?error=server");
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        doPost(req, res);
+    }
 }
