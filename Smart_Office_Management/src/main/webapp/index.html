@@ -4,77 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+
     <style>
-        body{
-            background: linear-gradient(to right, #ff512f, #dd2476);
-            text-align: center;
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
         }
-        form{
-            padding: 10px;
-            margin-left: 32%;
-            margin-top: 10%;
-            width: 30%;
-            height: 60vh;
-            background: grey;
-            border-radius: 25%;
-            color: white;
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f4f6f9;
         }
-        h1{
-            padding: 3px;
-            font-style: oblique;
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
-            cursor: pointer;
-        }
-        h1 a{
-            color: white;
-            text-decoration: none;
-        }
-        form label{
-            padding: 10px;
-            font-size: 18px;
-        }
-        input{
-            margin: 11px;
-            width: 250px;
-            height: 4vh;
+
+        .login-box {
+            width: 350px;
+            padding: 30px;
+            background: #ffffff;
             border-radius: 10px;
-            border: 1px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
-        input:hover{
-            width: 252px;
-            background: white;
+
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
         }
-        .role{
-            margin-left: -8px;
+
+        .login-box label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #555;
         }
-        #role{
-            margin-left: 48px;
+
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 18px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
         }
-        button{
-            padding: 6px;
-            margin: 10px;
-            width: 35%;
-            font-size: 19px;
-            background: white;
+
+        .login-box input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 10px;
             border: none;
-            border-radius: 25px;
- 
-        }
-        button:hover{
-            width: 36%;
-            cursor: pointer;
-            background: linear-gradient(to right, #b65f4e, #b65a83);
+            border-radius: 6px;
+            background: #4f46e5;
             color: white;
-            font-size: 21px;
+            font-size: 16px;
+            cursor: pointer;
         }
-        </style>
+
+        .login-box button:hover {
+            background: #4338ca;
+        }
+    </style>
 </head>
+
 <body>
-    <form action="Login" method="post">
+    <div class="login-box">
         <h1>Login</h1>
-        <label for="name">Username :<input type="text" name="username"></label>
-        <label for="Password">Password :  <input type="password" name="password"></label>
-        <button>login</button>
-    </form>
+
+        <form action="Login" method="post">
+            <label>Username</label>
+            <input type="text" name="username" required>
+
+            <label>Password</label>
+            <input type="password" name="password" required>
+
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    
+    <script>
+    	const params = new URLSearchParams(window.location.search);
+    	const error = params.get("error");
+
+    	if (error === "invalid") {
+      	  alert("Invalid username or password!");
+    	} else if (error === "server") {
+    	    alert("Server error. Please try again later.");
+   	 	} else if (error === "invalidRole") {
+    	    alert("Invalid user role. Contact admin.");
+    	}
+	</script>
+    
+    
 </body>
 </html>

@@ -39,7 +39,6 @@ public class LoginServlet extends HttpServlet {
             if (rs.next()) {
 
                 String role = rs.getString("role");
-                out.println("User role: " + role);
 
                 // create session
                 HttpSession session = req.getSession();
