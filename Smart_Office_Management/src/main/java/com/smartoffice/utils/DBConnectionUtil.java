@@ -7,13 +7,9 @@ import java.io.InputStream;
 
 public class DBConnectionUtil {
 
-    private static Connection con;
-
     public static Connection getConnection() {
 
-        if (con != null) {
-            return con;
-        }
+        Connection con = null;
 
         try {
             Properties props = new Properties();

@@ -1,194 +1,195 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
-<%@ page import="java.sql.*" %>
-<%@ page import="com.smartoffice.utils.DBConnectionUtil" %>
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Admin Dashboard</title>
 
+<!-- ✅ Font Awesome Icons -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f4f6f8;
-    }
 
-    /* Top bar */
-    .top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px 30px;
-        background: #2c3e50;
-        color: white;
-    }
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f6f8;
+}
 
-    .logout-btn {
-        background: #e74c3c;
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    .logout-btn:hover {
-    	background: #217dbb;
-    	box-shadow: 0 2px 8px rgba(52,152,219,0.15);
-    	transition: background 0.2s, box-shadow 0.2s;
-    	transform: translateY(-2px);
-	}
+/* ===== Top Bar ===== */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: #1f2933;
+    color: white;
+}
 
-    /* Layout */
-    .container {
-        display: flex;
-        height: calc(100vh - 60px);
-    }
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
 
-    /* Left panel */
-    .left-panel {
-        width: 25%;
-        background: white;
-        padding: 30px;
-        box-shadow: 2px 0 8px rgba(0,0,0,0.1);
-    }
+.logout-btn {
+    background: #ef4444;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
 
-    .info {
-        margin-bottom: 12px;
-        color: #555;
-    }
+.logout-btn:hover {
+    background: #dc2626;
+}
 
-    /* Right panel */
-    .right-panel {
-        width: 75%;
-        padding: 30px;
-    }
+/* ===== Layout ===== */
+.container {
+    display: flex;
+    height: calc(100vh - 60px);
+}
 
-    /* Action buttons */
-    .actions-bar {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 25px;
-    }
+/* ===== Sidebar ===== */
+.left-panel {
+    width: 240px;
+    background: white;
+    padding: 25px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+}
 
-    .action-btn {
-    	width: 170px;
-        padding: 12px 18px;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        color: white;
-        background: #3498db;
-    }
-    
-    
-	.action-btn:hover {
-    	background: #217dbb;
-    	box-shadow: 0 2px 8px rgba(52,152,219,0.15);
-    	transition: background 0.2s, box-shadow 0.2s;
-    	transform: translateY(-2px);
-	}
-  
-    .danger { background: #e67e22; }
-    .toggle { background: #2ecc71; }
+.left-panel h3 {
+    margin-bottom: 20px;
+    color: #374151;
+}
 
-    /* Table */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-    }
+/* Sidebar Buttons */
+.nav-btn {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #3b82f6;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-    th {
-        background: #2c3e50;
-        color: white;
-        padding: 12px;
-        text-align: left;
-    }
+.nav-btn i {
+    font-size: 15px;
+}
 
-    td {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-    }
+.nav-btn:hover {
+    background: #2563eb;
+    transform: translateX(4px);
+}
 
-    tr:hover {
-        background: #f9fbfd;
-    }
+.danger {
+    background: #ef4444;
+}
 
-    .badge {
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: bold;
-    }
+.danger:hover {
+    background: #dc2626;
+}
 
-    .active { background: #e6f4ea; color: #1e7e34; }
-    .inactive { background: #f1f3f5; color: #6c757d; }
-    .banned { background: #fdecea; color: #c0392b; }
+/* ===== Content Panel ===== */
+.right-panel {
+    flex: 1;
+    padding: 25px;
+}
 
-    .table-actions button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-    }
+/* iframe Content Loader */
+#contentFrame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
 </style>
 </head>
 
 <body>
 
-<!-- Top Bar -->
+<!-- ===== Top Bar ===== -->
 <div class="top-bar">
-    <h2>Admin Dashboard</h2>
-    <a href="<%= request.getContextPath() %>/logout">
-        <button class="logout-btn">Logout</button>
-    </a>
+
+    <h2>Smart Office • Admin Dashboard</h2>
+
+    <div class="user-area">
+        Welcome, <strong>${sessionScope.username}</strong>
+
+        <a href="<%= request.getContextPath() %>/logout">
+            <button class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+        </a>
+    </div>
+
 </div>
 
+
+<!-- ===== Main Layout ===== -->
 <div class="container">
 
+    <!-- ===== Sidebar ===== -->
     <div class="left-panel">
-        <h3>Admin Details</h3>
-        <div class="info"><strong>Username:</strong> <%= session.getAttribute("username") %></div>
-        <div class="info"><strong>Role:</strong> Admin</div>
-        <div class="info"><strong>Status:</strong> Active</div>
+
+        <h3>Navigation</h3>
+
+        <button class="nav-btn" onclick="loadPage('addUser.jsp')">
+            <i class="fa-solid fa-user-plus"></i> Add User
+        </button>
+
+        <button class="nav-btn" onclick="loadPage('viewUser')">
+            <i class="fa-solid fa-users"></i> View Users
+        </button>
+
+        <button class="nav-btn" onclick="loadPage('editUser.jsp')">
+            <i class="fa-solid fa-user-pen"></i> Edit User
+        </button>
+
+        <button class="nav-btn" onclick="loadPage('toggleUserStatus.jsp')">
+            <i class="fa-solid fa-user-lock"></i> Enable / Disable
+        </button>
+
+        <button class="nav-btn danger" onclick="loadPage('deleteUser.jsp')">
+            <i class="fa-solid fa-user-xmark"></i> Delete User
+        </button>
+
     </div>
 
-    <!-- Right Panel -->
+
+    <!-- ===== Content Area ===== -->
     <div class="right-panel">
 
-        <!-- Action Buttons -->
-        <div class="actions-bar">
-            <button class="action-btn" onclick="location.href='addUser.jsp'">
-            	Add User
-            </button>
-            <button class="action-btn" onclick="location.href='viewUser.jsp'">
-            	View Users
-            </button>
-            <button class="action-btn danger" onclick="location.href='editUser.jsp'">
-            	Edit User
-            </button>
-            <button class="action-btn toggle" onclick="location.href='toggleUserStatus.jsp'">
-            	Enable / Disable
-            </button>
-            <button class="action-btn danger" onclick="location.href='deleteUser.jsp'">
-            	Delete User
-            </button>
-        </div>
-
-        
+        <iframe id="contentFrame"></iframe>
 
     </div>
+
 </div>
+
+
+<!-- ===== JavaScript Page Loader ===== -->
+<script>
+	function loadPage(page) {
+    	document.getElementById("contentFrame").src = page;
+	}
+
+</script>
 
 </body>
 </html>

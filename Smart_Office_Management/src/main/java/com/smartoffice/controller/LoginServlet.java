@@ -17,7 +17,8 @@ import com.smartoffice.utils.DBConnectionUtil;
 @SuppressWarnings("serial")
 public class LoginServlet extends HttpServlet {
 
-    @Override
+    @SuppressWarnings("unused")
+	@Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
@@ -26,7 +27,7 @@ public class LoginServlet extends HttpServlet {
 
         try (Connection con = DBConnectionUtil.getConnection()) {
 
-            String sql = "SELECT role FROM users WHERE username = ? AND password = ?";
+            String sql = "SELECT role, status FROM users WHERE username = ? AND password = ?";
             PreparedStatement ps = con.prepareStatement(sql);
 
             ps.setString(1, username);
@@ -39,30 +40,36 @@ public class LoginServlet extends HttpServlet {
             if (rs.next()) {
 
                 String role = rs.getString("role");
+                String status = rs.getString("status");
 
                 // create session
                 HttpSession session = req.getSession();
                 session.setAttribute("username", username);
                 session.setAttribute("role", role);
 
-                // role based redirect
-                switch (role.toLowerCase()) {
+				if (status.equals("active")) {
+					// role based redirect
+	                switch (role.toLowerCase()) {
 
-                case "user":
-                    res.sendRedirect("user.jsp");
-                    break;
+	                case "user":
+	                    res.sendRedirect("user.jsp");
+	                    break;
 
-                case "manager":
-                    res.sendRedirect("manager.jsp");
-                    break;
+	                case "manager":
+	                    res.sendRedirect("manager.jsp");
+	                    break;
 
-                case "admin":
-                    res.sendRedirect("admin.jsp");
-                    break;
+	                case "admin":
+	                    res.sendRedirect("admin.jsp");
+	                    break;
 
-                default:
-                    res.sendRedirect("index.html?error=invalidRole");
-            }
+	                default:
+	                    res.sendRedirect("index.html?error=invalidRole");
+	            }
+				} else {
+					res.sendRedirect("index.html?error=inactive");
+                	
+                }
 
 
             } else {

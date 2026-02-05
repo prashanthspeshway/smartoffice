@@ -14,21 +14,23 @@ import com.smartoffice.utils.DBConnectionUtil;
 
 @SuppressWarnings("serial")
 @WebServlet("/enableanddisable")
-public class EnableAndDisable extends HttpServlet {
+public class EnableAndDisableUser extends HttpServlet {
 
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
         String username = req.getParameter("username");
         String status = req.getParameter("status"); // active / inactive
+
         boolean updated = false;
 
-        try (
+        try {
             Connection con = DBConnectionUtil.getConnection();
-            PreparedStatement ps = con.prepareStatement(
-                "UPDATE users SET status = ? WHERE username = ?"
-            )
-        ) {
+
+            String sql = "UPDATE users SET status = ? WHERE username = ?";
+
+            PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, status);
             ps.setString(2, username);
 
@@ -39,11 +41,17 @@ public class EnableAndDisable extends HttpServlet {
             e.printStackTrace();
         }
 
+        // ✅ Redirect with message for toast popup
         if (updated) {
-            res.sendRedirect("admin.jsp?msg=User_" + status);
-            System.out.println("User " + username + " set to " + status);
+            res.sendRedirect(
+                req.getContextPath() +
+                "/toggleUserStatus.jsp?msg=User_" + status
+            );
         } else {
-            res.sendRedirect("editUser.jsp?error=UpdateFailed");
+            res.sendRedirect(
+                req.getContextPath() +
+                "/toggleUserStatus.jsp?error=UpdateFailed"
+            );
         }
     }
 }
