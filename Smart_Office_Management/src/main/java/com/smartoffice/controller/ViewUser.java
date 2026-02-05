@@ -17,6 +17,7 @@ import com.smartoffice.utils.DBConnectionUtil;
 @WebServlet("/viewUser")
 public class ViewUser extends HttpServlet {
 
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
@@ -27,19 +28,50 @@ public class ViewUser extends HttpServlet {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
+
+                int userId = rs.getInt("id");
+                String status = rs.getString("status");
+
                 rows.append("<tr>")
-                    .append("<td>").append(rs.getInt("id")).append("</td>")
+
                     .append("<td>").append(rs.getString("username")).append("</td>")
                     .append("<td>").append(rs.getString("role")).append("</td>")
-                    .append("<td>").append(rs.getString("status")).append("</td>")
-                    .append("</tr>");
-            }
 
-            req.setAttribute("rows", rows.toString());
-            req.getRequestDispatcher("viewUser.jsp").forward(req, res);
+                    // Status badge
+                    .append("<td>")
+                        .append("<span class='badge ")
+                        .append(status.equalsIgnoreCase("active") ? "active" : "inactive")
+                        .append("'>")
+                        .append(status)
+                        .append("</span>")
+                    .append("</td>")
+
+                    .append("<td>").append(rs.getString("fullname")).append("</td>")
+                    .append("<td>").append(rs.getString("email")).append("</td>")
+                    .append("<td>").append(rs.getDate("joinedDate")).append("</td>")
+
+                    // ICON ACTIONS
+                    .append("<td class='actions'>")
+
+                    	.append("<a href='editUser?id=").append(userId)
+                        .append("' class='icon-btn edit' title='Edit User'>")
+                        .append("<i class='fa-solid fa-pen'></i></a>")
+
+                        .append("<a href='deleteUser?id=").append(userId)
+                        .append("' class='icon-btn delete' title='Delete User' ")
+                        .append("onclick=\"return confirm('Are you sure you want to delete this user?');\">")
+                        .append("<i class='fa-solid fa-trash'></i></a>")
+
+                    .append("</td>")
+
+                .append("</tr>");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        req.setAttribute("rows", rows.toString());
+        req.getRequestDispatcher("viewUser.jsp").forward(req, res);
     }
 }

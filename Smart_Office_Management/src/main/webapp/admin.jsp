@@ -7,12 +7,12 @@
 <meta charset="UTF-8">
 <title>Admin Dashboard</title>
 
-<!-- ✅ Font Awesome Icons -->
+<!-- Font Awesome -->
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-
+/* ===== Base ===== */
 body {
     margin: 0;
     font-family: "Segoe UI", Arial, sans-serif;
@@ -35,6 +35,28 @@ body {
     gap: 15px;
 }
 
+/* Settings Button */
+.settings-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #374151;
+    border: none;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.settings-btn:hover {
+    background: #4b5563;
+    transform: rotate(20deg);
+}
+
+/* Logout Button */
 .logout-btn {
     background: #ef4444;
     border: none;
@@ -53,7 +75,7 @@ body {
 /* ===== Layout ===== */
 .container {
     display: flex;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 64px);
 }
 
 /* ===== Sidebar ===== */
@@ -95,12 +117,13 @@ body {
     transform: translateX(4px);
 }
 
-.danger {
-    background: #ef4444;
+/* Export Button */
+.export-btn {
+    background: #10b981;
 }
 
-.danger:hover {
-    background: #dc2626;
+.export-btn:hover {
+    background: #059669;
 }
 
 /* ===== Content Panel ===== */
@@ -109,7 +132,7 @@ body {
     padding: 25px;
 }
 
-/* iframe Content Loader */
+/* iframe Loader */
 #contentFrame {
     width: 100%;
     height: 100%;
@@ -118,7 +141,6 @@ body {
     background: white;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
-
 </style>
 </head>
 
@@ -126,28 +148,32 @@ body {
 
 <!-- ===== Top Bar ===== -->
 <div class="top-bar">
-
     <h2>Smart Office • Admin Dashboard</h2>
 
     <div class="user-area">
-        Welcome, <strong>${sessionScope.username}</strong>
+        <span>
+            Welcome, <strong>${sessionScope.username}</strong>
+        </span>
 
+        <!-- Settings -->
+        <button class="settings-btn" onclick="loadPage('adminSettings.jsp')" title="Settings">
+            <i class="fa-solid fa-gear"></i>
+        </button>
+
+        <!-- Logout -->
         <a href="<%= request.getContextPath() %>/logout">
             <button class="logout-btn">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </button>
         </a>
     </div>
-
 </div>
-
 
 <!-- ===== Main Layout ===== -->
 <div class="container">
 
-    <!-- ===== Sidebar ===== -->
+    <!-- Sidebar -->
     <div class="left-panel">
-
         <h3>Navigation</h3>
 
         <button class="nav-btn" onclick="loadPage('addUser.jsp')">
@@ -158,37 +184,27 @@ body {
             <i class="fa-solid fa-users"></i> View Users
         </button>
 
-        <button class="nav-btn" onclick="loadPage('editUser.jsp')">
-            <i class="fa-solid fa-user-pen"></i> Edit User
+        <button class="nav-btn export-btn" onclick="loadPage('exportUsers')">
+            <i class="fa-solid fa-file-export"></i> Export Users
         </button>
 
         <button class="nav-btn" onclick="loadPage('toggleUserStatus.jsp')">
             <i class="fa-solid fa-user-lock"></i> Enable / Disable
         </button>
-
-        <button class="nav-btn danger" onclick="loadPage('deleteUser.jsp')">
-            <i class="fa-solid fa-user-xmark"></i> Delete User
-        </button>
-
     </div>
 
-
-    <!-- ===== Content Area ===== -->
+    <!-- Content -->
     <div class="right-panel">
-
         <iframe id="contentFrame"></iframe>
-
     </div>
 
 </div>
 
-
-<!-- ===== JavaScript Page Loader ===== -->
+<!-- ===== JS ===== -->
 <script>
-	function loadPage(page) {
-    	document.getElementById("contentFrame").src = page;
-	}
-
+function loadPage(page) {
+    document.getElementById("contentFrame").src = page;
+}
 </script>
 
 </body>

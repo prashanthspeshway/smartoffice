@@ -1,105 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
-        }
+<!-- Font Awesome -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f4f6f9;
-        }
+<style>
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
 
-        .login-box {
-            width: 350px;
-            padding: 30px;
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f6f9;
+}
 
-        .login-box h1 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #333;
-        }
+/* ===== Login Box ===== */
+.login-box {
+    width: 350px;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
 
-        .login-box label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: #555;
-        }
+.login-box h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+}
 
-        .login-box input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 18px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-        }
+.login-box label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #555;
+}
 
-        .login-box input:focus {
-            outline: none;
-            border-color: #4f46e5;
-        }
+.login-box input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
 
-        .login-box button {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            background: #4f46e5;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
+.login-box input:focus {
+    outline: none;
+    border-color: #4f46e5;
+}
 
-        .login-box button:hover {
-            background: #4338ca;
-        }
-    </style>
+/* ===== Password Wrapper ===== */
+.password-wrapper {
+    position: relative;
+    margin-bottom: 18px;
+}
+
+.password-wrapper input {
+    padding-right: 40px;
+}
+
+.password-wrapper i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6b7280;
+}
+
+/* ===== Button ===== */
+.login-box button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #4f46e5;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.login-box button:hover {
+    background: #4338ca;
+}
+
+/* ===== TOASTER ===== */
+#toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 260px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 999;
+}
+</style>
 </head>
 
 <body>
-    <div class="login-box">
-        <h1>Login</h1>
 
-        <form action="Login" method="post">
-            <label>Username</label>
-            <input type="text" name="username" required>
+<div class="login-box">
+    <h1>Login</h1>
 
-            <label>Password</label>
-            <input type="password" name="password" required>
+    <form action="Login" method="post">
+        <label>Username</label>
+        <input type="text" name="username" required>
 
-            <button type="submit">Login</button>
-        </form>
-    </div>
-    
-    <script>
-    	const params = new URLSearchParams(window.location.search);
-    	const error = params.get("error");
+        <label>Password</label>
+        <div class="password-wrapper">
+            <input type="password" name="password" id="password" required>
+            <i class="fa-solid fa-eye" id="eyeIcon" title="Hold to view password"></i>
+        </div>
 
-    	if (error === "invalid") {
-      	  alert("Invalid username or password!");
-    	} else if (error === "server") {
-    	    alert("Server error. Please try again later.");
-   	 	} else if (error === "invalidRole") {
-    	    alert("Invalid user role. Contact admin.");
-    	}
-	</script>
-    
-    
+        <button type="submit">Login</button>
+    </form>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+/* ===== Password View (Hold) ===== */
+const eyeIcon = document.getElementById("eyeIcon");
+const password = document.getElementById("password");
+
+eyeIcon.addEventListener("mousedown", () => password.type = "text");
+eyeIcon.addEventListener("mouseup", () => password.type = "password");
+eyeIcon.addEventListener("mouseleave", () => password.type = "password");
+
+eyeIcon.addEventListener("touchstart", () => password.type = "text");
+eyeIcon.addEventListener("touchend", () => password.type = "password");
+
+/* ===== TOASTER FUNCTION ===== */
+function showToast(message, type) {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+
+    toast.style.background =
+        type === "error" ? "#dc2626" : "#16a34a";
+
+    toast.style.display = "block";
+
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 3000);
+}
+
+/* ===== Read URL Error ===== */
+const params = new URLSearchParams(window.location.search);
+const error = params.get("error");
+
+if (error === "invalid") {
+    showToast("Invalid username or password", "error");
+}
+else if (error === "inactive") {
+    showToast("Your account is inactive. Contact admin.", "error");
+}
+else if (error === "invalidRole") {
+    showToast("Invalid role assigned. Contact admin.", "error");
+}
+else if (error === "server") {
+    showToast("Server error. Please try again later.", "error");
+}
+</script>
+
 </body>
 </html>

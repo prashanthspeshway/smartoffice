@@ -48,6 +48,7 @@ public class UserCheck extends HttpServlet {
             res.sendRedirect("editUserDetails.jsp?username=" + username);
         } else {
             res.sendRedirect("editUserDetails.jsp?error=UserNotFound");
+            System.out.println("User not found: " + username);
         }
     }
 }
