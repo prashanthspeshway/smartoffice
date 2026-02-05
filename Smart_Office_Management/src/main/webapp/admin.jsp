@@ -156,7 +156,6 @@
 
 <div class="container">
 
-    <!-- Left Panel -->
     <div class="left-panel">
         <h3>Admin Details</h3>
         <div class="info"><strong>Username:</strong> <%= session.getAttribute("username") %></div>
