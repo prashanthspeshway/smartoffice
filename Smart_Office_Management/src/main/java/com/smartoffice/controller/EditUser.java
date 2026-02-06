@@ -34,6 +34,7 @@ public class EditUser extends HttpServlet {
                 req.setAttribute("fullname", rs.getString("fullname"));
                 req.setAttribute("email", rs.getString("email"));
                 req.setAttribute("joinedDate", rs.getDate("joinedDate"));
+                req.setAttribute("manager", rs.getString("manager"));
             }
  
         } catch (Exception e) {
