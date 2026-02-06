@@ -12,7 +12,10 @@
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-/* ===== Base ===== */
+/* ===== Base ===== */<div class="form-group">
+				<label>Manager</label> <input type="text" name="manager"
+					value="${manager}" required>
+			</div>
 body {
     margin: 0;
     font-family: "Segoe UI", Arial, sans-serif;

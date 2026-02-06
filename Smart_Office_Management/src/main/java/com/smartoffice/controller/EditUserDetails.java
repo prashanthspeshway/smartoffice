@@ -21,6 +21,7 @@ public class EditUserDetails extends HttpServlet {
         String status = req.getParameter("status");
         String fullname = req.getParameter("fullname");
         String email = req.getParameter("email");
+        String manager = req.getParameter("manager");
         String joinedDateStr = req.getParameter("joinedDate");
 
         Date joinedDate = null;
@@ -30,14 +31,15 @@ public class EditUserDetails extends HttpServlet {
 
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE users SET role=?, status=?, fullname=?, email=?, joinedDate=? WHERE id=?")) {
+                 "UPDATE users SET role=?, status=?, fullname=?, email=?, joinedDate=?, manager=? WHERE id=?")) {
 
             ps.setString(1, role);
             ps.setString(2, status);
             ps.setString(3, fullname);
             ps.setString(4, email);
             ps.setDate(5, joinedDate);
-            ps.setInt(6, id);
+            ps.setString(6, manager);
+            ps.setInt(7, id);
 
             ps.executeUpdate();
 
