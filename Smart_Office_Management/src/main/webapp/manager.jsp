@@ -1,5 +1,17 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<!-- <%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%> -->
+
+<%
+java.sql.Timestamp punchIn = (java.sql.Timestamp) request.getAttribute("punchIn");
+java.sql.Timestamp punchOut = (java.sql.Timestamp) request.getAttribute("punchOut");
+
+String status = "Not Punched In";
+if (punchIn != null && punchOut == null)
+	status = "Punched In";
+if (punchOut != null)
+	status = "Punched Out";
+%>
+
 
 <!DOCTYPE html>
 <html>
@@ -8,292 +20,313 @@
 <title>Manager Dashboard</title>
 
 <link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+/* ===== Global ===== */
+* {
+	box-sizing: border-box;
+}
+
 body {
-    margin: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #f4f6f8;
+	margin: 0;
+	font-family: "Segoe UI", Arial, sans-serif;
+	background: #f1f5f9;
+	transition: background 0.3s;
+}
+
+body.dark {
+	background: #0f172a;
+	color: #e5e7eb;
 }
 
 /* ===== Top Bar ===== */
 .top-bar {
-    display: flex;
-    align-items: center;
-    padding: 15px 30px;
-    background: #1f2933;
-    color: white;
+	height: 75px;
+	background: linear-gradient(135deg, #17223d, #2a3c66, #29448a);
+	color: #fff;
+	display: flex;
+	align-items: center;
+	padding: 0 30px;
 }
 
 .user-area {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-left: auto;
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: 15px;
 }
 
 .icon-btn {
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
+	background: transparent;
+	border: none;
+	color: #fff;
+	font-size: 18px;
+	cursor: pointer;
 }
 
 .logout-btn {
-    background: #ef4444;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    color: white;
-    cursor: pointer;
+	background: #ef4444;
+	border: none;
+	padding: 8px 18px;
+	border-radius: 20px;
+	color: #fff;
+	cursor: pointer;
 }
 
 /* ===== Layout ===== */
 .container {
-    display: flex;
-    height: calc(100vh - 60px);
+	display: flex;
+	height: calc(100vh - 75px);
 }
 
 /* ===== Sidebar ===== */
 .left-panel {
-    width: 240px;
-    background: white;
-    padding: 25px;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+	width: 260px;
+	background: #ffffff;
+	padding: 25px 20px;
+	box-shadow: 3px 0 12px rgba(0, 0, 0, 0.08);
+}
+
+body.dark .left-panel {
+	background: #020617;
 }
 
 .nav-btn {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 12px;
-    border: none;
-    border-radius: 6px;
-    background: #3b82f6;
-    color: white;
-    cursor: pointer;
-    font-size: 15px;
+	width: 100%;
+	padding: 14px;
+	margin-bottom: 14px;
+	border: none;
+	border-radius: 10px;
+	background: #1c42a5;
+	color: #eee;
+	cursor: pointer;
+	font-size: 15px;
+}
+
+.nav-btn:hover {
+	background: #2563eb;
 }
 
 /* ===== Content ===== */
 .right-panel {
-    flex: 1;
-    padding: 25px;
+	flex: 1;
+	padding: 30px;
+	overflow-y: auto;
 }
 
-/* Box */
+/* ===== Cards ===== */
 .box {
-    max-width: 600px;
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+	background: #ffffff;
+	padding: 25px 30px;
+	border-radius: 16px;
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+	margin-bottom: 30px;
 }
 
-/* ===== Task View ===== */
-.task {
-    background: #f9fafb;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+body.dark .box {
+	background: #020617;
 }
 
-.status {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 13px;
-    color: white;
+/* ===== Forms ===== */
+.form-control {
+	width: 100%;
+	padding: 12px;
+	border-radius: 10px;
+	border: 1px solid #d1d5db;
+	margin-bottom: 15px;
 }
 
-.completed {
-    background: #16a34a;
+/* ===== Buttons ===== */
+.primary-btn {
+	background: #22c55e;
+	color: #fff;
+	padding: 10px 22px;
+	border: none;
+	border-radius: 22px;
+	cursor: pointer;
 }
 
-.incomplete {
-    background: #dc2626;
+.secondary-btn {
+	background: #3b82f6;
+	color: #fff;
+	padding: 8px 18px;
+	border: none;
+	border-radius: 18px;
+	cursor: pointer;
 }
 
-/* ===== Settings Popup ===== */
-.popup {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
+.reject-btn {
+	background: #ef4444;
+	color: #fff;
+	padding: 8px 18px;
+	border: none;
+	border-radius: 18px;
 }
 
-.popup-content {
-    background: white;
-    width: 400px;
-    padding: 20px;
-    border-radius: 10px;
-    margin: 12% auto;
+/* ===== Tables ===== */
+table {
+	width: 100%;
+	border-collapse: collapse;
 }
 
-.popup-content input {
-    width: 90%;
-    padding: 10px;
-    margin-bottom: 10px;
+th, td {
+	padding: 12px;
+	text-align: center;
+}
+
+th {
+	background: #2563eb;
+	color: #fff;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== Top Bar ===== -->
-<div class="top-bar">
-    <h2>Smart Office • Manager Dashboard</h2>
+	<!-- ===== Top Bar ===== -->
+	<div class="top-bar">
+		<h2>Smart Office • Manager Dashboard</h2>
+		<div class="user-area">
+			<span>Welcome, <b>${sessionScope.username}</b></span>
+			<button class="icon-btn" onclick="showSection('settings')">
+				<i class="fa-solid fa-gear"></i>
+			</button>
+			<a href="<%=request.getContextPath()%>/logout">
+				<button class="logout-btn">Logout</button>
+			</a>
+		</div>
+	</div>
 
-    <div class="user-area">
-        <span>Welcome, <b>${sessionScope.username}</b></span>
+	<div class="container">
 
-        <button class="icon-btn" onclick="openSettings()">
-            <i class="fa-solid fa-gear"></i>
-        </button>
+		<!-- ===== Sidebar ===== -->
+		<div class="left-panel">
+			<button class="nav-btn" onclick="showSection('selfAttendance')">
+				<i class="fa-solid fa-user-clock"></i> My Attendance
+			</button>
+			<button class="nav-btn" onclick="showSection('team')">
+				<i class="fa-solid fa-users"></i> Team Profile
+			</button>
+			<button class="nav-btn" onclick="showSection('assign')">
+				<i class="fa-solid fa-list-check"></i> Assign Tasks
+			</button>
+			<button class="nav-btn" onclick="showSection('attendance')">
+				<i class="fa-solid fa-calendar-check"></i> Team Attendance
+			</button>
+			<button class="nav-btn" onclick="showSection('leave')">
+				<i class="fa-solid fa-plane-departure"></i> Leave Requests
+			</button>
 
-        <a href="<%=request.getContextPath()%>/logout">
-            <button class="logout-btn">Logout</button>
-        </a>
-    </div>
-</div>
+		</div>
 
-<!-- ===== Layout ===== -->
-<div class="container">
+		<!-- ===== Content ===== -->
+		<div class="right-panel">
 
-    <!-- Sidebar -->
-    <div class="left-panel">
-        <button class="nav-btn" onclick="showSection('profile')">View Profile</button>
-        <button class="nav-btn" onclick="showSection('assign')">Assign Tasks</button>
-        <button class="nav-btn" onclick="showSection('viewTasks')">View Tasks</button>
-        <button class="nav-btn" onclick="showSection('attendance')">Attendance Report</button>
-        <button class="nav-btn" onclick="showSection('leave')">Leave Requests</button>
-    </div>
+			<!-- ===== My Attendance ===== -->
+			<div class="box" id="selfAttendance" style="display: none;">
+				<h3>My Attendance</h3>
 
-    <!-- Content -->
-    <div class="right-panel">
+				<p>
+					<b>Status:</b>
+					<%=status%></p>
 
-        <!-- Profile -->
-        <div class="box" id="profile">
-            <h3>Manager Profile</h3>
-            <p>Name: ${sessionScope.username}</p>
-            <p>Role: Manager</p>
-            <p>Email: manager@company.com</p>
-        </div>
+				<p>
+					<b>Punch In:</b>
+					<%=punchIn != null ? punchIn : "--"%></p>
+				<p>
+					<b>Punch Out:</b>
+					<%=punchOut != null ? punchOut : "--"%></p>
 
-        <!-- Assign Tasks -->
-        <div class="box" id="assign" style="display:none;">
-            <h3>Assign Tasks</h3>
-            <input type="text" placeholder="Employee Name"><br><br>
-            <input type="text" placeholder="Task Description"><br><br>
-            <button style="background:#16a34a;color:white;padding:8px 14px;border:none;border-radius:6px;">
-                Assign Task
-            </button>
-        </div>
+				<form action="attendance" method="post" style="display: inline;">
+					<input type="hidden" name="action" value="punchin">
+					<button class="primary-btn"
+						<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
+				</form>
 
-        <!-- View Tasks (ADDED BELOW ASSIGN TASK) -->
-        <div class="box" id="viewTasks" style="display:none;">
-            <h3>View Tasks</h3>
+				<form action="attendance" method="post" style="display: inline;">
+					<input type="hidden" name="action" value="punchout">
+					<button class="reject-btn"
+						<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
+						Punch Out</button>
+				</form>
+			</div>
 
-            <div class="task">
-                <div>
-                    <b>Employee:</b> Employee A<br>
-                    <b>Task:</b> Prepare monthly report
-                </div>
-                <span class="status completed">Completed</span>
-            </div>
 
-            <div class="task">
-                <div>
-                    <b>Employee:</b> Employee B<br>
-                    <b>Task:</b> Update client data
-                </div>
-                <span class="status incomplete">Incomplete</span>
-            </div>
+			<!-- ===== Team ===== -->
+			<div class="box" id="team" style="display: none;">
+				<h3>My Team</h3>
+				<p>Team members details here</p>
+			</div>
 
-        </div>
+			<!-- ===== Assign ===== -->
+			<div class="box" id="assign" style="display: none;">
+				<h3>Assign Task</h3>
+				<input class="form-control" placeholder="Employee Name">
+				<textarea class="form-control" rows="4"
+					placeholder="Task Description"></textarea>
+				<button class="primary-btn">Assign Task</button>
+			</div>
 
-        <!-- Attendance -->
-        <div class="box" id="attendance" style="display:none;">
-            <h3>Attendance Report</h3>
-            <p>✔ Employee A - Present</p>
-            <p>❌ Employee B - Absent</p>
-        </div>
+			<!-- ===== Attendance ===== -->
+			<div class="box" id="attendance" style="display: none;">
+				<h3>Team Attendance</h3>
+			</div>
 
-        <!-- Leave -->
-        <div class="box" id="leave" style="display:none;">
-            <h3>Leave Requests</h3>
-            <p>Employee A - Sick Leave</p>
-            <button style="background:#16a34a;color:white;">Approve</button>
-            <button style="background:#dc2626;color:white;">Reject</button>
-        </div>
+			<!-- ===== Leave ===== -->
+			<div class="box" id="leave" style="display: none;">
+				<h3>Leave Requests</h3>
+			</div>
 
-    </div>
-</div>
+			<!-- ===== SETTINGS ===== -->
+			<div class="box" id="settings" style="display: none;">
+				<h3>Settings</h3>
 
-<!-- ===== Settings Popup ===== -->
-<div class="popup" id="settingsPopup">
-    <div class="popup-content">
+				<h4>👤 Profile</h4>
+				<p>
+					<b>Name:</b> ${sessionScope.username}
+				</p>
+				<p>
+					<b>Role:</b> Manager
+				</p>
 
-        <div id="settingsMenu">
-            <h3>Settings</h3>
-            <button style="width:95%;background:#2563eb;color:white;padding:5px;border:none;"
-                    onclick="openChangePassword()">
-                Change Password
-            </button>
+				<hr>
 
-            <button onclick="closeSettings()"
-                    style="width:95%;margin-top:8px;background:#6b7280;color:white;padding:5px;border:none;">
-                Close
-            </button>
-        </div>
+				<h4>🔒 Change Password</h4>
+				<input type="password" class="form-control"
+					placeholder="Current Password"> <input type="password"
+					class="form-control" placeholder="New Password"> <input
+					type="password" class="form-control" placeholder="Confirm Password">
+				<button class="secondary-btn">Update Password</button>
 
-        <div id="changePasswordForm" style="display:none;padding:6px;">
-            <h3>Change Password</h3>
-            <input type="password" placeholder="Old Password">
-            <input type="password" placeholder="New Password">
-            <input type="password" placeholder="Confirm Password">
+				<hr>
 
-            <button style="width:95%;background:#16a34a;color:white;padding:5px;">
-                Update Password
-            </button>
+				<h4>🎨 Theme</h4>
+				<button class="primary-btn" onclick="toggleTheme()">Toggle
+					Dark / Light</button>
+			</div>
 
-            <button onclick="backToSettings()"
-                    style="width:95%;margin-top:8px;background:#6b7280;color:white;padding:5px;">
-                Back
-            </button>
-        </div>
+		</div>
+	</div>
 
-    </div>
-</div>
-
-<script>
+	<script>
 function showSection(id) {
     document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
     document.getElementById(id).style.display = 'block';
 }
-
-function openSettings() {
-    document.getElementById("settingsPopup").style.display = "block";
-    document.getElementById("settingsMenu").style.display = "block";
-    document.getElementById("changePasswordForm").style.display = "none";
-}
-
-function closeSettings() {
-    document.getElementById("settingsPopup").style.display = "none";
-}
-
-function openChangePassword() {
-    document.getElementById("settingsMenu").style.display = "none";
-    document.getElementById("changePasswordForm").style.display = "block";
-}
-
-function backToSettings() {
-    document.getElementById("changePasswordForm").style.display = "none";
-    document.getElementById("settingsMenu").style.display = "block";
+ 
+// function punchIn() {
+//     document.getElementById("punchInTime").innerHTML =
+//         "<b>Punch In:</b> " + new Date().toLocaleTimeString();
+// }
+ 
+// function punchOut() {
+//     document.getElementById("punchOutTime").innerHTML =
+//         "<b>Punch Out:</b> " + new Date().toLocaleTimeString();
+// }
+ 
+function toggleTheme() {
+    document.body.classList.toggle("dark");
 }
 </script>
 

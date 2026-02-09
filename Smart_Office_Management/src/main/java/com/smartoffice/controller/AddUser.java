@@ -1,5 +1,5 @@
 package com.smartoffice.controller;
- 
+
 import java.io.IOException;
 
 import java.sql.Connection;
@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.Date;
 
 import java.sql.PreparedStatement;
- 
+
 import javax.servlet.ServletException;
 
 import javax.servlet.annotation.WebServlet;
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
 import javax.servlet.http.HttpServletResponse;
- 
+
 import com.smartoffice.utils.DBConnectionUtil;
 
 @SuppressWarnings("serial")
@@ -25,65 +25,61 @@ import com.smartoffice.utils.DBConnectionUtil;
 @WebServlet("/addUser")
 
 public class AddUser extends HttpServlet {
- 
-    @Override
 
-    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+	@Override
 
-            throws ServletException, IOException {
- 
-        try {
+	protected void doPost(HttpServletRequest req, HttpServletResponse res)
 
-            Connection con = DBConnectionUtil.getConnection();
- 
-            String manager1 = req.getParameter("manager");
+			throws ServletException, IOException {
 
-            String sql = "INSERT INTO users "
+		try {
 
-            		
-                       + "(username, password, role, status, email, fullname, joinedDate, manager) "
+			Connection con = DBConnectionUtil.getConnection();
 
-                       + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
- 
-            PreparedStatement ps = con.prepareStatement(sql);
- 
-            ps.setString(1, req.getParameter("username"));
+			String manager1 = req.getParameter("manager");
 
-            ps.setString(2, req.getParameter("password"));
+			String sql = "INSERT INTO users "
 
-            ps.setString(3, req.getParameter("role"));
+					+ "(username, password, role, status, email, fullname, joinedDate, manager) "
 
-            ps.setString(4, req.getParameter("status"));
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-            ps.setString(5, req.getParameter("email"));
+			PreparedStatement ps = con.prepareStatement(sql);
 
-            ps.setString(6, req.getParameter("fullname"));
+			ps.setString(1, req.getParameter("username"));
 
-            ps.setDate(7, Date.valueOf(req.getParameter("joinedDate")));
+			ps.setString(2, req.getParameter("password"));
 
-            ps.setString(8, manager1);
-            
- 
-            ps.executeUpdate();
- 
-            req.getSession().setAttribute("successMsg", "User added successfully!");
- 
-           // System.out.println(manager1);
+			ps.setString(3, req.getParameter("role"));
 
-            res.sendRedirect("addUser.jsp");
- 
-        } catch (Exception e) {
+			ps.setString(4, req.getParameter("status"));
 
-            e.printStackTrace();
+			ps.setString(5, req.getParameter("email"));
 
-            req.getSession().setAttribute("errorMsg", "Failed to add user!");
+			ps.setString(6, req.getParameter("fullname"));
 
-            res.sendRedirect("addUser.jsp");
+			ps.setDate(7, Date.valueOf(req.getParameter("joinedDate")));
 
-        }
+			ps.setString(8, manager1);
 
-    }
+			ps.executeUpdate();
+
+			req.getSession().setAttribute("successMsg", "User added successfully!");
+
+			// System.out.println(manager1);
+
+			res.sendRedirect("addUser.jsp");
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			req.getSession().setAttribute("errorMsg", "Failed to add user!");
+
+			res.sendRedirect("addUser.jsp");
+
+		}
+
+	}
 
 }
-
- 

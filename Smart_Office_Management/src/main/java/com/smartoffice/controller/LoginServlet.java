@@ -52,11 +52,11 @@ public class LoginServlet extends HttpServlet {
 	                switch (role.toLowerCase()) {
 
 	                case "user":
-	                    res.sendRedirect("user.jsp");
+	                    res.sendRedirect("user");
 	                    break;
 
 	                case "manager":
-	                    res.sendRedirect("manager.jsp");
+	                    res.sendRedirect("manager");
 	                    break;
 
 	                case "admin":
