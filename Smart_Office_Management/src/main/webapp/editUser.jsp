@@ -105,7 +105,7 @@ input:focus, select:focus {
 	<div class="card">
 		<h2>Edit User</h2>
 
-		<form action="editUserDetails" method="post">
+		<form action="editUser" method="post">
 
 			<!-- Hidden ID -->
 			<input type="hidden" name="id" value="${id}">
