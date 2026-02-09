@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Office Login</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* ===== Global ===== */
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #9333ea, #ec4899, #4f46e5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* ===== Floating Shapes ===== */
+.bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.7;
+}
+
+.shape1 {
+    width: 300px;
+    height: 300px;
+    background: #22d3ee;
+    top: -80px;
+    left: -80px;
+}
+
+.shape2 {
+    width: 250px;
+    height: 250px;
+    background: #facc15;
+    bottom: -60px;
+    right: -60px;
+}
+
+/* ===== Login Card ===== */
+.login-box {
+    width: 360px;
+    padding: 35px 30px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+    color: #fff;
+    z-index: 10;
+    animation: slideUp 0.8s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.login-box h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* ===== Input Group ===== */
+.input-group {
+    position: relative;
+    margin-bottom: 22px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 14px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #22d3ee;
+    box-shadow: 0 0 0 2px rgba(34,211,238,0.4);
+}
+
+.input-group label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #e5e7eb;
+    font-size: 14px;
+    pointer-events: none;
+    transition: 0.3s ease;
+    background: transparent;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+    top: -8px;
+    font-size: 12px;
+    color: #22d3ee;
+}
+
+/* ===== Password Eye ===== */
+.password-eye {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #e5e7eb;
+}
+
+/* ===== Button ===== */
+.login-box button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #22d3ee, #3b82f6);
+    color: #111827;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.login-box button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+}
+
+/* ===== Toast ===== */
+#toast {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    min-width: 260px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    display: none;
+    z-index: 100;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Background Effects -->
+<div class="bg-shape shape1"></div>
+<div class="bg-shape shape2"></div>
+
+<!-- Login Box -->
+<div class="login-box">
+    <h1>SMART OFFICE</h1>
+
+    <form action="Login" method="post">
+        <div class="input-group">
+            <input type="text" name="username" required placeholder=" ">
+            <label>Username</label>
+        </div>
+
+        <div class="input-group">
+            <input type="password" name="password" id="password" required placeholder=" ">
+            <label>Password</label>
+            <i class="fa-solid fa-eye password-eye" id="eyeIcon"></i>
+        </div>
+
+        <button type="submit">LOGIN</button>
+    </form>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+/* ===== Password Hold ===== */
+const eyeIcon = document.getElementById("eyeIcon");
+const password = document.getElementById("password");
+
+eyeIcon.addEventListener("mousedown", () => password.type = "text");
+eyeIcon.addEventListener("mouseup", () => password.type = "password");
+eyeIcon.addEventListener("mouseleave", () => password.type = "password");
+eyeIcon.addEventListener("touchstart", () => password.type = "text");
+eyeIcon.addEventListener("touchend", () => password.type = "password");
+
+/* ===== Toast ===== */
+function showToast(msg, type) {
+    const toast = document.getElementById("toast");
+    toast.innerText = msg;
+    toast.style.background = type === "error" ? "#dc2626" : "#16a34a";
+    toast.style.display = "block";
+
+    setTimeout(() => toast.style.display = "none", 3000);
+}
+
+/* ===== Read URL Params ===== */
+const params = new URLSearchParams(window.location.search);
+const error = params.get("error");
+
+if (error === "invalid") showToast("Invalid username or password", "error");
+else if (error === "inactive") showToast("Account inactive. Contact admin.", "error");
+else if (error === "invalidRole") showToast("Invalid role assigned.", "error");
+else if (error === "server") showToast("Server error. Try again later.", "error");
+</script>
+
+</body>
+</html>

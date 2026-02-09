@@ -180,7 +180,6 @@ body {
         <div class="box" id="profile">
             <h3>Manager Profile</h3>
             <p>Name: ${sessionScope.username}</p>
-            <p>Role: Manager</p>
             <p>Email: manager@company.com</p>
         </div>
 
