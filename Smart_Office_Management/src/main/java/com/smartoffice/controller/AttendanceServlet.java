@@ -15,38 +15,40 @@ import com.smartoffice.dao.AttendanceDAO;
 @WebServlet("/attendance")
 public class AttendanceServlet extends HttpServlet {
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-	        throws ServletException, IOException {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-	    HttpSession session = request.getSession(false);
-	    if (session == null || session.getAttribute("username") == null) {
-	        response.sendRedirect("login.jsp");
-	        return;
-	    }
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("username") == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
 
-	    String username = (String) session.getAttribute("username");
-	    String role = (String) session.getAttribute("role"); // 🔥 KEY
-	    String action = request.getParameter("action");
+        String username = (String) session.getAttribute("username");
+        String role = (String) session.getAttribute("role");
+        String action = request.getParameter("action");
 
-	    AttendanceDAO dao = new AttendanceDAO();
+        AttendanceDAO dao = new AttendanceDAO();
 
-	    try {
-	        if ("punchin".equals(action)) {
-	            dao.punchIn(username);
-	        } else if ("punchout".equals(action)) {
-	            dao.punchOut(username);
-	        }
+        try {
+            if ("punchin".equals(action)) {
+                dao.punchIn(username);
+            } else if ("punchout".equals(action)) {
+                dao.punchOut(username);
+            }
 
-	        // ✅ ROLE-BASED REDIRECT
-	        if ("manager".equalsIgnoreCase(role)) {
-	            response.sendRedirect("manager");
-	        } else {
-	            response.sendRedirect("user");
-	        }
+            // ✅ ALWAYS REDIRECT AFTER POST
+            if ("Admin".equalsIgnoreCase(role)) {
+                response.sendRedirect("AdminAttendance.jsp");
+            } else if ("Manager".equalsIgnoreCase(role)) {
+                response.sendRedirect("manager");
+            } else {
+                response.sendRedirect("user");
+            }
 
-	    } catch (Exception e) {
-	        throw new ServletException(e);
-	    }
-	}
-
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
+    }
 }

@@ -136,7 +136,6 @@ to {
 			<div class="form-group">
 				<label>Role</label> <select name="role" required>
 					<option value="">Select Role</option>
-					<option value="admin">Admin</option>
 					<option value="manager">Manager</option>
 					<option value="user">User</option>
 				</select>
@@ -155,6 +154,10 @@ to {
  
 			<div class="form-group">
 				<label>Full Name</label> <input type="text" name="fullname" required>
+			</div>
+			
+			<div class="form-group">
+				<label>Phone Number</label> <input type="number" name="phonenumber" required>
 			</div>
  
 			<div class="form-group">

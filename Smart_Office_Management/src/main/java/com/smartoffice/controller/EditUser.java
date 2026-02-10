@@ -35,6 +35,8 @@ public class EditUser extends HttpServlet {
                 req.setAttribute("role", rs.getString("role"));
                 req.setAttribute("status", rs.getString("status"));
                 req.setAttribute("fullname", rs.getString("fullname"));
+                req.setAttribute("password", rs.getString("password"));
+                req.setAttribute("phone", rs.getString("phone"));
                 req.setAttribute("email", rs.getString("email"));
                 req.setAttribute("joinedDate", rs.getDate("joinedDate"));
                 req.setAttribute("manager", rs.getString("manager"));
@@ -58,6 +60,8 @@ public class EditUser extends HttpServlet {
         String role = req.getParameter("role");
         String status = req.getParameter("status");
         String fullname = req.getParameter("fullname");
+        String phone = req.getParameter("number");
+        String password = req.getParameter("password");
         String email = req.getParameter("email");
         String manager = req.getParameter("manager");
         String joinedDateStr = req.getParameter("joinedDate");
@@ -69,7 +73,7 @@ public class EditUser extends HttpServlet {
 
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                     "UPDATE users SET role=?, status=?, fullname=?, email=?, joinedDate=?, manager=? WHERE id=?")) {
+                     "UPDATE users SET role=?, status=?, fullname=?, email=?, joinedDate=?, manager=?, password=?,phone=? WHERE id=?")) {
 
             ps.setString(1, role);
             ps.setString(2, status);
@@ -77,7 +81,9 @@ public class EditUser extends HttpServlet {
             ps.setString(4, email);
             ps.setDate(5, joinedDate);
             ps.setString(6, manager);
-            ps.setInt(7, id);
+            ps.setString(7, password);
+            ps.setString(8, phone);
+            ps.setInt(9, id);
 
             ps.executeUpdate();
 

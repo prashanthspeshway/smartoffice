@@ -335,7 +335,7 @@ button:disabled {
 <body>
 
 	<div class="top-bar">
-		<h2>Smart Office • User Dashboard</h2>
+		<h2>Smart Office • Employee Dashboard</h2>
 		<div class="user-area">
 			Welcome, <b><%=username%></b>
 			<button class="icon-btn" onclick="openSettings()">
@@ -392,7 +392,7 @@ button:disabled {
 			</div>
 
 			<!-- Tasks -->
-			<div class="box" id="taskSection" style="display: none;">
+			<div class="box" id="taskSection" style="display: none;">	
 				<h3>
 					<i class="fa-solid fa-list-check"></i> My Tasks
 				</h3>

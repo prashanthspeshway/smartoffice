@@ -11,34 +11,60 @@ import com.smartoffice.utils.DBConnectionUtil;
 
 public class UserDao {
 
-    public static List<User> getAllUsers() {
+	public static List<User> getAllUsers() {
 
-        List<User> users = new ArrayList<>();
+		List<User> users = new ArrayList<>();
 
-        String sql = "SELECT id, username, role, status, email FROM users";
+		String sql = "SELECT id, username, role, status, email FROM users";
 
-        try (
-            Connection con = DBConnectionUtil.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()
-        ) {
+		try (Connection con = DBConnectionUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql);
+				ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
+			while (rs.next()) {
+				User u = new User();
+				u.setId(rs.getInt("id"));
+				u.setUsername(rs.getString("username"));
+				u.setRole(rs.getString("role"));
+				u.setStatus(rs.getString("status"));
+				u.setEmail(rs.getString("email"));
+				users.add(u);
+			}
 
-                User u = new User();
-                u.setId(rs.getInt("id"));
-                u.setUsername(rs.getString("username"));
-                u.setRole(rs.getString("role"));
-                u.setStatus(rs.getString("status"));
-                u.setEmail(rs.getString("email"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-                users.add(u);
-            }
+		return users;
+	}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+	public static List<User> getUsersByManager(String managerUsername) {
 
-        return users;
-    }
+		List<User> users = new ArrayList<>();
+
+		String sql = "SELECT id, username, fullname, role, status, email, phone " + "FROM users WHERE manager = ?";
+
+		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setString(1, managerUsername);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				User u = new User();
+				u.setId(rs.getInt("id"));
+				u.setUsername(rs.getString("username"));
+				u.setFullname(rs.getString("fullname"));
+				u.setRole(rs.getString("role"));
+				u.setStatus(rs.getString("status"));
+				u.setEmail(rs.getString("email"));
+				u.setPhone(rs.getString("phone"));
+				users.add(u);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return users;
+	}
 }

@@ -40,9 +40,9 @@ public class AddUser extends HttpServlet {
 
 			String sql = "INSERT INTO users "
 
-					+ "(username, password, role, status, email, fullname, joinedDate, manager) "
+					+ "(username, password, role, status, email, fullname, joinedDate, manager, phone) "
 
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 			PreparedStatement ps = con.prepareStatement(sql);
 
@@ -61,6 +61,8 @@ public class AddUser extends HttpServlet {
 			ps.setDate(7, Date.valueOf(req.getParameter("joinedDate")));
 
 			ps.setString(8, manager1);
+			
+			ps.setString(9, req.getParameter("phonenumber"));
 
 			ps.executeUpdate();
 

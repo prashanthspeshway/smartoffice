@@ -1,5 +1,8 @@
-<!-- <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%> -->
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+
+<%@ page import="java.util.List"%>
+<%@ page import="com.smartoffice.model.User"%>
 
 <%
 java.sql.Timestamp punchIn = (java.sql.Timestamp) request.getAttribute("punchIn");
@@ -11,7 +14,6 @@ if (punchIn != null && punchOut == null)
 if (punchOut != null)
 	status = "Punched Out";
 %>
-
 
 <!DOCTYPE html>
 <html>
@@ -32,7 +34,6 @@ body {
 	margin: 0;
 	font-family: "Segoe UI", Arial, sans-serif;
 	background: #f1f5f9;
-	transition: background 0.3s;
 }
 
 body.dark {
@@ -58,7 +59,7 @@ body.dark {
 }
 
 .icon-btn {
-	background: transparent;
+	background: none;
 	border: none;
 	color: #fff;
 	font-size: 18px;
@@ -88,10 +89,6 @@ body.dark {
 	box-shadow: 3px 0 12px rgba(0, 0, 0, 0.08);
 }
 
-body.dark .left-panel {
-	background: #020617;
-}
-
 .nav-btn {
 	width: 100%;
 	padding: 14px;
@@ -113,28 +110,16 @@ body.dark .left-panel {
 	flex: 1;
 	padding: 30px;
 	overflow-y: auto;
+	background: #f1f5f9;
 }
 
-/* ===== Cards ===== */
+/* ===== Box ===== */
 .box {
 	background: #ffffff;
 	padding: 25px 30px;
 	border-radius: 16px;
 	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 	margin-bottom: 30px;
-}
-
-body.dark .box {
-	background: #020617;
-}
-
-/* ===== Forms ===== */
-.form-control {
-	width: 100%;
-	padding: 12px;
-	border-radius: 10px;
-	border: 1px solid #d1d5db;
-	margin-bottom: 15px;
 }
 
 /* ===== Buttons ===== */
@@ -145,6 +130,31 @@ body.dark .box {
 	border: none;
 	border-radius: 22px;
 	cursor: pointer;
+}
+
+.primary-btn, .reject-btn {
+	transition: all 0.2s ease;
+	font-weight: 500;
+}
+
+.primary-btn:hover:not(:disabled) {
+	background: #16a34a;
+	transform: translateY(-1px);
+	box-shadow: 0 6px 14px rgba(34, 197, 94, 0.35);
+}
+
+.reject-btn:hover:not(:disabled) {
+	background: #dc2626;
+	transform: translateY(-1px);
+	box-shadow: 0 6px 14px rgba(239, 68, 68, 0.35);
+}
+
+.primary-btn:disabled, .reject-btn:disabled {
+	background: #e5e7eb;
+	color: #9ca3af;
+	cursor: not-allowed;
+	box-shadow: none;
+	transform: none;
 }
 
 .secondary-btn {
@@ -162,22 +172,75 @@ body.dark .box {
 	padding: 8px 18px;
 	border: none;
 	border-radius: 18px;
+	cursor: pointer;
 }
 
-/* ===== Tables ===== */
-table {
+/* ===== Employee Grid ===== */
+.employee-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 16px;
+	margin-top: 15px;
+}
+
+/* ===== Employee Card ===== */
+.employee-card {
+	border-left: 4px solid #3b82f6;
+	padding: 14px 16px;
+	background: linear-gradient(135deg, #f8fafc, #eef2ff); border-left :
+	5px solid #2563eb; border-radius : 12px;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	border-left: 5px solid #2563eb;
+	border-radius: 12px;
+}
+
+.employee-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.emp-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 6px;
+	font-size: 14px;
+}
+
+.emp-header i {
+	color: #3b82f6;
+}
+
+.emp-name {
+	font-weight: 600;
+	flex: 1;
+}
+
+.emp-status {
+	font-size: 11px;
+	padding: 3px 10px;
+	border-radius: 12px;
+	background: #dcfce7;
+	color: #166534;
+}
+
+.emp-body {
+	font-size: 13px;
+	color: #475569;
+}
+
+.emp-body div {
+	margin-bottom: 4px;
+}
+
+/* ===== Form ===== */
+.form-control {
 	width: 100%;
-	border-collapse: collapse;
-}
-
-th, td {
 	padding: 12px;
-	text-align: center;
-}
-
-th {
-	background: #2563eb;
-	color: #fff;
+	border-radius: 10px;
+	border: 1px solid #d1d5db;
+	margin-bottom: 15px;
 }
 </style>
 </head>
@@ -202,22 +265,16 @@ th {
 
 		<!-- ===== Sidebar ===== -->
 		<div class="left-panel">
-			<button class="nav-btn" onclick="showSection('selfAttendance')">
-				<i class="fa-solid fa-user-clock"></i> My Attendance
-			</button>
-			<button class="nav-btn" onclick="showSection('team')">
-				<i class="fa-solid fa-users"></i> Team Profile
-			</button>
-			<button class="nav-btn" onclick="showSection('assign')">
-				<i class="fa-solid fa-list-check"></i> Assign Tasks
-			</button>
-			<button class="nav-btn" onclick="showSection('attendance')">
-				<i class="fa-solid fa-calendar-check"></i> Team Attendance
-			</button>
-			<button class="nav-btn" onclick="showSection('leave')">
-				<i class="fa-solid fa-plane-departure"></i> Leave Requests
-			</button>
-
+			<button class="nav-btn" onclick="showSection('selfAttendance')">My
+				Attendance</button>
+			<button class="nav-btn" onclick="showSection('teamSection')">My
+				Team</button>
+			<button class="nav-btn" onclick="showSection('assign')">Assign
+				Tasks</button>
+			<button class="nav-btn" onclick="showSection('attendance')">Team
+				Attendance</button>
+			<button class="nav-btn" onclick="showSection('leave')">Leave
+				Requests</button>
 		</div>
 
 		<!-- ===== Content ===== -->
@@ -226,11 +283,9 @@ th {
 			<!-- ===== My Attendance ===== -->
 			<div class="box" id="selfAttendance" style="display: none;">
 				<h3>My Attendance</h3>
-
 				<p>
 					<b>Status:</b>
 					<%=status%></p>
-
 				<p>
 					<b>Punch In:</b>
 					<%=punchIn != null ? punchIn : "--"%></p>
@@ -240,8 +295,8 @@ th {
 
 				<form action="attendance" method="post" style="display: inline;">
 					<input type="hidden" name="action" value="punchin">
-					<button class="primary-btn"
-						<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
+					<button class="primary-btn" <%=punchIn != null ? "disabled" : ""%>>Punch
+						In</button>
 				</form>
 
 				<form action="attendance" method="post" style="display: inline;">
@@ -252,11 +307,42 @@ th {
 				</form>
 			</div>
 
-
-			<!-- ===== Team ===== -->
-			<div class="box" id="team" style="display: none;">
+			<!-- ===== My Team ===== -->
+			<div class="box" id="teamSection" style="display: none;">
 				<h3>My Team</h3>
-				<p>Team members details here</p>
+
+				<div class="employee-grid">
+					<%
+					List<User> team = (List<User>) request.getAttribute("teamList");
+					if (team != null && !team.isEmpty()) {
+						for (User u : team) {
+					%>
+					<div class="employee-card">
+						<div class="emp-header">
+							<i class="fa-solid fa-user"></i> <span class="emp-name"><%=u.getFullname()%></span>
+							<span class="emp-status"><%=u.getStatus()%></span>
+						</div>
+						<div class="emp-body">
+							<div>
+								<b>Username:</b>
+								<%=u.getUsername()%></div>
+							<div>
+								<b>Email:</b>
+								<%=u.getEmail()%></div>
+							<div>
+								<b>Phone:</b>
+								<%=u.getPhone()%></div>
+						</div>
+					</div>
+					<%
+					}
+					} else {
+					%>
+					<p>No employees found</p>
+					<%
+					}
+					%>
+				</div>
 			</div>
 
 			<!-- ===== Assign ===== -->
@@ -278,32 +364,17 @@ th {
 				<h3>Leave Requests</h3>
 			</div>
 
-			<!-- ===== SETTINGS ===== -->
+			<!-- ===== Settings ===== -->
 			<div class="box" id="settings" style="display: none;">
 				<h3>Settings</h3>
-
-				<h4>👤 Profile</h4>
 				<p>
 					<b>Name:</b> ${sessionScope.username}
 				</p>
 				<p>
 					<b>Role:</b> Manager
 				</p>
-
-				<hr>
-
-				<h4>🔒 Change Password</h4>
-				<input type="password" class="form-control"
-					placeholder="Current Password"> <input type="password"
-					class="form-control" placeholder="New Password"> <input
-					type="password" class="form-control" placeholder="Confirm Password">
-				<button class="secondary-btn">Update Password</button>
-
-				<hr>
-
-				<h4>🎨 Theme</h4>
-				<button class="primary-btn" onclick="toggleTheme()">Toggle
-					Dark / Light</button>
+				<button class="secondary-btn" onclick="toggleTheme()">Toggle
+					Theme</button>
 			</div>
 
 		</div>
@@ -311,22 +382,11 @@ th {
 
 	<script>
 function showSection(id) {
-    document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
+	document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
+	document.getElementById(id).style.display = 'block';
 }
- 
-// function punchIn() {
-//     document.getElementById("punchInTime").innerHTML =
-//         "<b>Punch In:</b> " + new Date().toLocaleTimeString();
-// }
- 
-// function punchOut() {
-//     document.getElementById("punchOutTime").innerHTML =
-//         "<b>Punch Out:</b> " + new Date().toLocaleTimeString();
-// }
- 
 function toggleTheme() {
-    document.body.classList.toggle("dark");
+	document.body.classList.toggle("dark");
 }
 </script>
 

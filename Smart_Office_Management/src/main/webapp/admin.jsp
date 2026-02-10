@@ -182,8 +182,11 @@ required> </div>body {
 
 		<!-- Sidebar -->
 		<div class="left-panel">
-			<h3>Navigation</h3>
-
+		
+			<button class="nav-btn" onclick="loadPage('AdminAttendance.jsp')">
+			<i class="fa-solid fa-calendar-check"></i> Attendance
+			</button>
+		
 			<button class="nav-btn" onclick="loadPage('addUser.jsp')">
 				<i class="fa-solid fa-user-plus"></i> Add User
 			</button>
@@ -192,13 +195,14 @@ required> </div>body {
 				<i class="fa-solid fa-users"></i> View Users
 			</button>
 
+			<button class="nav-btn" onclick="loadPage('toggleUserStatus.jsp')">
+				<i class="fa-solid fa-user-lock"></i> Enable / Disable
+			</button>
+
 			<button class="nav-btn export-btn" onclick="loadPage('exportUsers')">
 				<i class="fa-solid fa-file-export"></i> Export Users
 			</button>
 
-			<button class="nav-btn" onclick="loadPage('toggleUserStatus.jsp')">
-				<i class="fa-solid fa-user-lock"></i> Enable / Disable
-			</button>
 		</div>
 
 		<!-- Content -->

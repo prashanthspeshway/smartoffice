@@ -140,6 +140,16 @@ input:focus, select:focus {
 			</div>
 
 			<div class="form-group">
+				<label>Password</label> <input type="text" name="password"
+					value="${password}" required>
+			</div>
+			
+			<div class="form-group">
+				<label>Phone Number</label> <input type="text" name="number"
+					value="${phone}" required>
+			</div>
+			
+			<div class="form-group">
 				<label>Email</label> <input type="email" name="email"
 					value="${email}" required>
 			</div>
