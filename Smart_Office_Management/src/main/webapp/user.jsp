@@ -404,7 +404,7 @@ button:disabled {
 				<%
 				List<Task> tasks = (List<Task>) request.getAttribute("tasks");
 
-				if (tasks == null || tasks.isEmpty()) {
+						if (tasks == null || tasks.isEmpty()) {
 				%>
 				<p>No tasks assigned.</p>
 				<%
@@ -461,8 +461,7 @@ button:disabled {
 					<i class="fa-solid fa-calendar-days"></i> Company Calendar
 				</h3>
 
-				<iframe id="calendarFrame" src=""
-					style="width: 100%; height: 600px; border: none;"></iframe>
+				<iframe id="calendarFrame" src="" style="width:100%; height:600px; border:none;"></iframe>
 
 			</div>
 			<!-- Leave -->
@@ -634,7 +633,10 @@ button:disabled {
 				showToast("Old password is incorrect", true);
 			} else if (error === "PasswordMismatch") {
 				showToast("Passwords do not match", true);
-			} else {
+			}
+			else if (error === "HolidayAttendance") {
+		        showToast("Today is a holiday. Attendance not allowed.", true);
+		    }else {
 				showToast("Something went wrong", true);
 			}
 		}
