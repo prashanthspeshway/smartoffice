@@ -14,12 +14,46 @@
 <style>
 /* ===== Base ===== */
 <
-div class ="form-group "> <label>Manager </label> <input type ="text " name
-	="manager "
-					value ="${manager
-	
-}
+div
+ 
+class
+ 
+="
+form-group
+ 
+">
+<
+label
+>
+Manager
+ 
+</
+label
+>
+<
+input
+ 
+type
+ 
+="
+text
+ 
+"
+name
 
+	
+="
+manager
+ 
+"
+value
+ 
+="${
+manager
+
+	
+
+}
 "
 required> </div>body {
 	margin: 0;
@@ -35,6 +69,10 @@ required> </div>body {
 	padding: 15px 30px;
 	background: #1f2933;
 	color: white;
+	width: 96.5%;
+    margin-top: -7px;
+    margin-left: -7.7px;
+ 
 }
 
 .user-area {
@@ -182,11 +220,11 @@ required> </div>body {
 
 		<!-- Sidebar -->
 		<div class="left-panel">
-		
+
 			<button class="nav-btn" onclick="loadPage('AdminAttendance.jsp')">
-			<i class="fa-solid fa-calendar-check"></i> Attendance
+				<i class="fa-solid fa-calendar-check"></i> Attendance
 			</button>
-		
+
 			<button class="nav-btn" onclick="loadPage('addUser.jsp')">
 				<i class="fa-solid fa-user-plus"></i> Add User
 			</button>

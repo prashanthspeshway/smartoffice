@@ -1,9 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8" isELIgnored="false"%>
 
 <%@ page import="java.util.List"%>
 <%@ page import="com.smartoffice.model.User"%>
+<%@ page import="com.smartoffice.model.Task"%>
+<%@ page import="com.smartoffice.dao.TaskDAO"%>
 
+<%
+String activeTab = (String) request.getAttribute("tab");
+%>
+<%
+List<Task> assignTasks = (List<Task>) request.getAttribute("assignTasks");
+List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");
+%>
 <%
 java.sql.Timestamp punchIn = (java.sql.Timestamp) request.getAttribute("punchIn");
 java.sql.Timestamp punchOut = (java.sql.Timestamp) request.getAttribute("punchOut");
@@ -123,18 +132,18 @@ body.dark {
 }
 
 /* ===== Buttons ===== */
+.primary-btn, .reject-btn {
+	padding: 10px 22px;
+	border-radius: 22px;
+	cursor: pointer;
+	font-weight: 500;
+	transition: all 0.2s ease;
+	border: none;
+}
+
 .primary-btn {
 	background: #22c55e;
 	color: #fff;
-	padding: 10px 22px;
-	border: none;
-	border-radius: 22px;
-	cursor: pointer;
-}
-
-.primary-btn, .reject-btn {
-	transition: all 0.2s ease;
-	font-weight: 500;
 }
 
 .primary-btn:hover:not(:disabled) {
@@ -143,8 +152,13 @@ body.dark {
 	box-shadow: 0 6px 14px rgba(34, 197, 94, 0.35);
 }
 
-.reject-btn:hover:not(:disabled) {
+.reject-btn {
 	background: #dc2626;
+	color: #fff;
+}
+
+.reject-btn:hover:not(:disabled) {
+	background: #b91c1c;
 	transform: translateY(-1px);
 	box-shadow: 0 6px 14px rgba(239, 68, 68, 0.35);
 }
@@ -166,15 +180,6 @@ body.dark {
 	cursor: pointer;
 }
 
-.reject-btn {
-	background: #ef4444;
-	color: #fff;
-	padding: 8px 18px;
-	border: none;
-	border-radius: 18px;
-	cursor: pointer;
-}
-
 /* ===== Employee Grid ===== */
 .employee-grid {
 	display: grid;
@@ -183,16 +188,14 @@ body.dark {
 	margin-top: 15px;
 }
 
-/* ===== Employee Card ===== */
 .employee-card {
-	border-left: 4px solid #3b82f6;
+	border-left: 5px solid #2563eb;
 	padding: 14px 16px;
-	background: linear-gradient(135deg, #f8fafc, #eef2ff); border-left :
-	5px solid #2563eb; border-radius : 12px;
+	background: linear-gradient(135deg, #f8fafc, #eef2ff);
+	border-radius: 12px;
 	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
-	border-left: 5px solid #2563eb;
-	border-radius: 12px;
+	background: linear-gradient(135deg, #f8fafc, #eef2ff);
 }
 
 .employee-card:hover {
@@ -234,7 +237,7 @@ body.dark {
 	margin-bottom: 4px;
 }
 
-/* ===== Form ===== */
+/* ===== Form Controls ===== */
 .form-control {
 	width: 100%;
 	padding: 12px;
@@ -242,9 +245,95 @@ body.dark {
 	border: 1px solid #d1d5db;
 	margin-bottom: 15px;
 }
+
+/* ===== Attendance Module Styles ===== */
+.attendance-buttons {
+	margin-top: 15px;
+	display: flex;
+	gap: 15px;
+}
+
+.attendance-buttons button {
+	min-width: 100px;
+}
+
+/* ===== Settings Module Styles ===== */
+#settings p {
+	margin-bottom: 12px;
+}
+
+/* ===== Tasks Title ===== */
+.tasks-title {
+	margin-top: 25px;
+	margin-bottom: 14px;
+	font-size: 18px;
+	font-weight: 600;
+	color: #1e293b;
+}
+
+/* ===== Assigned Tasks Grid ===== */
+.task-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 20px;
+}
+
+/* ===== Task Card ===== */
+.task-card {
+	background: #03368a;
+	border-radius: 14px;
+	padding: 18px;
+	border: 1px solid #e5e7eb;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover (soft & professional) */
+.task-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== Task Description ===== */
+.task-desc {
+	font-size: 14px;
+	font-weight: 500;
+	color: white;
+	margin-bottom: 14px;
+	line-height: 1.5;
+}
+
+/* ===== Status Badge ===== */
+.task-status {
+	display: inline-block;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 6px 14px;
+	border-radius: 999px;
+}
+
+/* ASSIGNED */
+.task-status.assigned {
+	background: #fde68a;
+	color: #92400e;
+}
+
+/* COMPLETED */
+.task-status.completed {
+	background: #bbf7d0;
+	color: #166534;
+}
+
+/* COMPLETED card subtle fade */
+.task-card.completed {
+	opacity: 0.75;
+}
+
+.task-card.completed {
+	opacity: 1;
+}
 </style>
 </head>
-
 <body>
 
 	<!-- ===== Top Bar ===== -->
@@ -269,7 +358,7 @@ body.dark {
 				Attendance</button>
 			<button class="nav-btn" onclick="showSection('teamSection')">My
 				Team</button>
-			<button class="nav-btn" onclick="showSection('assign')">Assign
+			<button class="nav-btn" onclick="showSection('assignTask')">Assign
 				Tasks</button>
 			<button class="nav-btn" onclick="showSection('attendance')">Team
 				Attendance</button>
@@ -277,8 +366,13 @@ body.dark {
 				Requests</button>
 		</div>
 
-		<!-- ===== Content ===== -->
+		<!-- ===== Right Panel ===== -->
 		<div class="right-panel">
+
+			<div class="box" id="blank" style="display: none;">
+				<h3>Welcome 👋</h3>
+				<p>Select an option from the left menu to continue.</p>
+			</div>
 
 			<!-- ===== My Attendance ===== -->
 			<div class="box" id="selfAttendance" style="display: none;">
@@ -293,24 +387,25 @@ body.dark {
 					<b>Punch Out:</b>
 					<%=punchOut != null ? punchOut : "--"%></p>
 
-				<form action="attendance" method="post" style="display: inline;">
-					<input type="hidden" name="action" value="punchin">
-					<button class="primary-btn" <%=punchIn != null ? "disabled" : ""%>>Punch
-						In</button>
-				</form>
+				<div class="attendance-buttons">
+					<form action="attendance" method="post" style="display: inline;">
+						<input type="hidden" name="action" value="punchin">
+						<button class="primary-btn" <%=punchIn != null ? "disabled" : ""%>>Punch
+							In</button>
+					</form>
 
-				<form action="attendance" method="post" style="display: inline;">
-					<input type="hidden" name="action" value="punchout">
-					<button class="reject-btn"
-						<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
-						Punch Out</button>
-				</form>
+					<form action="attendance" method="post" style="display: inline;">
+						<input type="hidden" name="action" value="punchout">
+						<button class="reject-btn"
+							<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>Punch
+							Out</button>
+					</form>
+				</div>
 			</div>
 
 			<!-- ===== My Team ===== -->
 			<div class="box" id="teamSection" style="display: none;">
 				<h3>My Team</h3>
-
 				<div class="employee-grid">
 					<%
 					List<User> team = (List<User>) request.getAttribute("teamList");
@@ -345,23 +440,123 @@ body.dark {
 				</div>
 			</div>
 
-			<!-- ===== Assign ===== -->
-			<div class="box" id="assign" style="display: none;">
+			<!-- ===== Assign Tasks ===== -->
+			<div class="box" id="assignTask" style="display: none;">
+
 				<h3>Assign Task</h3>
-				<input class="form-control" placeholder="Employee Name">
-				<textarea class="form-control" rows="4"
-					placeholder="Task Description"></textarea>
-				<button class="primary-btn">Assign Task</button>
+
+				<!-- Display error message if any -->
+				<%
+				String errorMessage = (String) request.getAttribute("errorMessage");
+				if (errorMessage != null) {
+				%>
+				<div style="color: red; font-weight: bold; margin-bottom: 15px;">
+					<%=errorMessage%>
+				</div>
+				<%
+				}
+				%>
+
+				<!-- Assign form with dropdown for employee -->
+				<form action="<%=request.getContextPath()%>/assignTask"
+					method="post">
+					<select name="employeeUsername">
+						<option value="">Select Employee</option>
+						<%
+						String assignEmployee = (String) request.getAttribute("assignEmployee");
+						for (User u : team) {
+						%>
+						<option value="<%=u.getUsername()%>"
+							<%=u.getUsername().equals(assignEmployee) ? "selected" : ""%>>
+							<%=u.getUsername()%>
+						</option>
+						<%
+						}
+						%>
+					</select>
+
+					<textarea class="form-control" name="taskDesc" rows="4"
+						placeholder="Task Description" required><%=request.getParameter("taskDesc") != null ? request.getParameter("taskDesc") : ""%></textarea>
+					<button class="primary-btn">Assign Task</button>
+				</form>
+
+
+				<hr style="margin: 25px 0;">
+
+
+				<!-- View tasks form -->
+				<form action="<%=request.getContextPath()%>/viewAssignedTasks"
+					method="post">
+					<select class="form-control" name="employeeUsername" required>
+						<option value="">Select Employee</option>
+						<%
+						String viewEmployee = (String) request.getAttribute("viewEmployee");
+						if (team != null) {
+							for (User u : team) {
+						%>
+						<option value="<%=u.getUsername()%>"
+							<%=u.getUsername().equals(viewEmployee) ? "selected" : ""%>>
+							<%=u.getFullname()%> (<%=u.getUsername()%>)
+						</option>
+						<%
+						}
+						}
+						%>
+					</select>
+					<button class="secondary-btn">View Assigned Tasks</button>
+				</form>
+
+				<!-- Task list -->
+				<%
+				// 				List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");
+				// 				String viewEmployee = (String) request.getAttribute("viewEmployee");
+				if (viewTasks != null) {
+				%>
+
+				<h4 class="tasks-title">
+					Tasks for
+					<%=viewEmployee%>
+				</h4>
+
+
+				<div id="taskList" class="task-list">
+
+					<%
+					if (viewTasks.isEmpty()) {
+					%>
+					<p>No tasks found.</p>
+					<%
+					} else {
+					for (Task t : viewTasks) {
+					%>
+					<div
+						class="task-card <%=t.getStatus().equals("COMPLETED") ? "completed" : ""%>">
+						<div class="task-desc"><%=t.getDescription()%></div>
+						<span
+							class="task-status <%=t.getStatus().equals("COMPLETED") ? "completed" : "assigned"%>">
+							<%=t.getStatus()%>
+						</span>
+					</div>
+
+					<%
+					}
+					}
+					}
+					%>
+				</div>
 			</div>
 
-			<!-- ===== Attendance ===== -->
+
+			<!-- ===== Team Attendance ===== -->
 			<div class="box" id="attendance" style="display: none;">
 				<h3>Team Attendance</h3>
+				<p>Coming soon…</p>
 			</div>
 
-			<!-- ===== Leave ===== -->
+			<!-- ===== Leave Requests ===== -->
 			<div class="box" id="leave" style="display: none;">
 				<h3>Leave Requests</h3>
+				<p>Coming soon…</p>
 			</div>
 
 			<!-- ===== Settings ===== -->
@@ -389,6 +584,22 @@ function toggleTheme() {
 	document.body.classList.toggle("dark");
 }
 </script>
+
+	<%
+	if (activeTab != null) {
+	%>
+	<script>
+showSection("<%=activeTab%>");
+</script>
+	<%
+	} else {
+	%>
+	<script>
+showSection("blank");
+</script>
+	<%
+	}
+	%>
 
 </body>
 </html>
