@@ -40,7 +40,7 @@ public class AttendanceServlet extends HttpServlet {
 
             // ✅ ALWAYS REDIRECT AFTER POST
             if ("Admin".equalsIgnoreCase(role)) {
-                response.sendRedirect("AdminAttendance.jsp");
+                response.sendRedirect("AdminAttendance");
             } else if ("Manager".equalsIgnoreCase(role)) {
                 response.sendRedirect("manager");
             } else {
@@ -48,7 +48,12 @@ public class AttendanceServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            throw new ServletException(e);
+        	 if (e.getMessage().contains("holiday")) {
+        	        response.sendRedirect("user?error=HolidayAttendance");
+        	    } else {
+        	        throw new ServletException(e);
+        	    }
+           
         }
     }
 }

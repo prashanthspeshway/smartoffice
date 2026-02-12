@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ page import="java.util.List"%>
+<%@ page import="com.smartoffice.model.Task"%>
 
 <%
 String username = (String) session.getAttribute("username");
@@ -26,7 +28,7 @@ if (punchOut != null)
 <html>
 <head>
 <meta charset="UTF-8">
-<title>User Dashboard</title>
+<title>Employee Dashboard</title>
 
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -353,6 +355,8 @@ button:disabled {
 			<button class="nav-btn" onclick="showAttendance()">Attendance</button>
 			<button class="nav-btn" onclick="showTasks()">Tasks</button>
 			<button class="nav-btn" onclick="showLeave()">Leave</button>
+			<button class="nav-btn" onclick="openCalendar()">Calendar</button>
+
 		</div>
 
 		<div class="right-panel">
@@ -392,39 +396,74 @@ button:disabled {
 			</div>
 
 			<!-- Tasks -->
-			<div class="box" id="taskSection" style="display: none;">	
+			<div class="box" id="taskSection" style="display: none;">
 				<h3>
 					<i class="fa-solid fa-list-check"></i> My Tasks
 				</h3>
-				<div class="task-card">
-					<div class="task-left">
-						<i class="fa-solid fa-file-lines"></i> Prepare report
-					</div>
-					<div class="task-actions">
-						<span class="task-status pending">Pending</span>
-						<button class="task-btn" onclick="completeTask(this)">Done</button>
-					</div>
-				</div>
-				<div class="task-card">
-					<div class="task-left">
-						<i class="fa-solid fa-users"></i> Client meeting at 3 PM
-					</div>
-					<div class="task-actions">
-						<span class="task-status pending">Pending</span>
-						<button class="task-btn" onclick="completeTask(this)">Done</button>
-					</div>
-				</div>
-				<div class="task-card">
-					<div class="task-left">
-						<i class="fa-solid fa-envelope"></i> Reply to emails
-					</div>
-					<div class="task-actions">
-						<span class="task-status pending">Pending</span>
-						<button class="task-btn" onclick="completeTask(this)">Done</button>
-					</div>
-				</div>
-			</div>
 
+				<%
+				List<Task> tasks = (List<Task>) request.getAttribute("tasks");
+
+						if (tasks == null || tasks.isEmpty()) {
+				%>
+				<p>No tasks assigned.</p>
+				<%
+				} else {
+				for (Task t : tasks) {
+				%>
+
+				<div class="task-card">
+					<div class="task-left">
+						<i class="fa-solid fa-file-lines"></i>
+						<div>
+							<b><%=t.getDescription()%></b><br> <small>Assigned
+								by: <%=t.getAssignedBy()%></small>
+						</div>
+					</div>
+
+					<div class="task-actions">
+
+						<%
+						if (!"COMPLETED".equals(t.getStatus())) {
+						%>
+
+						<span class="task-status pending">PENDING</span>
+
+						<form action="updateTaskStatus" method="post"
+							style="display: inline;">
+							<input type="hidden" name="taskId" value="<%=t.getId()%>">
+							<input type="hidden" name="status" value="COMPLETED">
+							<button class="task-btn">Done</button>
+						</form>
+
+						<%
+						} else {
+						%>
+
+						<span class="task-status done">✔ Completed</span>
+
+						<%
+						}
+						%>
+
+					</div>
+
+				</div>
+
+				<%
+				}
+				}
+				%>
+			</div>
+			<!-- Calendar -->
+			<div class="box" id="calendarSection" style="display: none;">
+				<h3>
+					<i class="fa-solid fa-calendar-days"></i> Company Calendar
+				</h3>
+
+				<iframe id="calendarFrame" src="" style="width:100%; height:600px; border:none;"></iframe>
+
+			</div>
 			<!-- Leave -->
 			<div class="box" id="leaveSection" style="display: none;">
 				<h3>
@@ -503,27 +542,39 @@ button:disabled {
 
 		</div>
 	</div>
+
 	<!-- Toast Notification -->
 	<div id="toast" class="toast"></div>
 
 
 
 	<script>
-		function showAttendance() {
-			attendanceSection.style.display = "block";
-			taskSection.style.display = "none";
-			leaveSection.style.display = "none";
-		}
-		function showTasks() {
-			attendanceSection.style.display = "none";
-			taskSection.style.display = "block";
-			leaveSection.style.display = "none";
-		}
-		function showLeave() {
-			attendanceSection.style.display = "none";
-			taskSection.style.display = "none";
-			leaveSection.style.display = "block";
-		}
+	function hideAllSections() {
+		attendanceSection.style.display = "none";
+		taskSection.style.display = "none";
+		leaveSection.style.display = "none";
+		calendarSection.style.display = "none";
+	}
+
+	function showAttendance() {
+		hideAllSections();
+		attendanceSection.style.display = "block";
+	}
+
+	function showTasks() {
+		hideAllSections();
+		taskSection.style.display = "block";
+	}
+
+	function showLeave() {
+		hideAllSections();
+		leaveSection.style.display = "block";
+	}
+
+	function showCalendar() {
+		hideAllSections();
+		calendarSection.style.display = "block";
+	}
 		function completeTask(btn) {
 			btn.disabled = true;
 			btn.previousElementSibling.className = "task-status done";
@@ -582,7 +633,10 @@ button:disabled {
 				showToast("Old password is incorrect", true);
 			} else if (error === "PasswordMismatch") {
 				showToast("Passwords do not match", true);
-			} else {
+			}
+			else if (error === "HolidayAttendance") {
+		        showToast("Today is a holiday. Attendance not allowed.", true);
+		    }else {
 				showToast("Something went wrong", true);
 			}
 		}
@@ -591,6 +645,19 @@ button:disabled {
 				window.history.replaceState({}, document.title, window.location.pathname);
 			}, 100);
 		}
+		
+		// Auto-open Tasks tab after redirect
+		const tab = new URLSearchParams(window.location.search).get("tab");
+
+		if (tab === "tasks") {
+		    showTasks();
+		}
+		function openCalendar() {
+		    hideAllSections();   // hide attendance/tasks/leave
+		    document.getElementById("calendarSection").style.display = "block";
+		    document.getElementById("calendarFrame").src = "calendar.jsp";
+		}
+
 	</script>
 
 </body>
