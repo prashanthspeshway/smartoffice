@@ -7,6 +7,16 @@
 <%@ page import="com.smartoffice.dao.TaskDAO"%>
 
 <%
+String error = request.getParameter("error");
+if ("HolidayAttendance".equals(error)) {
+%>
+<div class="alert alert-warning">Today is a holiday. Attendance is
+	disabled.</div>
+<%
+}
+%>
+
+<%
 String activeTab = (String) request.getAttribute("tab");
 %>
 <%
@@ -364,7 +374,7 @@ body.dark {
 				Attendance</button>
 			<button class="nav-btn" onclick="showSection('leave')">Leave
 				Requests</button>
-				<button class="nav-btn" onclick="openCalendar()">Calendar</button>
+			<button class="nav-btn" onclick="openCalendar()">Calendar</button>
 		</div>
 
 		<!-- ===== Right Panel ===== -->
@@ -463,9 +473,12 @@ body.dark {
 					method="post">
 					<select name="employeeUsername">
 						<option value="">Select Employee</option>
+
 						<%
 						String assignEmployee = (String) request.getAttribute("assignEmployee");
-						for (User u : team) {
+
+						if (team != null && !team.isEmpty()) {
+							for (User u : team) {
 						%>
 						<option value="<%=u.getUsername()%>"
 							<%=u.getUsername().equals(assignEmployee) ? "selected" : ""%>>
@@ -473,8 +486,14 @@ body.dark {
 						</option>
 						<%
 						}
+						} else {
+						%>
+						<option disabled>No employees available</option>
+						<%
+						}
 						%>
 					</select>
+
 
 					<textarea class="form-control" name="taskDesc" rows="4"
 						placeholder="Task Description" required><%=request.getParameter("taskDesc") != null ? request.getParameter("taskDesc") : ""%></textarea>
@@ -490,9 +509,11 @@ body.dark {
 					method="post">
 					<select class="form-control" name="employeeUsername" required>
 						<option value="">Select Employee</option>
+
 						<%
 						String viewEmployee = (String) request.getAttribute("viewEmployee");
-						if (team != null) {
+
+						if (team != null && !team.isEmpty()) {
 							for (User u : team) {
 						%>
 						<option value="<%=u.getUsername()%>"
@@ -501,9 +522,14 @@ body.dark {
 						</option>
 						<%
 						}
+						} else {
+						%>
+						<option disabled>No employees available</option>
+						<%
 						}
 						%>
 					</select>
+
 					<button class="secondary-btn">View Assigned Tasks</button>
 				</form>
 
@@ -559,13 +585,14 @@ body.dark {
 				<h3>Leave Requests</h3>
 				<p>Coming soon…</p>
 			</div>
-<!-- Calendar -->
+			<!-- Calendar -->
 			<div class="box" id="calendarSection" style="display: none;">
 				<h3>
 					<i class="fa-solid fa-calendar-days"></i> Company Calendar
 				</h3>
 
-				<iframe id="calendarFrame" src="" style="width:100%; height:600px; border:none;"></iframe>
+				<iframe id="calendarFrame" src=""
+					style="width: 100%; height: 600px; border: none;"></iframe>
 
 			</div>
 			<!-- ===== Settings ===== -->
