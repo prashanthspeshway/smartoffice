@@ -364,6 +364,7 @@ body.dark {
 				Attendance</button>
 			<button class="nav-btn" onclick="showSection('leave')">Leave
 				Requests</button>
+				<button class="nav-btn" onclick="openCalendar()">Calendar</button>
 		</div>
 
 		<!-- ===== Right Panel ===== -->
@@ -558,7 +559,15 @@ body.dark {
 				<h3>Leave Requests</h3>
 				<p>Coming soon…</p>
 			</div>
+<!-- Calendar -->
+			<div class="box" id="calendarSection" style="display: none;">
+				<h3>
+					<i class="fa-solid fa-calendar-days"></i> Company Calendar
+				</h3>
 
+				<iframe id="calendarFrame" src="" style="width:100%; height:600px; border:none;"></iframe>
+
+			</div>
 			<!-- ===== Settings ===== -->
 			<div class="box" id="settings" style="display: none;">
 				<h3>Settings</h3>
@@ -583,6 +592,16 @@ function showSection(id) {
 function toggleTheme() {
 	document.body.classList.toggle("dark");
 }
+function openCalendar() {
+    // hide all sections (same logic as showSection)
+    document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
+
+    // show calendar section
+    document.getElementById("calendarSection").style.display = "block";
+
+    // load calendar jsp in iframe
+    document.getElementById("calendarFrame").src = "<%=request.getContextPath()%>/calendar.jsp";
+}
 </script>
 
 	<%
@@ -596,6 +615,7 @@ showSection("<%=activeTab%>");
 	%>
 	<script>
 showSection("blank");
+
 </script>
 	<%
 	}
