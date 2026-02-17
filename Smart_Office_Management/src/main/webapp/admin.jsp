@@ -240,6 +240,10 @@ required> </div>body {
 			<button class="nav-btn export-btn" onclick="loadPage('exportUsers')">
 				<i class="fa-solid fa-file-export"></i> Export Users
 			</button>
+			<button class="nav-btn" onclick="loadPage('calendar.jsp')">
+    <i class="fa-solid fa-calendar-days"></i> Calendar
+</button>
+			
 
 		</div>
 
