@@ -119,11 +119,23 @@ width:100%; height:100%; background:rgba(0,0,0,0.4);">
              style="width:100%; padding:8px; margin-top:10px;">
 
       <div style="margin-top:15px; text-align:right;">
-          <button onclick="closeModal()">Cancel</button>
-          <button onclick="saveHoliday()" 
-                  style="background:#16a34a; color:white; border:none; padding:6px 12px;">
-              Save
-          </button>
+         <div style="margin-top:15px; text-align:right;">
+    <button onclick="closeModal()">Cancel</button>
+
+   <button type="button"
+        id="deleteBtn"
+        onclick="deleteHoliday()"
+        style="background:#dc2626; color:white; border:none; padding:6px 12px; display:none;">
+    Delete
+</button>
+
+
+    <button onclick="saveHoliday()"
+            style="background:#16a34a; color:white; border:none; padding:6px 12px;">
+        Save
+    </button>
+</div>
+
       </div>
 
   </div>
@@ -228,7 +240,7 @@ document.addEventListener("click", function(e){
     let cell = e.target.closest("#calendar td");
     if(!cell) return;
 
-    let day = cell.innerText.trim();
+    let day = cell.childNodes[0].nodeValue.trim();
     if(day === "" || isNaN(day)) return;
 
     const role = "<%=session.getAttribute("role")%>";
@@ -239,12 +251,36 @@ document.addEventListener("click", function(e){
 
     selectedDate = currentYear + "-" + month + "-" + d;
 
-    document.getElementById("modalDate").innerText =
-        "Add Holiday for " + selectedDate;
+    /* BLOCK PAST DATE */
+    let todayStr = new Date().toISOString().split("T")[0];
+    if(selectedDate < todayStr){
+        showToast("previous date not allowed","error");
+        return;
+    }
 
-    document.getElementById("holidayNameInput").value = "";
-    document.getElementById("holidayModal").style.display = "block";
+    //  Check if holiday exists
+    fetch("getHolidayByDate?date=" + selectedDate)
+    .then(r => r.json())
+    .then(data => {
+
+        document.getElementById("holidayModal").style.display = "block";
+
+        if(data.exists){
+            editMode = true;
+            document.getElementById("modalDate").innerText =
+                "Edit Holiday for " + selectedDate;
+            document.getElementById("holidayNameInput").value = data.name;
+            document.getElementById("deleteBtn").style.display = "inline-block";
+        } else {
+            editMode = false;
+            document.getElementById("modalDate").innerText =
+                "Add Holiday for " + selectedDate;
+            document.getElementById("holidayNameInput").value = "";
+            document.getElementById("deleteBtn").style.display = "none";
+        }
+    });
 });
+
 
 /* ===== CLOSE MODAL ===== */
 function closeModal(){
@@ -276,7 +312,9 @@ function saveHoliday(){
         return;
     }
 
-    fetch("addHoliday",{
+    let url = editMode ? "updateHoliday" : "addHoliday";
+
+    fetch(url,{
         method:"POST",
         headers:{ "Content-Type":"application/x-www-form-urlencoded" },
         body:"date=" + encodeURIComponent(selectedDate) +
@@ -284,14 +322,30 @@ function saveHoliday(){
     })
     .then(r => r.text())
     .then(msg => {
-        showToast(msg, "success");  // ✅ toast instead of alert
+        showToast(msg);
         closeModal();
-        loadCalendar();   // refresh calendar
+        loadCalendar();
     })
-    .catch(err => {
-        showToast("Failed to add holiday", "error");
-    });
+    .catch(() => showToast("Operation failed","error"));
 }
+
+/* delete existing holiday */
+function deleteHoliday(){
+
+    fetch("deleteHoliday?date=" + encodeURIComponent(selectedDate), {
+        method: "GET"
+    })
+    .then(response => response.text())
+    .then(msg => {
+        showToast(msg || "Holiday deleted");
+        closeModal();
+        loadCalendar();
+    })
+    .catch(() => showToast("Delete failed","error"));
+}
+
+
+
 /* ===== LOAD ON START ===== */
 window.onload = loadCalendar;
 </script>
