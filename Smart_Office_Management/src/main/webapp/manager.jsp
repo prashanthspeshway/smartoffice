@@ -424,6 +424,8 @@ if ("HolidayAttendance".equals(error)) {
 				Team</button>
 			<button class="nav-btn" onclick="showSection('assignTask')">Assign
 				Tasks</button>
+			<button class="nav-btn" onclick="showSection('schedulemeeting')">
+				Schedule Meetings</button>
 			<button class="nav-btn" onclick="showSection('attendance')">Team
 				Attendance</button>
 			<button class="nav-btn"
@@ -469,6 +471,30 @@ if ("HolidayAttendance".equals(error)) {
 							Out</button>
 					</form>
 				</div>
+			</div>
+
+			<!-- ===== Schedule Meeting ===== -->
+			<div class="box" id="schedulemeeting" style="display: none;">
+				<h3>Schedule Meeting</h3>
+
+				<form action="<%=request.getContextPath()%>/schedulemeeting"
+					method="post">
+
+					<input class="form-control" type="text" name="title"
+						placeholder="Meeting Title" required>
+
+					<textarea class="form-control" name="description"
+						placeholder="Meeting Description" rows="3" required></textarea>
+
+					<label>Start Time</label> <input class="form-control"
+						type="datetime-local" name="startTime" required> <label>End
+						Time</label> <input class="form-control" type="datetime-local"
+						name="endTime" required> <label>Meeting Link
+						(optional)</label> <input class="form-control" type="text"
+						name="meetingLink" placeholder="Zoom / Google Meet link">
+
+					<button class="primary-btn">Schedule Meeting</button>
+				</form>
 			</div>
 
 			<!-- ===== Team Attendance ===== -->

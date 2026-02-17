@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.List"%>
 <%@ page import="com.smartoffice.model.Task"%>
+<%@ page import="com.smartoffice.model.Meeting"%>
 <%@ page import="com.smartoffice.model.LeaveRequest"%>
 
 <%
@@ -355,13 +356,12 @@ to {
 keyframes fadeOut {to { opacity:0;
 	transform: translateX(60px);
 }
-}
 
+}
 .task-status.out {
-    background: #fecaca;
-    color: #7f1d1d;
+	background: #fecaca;
+	color: #7f1d1d;
 }
-
 </style>
 </head>
 
@@ -386,6 +386,9 @@ keyframes fadeOut {to { opacity:0;
 			<button class="nav-btn" onclick="showAttendance()">Attendance</button>
 			<button class="nav-btn" onclick="showTasks()">Tasks</button>
 			<button class="nav-btn" onclick="showLeave()">Leave</button>
+			<a href="<%=request.getContextPath()%>/viewMeetings?tab=meetings">
+				<button class="nav-btn">Meetings</button>
+			</a>
 			<button class="nav-btn" onclick="openCalendar()">Calendar</button>
 
 		</div>
@@ -486,6 +489,52 @@ keyframes fadeOut {to { opacity:0;
 				}
 				%>
 			</div>
+
+			<!-- Meetings -->
+
+			<div class="box" id="meetingSection" style="display: none;">
+				<h3>
+					<i class="fa-solid fa-video"></i> Scheduled Meetings
+				</h3>
+
+				<%
+				List<Meeting> meetings = (List<Meeting>) request.getAttribute("meetings");
+
+				if (meetings == null || meetings.isEmpty()) {
+				%>
+				<p>No upcoming meetings.</p>
+				<%
+				} else {
+				for (Meeting m : meetings) {
+				%>
+
+				<div class="task-card">
+					<div class="task-left">
+						<i class="fa-solid fa-users"></i>
+						<div>
+							<b><%=m.getTitle()%></b><br> <small><%=m.getDescription()%></small><br>
+							<small> 🕒 <%=m.getStartTime()%> → <%=m.getEndTime()%>
+							</small>
+						</div>
+					</div>
+
+					<%
+					if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
+					%>
+					<a href="<%=m.getMeetingLink()%>" target="_blank">
+						<button class="task-btn">Join</button>
+					</a>
+					<%
+					}
+					%>
+				</div>
+
+				<%
+				}
+				}
+				%>
+			</div>
+
 			<!-- Calendar -->
 			<div class="box" id="calendarSection" style="display: none;">
 				<h3>
@@ -630,6 +679,7 @@ keyframes fadeOut {to { opacity:0;
 		taskSection.style.display = "none";
 		leaveSection.style.display = "none";
 		calendarSection.style.display = "none";
+		meetingSection.style.display = "none";
 	}
 
 	function showAttendance() {
@@ -641,6 +691,12 @@ keyframes fadeOut {to { opacity:0;
 		hideAllSections();
 		taskSection.style.display = "block";
 	}
+	
+	function showMeetings() {
+	    hideAllSections();
+	    meetingSection.style.display = "block";
+	}
+
 
 	function showLeave() {
 		hideAllSections();
@@ -727,6 +783,12 @@ keyframes fadeOut {to { opacity:0;
 
 		if (tab === "tasks") {
 		    showTasks();
+		}
+		else if (tab === "meetings") {
+			showMeetings();
+		}
+		else if (tab === "calendar") {
+			openCalendar();
 		}
 		function openCalendar() {
 		    hideAllSections();   // hide attendance/tasks/leave

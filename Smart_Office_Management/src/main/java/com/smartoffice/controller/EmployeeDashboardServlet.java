@@ -20,8 +20,9 @@ public class EmployeeDashboardServlet extends HttpServlet {
 
 		String username = (String) req.getSession().getAttribute("username");
 		List<Task> tasks = TaskDAO.getTasksForEmployee(username);
-
+		
+		
 		req.setAttribute("tasks", tasks);
-		req.getRequestDispatcher("employeeDashboard.jsp").forward(req, resp);
+		req.getRequestDispatcher("user.jsp").forward(req, resp);
 	}
 }
