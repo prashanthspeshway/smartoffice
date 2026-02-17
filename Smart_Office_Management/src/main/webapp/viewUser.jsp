@@ -165,6 +165,30 @@ tr:hover {
             : "<tr><td colspan='7' class='empty'>No Data Found</td></tr>" %>
 
     </table>
+    <div style="margin-top:15px; text-align:center;">
+
+<%
+int currentPage = request.getAttribute("currentPage") != null
+        ? (int) request.getAttribute("currentPage") : 1;
+
+int totalPages = request.getAttribute("totalPages") != null
+        ? (int) request.getAttribute("totalPages") : 1;
+
+for (int i = 1; i <= totalPages; i++) {
+%>
+    <a href="viewUser?page=<%=i%>"
+       style="padding:6px 10px; margin:3px; border-radius:5px;
+              text-decoration:none;
+              background:<%= (i == currentPage) ? "#3b82f6" : "#e5e7eb" %>;
+              color:<%= (i == currentPage) ? "white" : "#374151" %>;">
+        <%=i%>
+    </a>
+<%
+}
+%>
+
+</div>
+    
 </div>
 
 <div id="toast"></div>
