@@ -221,10 +221,6 @@ required> </div>body {
 		<!-- Sidebar -->
 		<div class="left-panel">
 
-			<button class="nav-btn" onclick="loadPage('AdminAttendance.jsp')">
-				<i class="fa-solid fa-calendar-check"></i> Attendance
-			</button>
-
 			<button class="nav-btn" onclick="loadPage('addUser.jsp')">
 				<i class="fa-solid fa-user-plus"></i> Add User
 			</button>
