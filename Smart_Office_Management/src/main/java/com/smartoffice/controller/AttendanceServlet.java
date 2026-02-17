@@ -51,20 +51,24 @@ public class AttendanceServlet extends HttpServlet {
 		    if (e.getMessage() != null && e.getMessage().contains("holiday")) {
 
 		        if ("manager".equalsIgnoreCase(role)) {
-		            response.sendRedirect(request.getContextPath()
-		                + "/manager?error=HolidayAttendance&tab=selfAttendance");
+		            response.sendRedirect(
+		                request.getContextPath() + "/manager?error=HolidayAttendance&tab=selfAttendance"
+		            );
 		        } else if ("admin".equalsIgnoreCase(role)) {
-		            response.sendRedirect(request.getContextPath()
-		                + "/admin?error=HolidayAttendance");
+		            response.sendRedirect(
+		                request.getContextPath() + "/admin?error=HolidayAttendance"
+		            );
 		        } else {
-		            response.sendRedirect(request.getContextPath()
-		                + "/user?error=HolidayAttendance");
+		            response.sendRedirect(
+		                request.getContextPath() + "/user?error=HolidayAttendance"
+		            );
 		        }
 
 		    } else {
 		        throw new ServletException(e);
 		    }
 		}
+
 
 	}
 }

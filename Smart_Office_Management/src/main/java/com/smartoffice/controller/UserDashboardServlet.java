@@ -2,6 +2,7 @@ package com.smartoffice.controller;
 
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,40 +13,55 @@ import javax.servlet.http.HttpSession;
 
 import com.smartoffice.dao.AttendanceDAO;
 import com.smartoffice.dao.TaskDAO;
+import com.smartoffice.dao.LeaveRequestDAO;
+import com.smartoffice.model.LeaveRequest;
 
 @SuppressWarnings("serial")
 @WebServlet("/user")
 public class UserDashboardServlet extends HttpServlet {
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		HttpSession session = request.getSession(false);
-		if (session == null || session.getAttribute("username") == null) {
-			response.sendRedirect("login.jsp");
-			return;
-		}
-		
-		TaskDAO.deleteOldCompletedTasks();
+        // 🔐 Session validation
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("username") == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
 
-		String username = (String) session.getAttribute("username");
+        // Cleanup old completed tasks
+        TaskDAO.deleteOldCompletedTasks();
 
-		try {
-			// Attendance
-			AttendanceDAO dao = new AttendanceDAO();
-			ResultSet rs = dao.getTodayAttendance(username);
-			if (rs.next()) {
-				request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
-				request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
-			}
+        String username = (String) session.getAttribute("username");
 
-			// Tasks
-			request.setAttribute("tasks", TaskDAO.getTasksForEmployee(username));
+        try {
+            /* ================= ATTENDANCE ================= */
+            AttendanceDAO attendanceDAO = new AttendanceDAO();
+            ResultSet rs = attendanceDAO.getTodayAttendance(username);
 
-			request.getRequestDispatcher("user.jsp").forward(request, response);
+            if (rs.next()) {
+                request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
+                request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
+            }
 
-		} catch (Exception e) {
-			throw new ServletException(e);
-		}
-	}
+            /* ================= TASKS ================= */
+            request.setAttribute("tasks",
+                    TaskDAO.getTasksForEmployee(username));
+
+            /* ================= LEAVE STATUS ================= */
+            LeaveRequestDAO leaveDAO = new LeaveRequestDAO();
+            List<LeaveRequest> myLeaves =
+                    leaveDAO.getLeavesByUsername(username);
+            request.setAttribute("myLeaves", myLeaves);
+
+            /* ================= FORWARD ================= */
+            request.getRequestDispatcher("user.jsp")
+                   .forward(request, response);
+
+        } catch (Exception e) {
+            throw new ServletException("Error loading user dashboard", e);
+        }
+    }
 }

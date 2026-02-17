@@ -4,17 +4,9 @@
 <%@ page import="java.util.List"%>
 <%@ page import="com.smartoffice.model.User"%>
 <%@ page import="com.smartoffice.model.Task"%>
-<%@ page import="com.smartoffice.dao.TaskDAO"%>
+<%@ page import="com.smartoffice.model.TeamAttendance"%>
+<%@ page import="com.smartoffice.model.LeaveRequest"%>
 
-<%
-String error = request.getParameter("error");
-if ("HolidayAttendance".equals(error)) {
-%>
-<div class="alert alert-warning">Today is a holiday. Attendance is
-	disabled.</div>
-<%
-}
-%>
 
 <%
 String activeTab = (String) request.getAttribute("tab");
@@ -201,9 +193,10 @@ body.dark {
 .employee-card {
 	border-left: 5px solid #2563eb;
 	padding: 14px 16px;
+	margin-bottom: 12px;
 	background: linear-gradient(135deg, #f8fafc, #eef2ff);
 	border-radius: 12px;
-	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.00);
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 	background: linear-gradient(135deg, #f8fafc, #eef2ff);
 }
@@ -342,8 +335,69 @@ body.dark {
 .task-card.completed {
 	opacity: 1;
 }
+
+.centered-box {
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+/* ===== Toast Notification ===== */
+.toast-success {
+	position: fixed;
+	top: 80px;
+	right: 500px;
+	background: red;
+	color: white;
+	padding: 14px 22px;
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	font-size: 14px;
+	font-weight: 500;
+	box-shadow: 0 10px 25px rgba(34, 197, 94, 0.35);
+	animation: slideIn 0.4s ease, fadeOut 0.4s ease 3.6s forwards;
+	z-index: 9999;
+}
+
+.toast-success i {
+	font-size: 18px;
+}
+
+/* Slide from right */
+@
+keyframes slideIn {from { opacity:0;
+	transform: translateX(60px);
+}
+
+to {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+}
+
+/* Fade out */
+@
+keyframes fadeOut {to { opacity:0;
+	transform: translateX(60px);
+}
+}
 </style>
 </head>
+
+<%
+String error = request.getParameter("error");
+if ("HolidayAttendance".equals(error)) {
+%>
+<div id="toast" class="toast-success">
+	<i class="fa-solid fa-circle-check"></i> <span>Today is a
+		holiday. Attendance is disabled.</span>
+</div>
+<%
+}
+%>
+
 <body>
 
 	<!-- ===== Top Bar ===== -->
@@ -372,8 +426,10 @@ body.dark {
 				Tasks</button>
 			<button class="nav-btn" onclick="showSection('attendance')">Team
 				Attendance</button>
-			<button class="nav-btn" onclick="showSection('leave')">Leave
-				Requests</button>
+			<button class="nav-btn"
+				onclick="location.href='<%=request.getContextPath()%>/leave-approval'">
+				Leave Requests</button>
+
 			<button class="nav-btn" onclick="openCalendar()">Calendar</button>
 		</div>
 
@@ -388,6 +444,7 @@ body.dark {
 			<!-- ===== My Attendance ===== -->
 			<div class="box" id="selfAttendance" style="display: none;">
 				<h3>My Attendance</h3>
+
 				<p>
 					<b>Status:</b>
 					<%=status%></p>
@@ -412,6 +469,121 @@ body.dark {
 							Out</button>
 					</form>
 				</div>
+			</div>
+
+			<!-- ===== Team Attendance ===== -->
+			<div class="box" id="attendance" style="display: none;">
+				<h3>Team Attendance (Today)</h3>
+
+				<div class="employee-grid">
+					<%
+					List<TeamAttendance> teamAttendance = (List<TeamAttendance>) request.getAttribute("teamAttendance");
+
+					if (teamAttendance != null && !teamAttendance.isEmpty()) {
+						for (TeamAttendance ta : teamAttendance) {
+					%>
+
+
+					<div class="employee-card">
+						<div class="emp-header">
+							<i class="fa-solid fa-user"></i> <span class="emp-name"><%=ta.getFullName()%></span>
+							<span class="emp-status"><%=ta.getStatus()%></span>
+						</div>
+
+						<div class="emp-body">
+							<div>
+								<b>Punch In:</b>
+								<%=ta.getPunchIn() != null ? ta.getPunchIn() : "--"%></div>
+							<div>
+								<b>Punch Out:</b>
+								<%=ta.getPunchOut() != null ? ta.getPunchOut() : "--"%></div>
+						</div>
+					</div>
+
+					<%
+					}
+					} else {
+					%>
+					<p>No attendance data available for today.</p>
+					<%
+					}
+					%>
+
+
+				</div>
+			</div>
+
+
+			<!-- ===== Leave Requests ===== -->
+			<div class="box centered-box" id="leave" style="display: none;">
+				<h3>Leave Requests</h3>
+
+				<%
+				List<LeaveRequest> leaveRequests = (List<LeaveRequest>) request.getAttribute("leaveRequests");
+
+				if (leaveRequests != null && !leaveRequests.isEmpty()) {
+					for (LeaveRequest lr : leaveRequests) {
+				%>
+
+				<div class="employee-card">
+					<div class="emp-header">
+						<i class="fa-solid fa-calendar-xmark"></i> <span class="emp-name"><%=lr.getUsername()%></span>
+						<span class="emp-status"><%=lr.getStatus()%></span>
+					</div>
+
+					<div class="emp-body">
+						<div>
+							<b>Type:</b>
+							<%=lr.getLeaveType()%></div>
+						<div>
+							<b>From:</b>
+							<%=lr.getFromDate()%></div>
+						<div>
+							<b>To:</b>
+							<%=lr.getToDate()%></div>
+						<div>
+							<b>Reason:</b>
+							<%=lr.getReason()%></div>
+					</div>
+
+					<%
+					if ("PENDING".equals(lr.getStatus())) {
+					%>
+					<form action="leave-approval" method="post">
+						<input type="hidden" name="leaveId" value="<%=lr.getId()%>">
+
+						<button class="primary-btn" name="action" value="approve">
+							Approve</button>
+
+						<button class="reject-btn" name="action" value="reject">
+							Reject</button>
+					</form>
+					<%
+					}
+					%>
+				</div>
+
+				<%
+				}
+				} else {
+				%>
+				<p>No leave requests.</p>
+				<%
+				}
+				%>
+			</div>
+
+
+			<!-- Calendar -->
+			<div class="box centered-box" id="calendarSection"
+				style="display: none;">
+				<h3>
+					<i class="fa-solid fa-calendar-days"></i> Company Calendar
+				</h3>
+
+				<iframe id="calendarFrame" src=""
+					style="width: 100%; height: 600px; border: none;"></iframe>
+
 			</div>
 
 			<!-- ===== My Team ===== -->
@@ -471,7 +643,7 @@ body.dark {
 				<!-- Assign form with dropdown for employee -->
 				<form action="<%=request.getContextPath()%>/assignTask"
 					method="post">
-					<select name="employeeUsername">
+					<select class="form-control" name="employeeUsername" required>
 						<option value="">Select Employee</option>
 
 						<%
@@ -573,28 +745,6 @@ body.dark {
 				</div>
 			</div>
 
-
-			<!-- ===== Team Attendance ===== -->
-			<div class="box" id="attendance" style="display: none;">
-				<h3>Team Attendance</h3>
-				<p>Coming soon…</p>
-			</div>
-
-			<!-- ===== Leave Requests ===== -->
-			<div class="box" id="leave" style="display: none;">
-				<h3>Leave Requests</h3>
-				<p>Coming soon…</p>
-			</div>
-			<!-- Calendar -->
-			<div class="box" id="calendarSection" style="display: none;">
-				<h3>
-					<i class="fa-solid fa-calendar-days"></i> Company Calendar
-				</h3>
-
-				<iframe id="calendarFrame" src=""
-					style="width: 100%; height: 600px; border: none;"></iframe>
-
-			</div>
 			<!-- ===== Settings ===== -->
 			<div class="box" id="settings" style="display: none;">
 				<h3>Settings</h3>
@@ -647,6 +797,15 @@ showSection("blank");
 	<%
 	}
 	%>
+
+	<script>
+setTimeout(() => {
+    const toast = document.getElementById("toast");
+    if (toast) toast.remove();
+}, 4200);
+</script>
+
+
 
 </body>
 </html>

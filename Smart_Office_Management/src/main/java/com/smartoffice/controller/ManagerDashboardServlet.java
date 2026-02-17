@@ -29,12 +29,12 @@ public class ManagerDashboardServlet extends HttpServlet {
 			response.sendRedirect("login.jsp");
 			return;
 		}
-		
+
 		TaskDAO.deleteOldCompletedTasks();
 
 		String tab = request.getParameter("tab");
 		if (tab == null || tab.isEmpty()) {
-			tab = "none"; // blank right panel
+			tab = "none";
 		}
 		request.setAttribute("tab", tab);
 
@@ -43,14 +43,21 @@ public class ManagerDashboardServlet extends HttpServlet {
 		try {
 			AttendanceDAO attendanceDAO = new AttendanceDAO();
 
+			// ===== Manager self attendance =====
 			ResultSet rs = attendanceDAO.getTodayAttendance(username);
 			if (rs != null && rs.next()) {
 				request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
 				request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
 			}
 
+			// ===== Team list =====
 			List<User> teamList = UserDao.getUsersByManager(username);
 			request.setAttribute("teamList", teamList);
+
+			// ===== ✅ Team attendance (NEW) =====
+			List<com.smartoffice.model.TeamAttendance> teamAttendance = attendanceDAO
+					.getTeamAttendanceForToday(username);
+			request.setAttribute("teamAttendance", teamAttendance);
 
 		} catch (Exception e) {
 			throw new ServletException("Error loading manager dashboard", e);

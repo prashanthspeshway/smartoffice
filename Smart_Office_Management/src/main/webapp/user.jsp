@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.List"%>
 <%@ page import="com.smartoffice.model.Task"%>
+<%@ page import="com.smartoffice.model.LeaveRequest"%>
 
 <%
 String username = (String) session.getAttribute("username");
@@ -22,6 +23,10 @@ if (punchIn != null && punchOut == null)
 	status = "Punched In";
 if (punchOut != null)
 	status = "Punched Out";
+%>
+
+<%
+List<LeaveRequest> myLeaves = (List<LeaveRequest>) request.getAttribute("myLeaves");
 %>
 
 <!DOCTYPE html>
@@ -309,8 +314,8 @@ button:disabled {
 /* ===== Toast Notification ===== */
 .toast {
 	position: fixed;
-	top: 200px;
-	right: 20px;
+	top: 80px;
+	right: 500px;
 	background: #16a34a;
 	color: white;
 	padding: 14px 20px;
@@ -318,19 +323,45 @@ button:disabled {
 	font-weight: 600;
 	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 	opacity: 0;
-	transform: translateY(-20px);
+	animation: slideIn 0.4s ease, fadeOut 0.4s ease 3.6s forwards;
+	/* 	transform: translateY(-20px); */
 	transition: all 0.4s ease;
 	z-index: 2000;
 }
 
 .toast.show {
 	opacity: 1;
-	transform: translateY(0);
+	/* 	transform: translateY(0); */
 }
 
 .toast.error {
 	background: #dc2626;
 }
+/* Slide from right */
+@
+keyframes slideIn {from { opacity:0;
+	transform: translateX(60px);
+}
+
+to {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+}
+
+/* Fade out */
+@
+keyframes fadeOut {to { opacity:0;
+	transform: translateX(60px);
+}
+}
+
+.task-status.out {
+    background: #fecaca;
+    color: #7f1d1d;
+}
+
 </style>
 </head>
 
@@ -404,7 +435,7 @@ button:disabled {
 				<%
 				List<Task> tasks = (List<Task>) request.getAttribute("tasks");
 
-						if (tasks == null || tasks.isEmpty()) {
+				if (tasks == null || tasks.isEmpty()) {
 				%>
 				<p>No tasks assigned.</p>
 				<%
@@ -461,7 +492,8 @@ button:disabled {
 					<i class="fa-solid fa-calendar-days"></i> Company Calendar
 				</h3>
 
-				<iframe id="calendarFrame" src="" style="width:100%; height:600px; border:none;"></iframe>
+				<iframe id="calendarFrame" src=""
+					style="width: 100%; height: 600px; border: none;"></iframe>
 
 			</div>
 			<!-- Leave -->
@@ -483,6 +515,50 @@ button:disabled {
 
 					<button class="apply-leave-btn">Apply Leave</button>
 				</form>
+
+				<hr style="margin: 30px 0;">
+
+				<h3>
+					<i class="fa-solid fa-list"></i> My Leave Requests
+				</h3>
+
+				<%
+				if (myLeaves == null || myLeaves.isEmpty()) {
+				%>
+				<p>No leave requests found.</p>
+				<%
+				} else {
+				for (LeaveRequest lr : myLeaves) {
+				%>
+
+				<div class="task-card">
+					<div class="task-left">
+						<i class="fa-solid fa-plane-departure"></i>
+						<div>
+							<b><%=lr.getLeaveType()%></b><br> <small> <%=lr.getFromDate()%>
+								→ <%=lr.getToDate()%>
+							</small>
+						</div>
+					</div>
+
+					<%
+					String st = lr.getStatus();
+					String cls = "pending";
+					if ("APPROVED".equalsIgnoreCase(st))
+						cls = "done";
+					if ("REJECTED".equalsIgnoreCase(st))
+						cls = "out";
+					%>
+
+					<span class="task-status <%=cls%>"> <%=st%>
+					</span>
+				</div>
+
+				<%
+				}
+				}
+				%>
+
 			</div>
 
 		</div>
