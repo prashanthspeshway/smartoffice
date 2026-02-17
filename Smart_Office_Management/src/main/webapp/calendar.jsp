@@ -251,14 +251,14 @@ document.addEventListener("click", function(e){
 
     selectedDate = currentYear + "-" + month + "-" + d;
 
-    /* 🚫 BLOCK PAST DATE */
+    /* BLOCK PAST DATE */
     let todayStr = new Date().toISOString().split("T")[0];
     if(selectedDate < todayStr){
         showToast("previous date not allowed","error");
         return;
     }
 
-    // 🔎 Check if holiday exists
+    //  Check if holiday exists
     fetch("getHolidayByDate?date=" + selectedDate)
     .then(r => r.json())
     .then(data => {

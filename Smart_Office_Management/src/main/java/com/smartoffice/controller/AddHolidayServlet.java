@@ -44,7 +44,7 @@ public class AddHolidayServlet extends HttpServlet {
 
         try(Connection con = DBConnectionUtil.getConnection()) {
 
-            // ❌ Prevent duplicate
+            //  Prevent duplicate
             PreparedStatement check = con.prepareStatement(
                     "SELECT 1 FROM holidays WHERE holiday_date=?");
             check.setDate(1, sqlDate);
