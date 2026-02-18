@@ -106,11 +106,12 @@ body {
 .right-panel {
 	flex: 1;
 	padding: 30px;
+	overflow-y: auto;
 }
 
 /* ===== Card ===== */
 .box {
-	max-width: 620px;
+	max-width: auto;
 	background: white;
 	padding: 28px;
 	border-radius: 14px;
@@ -366,25 +367,27 @@ keyframes fadeOut {to { opacity:0;
 /* notification */
 .notification-panel {
     position: fixed;
-    top: 60px;
+    bottom: 30px;
     right: -380px;
     width: 350px;
-    height: 100%;
+    height: auto;
     background: #ffffff;
     box-shadow: -3px 0 10px rgba(0,0,0,0.15);
+    border-radius: 14px;
     transition: right 0.3s ease-in-out;
     z-index: 1000;
     font-family: Arial, sans-serif;
 }
  
 .notification-panel.show {
-    right: 0;
+    right: 25px;
 }
  
 .notification-header {
-    background: #1f2937;
-    color: #fff;
+    background: #f5fa5c;
+    color: black;
     padding: 15px;
+    border-radius: 14px 14px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -393,13 +396,15 @@ keyframes fadeOut {to { opacity:0;
 .notification-header button {
     background: none;
     border: none;
-    color: #fff;
+    color: black;
     font-size: 18px;
     cursor: pointer;
 }
  
 .notification-list {
     padding: 15px;
+    max-height: 250px; /* Adjust as needed */
+    overflow-y: auto;
 }
  
 .notification-item {
