@@ -37,6 +37,7 @@ public class AssignTaskServlet extends HttpServlet {
 			request.setAttribute("errorMessage", "Task description cannot be empty.");
 		} else {
 			TaskDAO.assignTask(employee, manager, desc);
+			employee=null;
 		}
 
 		// ✅ Assign module attributes

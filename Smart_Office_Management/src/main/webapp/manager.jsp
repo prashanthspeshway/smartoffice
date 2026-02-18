@@ -428,9 +428,9 @@ if ("HolidayAttendance".equals(error)) {
 				Schedule Meetings</button>
 			<button class="nav-btn" onclick="showSection('attendance')">Team
 				Attendance</button>
-			<button class="nav-btn"
-				onclick="location.href='<%=request.getContextPath()%>/leave-approval'">
+			<button class="nav-btn" onclick="showSection('leave')">
 				Leave Requests</button>
+
 
 			<button class="nav-btn" onclick="openCalendar()">Calendar</button>
 		</div>
@@ -692,9 +692,8 @@ if ("HolidayAttendance".equals(error)) {
 						%>
 					</select>
 
-
 					<textarea class="form-control" name="taskDesc" rows="4"
-						placeholder="Task Description" required><%=request.getParameter("taskDesc") != null ? request.getParameter("taskDesc") : ""%></textarea>
+						placeholder="Task Description" required></textarea>
 					<button class="primary-btn">Assign Task</button>
 				</form>
 
@@ -806,29 +805,25 @@ function openCalendar() {
     document.getElementById("calendarFrame").src = "<%=request.getContextPath()%>/calendar.jsp";
 }
 </script>
-
-	<%
-	if (activeTab != null) {
-	%>
-	<script>
-showSection("<%=activeTab%>");
-</script>
-	<%
-	} else {
-	%>
-	<script>
-showSection("blank");
-
-</script>
-	<%
-	}
-	%>
-
 	<script>
 setTimeout(() => {
     const toast = document.getElementById("toast");
     if (toast) toast.remove();
 }, 4200);
+</script>
+
+	<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    <%String tabAttr = (String) request.getAttribute("tab");%>
+
+    <%if (tabAttr != null) {%>
+        showSection("<%=tabAttr%>");
+    <%} else {%>
+        showSection("selfAttendance");
+    <%}%>
+
+});
 </script>
 
 

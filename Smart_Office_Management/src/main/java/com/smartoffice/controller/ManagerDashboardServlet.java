@@ -32,11 +32,11 @@ public class ManagerDashboardServlet extends HttpServlet {
 
 		TaskDAO.deleteOldCompletedTasks();
 
-		String tab = request.getParameter("tab");
-		if (tab == null || tab.isEmpty()) {
-			tab = "none";
+		String tab = (String)request.getParameter("tab");
+		if (tab != null ) {
+			request.setAttribute("tab", tab);
 		}
-		request.setAttribute("tab", tab);
+		
 
 		String username = (String) session.getAttribute("username");
 
