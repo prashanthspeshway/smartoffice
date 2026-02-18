@@ -362,6 +362,56 @@ keyframes fadeOut {to { opacity:0;
 	background: #fecaca;
 	color: #7f1d1d;
 }
+
+/* notification */
+.notification-panel {
+    position: fixed;
+    top: 60px;
+    right: -380px;
+    width: 350px;
+    height: 100%;
+    background: #ffffff;
+    box-shadow: -3px 0 10px rgba(0,0,0,0.15);
+    transition: right 0.3s ease-in-out;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
+ 
+.notification-panel.show {
+    right: 0;
+}
+ 
+.notification-header {
+    background: #1f2937;
+    color: #fff;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+ 
+.notification-header button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+}
+ 
+.notification-list {
+    padding: 15px;
+}
+ 
+.notification-item {
+    background: #f3f4f6;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid #2563eb;
+    border-radius: 4px;
+    font-size: 14px;
+}
+ 
+ 
 </style>
 </head>
 
@@ -390,6 +440,7 @@ keyframes fadeOut {to { opacity:0;
 				<button class="nav-btn">Meetings</button>
 			</a>
 			<button class="nav-btn" onclick="openCalendar()">Calendar</button>
+			<button class="nav-btn" onclick="openNotifications()">Notification</button>
 
 		</div>
 
@@ -548,67 +599,77 @@ keyframes fadeOut {to { opacity:0;
 			<!-- Leave -->
 			<div class="box" id="leaveSection" style="display: none;">
 				<h3>
-					<i class="fa-solid fa-calendar-days"></i> Apply Leave
+					<i class="fa-solid fa-calendar-days"></i> Leave
 				</h3>
 
-				<form class="leave-form" action="applyLeave" method="post">
-					<label>Leave Type</label> <select name="leaveType" required>
-						<option value="">Select</option>
-						<option>Casual Leave</option>
-						<option>Sick Leave</option>
-						<option>Earned Leave</option>
-					</select> <label>From Date</label> <input type="date" name="fromDate"
-						required> <label>To Date</label> <input type="date"
-						name="toDate" required> <label>Reason</label>
-					<textarea name="reason" required></textarea>
+				<!-- Leave Tabs -->
+				<div style="display: flex; gap: 12px; margin-bottom: 20px;">
+					<button class="nav-btn" style="flex: 1;" onclick="showApplyLeave()">Apply
+						Leave</button>
+					<button class="nav-btn" style="flex: 1; background: #6b7280;"
+						onclick="showMyLeaves()">My Leave Requests</button>
+				</div>
 
-					<button class="apply-leave-btn">Apply Leave</button>
-				</form>
+				<!-- Apply Leave -->
+				<div id="applyLeaveSection">
+					<form class="leave-form" action="applyLeave" method="post">
+						<label>Leave Type</label> <select name="leaveType" required>
+							<option value="">Select</option>
+							<option>Casual Leave</option>
+							<option>Sick Leave</option>
+							<option>Earned Leave</option>
+						</select> <label>From Date</label> <input type="date" name="fromDate"
+							required> <label>To Date</label> <input type="date"
+							name="toDate" required> <label>Reason</label>
+						<textarea name="reason" required></textarea>
 
-				<hr style="margin: 30px 0;">
+						<button class="apply-leave-btn">Apply Leave</button>
+					</form>
+				</div>
 
-				<h3>
-					<i class="fa-solid fa-list"></i> My Leave Requests
-				</h3>
+				<!-- My Leave Requests -->
+				<div id="myLeaveSection" style="display: none;">
+					<h3 style="margin-top: 10px;">
+						<i class="fa-solid fa-list"></i> My Leave Requests
+					</h3>
 
-				<%
-				if (myLeaves == null || myLeaves.isEmpty()) {
-				%>
-				<p>No leave requests found.</p>
-				<%
-				} else {
-				for (LeaveRequest lr : myLeaves) {
-				%>
+					<%
+					if (myLeaves == null || myLeaves.isEmpty()) {
+					%>
+					<p>No leave requests found.</p>
+					<%
+					} else {
+					for (LeaveRequest lr : myLeaves) {
+					%>
 
-				<div class="task-card">
-					<div class="task-left">
-						<i class="fa-solid fa-plane-departure"></i>
-						<div>
-							<b><%=lr.getLeaveType()%></b><br> <small> <%=lr.getFromDate()%>
-								→ <%=lr.getToDate()%>
-							</small>
+					<div class="task-card">
+						<div class="task-left">
+							<i class="fa-solid fa-plane-departure"></i>
+							<div>
+								<b><%=lr.getLeaveType()%></b><br> <small><%=lr.getFromDate()%>
+									→ <%=lr.getToDate()%></small>
+							</div>
 						</div>
+
+						<%
+						String st = lr.getStatus();
+						String cls = "pending";
+						if ("APPROVED".equalsIgnoreCase(st))
+							cls = "done";
+						if ("REJECTED".equalsIgnoreCase(st))
+							cls = "out";
+						%>
+
+						<span class="task-status <%=cls%>"><%=st%></span>
 					</div>
 
 					<%
-					String st = lr.getStatus();
-					String cls = "pending";
-					if ("APPROVED".equalsIgnoreCase(st))
-						cls = "done";
-					if ("REJECTED".equalsIgnoreCase(st))
-						cls = "out";
+					}
+					}
 					%>
-
-					<span class="task-status <%=cls%>"> <%=st%>
-					</span>
 				</div>
-
-				<%
-				}
-				}
-				%>
-
 			</div>
+
 
 		</div>
 	</div>
@@ -668,6 +729,26 @@ keyframes fadeOut {to { opacity:0;
 		</div>
 	</div>
 
+	<div id="notificationPanel" class="notification-panel">
+		<div class="notification-header">
+			<span>🔔 Smart Office Notifications</span>
+			<button onclick="closeNotifications()">✖</button>
+		</div>
+
+		<div class="notification-list">
+			<div class="notification-item">📅 Meeting Reminder: Project
+				Sync at 3:00 PM</div>
+			<div class="notification-item">📝 Approval Needed: Leave
+				request from Rahul</div>
+			<div class="notification-item">⚠️ System Alert: Printer 2 is
+				out of paper</div>
+			<div class="notification-item">📢 Announcement: Office will be
+				closed on Friday</div>
+			<div class="notification-item">✅ Task Update: Monthly report
+				submitted successfully</div>
+		</div>
+	</div>
+
 	<!-- Toast Notification -->
 	<div id="toast" class="toast"></div>
 
@@ -681,6 +762,14 @@ keyframes fadeOut {to { opacity:0;
 		calendarSection.style.display = "none";
 		meetingSection.style.display = "none";
 	}
+	
+	function openNotifications() {
+        document.getElementById("notificationPanel").classList.add("show");
+    }
+
+    function closeNotifications() {
+        document.getElementById("notificationPanel").classList.remove("show");
+    }
 
 	function showAttendance() {
 		hideAllSections();
@@ -696,7 +785,16 @@ keyframes fadeOut {to { opacity:0;
 	    hideAllSections();
 	    meetingSection.style.display = "block";
 	}
+	
+	function showApplyLeave() {
+	    document.getElementById("applyLeaveSection").style.display = "block";
+	    document.getElementById("myLeaveSection").style.display = "none";
+	}
 
+	function showMyLeaves() {
+	    document.getElementById("applyLeaveSection").style.display = "none";
+	    document.getElementById("myLeaveSection").style.display = "block";
+	}
 
 	function showLeave() {
 		hideAllSections();
