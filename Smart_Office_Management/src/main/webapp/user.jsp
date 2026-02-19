@@ -441,9 +441,7 @@ keyframes fadeOut {to { opacity:0;
 			<button class="nav-btn" onclick="showAttendance()">Attendance</button>
 			<button class="nav-btn" onclick="showTasks()">Tasks</button>
 			<button class="nav-btn" onclick="showLeave()">Leave</button>
-			<a href="<%=request.getContextPath()%>/viewMeetings?tab=meetings">
-				<button class="nav-btn">Meetings</button>
-			</a>
+			<button class="nav-btn" onclick="showMeetings()">Meetings</button>
 			<button class="nav-btn" onclick="openCalendar()">Calendar</button>
 			<button class="nav-btn" onclick="openNotifications()">Notification</button>
 

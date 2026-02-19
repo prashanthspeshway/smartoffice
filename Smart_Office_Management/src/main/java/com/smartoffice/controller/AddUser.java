@@ -1,87 +1,119 @@
 package com.smartoffice.controller;
 
 import java.io.IOException;
-
 import java.sql.Connection;
-
 import java.sql.Date;
-
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.annotation.WebServlet;
-
 import javax.servlet.http.HttpServlet;
-
 import javax.servlet.http.HttpServletRequest;
-
 import javax.servlet.http.HttpServletResponse;
 
 import com.smartoffice.utils.DBConnectionUtil;
 
 @SuppressWarnings("serial")
-
 @WebServlet("/addUser")
-
 public class AddUser extends HttpServlet {
 
-	@Override
+    private boolean isStrongPassword(String password) {
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$";
+        return password != null && password.matches(regex);
+    }
 
-	protected void doPost(HttpServletRequest req, HttpServletResponse res)
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
 
-			throws ServletException, IOException {
+        String password = req.getParameter("password");
+        String role = req.getParameter("role");
+        String manager = req.getParameter("manager");
 
-		try {
+        // 🔐 Password validation
+        if (!isStrongPassword(password)) {
+            req.getSession().setAttribute(
+                "errorMsg",
+                "Password must be at least 8 characters with uppercase, lowercase, number, and symbol."
+            );
+            res.sendRedirect("addUser");
+            return;
+        }
 
-			Connection con = DBConnectionUtil.getConnection();
+        // ✅ Business rule validation
+        if ("user".equalsIgnoreCase(role) && (manager == null || manager.isEmpty())) {
+            req.getSession().setAttribute(
+                "errorMsg",
+                "Please select a manager for the user."
+            );
+            res.sendRedirect("addUser");
+            return;
+        }
 
-			String manager1 = req.getParameter("manager");
+        // Managers should not have managers
+        if ("manager".equalsIgnoreCase(role)) {
+            manager = null;
+        }
 
-			String sql = "INSERT INTO users "
+        try (Connection con = DBConnectionUtil.getConnection()) {
 
-					+ "(username, password, role, status, email, fullname, joinedDate, manager, phone) "
+            String sql = "INSERT INTO users " +
+                    "(username, password, role, status, email, fullname, joinedDate, manager, phone) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement ps = con.prepareStatement(sql);
 
-			PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, req.getParameter("username"));
+            ps.setString(2, password);
+            ps.setString(3, role);
+            ps.setString(4, req.getParameter("status"));
+            ps.setString(5, req.getParameter("email"));
+            ps.setString(6, req.getParameter("fullname"));
+            ps.setDate(7, Date.valueOf(req.getParameter("joinedDate")));
+            ps.setString(8, manager);
+            ps.setString(9, req.getParameter("phonenumber"));
 
-			ps.setString(1, req.getParameter("username"));
+            ps.executeUpdate();
 
-			ps.setString(2, req.getParameter("password"));
+            req.getSession().setAttribute("successMsg", "User added successfully!");
+            res.sendRedirect("addUser");
 
-			ps.setString(3, req.getParameter("role"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.getSession().setAttribute("errorMsg", "Failed to add user!");
+            res.sendRedirect("addUser");
+        }
+    }
 
-			ps.setString(4, req.getParameter("status"));
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
 
-			ps.setString(5, req.getParameter("email"));
+        try (Connection con = DBConnectionUtil.getConnection()) {
 
-			ps.setString(6, req.getParameter("fullname"));
+            String sql = "SELECT username FROM users " +
+                         "WHERE LOWER(TRIM(role)) = 'manager' " +
+                         "AND LOWER(TRIM(status)) = 'active'";
 
-			ps.setDate(7, Date.valueOf(req.getParameter("joinedDate")));
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
 
-			ps.setString(8, manager1);
-			
-			ps.setString(9, req.getParameter("phonenumber"));
+            List<String> managers = new ArrayList<>();
 
-			ps.executeUpdate();
+            while (rs.next()) {
+                managers.add(rs.getString("username"));
+            }
 
-			req.getSession().setAttribute("successMsg", "User added successfully!");
+            req.setAttribute("managers", managers);
 
-			// System.out.println(manager1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-			res.sendRedirect("addUser.jsp");
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-
-			req.getSession().setAttribute("errorMsg", "Failed to add user!");
-
-			res.sendRedirect("addUser.jsp");
-
-		}
-
-	}
-
+        // ✅ Forward to JSP (NOT servlet)
+        req.getRequestDispatcher("addUser.jsp").forward(req, res);
+    }
 }

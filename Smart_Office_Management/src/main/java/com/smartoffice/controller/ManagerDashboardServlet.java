@@ -36,49 +36,38 @@ public class ManagerDashboardServlet extends HttpServlet {
 
 		String tab = request.getParameter("tab");
 		if (tab != null) {
-		    request.setAttribute("tab", tab);
+			request.setAttribute("tab", tab);
 		}
 
 		String username = (String) session.getAttribute("username");
 
-
-		// ===== Load Leave Requests when Leave tab opened =====
-		if ("leave".equals(tab)) {
-		    LeaveRequestDAO leaveDao = new LeaveRequestDAO();
-		    List<LeaveRequest> leaveRequests = null;
-			try {
-				leaveRequests = leaveDao.getTeamLeaveRequests(username);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		    request.setAttribute("leaveRequests", leaveRequests);
-		}
-
 		try {
 			AttendanceDAO attendanceDAO = new AttendanceDAO();
 
-			// ===== Manager self attendance =====
+			// Self attendance
 			ResultSet rs = attendanceDAO.getTodayAttendance(username);
 			if (rs != null && rs.next()) {
 				request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
 				request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
 			}
 
-			// ===== Team list =====
+			// Team list
 			List<User> teamList = UserDao.getUsersByManager(username);
 			request.setAttribute("teamList", teamList);
 
-			// ===== ✅ Team attendance (NEW) =====
-			List<com.smartoffice.model.TeamAttendance> teamAttendance = attendanceDAO
-					.getTeamAttendanceForToday(username);
-			request.setAttribute("teamAttendance", teamAttendance);
+			// Team attendance
+			request.setAttribute("teamAttendance", attendanceDAO.getTeamAttendanceForToday(username));
+
+			// ✅ ALWAYS load leave requests
+			LeaveRequestDAO leaveDao = new LeaveRequestDAO();
+			request.setAttribute("leaveRequests", leaveDao.getTeamLeaveRequests(username));
 
 		} catch (Exception e) {
 			throw new ServletException("Error loading manager dashboard", e);
 		}
 
 		request.getRequestDispatcher("manager.jsp").forward(request, response);
+
 	}
 
 	@Override

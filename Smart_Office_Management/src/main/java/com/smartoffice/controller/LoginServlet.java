@@ -1,7 +1,6 @@
 package com.smartoffice.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,23 +16,34 @@ import com.smartoffice.utils.DBConnectionUtil;
 @SuppressWarnings("serial")
 public class LoginServlet extends HttpServlet {
 
-    @SuppressWarnings("unused")
-	@Override
+    // 🔐 Password validation method
+    private boolean isStrongPassword(String password) {
+        String regex =
+            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$";
+        return password != null && password.matches(regex);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
+        // ❌ Reject weak password immediately
+        if (!isStrongPassword(password)) {
+            res.sendRedirect("index.html?error=weakPassword");
+            return;
+        }
+
         try (Connection con = DBConnectionUtil.getConnection()) {
 
-            String sql = "SELECT role, status FROM users WHERE username = ? AND password = ?";
+            String sql =
+                "SELECT role, status FROM users WHERE username = ? AND password = ?";
             PreparedStatement ps = con.prepareStatement(sql);
 
             ps.setString(1, username);
             ps.setString(2, password);
-            
-            PrintWriter out = res.getWriter();
 
             ResultSet rs = ps.executeQuery();
 
@@ -42,35 +52,30 @@ public class LoginServlet extends HttpServlet {
                 String role = rs.getString("role");
                 String status = rs.getString("status");
 
-                // create session
+                if (!"active".equalsIgnoreCase(status)) {
+                    res.sendRedirect("index.html?error=inactive");
+                    return;
+                }
+
+                // ✅ Create session
                 HttpSession session = req.getSession();
                 session.setAttribute("username", username);
                 session.setAttribute("role", role);
 
-				if (status.equals("active")) {
-					// role based redirect
-	                switch (role.toLowerCase()) {
-
-	                case "user":
-	                    res.sendRedirect("user");
-	                    break;
-
-	                case "manager":
-	                    res.sendRedirect("manager");
-	                    break;
-
-	                case "admin":
-	                    res.sendRedirect("admin.jsp");
-	                    break;
-
-	                default:
-	                    res.sendRedirect("index.html?error=invalidRole");
-	            }
-				} else {
-					res.sendRedirect("index.html?error=inactive");
-                	
+                // 🔁 Role-based redirect
+                switch (role.toLowerCase()) {
+                    case "user":
+                        res.sendRedirect("user");
+                        break;
+                    case "manager":
+                        res.sendRedirect("manager");
+                        break;
+                    case "admin":
+                        res.sendRedirect("admin.jsp");
+                        break;
+                    default:
+                        res.sendRedirect("index.html?error=invalidRole");
                 }
-
 
             } else {
                 res.sendRedirect("index.html?error=invalid");

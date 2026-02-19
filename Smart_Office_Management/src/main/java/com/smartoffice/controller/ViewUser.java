@@ -146,5 +146,6 @@ public class ViewUser extends HttpServlet {
 
         req.setAttribute("rows", rows.toString());
         req.getRequestDispatcher("viewUser.jsp").forward(req, res);
+        return;
     }
 }

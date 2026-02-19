@@ -176,6 +176,14 @@ else if (error === "invalidRole") {
 else if (error === "server") {
     showToast("Server error. Please try again later.", "error");
 }
+
+else if (error === "weakPassword") {
+    showToast(
+        "Password must be at least 8 characters with uppercase, lowercase, number, and symbol",
+        "error"
+    );
+}
+
 </script>
 
 </body>

@@ -1,7 +1,10 @@
 package com.smartoffice.controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -12,56 +15,89 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.smartoffice.dao.AttendanceDAO;
-import com.smartoffice.dao.TaskDAO;
 import com.smartoffice.dao.LeaveRequestDAO;
+import com.smartoffice.dao.TaskDAO;
 import com.smartoffice.model.LeaveRequest;
+import com.smartoffice.model.Meeting;
+import com.smartoffice.utils.DBConnectionUtil;
 
 @SuppressWarnings("serial")
 @WebServlet("/user")
 public class UserDashboardServlet extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        // 🔐 Session validation
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("username") == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("username") == null) {
+			response.sendRedirect("login.jsp");
+			return;
+		}
 
-        // Cleanup old completed tasks
-        TaskDAO.deleteOldCompletedTasks();
+		TaskDAO.deleteOldCompletedTasks();
+		String username = (String) session.getAttribute("username");
 
-        String username = (String) session.getAttribute("username");
+		try {
+			/* ================= ATTENDANCE ================= */
+			AttendanceDAO attendanceDAO = new AttendanceDAO();
+			ResultSet rs = attendanceDAO.getTodayAttendance(username);
 
-        try {
-            /* ================= ATTENDANCE ================= */
-            AttendanceDAO attendanceDAO = new AttendanceDAO();
-            ResultSet rs = attendanceDAO.getTodayAttendance(username);
+			if (rs.next()) {
+				request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
+				request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
+			}
 
-            if (rs.next()) {
-                request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
-                request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
-            }
+			/* ================= TASKS ================= */
+			request.setAttribute("tasks", TaskDAO.getTasksForEmployee(username));
 
-            /* ================= TASKS ================= */
-            request.setAttribute("tasks",
-                    TaskDAO.getTasksForEmployee(username));
+			/* ================= LEAVES ================= */
+			LeaveRequestDAO leaveDAO = new LeaveRequestDAO();
+			List<LeaveRequest> myLeaves = leaveDAO.getLeavesByUsername(username);
+			request.setAttribute("myLeaves", myLeaves);
 
-            /* ================= LEAVE STATUS ================= */
-            LeaveRequestDAO leaveDAO = new LeaveRequestDAO();
-            List<LeaveRequest> myLeaves =
-                    leaveDAO.getLeavesByUsername(username);
-            request.setAttribute("myLeaves", myLeaves);
+			/* ================= MEETINGS ================= */
+			List<Meeting> meetings = new ArrayList<>();
 
-            /* ================= FORWARD ================= */
-            request.getRequestDispatcher("user.jsp")
-                   .forward(request, response);
+			String meetingSql = """
+					    SELECT *
+					    FROM meetings
+					    WHERE created_by = (
+					        SELECT manager
+					        FROM users
+					        WHERE username = ?
+					    )
+					    AND start_time >= NOW()
+					    ORDER BY start_time
+					""";
 
-        } catch (Exception e) {
-            throw new ServletException("Error loading user dashboard", e);
-        }
-    }
+			try (Connection con = DBConnectionUtil.getConnection();
+					PreparedStatement ps = con.prepareStatement(meetingSql)) {
+
+				ps.setString(1, username);
+				ResultSet rsMeetings = ps.executeQuery();
+
+				while (rsMeetings.next()) {
+					Meeting m = new Meeting();
+					m.setId(rsMeetings.getInt("id"));
+					m.setTitle(rsMeetings.getString("title"));
+					m.setDescription(rsMeetings.getString("description"));
+					m.setStartTime(rsMeetings.getTimestamp("start_time"));
+					m.setEndTime(rsMeetings.getTimestamp("end_time"));
+					m.setMeetingLink(rsMeetings.getString("meeting_link"));
+					m.setCreatedBy(rsMeetings.getString("created_by"));
+					meetings.add(m);
+				}
+			}
+
+			request.setAttribute("meetings", meetings);
+
+			/* ================= FORWARD (ONLY ONCE) ================= */
+			request.getRequestDispatcher("user.jsp").forward(request, response);
+
+		} catch (Exception e) {
+			throw new ServletException("Error loading user dashboard", e);
+		}
+	}
+
 }

@@ -221,7 +221,7 @@ required> </div>body {
 		<!-- Sidebar -->
 		<div class="left-panel">
 
-			<button class="nav-btn" onclick="loadPage('addUser.jsp')">
+			<button class="nav-btn" onclick="loadPage('addUser')">
 				<i class="fa-solid fa-user-plus"></i> Add User
 			</button>
 
