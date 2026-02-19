@@ -12,8 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.smartoffice.dao.AttendanceDAO;
+import com.smartoffice.dao.LeaveRequestDAO;
 import com.smartoffice.dao.TaskDAO;
 import com.smartoffice.dao.UserDao;
+import com.smartoffice.model.LeaveRequest;
 import com.smartoffice.model.User;
 
 @SuppressWarnings("serial")
@@ -32,13 +34,26 @@ public class ManagerDashboardServlet extends HttpServlet {
 
 		TaskDAO.deleteOldCompletedTasks();
 
-		String tab = (String)request.getParameter("tab");
-		if (tab != null ) {
-			request.setAttribute("tab", tab);
+		String tab = request.getParameter("tab");
+		if (tab != null) {
+		    request.setAttribute("tab", tab);
 		}
-		
 
 		String username = (String) session.getAttribute("username");
+
+
+		// ===== Load Leave Requests when Leave tab opened =====
+		if ("leave".equals(tab)) {
+		    LeaveRequestDAO leaveDao = new LeaveRequestDAO();
+		    List<LeaveRequest> leaveRequests = null;
+			try {
+				leaveRequests = leaveDao.getTeamLeaveRequests(username);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    request.setAttribute("leaveRequests", leaveRequests);
+		}
 
 		try {
 			AttendanceDAO attendanceDAO = new AttendanceDAO();

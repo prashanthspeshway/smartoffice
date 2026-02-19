@@ -428,10 +428,10 @@ if ("HolidayAttendance".equals(error)) {
 				Schedule Meetings</button>
 			<button class="nav-btn" onclick="showSection('attendance')">Team
 				Attendance</button>
-			<button class="nav-btn" onclick="showSection('leave')">
-				Leave Requests</button>
-
-
+			<button class="nav-btn"
+    onclick="location.href='<%=request.getContextPath()%>/manager?tab=leave'">
+    Leave Requests
+</button>
 			<button class="nav-btn" onclick="openCalendar()">Calendar</button>
 		</div>
 
