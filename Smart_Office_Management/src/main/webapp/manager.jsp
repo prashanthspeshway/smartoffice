@@ -341,6 +341,50 @@ body.dark {
 	margin: 0 auto;
 }
 
+/* ===== Performance Matrix Styling ===== */
+#performance {
+	max-width: 520px;
+}
+
+#performance h3 {
+	margin-bottom: 20px;
+	color: #1e293b;
+}
+
+/* Radio group container */
+.radio-group {
+	display: flex;
+	flex-direction: column; /* 👈 one by one */
+	gap: 10px;
+	margin: 15px 0 20px;
+}
+
+/* Individual radio option */
+.radio-group label {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 14px;
+	border-radius: 10px;
+	border: 1px solid #e5e7eb;
+	background: #f8fafc;
+	cursor: pointer;
+	font-size: 14px;
+	transition: background 0.2s ease, border 0.2s ease;
+}
+
+/* Hover effect */
+.radio-group label:hover {
+	background: #eef2ff;
+	border-color: #3b82f6;
+}
+
+/* Radio input */
+.radio-group input[type="radio"] {
+	accent-color: #2563eb;
+	transform: scale(1.1);
+}
+
 /* ===== Toast Notification ===== */
 .toast-success {
 	position: fixed;
@@ -365,7 +409,8 @@ body.dark {
 }
 
 /* Slide from right */
-@keyframes slideIn {from { opacity:0;
+@
+keyframes slideIn {from { opacity:0;
 	transform: translateX(60px);
 }
 
@@ -377,7 +422,8 @@ to {
 }
 
 /* Fade out */
-@keyframes fadeOut {to { opacity:0;
+@
+keyframes fadeOut {to { opacity:0;
 	transform: translateX(60px);
 }
 }
@@ -429,6 +475,8 @@ if ("HolidayAttendance".equals(error)) {
 			<button class="nav-btn"
 				onclick="location.href='<%=request.getContextPath()%>/manager?tab=leave'">
 				Leave Requests</button>
+			<button class="nav-btn" onclick="showSection('performance')">
+				Performance matrix</button>
 			<button class="nav-btn" onclick="openCalendar()">Calendar</button>
 		</div>
 
@@ -470,11 +518,55 @@ if ("HolidayAttendance".equals(error)) {
 				</div>
 			</div>
 
+			<!-- ===== Performance Matrix ===== -->
+			<div class="box centered-box" id="performance" style="display: none;">
+				<h3>
+					<i class="fa-solid fa-chart-line"></i> Performance Matrix
+				</h3>
+
+				<form id="performanceForm"
+					action="<%=request.getContextPath()%>/submitPerformance"
+					method="post">
+
+					<!-- Employee Dropdown -->
+					<select class="form-control" name="employee" required>
+						<option value="">Select Employee</option>
+						<%
+						List<User> teamPerf = (List<User>) request.getAttribute("teamList");
+						if (teamPerf != null) {
+							for (User u : teamPerf) {
+						%>
+						<option value="<%=u.getUsername()%>">
+							<%=u.getFullname()%> (<%=u.getUsername()%>)
+						</option>
+						<%
+						}
+						}
+						%>
+					</select>
+
+					<!-- Rating -->
+					<div class="radio-group">
+						<label><input type="radio" name="rating"
+							value="EXCELLENCE" required> Excellence</label> <label><input
+							type="radio" name="rating" value="GOOD"> Good</label> <label><input
+							type="radio" name="rating" value="AVERAGE"> Average</label> <label><input
+							type="radio" name="rating" value="BELOW_AVERAGE"> Below
+							Average</label>
+					</div>
+
+					<button class="primary-btn" type="submit">Submit
+						Performance</button>
+				</form>
+			</div>
+
 			<!-- ===== Schedule Meeting ===== -->
 			<div class="box" id="schedulemeeting" style="display: none;">
 				<h3>Schedule Meeting</h3>
 
-				<form id="scheduleMeetingForm" action="<%=request.getContextPath()%>/schedulemeeting" method="post">
+				<form id="scheduleMeetingForm"
+					action="<%=request.getContextPath()%>/schedulemeeting"
+					method="post">
 
 					<input class="form-control" type="text" name="title"
 						placeholder="Meeting Title" required>
@@ -496,6 +588,13 @@ if ("HolidayAttendance".equals(error)) {
 			<!-- ===== Team Attendance ===== -->
 			<div class="box" id="attendance" style="display: none;">
 				<h3>Team Attendance (Today)</h3>
+
+				<form action="<%=request.getContextPath()%>/exportTeamAttendance"
+					method="get" style="margin-bottom: 20px;">
+					<button type="submit" class="secondary-btn">
+						<i class="fa-solid fa-file-export"></i> Export Attendance
+					</button>
+				</form>
 
 				<div class="employee-grid">
 					<%
@@ -522,6 +621,8 @@ if ("HolidayAttendance".equals(error)) {
 						</div>
 					</div>
 
+
+
 					<%
 					}
 					} else {
@@ -530,7 +631,6 @@ if ("HolidayAttendance".equals(error)) {
 					<%
 					}
 					%>
-
 
 				</div>
 			</div>
@@ -787,6 +887,7 @@ function showSection(id) {
 	document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
 	document.getElementById(id).style.display = 'block';
 }
+
 function toggleTheme() {
 	document.body.classList.toggle("dark");
 }
@@ -808,7 +909,7 @@ setTimeout(() => {
 }, 4200);
 </script>
 
-<script>
+	<script>
 document.addEventListener("DOMContentLoaded", function () {
 
     const params = new URLSearchParams(window.location.search);
@@ -841,10 +942,44 @@ document.addEventListener("DOMContentLoaded", function () {
             window.history.replaceState({}, document.title, window.location.pathname);
         }, 100);
     }
+    
+    if (params.get("success") === "PerformanceSaved") {
+        const toast = document.createElement("div");
+        toast.className = "toast-success";
+        toast.innerHTML = `
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Performance submitted successfully</span>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+    
+ // ---- Assign Task messages ----
+    if (params.get("success") === "TaskAssigned") {
+        const toast = document.createElement("div");
+        toast.className = "toast-success";
+        toast.innerHTML = `
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Task assigned successfully</span>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    if (params.get("error") === "SelectEmployee") {
+        alert("Please select an employee");
+    }
+    if (params.get("error") === "InvalidEmployee") {
+        alert("You cannot assign task to this employee");
+    }
+    if (params.get("error") === "EmptyTask") {
+        alert("Task description cannot be empty");
+    }
+    
 });
 </script>
 
-<script>
+	<script>
 document.getElementById("scheduleMeetingForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -865,6 +1000,7 @@ document.getElementById("scheduleMeetingForm").addEventListener("submit", functi
     })
     .catch(() => alert("Failed to schedule meeting!"));
 });
+
 </script>
 
 </body>

@@ -42,8 +42,6 @@ public class ViewAssignedTasksServlet extends HttpServlet {
 		request.setAttribute("teamList", TaskDAO.getEmployeesUnderManager(manager));
 
 		// ✅ Correct tab
-		request.setAttribute("tab", "assignTask");
-
-		request.getRequestDispatcher("/manager").forward(request, response);
+		response.sendRedirect(request.getContextPath() + "/manager?tab=assignTask&viewEmployee=" + employeeUsername);
 	}
 }

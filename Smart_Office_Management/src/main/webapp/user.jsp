@@ -340,8 +340,7 @@ button:disabled {
 	background: #dc2626;
 }
 /* Slide from right */
-@
-keyframes slideIn {from { opacity:0;
+@keyframes slideIn {from { opacity:0;
 	transform: translateX(60px);
 }
 
@@ -353,8 +352,7 @@ to {
 }
 
 /* Fade out */
-@
-keyframes fadeOut {to { opacity:0;
+@keyframes fadeOut {to { opacity:0;
 	transform: translateX(60px);
 }
 
@@ -828,6 +826,11 @@ keyframes fadeOut {to { opacity:0;
         profileSection.style.display = "none";
         passwordSection.style.display = "none";
     }
+    function openCalendar() {
+			hideAllSections();
+			calendarSection.style.display = "block";
+			document.getElementById("calendarFrame").src = "calendar.jsp";
+		}
 
     // ===== Notifications =====
     function openNotifications() {
@@ -894,7 +897,7 @@ keyframes fadeOut {to { opacity:0;
         showMeetings();
     }
     else if (tab === "calendar") {
-        showCalendar();
+    	openCalendar();
     }
     else {
         // Default view

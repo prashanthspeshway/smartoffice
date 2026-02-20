@@ -110,18 +110,18 @@ public class AttendanceDAO {
 		List<TeamAttendance> list = new ArrayList<>();
 
 		String sql = """
-			    SELECT 
-			        u.username,
-			        u.fullname,
-			        a.punch_in,
-			        a.punch_out
-			    FROM users u
-			    LEFT JOIN attendance a
-			        ON a.username = u.username
-			        AND a.punch_date = CURDATE()
-			    WHERE u.manager = ?
-			    ORDER BY u.fullname
-			""";
+				    SELECT
+				        u.username,
+				        u.fullname,
+				        a.punch_in,
+				        a.punch_out
+				    FROM users u
+				    LEFT JOIN attendance a
+				        ON a.username = u.username
+				        AND a.punch_date = CURDATE()
+				    WHERE u.manager = ?
+				    ORDER BY u.fullname
+				""";
 
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -145,6 +145,46 @@ public class AttendanceDAO {
 				list.add(ta);
 			}
 		}
+		return list;
+	}
+
+	public List<TeamAttendance> getTeamAttendanceForMonth(String managerUsername) throws Exception {
+
+		List<TeamAttendance> list = new ArrayList<>();
+
+		String sql = """
+				    SELECT
+				        u.username,
+				        u.fullname,
+				        a.punch_date,
+				        a.punch_in,
+				        a.punch_out
+				    FROM users u
+				    LEFT JOIN attendance a
+				        ON a.username = u.username
+				        AND MONTH(a.punch_date) = MONTH(CURDATE())
+				        AND YEAR(a.punch_date) = YEAR(CURDATE())
+				    WHERE u.manager = ?
+				    ORDER BY u.fullname, a.punch_date
+				""";
+
+		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setString(1, managerUsername);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				TeamAttendance ta = new TeamAttendance();
+				ta.setUsername(rs.getString("username"));
+				ta.setFullName(rs.getString("fullname"));
+				ta.setAttendanceDate(rs.getDate("punch_date")); // ⭐ IMPORTANT
+				ta.setPunchIn(rs.getTimestamp("punch_in"));
+				ta.setPunchOut(rs.getTimestamp("punch_out"));
+
+				list.add(ta);
+			}
+		}
+
 		return list;
 	}
 

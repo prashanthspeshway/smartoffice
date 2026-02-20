@@ -15,7 +15,6 @@ import com.smartoffice.dao.AttendanceDAO;
 import com.smartoffice.dao.LeaveRequestDAO;
 import com.smartoffice.dao.TaskDAO;
 import com.smartoffice.dao.UserDao;
-import com.smartoffice.model.LeaveRequest;
 import com.smartoffice.model.User;
 
 @SuppressWarnings("serial")
@@ -32,42 +31,60 @@ public class ManagerDashboardServlet extends HttpServlet {
 			return;
 		}
 
-		TaskDAO.deleteOldCompletedTasks();
-
-		String tab = request.getParameter("tab");
-		if (tab != null) {
-			request.setAttribute("tab", tab);
-		}
-
 		String username = (String) session.getAttribute("username");
+
+		// ✅ Read tab from URL
+		String tab = request.getParameter("tab");
+		if (tab == null || tab.isEmpty()) {
+			tab = "selfAttendance"; // default
+		}
+		request.setAttribute("tab", tab);
+
+		TaskDAO.deleteOldCompletedTasks();
 
 		try {
 			AttendanceDAO attendanceDAO = new AttendanceDAO();
 
-			// Self attendance
+			// ================= SELF ATTENDANCE =================
 			ResultSet rs = attendanceDAO.getTodayAttendance(username);
 			if (rs != null && rs.next()) {
 				request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
 				request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
 			}
 
-			// Team list
+			// ================= TEAM LIST (COMMON) =================
 			List<User> teamList = UserDao.getUsersByManager(username);
 			request.setAttribute("teamList", teamList);
 
-			// Team attendance
+			// ================= TEAM ATTENDANCE =================
 			request.setAttribute("teamAttendance", attendanceDAO.getTeamAttendanceForToday(username));
 
-			// ✅ ALWAYS load leave requests
+			// ================= LEAVE REQUESTS =================
 			LeaveRequestDAO leaveDao = new LeaveRequestDAO();
 			request.setAttribute("leaveRequests", leaveDao.getTeamLeaveRequests(username));
+
+			// ================= ASSIGN TASK / VIEW TASK =================
+			if ("assignTask".equals(tab)) {
+
+				String viewEmployee = request.getParameter("viewEmployee");
+				String assignEmployee = request.getParameter("assignEmployee");
+
+				if (viewEmployee != null && !viewEmployee.isEmpty()) {
+					request.setAttribute("viewEmployee", viewEmployee);
+					request.setAttribute("viewTasks", TaskDAO.getTasksAssignedByManager(username, viewEmployee));
+				}
+
+				if (assignEmployee != null && !assignEmployee.isEmpty()) {
+					request.setAttribute("assignEmployee", assignEmployee);
+					request.setAttribute("assignTasks", TaskDAO.getTasksAssignedByManager(username, assignEmployee));
+				}
+			}
 
 		} catch (Exception e) {
 			throw new ServletException("Error loading manager dashboard", e);
 		}
 
 		request.getRequestDispatcher("manager.jsp").forward(request, response);
-
 	}
 
 	@Override
