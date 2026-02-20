@@ -366,57 +366,55 @@ keyframes fadeOut {to { opacity:0;
 
 /* notification */
 .notification-panel {
-    position: fixed;
-    bottom: 30px;
-    right: -380px;
-    width: 350px;
-    height: auto;
-    background: #ffffff;
-    box-shadow: -3px 0 10px rgba(0,0,0,0.15);
-    border-radius: 14px;
-    transition: right 0.3s ease-in-out;
-    z-index: 1000;
-    font-family: Arial, sans-serif;
+	position: fixed;
+	bottom: 30px;
+	right: -380px;
+	width: 350px;
+	height: auto;
+	background: #ffffff;
+	box-shadow: -3px 0 10px rgba(0, 0, 0, 0.15);
+	border-radius: 14px;
+	transition: right 0.3s ease-in-out;
+	z-index: 1000;
+	font-family: Arial, sans-serif;
 }
- 
+
 .notification-panel.show {
-    right: 25px;
+	right: 25px;
 }
- 
+
 .notification-header {
-    background: #f5fa5c;
-    color: black;
-    padding: 15px;
-    border-radius: 14px 14px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	background: #f5fa5c;
+	color: black;
+	padding: 15px;
+	border-radius: 14px 14px 0 0;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
- 
+
 .notification-header button {
-    background: none;
-    border: none;
-    color: black;
-    font-size: 18px;
-    cursor: pointer;
+	background: none;
+	border: none;
+	color: black;
+	font-size: 18px;
+	cursor: pointer;
 }
- 
+
 .notification-list {
-    padding: 15px;
-    max-height: 250px; /* Adjust as needed */
-    overflow-y: auto;
+	padding: 15px;
+	max-height: 250px; /* Adjust as needed */
+	overflow-y: auto;
 }
- 
+
 .notification-item {
-    background: #f3f4f6;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-left: 4px solid #2563eb;
-    border-radius: 4px;
-    font-size: 14px;
+	background: #f3f4f6;
+	padding: 12px;
+	margin-bottom: 10px;
+	border-left: 4px solid #2563eb;
+	border-radius: 4px;
+	font-size: 14px;
 }
- 
- 
 </style>
 </head>
 
@@ -758,15 +756,81 @@ keyframes fadeOut {to { opacity:0;
 
 
 	<script>
-	function hideAllSections() {
-		attendanceSection.style.display = "none";
-		taskSection.style.display = "none";
-		leaveSection.style.display = "none";
-		calendarSection.style.display = "none";
-		meetingSection.style.display = "none";
-	}
-	
-	function openNotifications() {
+    // ===== Section Helpers =====
+    function hideAllSections() {
+        attendanceSection.style.display = "none";
+        taskSection.style.display = "none";
+        leaveSection.style.display = "none";
+        calendarSection.style.display = "none";
+        meetingSection.style.display = "none";
+    }
+
+    function showAttendance() {
+        hideAllSections();
+        attendanceSection.style.display = "block";
+    }
+
+    function showTasks() {
+        hideAllSections();
+        taskSection.style.display = "block";
+    }
+
+    function showMeetings() {
+        hideAllSections();
+        meetingSection.style.display = "block";
+    }
+
+    function showLeave() {
+        hideAllSections();
+        leaveSection.style.display = "block";
+    }
+
+    function showCalendar() {
+        hideAllSections();
+        calendarSection.style.display = "block";
+        document.getElementById("calendarFrame").src = "calendar.jsp";
+    }
+
+    function showApplyLeave() {
+        document.getElementById("applyLeaveSection").style.display = "block";
+        document.getElementById("myLeaveSection").style.display = "none";
+    }
+
+    function showMyLeaves() {
+        document.getElementById("applyLeaveSection").style.display = "none";
+        document.getElementById("myLeaveSection").style.display = "block";
+    }
+
+    // ===== Settings =====
+    function openSettings() {
+        settingsPopup.style.display = "block";
+        backToSettings();
+    }
+
+    function closeSettings() {
+        settingsPopup.style.display = "none";
+    }
+
+    function showProfile() {
+        settingsMenu.style.display = "none";
+        profileSection.style.display = "block";
+        passwordSection.style.display = "none";
+    }
+
+    function showPassword() {
+        settingsMenu.style.display = "none";
+        profileSection.style.display = "none";
+        passwordSection.style.display = "block";
+    }
+
+    function backToSettings() {
+        settingsMenu.style.display = "block";
+        profileSection.style.display = "none";
+        passwordSection.style.display = "none";
+    }
+
+    // ===== Notifications =====
+    function openNotifications() {
         document.getElementById("notificationPanel").classList.add("show");
     }
 
@@ -774,130 +838,76 @@ keyframes fadeOut {to { opacity:0;
         document.getElementById("notificationPanel").classList.remove("show");
     }
 
-	function showAttendance() {
-		hideAllSections();
-		attendanceSection.style.display = "block";
-	}
+    // ===== Toast =====
+    function showToast(message, isError) {
+        const toast = document.getElementById("toast");
+        toast.innerText = message;
+        toast.className = "toast show" + (isError ? " error" : "");
+        setTimeout(() => toast.className = "toast", 3500);
+    }
 
-	function showTasks() {
-		hideAllSections();
-		taskSection.style.display = "block";
-	}
-	
-	function showMeetings() {
-	    hideAllSections();
-	    meetingSection.style.display = "block";
-	}
-	
-	function showApplyLeave() {
-	    document.getElementById("applyLeaveSection").style.display = "block";
-	    document.getElementById("myLeaveSection").style.display = "none";
-	}
+    // ===== URL PARAM HANDLING (IMPORTANT PART) =====
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    const sub = params.get("sub");
 
-	function showMyLeaves() {
-	    document.getElementById("applyLeaveSection").style.display = "none";
-	    document.getElementById("myLeaveSection").style.display = "block";
-	}
+    // ---- SUCCESS ----
+    if (params.has("success")) {
+        const success = params.get("success");
 
-	function showLeave() {
-		hideAllSections();
-		leaveSection.style.display = "block";
-	}
+        if (success === "LeaveApplied") {
+            showToast("Leave applied successfully", false);
+        } else if (success === "PasswordUpdated") {
+            showToast("Password updated successfully", false);
+        }
+    }
 
-	function showCalendar() {
-		hideAllSections();
-		calendarSection.style.display = "block";
-	}
-		function completeTask(btn) {
-			btn.disabled = true;
-			btn.previousElementSibling.className = "task-status done";
-			btn.previousElementSibling.innerText = "Completed";
-		}
-		function openSettings() {
-			settingsPopup.style.display = "block";
-			backToSettings();
-		}
+    // ---- ERROR ----
+    if (params.has("error")) {
+        const error = params.get("error");
 
-		function closeSettings() {
-			settingsPopup.style.display = "none";
-		}
+        if (error === "WrongOldPassword") {
+            showToast("Old password is incorrect", true);
+        } else if (error === "PasswordMismatch") {
+            showToast("Passwords do not match", true);
+        } else if (error === "HolidayAttendance") {
+            showToast("Today is a holiday. Attendance not allowed.", true);
+        } else {
+            showToast("Something went wrong", true);
+        }
+    }
 
-		function showProfile() {
-			settingsMenu.style.display = "none";
-			profileSection.style.display = "block";
-			passwordSection.style.display = "none";
-		}
+    // ---- TAB RESTORE LOGIC ----
+    if (tab === "leave") {
+        showLeave();
 
-		function showPassword() {
-			settingsMenu.style.display = "none";
-			profileSection.style.display = "none";
-			passwordSection.style.display = "block";
-		}
+        if (sub === "apply") {
+            showApplyLeave();
+        } else if (sub === "myLeaves") {
+            showMyLeaves();
+        }
+    }
+    else if (tab === "tasks") {
+        showTasks();
+    }
+    else if (tab === "meetings") {
+        showMeetings();
+    }
+    else if (tab === "calendar") {
+        showCalendar();
+    }
+    else {
+        // Default view
+        showAttendance();
+    }
 
-		function backToSettings() {
-			settingsMenu.style.display = "block";
-			profileSection.style.display = "none";
-			passwordSection.style.display = "none";
-		}
-		function showToast(message, isError) {
-			const toast = document.getElementById("toast");
-			toast.innerText = message;
-
-			toast.className = "toast show" + (isError ? " error" : "");
-
-			setTimeout(() => {
-				toast.className = "toast";
-			}, 3500);
-		}
-
-		// Read URL parameters
-		const params = new URLSearchParams(window.location.search);
-
-		if (params.has("success")) {
-			if (params.get("success") === "PasswordUpdated") {
-				showToast("Password updated successfully", false);
-			}
-		}
-
-		if (params.has("error")) {
-			const error = params.get("error");
-
-			if (error === "WrongOldPassword") {
-				showToast("Old password is incorrect", true);
-			} else if (error === "PasswordMismatch") {
-				showToast("Passwords do not match", true);
-			}
-			else if (error === "HolidayAttendance") {
-		        showToast("Today is a holiday. Attendance not allowed.", true);
-		    }else {
-				showToast("Something went wrong", true);
-			}
-		}
-		if (params.has("success") || params.has("error")) {
-			setTimeout(() => {
-				window.history.replaceState({}, document.title, window.location.pathname);
-			}, 100);
-		}
-		
-		// Auto-open Tasks tab after redirect
-		const tab = new URLSearchParams(window.location.search).get("tab");
-
-		if (tab === "tasks") {
-		    showTasks();
-		}
-		else if (tab === "meetings") {
-			showMeetings();
-		}
-		else if (tab === "calendar") {
-			openCalendar();
-		}
-		function openCalendar() {
-		    hideAllSections();   // hide attendance/tasks/leave
-		    document.getElementById("calendarSection").style.display = "block";
-		    document.getElementById("calendarFrame").src = "calendar.jsp";
-		}
-
-	</script>
+    // ---- Clean URL ----
+    if (params.has("success") || params.has("error")) {
+        setTimeout(() => {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }, 100);
+    }
+</script>
 
 </body>
 </html>

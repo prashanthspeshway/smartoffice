@@ -365,8 +365,7 @@ body.dark {
 }
 
 /* Slide from right */
-@
-keyframes slideIn {from { opacity:0;
+@keyframes slideIn {from { opacity:0;
 	transform: translateX(60px);
 }
 
@@ -378,8 +377,7 @@ to {
 }
 
 /* Fade out */
-@
-keyframes fadeOut {to { opacity:0;
+@keyframes fadeOut {to { opacity:0;
 	transform: translateX(60px);
 }
 }
@@ -476,8 +474,7 @@ if ("HolidayAttendance".equals(error)) {
 			<div class="box" id="schedulemeeting" style="display: none;">
 				<h3>Schedule Meeting</h3>
 
-				<form action="<%=request.getContextPath()%>/schedulemeeting"
-					method="post">
+				<form id="scheduleMeetingForm" action="<%=request.getContextPath()%>/schedulemeeting" method="post">
 
 					<input class="form-control" type="text" name="title"
 						placeholder="Meeting Title" required>
@@ -811,21 +808,64 @@ setTimeout(() => {
 }, 4200);
 </script>
 
-	<script>
+<script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    <%String tabAttr = (String) request.getAttribute("tab");%>
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    const success = params.get("success");
 
-    <%if (tabAttr != null) {%>
-        showSection("<%=tabAttr%>");
-    <%} else {%>
-        showSection("selfAttendance");
-    <%}%>
+    // ---- Restore correct tab ----
+    if (tab) {
+        showSection(tab);
+    } else {
+        showSection("selfAttendance"); // default
+    }
 
+    // ---- Success toast (optional, safe) ----
+    if (success === "MeetingScheduled") {
+        const toast = document.createElement("div");
+        toast.className = "toast-success";
+        toast.innerHTML = `
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Meeting scheduled successfully</span>
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    // ---- Clean URL (prevents reload issues) ----
+    if (tab || success) {
+        setTimeout(() => {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }, 100);
+    }
 });
 </script>
 
+<script>
+document.getElementById("scheduleMeetingForm").addEventListener("submit", function(e) {
+    e.preventDefault();
 
+    const formData = new FormData(this);
+
+    fetch(this.action, {
+        method: "POST",
+        body: formData
+    })
+    .then(resp => resp.text())
+    .then(() => {
+        const toast = document.createElement("div");
+        toast.className = "toast-success";
+        toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> Meeting scheduled successfully`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+        this.reset(); // reset form
+    })
+    .catch(() => alert("Failed to schedule meeting!"));
+});
+</script>
 
 </body>
 </html>

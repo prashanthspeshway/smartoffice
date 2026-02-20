@@ -49,11 +49,11 @@ public class ApplyLeaveServlet extends HttpServlet {
 			ps.executeUpdate();
 
 			// redirect back to SAME page
-			response.sendRedirect(request.getContextPath() + "/user.jsp?success=LeaveApplied");
+			response.sendRedirect(request.getContextPath() + "/user?tab=leave&success=LeaveApplied");
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.sendRedirect(request.getContextPath() + "/user.jsp?error=LeaveFailed");
+			response.sendRedirect(request.getContextPath() + "/user?tab=leave&error=LeaveFailed");
 		}
 	}
 }
