@@ -35,16 +35,16 @@ public class ViewMeetingsServlet extends HttpServlet {
 		}
 
 		String sql = """
-			    SELECT *
-			    FROM meetings
-			    WHERE created_by = (
-			        SELECT manager
-			        FROM users
-			        WHERE username = ?
-			    )
-			    AND start_time >= NOW()
-			    ORDER BY start_time
-			""";
+				    SELECT *
+				    FROM meetings
+				    WHERE created_by = (
+				        SELECT manager
+				        FROM users
+				        WHERE username = ?
+				    )
+				    AND start_time >= NOW()
+				    ORDER BY start_time
+				""";
 
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 

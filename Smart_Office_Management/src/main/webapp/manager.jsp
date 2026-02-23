@@ -390,7 +390,7 @@ body.dark {
 	position: fixed;
 	top: 80px;
 	right: 500px;
-	background: red;
+	background: #16a34a;
 	color: white;
 	padding: 14px 22px;
 	border-radius: 12px;
@@ -409,8 +409,7 @@ body.dark {
 }
 
 /* Slide from right */
-@
-keyframes slideIn {from { opacity:0;
+@keyframes slideIn {from { opacity:0;
 	transform: translateX(60px);
 }
 
@@ -422,11 +421,145 @@ to {
 }
 
 /* Fade out */
-@
-keyframes fadeOut {to { opacity:0;
+@keyframes fadeOut {to { opacity:0;
 	transform: translateX(60px);
 }
 }
+
+
+/* ================= SETTINGS ICON ================= */
+.settings-icon {
+    position:absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 26px;
+    cursor: pointer;
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 101;
+}
+
+ 
+/* ================= SETTINGS PANEL ================= */
+.settings-panel {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 300px;
+    height: 100%;
+    background: #f9f9f9;
+    box-shadow: -4px 0 10px rgba(0,0,0,0.3);
+    transition: right 0.3s ease;
+    z-index: 100;
+}
+ 
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #2c3e50;
+    color: white;
+}
+ 
+.close-btn {
+    cursor: pointer;
+    font-size: 18px;
+}
+ 
+.settings-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+ 
+.settings-list li {
+    padding: 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+}
+ 
+.settings-list li:hover {
+    background: #eaeaea;
+}
+ 
+/* ================= CHANGE PASSWORD MODAL ================= */
+.password-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+}
+ 
+.password-box {
+    width: 350px;
+    background: #fff;
+    margin: 10% auto;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+ 
+.password-header {
+    background: #34495e;
+    color: white;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+ 
+.password-body {
+    padding: 20px;
+}
+ 
+.password-body input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+ 
+.password-body button {
+    width: 100%;
+    padding: 10px;
+    background: #2ecc71;
+    border: none;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+ 
+.password-body button:hover {
+    background: #27ae60;
+}
+ 
+/* ================= DARK THEME ================= */
+.dark-theme {
+    background: #121212;
+    color: white;
+}
+ 
+.dark-theme .settings-panel {
+    background: #1e1e1e;
+}
+ 
+.dark-theme .password-box {
+    background: #1e1e1e;
+    color: white;
+}
+ 
+.dark-theme input {
+    background: #2c2c2c;
+    color: white;
+    border: 1px solid #555;
+}
+
+
 </style>
 </head>
 
@@ -444,12 +577,51 @@ if ("HolidayAttendance".equals(error)) {
 
 <body>
 
+ 
+<!-- SETTINGS PANEL -->
+<div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+        <h3>Settings</h3>
+        <span class="close-btn" onclick="closeSettings()">✖</span>
+    </div>
+ 
+    <ul class="settings-list">
+        <li onclick="openProfile()">👤 Self Profile</li>
+        <li onclick="openChangePassword()">🔐 Change Password</li>
+        <li onclick="toggleTheme()">🌗 Theme</li>
+    </ul>
+</div>
+ 
+<!-- CHANGE PASSWORD MODAL -->
+<div id="passwordModal" class="password-modal">
+    <div class="password-box">
+        <div class="password-header">
+            <h4>Change Password</h4>
+            <span class="close-btn" onclick="closeChangePassword()">✖</span>
+        </div>
+ 
+        <div class="password-body">
+            <input type="password" id="oldPassword" placeholder="Old Password">
+            <input type="password" id="newPassword" placeholder="New Password">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password">
+            <button onclick="submitPassword()">Update Password</button>
+        </div>
+    </div>
+</div>
+ 
+ 
+ 
+ 
+ 
+ 
+
+
 	<!-- ===== Top Bar ===== -->
 	<div class="top-bar">
 		<h2>Smart Office • Manager Dashboard</h2>
 		<div class="user-area">
 			<span>Welcome, <b>${sessionScope.username}</b></span>
-			<button class="icon-btn" onclick="showSection('settings')">
+			<button class="icon-btn" onclick="openSettings()">
 				<i class="fa-solid fa-gear"></i>
 			</button>
 			<a href="<%=request.getContextPath()%>/logout">
@@ -581,7 +753,7 @@ if ("HolidayAttendance".equals(error)) {
 						(optional)</label> <input class="form-control" type="text"
 						name="meetingLink" placeholder="Zoom / Google Meet link">
 
-					<button class="primary-btn">Schedule Meeting</button>
+					<button class="primary-btn" type="submit">Schedule Meeting</button>
 				</form>
 			</div>
 
@@ -706,6 +878,19 @@ if ("HolidayAttendance".equals(error)) {
 				<iframe id="calendarFrame" src=""
 					style="width: 100%; height: 600px; border: none;"></iframe>
 
+			</div>
+
+			<!-- ===== Settings ===== -->
+			<div class="box" id="settings" style="display: none;">
+				<h3>Settings</h3>
+				<p>
+					<b>Name:</b> ${sessionScope.username}
+				</p>
+				<p>
+					<b>Role:</b> Manager
+				</p>
+				<button class="secondary-btn" onclick="toggleTheme()">Toggle
+					Theme</button>
 			</div>
 
 			<!-- ===== My Team ===== -->
@@ -865,20 +1050,6 @@ if ("HolidayAttendance".equals(error)) {
 					%>
 				</div>
 			</div>
-
-			<!-- ===== Settings ===== -->
-			<div class="box" id="settings" style="display: none;">
-				<h3>Settings</h3>
-				<p>
-					<b>Name:</b> ${sessionScope.username}
-				</p>
-				<p>
-					<b>Role:</b> Manager
-				</p>
-				<button class="secondary-btn" onclick="toggleTheme()">Toggle
-					Theme</button>
-			</div>
-
 		</div>
 	</div>
 
@@ -975,33 +1146,133 @@ document.addEventListener("DOMContentLoaded", function () {
     if (params.get("error") === "EmptyTask") {
         alert("Task description cannot be empty");
     }
+    if (params.get("error") === "AlreadyRated") {
+        const toast = document.createElement("div");
+        toast.className = "toast-success";
+        toast.innerHTML = `
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>Performance already submitted for this employee this month</span>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
     
 });
 </script>
 
-	<script>
-document.getElementById("scheduleMeetingForm").addEventListener("submit", function(e) {
+<script>
+document.getElementById("meetingForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
-    const formData = new FormData(this);
+    const form = e.target;
+    const formData = new FormData(form);
 
-    fetch(this.action, {
+    fetch("schedulemeeting", {
         method: "POST",
         body: formData
     })
-    .then(resp => resp.text())
-    .then(() => {
-        const toast = document.createElement("div");
-        toast.className = "toast-success";
-        toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> Meeting scheduled successfully`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 4000);
-        this.reset(); // reset form
+    .then(res => res.text())
+    .then(text => {
+        switch (text.trim()) {
+            case "SUCCESS":
+                showToast("Meeting scheduled successfully ✅");
+                form.reset();
+                break;
+
+            case "INVALID":
+                showToast("Please fill all required fields ❌");
+                break;
+
+            case "INVALID_TIME":
+                showToast("End time must be after start time ⏰");
+                break;
+
+            default:
+                showToast("Something went wrong ❌");
+        }
     })
-    .catch(() => alert("Failed to schedule meeting!"));
+    .catch(() => {
+        showToast("Server error ❌");
+    });
 });
 
+function showToast(message) {
+    const toast = document.createElement("div");
+    toast.textContent = message;
+
+    Object.assign(toast.style, {
+        position: "fixed",
+        bottom: "20px",
+        right: "20px",
+        background: "#1f2933",
+        color: "#fff",
+        padding: "12px 18px",
+        borderRadius: "6px",
+        fontSize: "14px",
+        boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+        zIndex: "9999",
+        opacity: "0",
+        transition: "opacity 0.3s ease"
+    });
+
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => toast.style.opacity = "1");
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
 </script>
+
+<script>
+
+function openSettings() {
+
+    document.getElementById("settingsPanel").style.right = "0";
+
+    document.getElementById("overlay").style.display = "block";
+
+}
+ 
+function closeSettings() {
+
+    document.getElementById("settingsPanel").style.right = "-320px";
+
+}
+ 
+function openChangePassword() {
+
+    document.getElementById("passwordModal").style.display = "block";
+
+    document.getElementById("overlay").style.display = "block";
+
+}
+ 
+function closeChangePassword() {
+
+    document.getElementById("passwordModal").style.display = "none";
+
+}
+ 
+function toggleTheme() {
+
+    document.body.classList.toggle("dark-theme");
+
+}
+ 
+function closeAll() {
+
+    closeSettings();
+
+    closeChangePassword();
+
+    document.getElementById("overlay").style.display = "none";
+
+}
+</script>
+ 
 
 </body>
 </html>

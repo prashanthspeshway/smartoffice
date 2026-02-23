@@ -325,15 +325,12 @@ button:disabled {
 	font-weight: 600;
 	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 	opacity: 0;
-	animation: slideIn 0.4s ease, fadeOut 0.4s ease 3.6s forwards;
-	/* 	transform: translateY(-20px); */
-	transition: all 0.4s ease;
 	z-index: 2000;
 }
 
 .toast.show {
 	opacity: 1;
-	/* 	transform: translateY(0); */
+	animation: slideIn 0.4s ease, fadeOut 0.4s ease 3.6s forwards;
 }
 
 .toast.error {
@@ -413,10 +410,180 @@ to {
 	border-radius: 4px;
 	font-size: 14px;
 }
+
+
+/* ================= SETTINGS ICON ================= */
+.settings-icon {
+    position:absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 26px;
+    cursor: pointer;
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 101;
+}
+ 
+/* ================= SETTINGS PANEL ================= */
+.settings-panel {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 300px;
+    height: 100%;
+    background: #f9f9f9;
+    box-shadow: -4px 0 10px rgba(0,0,0,0.3);
+    transition: right 0.3s ease;
+    z-index: 100;
+}
+ 
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #2c3e50;
+    color: white;
+}
+ 
+.close-btn {
+    cursor: pointer;
+    font-size: 18px;
+}
+ 
+.settings-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+ 
+.settings-list li {
+    padding: 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+}
+ 
+.settings-list li:hover {
+    background: #eaeaea;
+}
+ 
+/* ================= CHANGE PASSWORD MODAL ================= */
+.password-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+}
+ 
+.password-box {
+    width: 350px;
+    background: #fff;
+    margin: 10% auto;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+ 
+.password-header {
+    background: #34495e;
+    color: white;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+ 
+.password-body {
+    padding: 20px;
+}
+ 
+.password-body input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+ 
+.password-body button {
+    width: 100%;
+    padding: 10px;
+    background: #2ecc71;
+    border: none;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+ 
+.password-body button:hover {
+    background: #27ae60;
+}
+ 
+/* ================= DARK THEME ================= */
+.dark-theme {
+    background: #121212;
+    color: white;
+}
+ 
+.dark-theme .settings-panel {
+    background: #1e1e1e;
+}
+ 
+.dark-theme .password-box {
+    background: #1e1e1e;
+    color: white;
+}
+ 
+.dark-theme input {
+    background: #2c2c2c;
+    color: white;
+    border: 1px solid #555;
+}
+
+
 </style>
 </head>
 
 <body>
+
+	<!-- SETTINGS PANEL -->
+	<div id="settingsPanel" class="settings-panel">
+		<div class="settings-header">
+			<h3>Settings</h3>
+			<span class="close-btn" onclick="closeSettings()">✖</span>
+		</div>
+
+		<ul class="settings-list">
+			<li onclick="openProfile()">👤 Self Profile</li>
+			<li onclick="openChangePassword()">🔐 Change Password</li>
+			<li onclick="toggleTheme()">🌗 Theme</li>
+		</ul>
+	</div>
+
+	<!-- CHANGE PASSWORD MODAL -->
+	<div id="passwordModal" class="password-modal">
+		<div class="password-box">
+			<div class="password-header">
+				<h4>Change Password</h4>
+				<span class="close-btn" onclick="closeChangePassword()">✖</span>
+			</div>
+
+			<div class="password-body">
+				<input type="password" id="oldPassword" placeholder="Old Password">
+				<input type="password" id="newPassword" placeholder="New Password">
+				<input type="password" id="confirmPassword"
+					placeholder="Confirm Password">
+				<button onclick="submitPassword()">Update Password</button>
+			</div>
+		</div>
+	</div>
+
+
+
+
 
 	<div class="top-bar">
 		<h2>Smart Office • Employee Dashboard</h2>
@@ -843,11 +1010,17 @@ to {
 
     // ===== Toast =====
     function showToast(message, isError) {
-        const toast = document.getElementById("toast");
-        toast.innerText = message;
-        toast.className = "toast show" + (isError ? " error" : "");
-        setTimeout(() => toast.className = "toast", 3500);
-    }
+    if (!message) return; // 🔒 SAFETY
+
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.className = "toast show" + (isError ? " error" : "");
+
+    setTimeout(() => {
+        toast.className = "toast";
+        toast.innerText = "";
+    }, 4000);
+}
 
     // ===== URL PARAM HANDLING (IMPORTANT PART) =====
     const params = new URLSearchParams(window.location.search);
@@ -911,6 +1084,54 @@ to {
         }, 100);
     }
 </script>
+
+<script>
+
+function openSettings() {
+
+    document.getElementById("settingsPanel").style.right = "0";
+
+    document.getElementById("overlay").style.display = "block";
+
+}
+ 
+function closeSettings() {
+
+    document.getElementById("settingsPanel").style.right = "-320px";
+
+}
+ 
+function openChangePassword() {
+
+    document.getElementById("passwordModal").style.display = "block";
+
+    document.getElementById("overlay").style.display = "block";
+
+}
+ 
+function closeChangePassword() {
+
+    document.getElementById("passwordModal").style.display = "none";
+
+}
+ 
+function toggleTheme() {
+
+    document.body.classList.toggle("dark-theme");
+
+}
+ 
+function closeAll() {
+
+    closeSettings();
+
+    closeChangePassword();
+
+    document.getElementById("overlay").style.display = "none";
+
+}
+</script>
+ 
 
 </body>
 </html>
