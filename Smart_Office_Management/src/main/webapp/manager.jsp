@@ -341,6 +341,86 @@ body.dark {
 	margin: 0 auto;
 }
 
+/* ===== Team Attendance Header ===== */
+.team-attendance-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20px;
+}
+
+/* Button container */
+.export-actions {
+	display: flex;
+	gap: 12px;
+}
+
+/* Unified export button style */
+.export-btn {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 18px;
+	border-radius: 20px;
+	border: none;
+	background: #2563eb;
+	color: #fff;
+	font-size: 14px;
+	cursor: pointer;
+	min-width: 190px;
+	justify-content: center;
+	transition: all 0.2s ease;
+}
+
+.export-btn:hover {
+	background: #1d4ed8;
+	transform: translateY(-1px);
+	box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+}
+
+.export-btn i {
+	font-size: 14px;
+}
+
+.team-attendance-header {
+	display: flex;
+	align-items: center; /* vertically aligns h3 + buttons */
+	justify-content: space-between;
+	margin-bottom: 20px;
+}
+
+/* Prevent h3 from forcing a new line */
+.team-title {
+	margin: 0;
+	white-space: nowrap;
+}
+
+/* Button container */
+.export-actions {
+	display: flex;
+	gap: 12px;
+}
+
+/* Buttons */
+.export-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 10px 18px;
+	min-width: 190px;
+	border-radius: 20px;
+	border: none;
+	background: #2563eb;
+	color: white;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.export-btn:hover {
+	background: #1d4ed8;
+}
+
 /* ===== Performance Matrix Styling ===== */
 #performance {
 	max-width: 520px;
@@ -409,7 +489,8 @@ body.dark {
 }
 
 /* Slide from right */
-@keyframes slideIn {from { opacity:0;
+@
+keyframes slideIn {from { opacity:0;
 	transform: translateX(60px);
 }
 
@@ -421,145 +502,143 @@ to {
 }
 
 /* Fade out */
-@keyframes fadeOut {to { opacity:0;
+@
+keyframes fadeOut {to { opacity:0;
 	transform: translateX(60px);
 }
-}
 
+}
 
 /* ================= SETTINGS ICON ================= */
 .settings-icon {
-    position:absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 26px;
-    cursor: pointer;
-    background: #ffffff;
-    padding: 10px;
-    border-radius: 50%;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    z-index: 101;
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	font-size: 26px;
+	cursor: pointer;
+	background: #ffffff;
+	padding: 10px;
+	border-radius: 50%;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	z-index: 101;
 }
 
- 
 /* ================= SETTINGS PANEL ================= */
 .settings-panel {
-    position: fixed;
-    top: 0;
-    right: -320px;
-    width: 300px;
-    height: 100%;
-    background: #f9f9f9;
-    box-shadow: -4px 0 10px rgba(0,0,0,0.3);
-    transition: right 0.3s ease;
-    z-index: 100;
+	position: fixed;
+	top: 0;
+	right: -320px;
+	width: 300px;
+	height: 100%;
+	background: #f9f9f9;
+	box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
+	transition: right 0.3s ease;
+	z-index: 100;
 }
- 
+
 .settings-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    background: #2c3e50;
-    color: white;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px;
+	background: #2c3e50;
+	color: white;
 }
- 
+
 .close-btn {
-    cursor: pointer;
-    font-size: 18px;
+	cursor: pointer;
+	font-size: 18px;
 }
- 
+
 .settings-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+	list-style: none;
+	padding: 0;
+	margin: 0;
 }
- 
+
 .settings-list li {
-    padding: 15px;
-    cursor: pointer;
-    border-bottom: 1px solid #ddd;
+	padding: 15px;
+	cursor: pointer;
+	border-bottom: 1px solid #ddd;
 }
- 
+
 .settings-list li:hover {
-    background: #eaeaea;
+	background: #eaeaea;
 }
- 
+
 /* ================= CHANGE PASSWORD MODAL ================= */
 .password-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 200;
+	display: none;
+	position: fixed;
+	inset: 0;
+	z-index: 200;
 }
- 
+
 .password-box {
-    width: 350px;
-    background: #fff;
-    margin: 10% auto;
-    border-radius: 6px;
-    overflow: hidden;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+	width: 350px;
+	background: #fff;
+	margin: 10% auto;
+	border-radius: 6px;
+	overflow: hidden;
+	box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
- 
+
 .password-header {
-    background: #34495e;
-    color: white;
-    padding: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	background: #34495e;
+	color: white;
+	padding: 12px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
- 
+
 .password-body {
-    padding: 20px;
+	padding: 20px;
 }
- 
+
 .password-body input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 12px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
 }
- 
+
 .password-body button {
-    width: 100%;
-    padding: 10px;
-    background: #2ecc71;
-    border: none;
-    color: white;
-    font-size: 15px;
-    cursor: pointer;
-    border-radius: 4px;
+	width: 100%;
+	padding: 10px;
+	background: #2ecc71;
+	border: none;
+	color: white;
+	font-size: 15px;
+	cursor: pointer;
+	border-radius: 4px;
 }
- 
+
 .password-body button:hover {
-    background: #27ae60;
+	background: #27ae60;
 }
- 
+
 /* ================= DARK THEME ================= */
 .dark-theme {
-    background: #121212;
-    color: white;
+	background: #121212;
+	color: white;
 }
- 
+
 .dark-theme .settings-panel {
-    background: #1e1e1e;
+	background: #1e1e1e;
 }
- 
+
 .dark-theme .password-box {
-    background: #1e1e1e;
-    color: white;
+	background: #1e1e1e;
+	color: white;
 }
- 
+
 .dark-theme input {
-    background: #2c2c2c;
-    color: white;
-    border: 1px solid #555;
+	background: #2c2c2c;
+	color: white;
+	border: 1px solid #555;
 }
-
-
 </style>
 </head>
 
@@ -577,43 +656,44 @@ if ("HolidayAttendance".equals(error)) {
 
 <body>
 
- 
-<!-- SETTINGS PANEL -->
-<div id="settingsPanel" class="settings-panel">
-    <div class="settings-header">
-        <h3>Settings</h3>
-        <span class="close-btn" onclick="closeSettings()">✖</span>
-    </div>
- 
-    <ul class="settings-list">
-        <li onclick="openProfile()">👤 Self Profile</li>
-        <li onclick="openChangePassword()">🔐 Change Password</li>
-        <li onclick="toggleTheme()">🌗 Theme</li>
-    </ul>
-</div>
- 
-<!-- CHANGE PASSWORD MODAL -->
-<div id="passwordModal" class="password-modal">
-    <div class="password-box">
-        <div class="password-header">
-            <h4>Change Password</h4>
-            <span class="close-btn" onclick="closeChangePassword()">✖</span>
-        </div>
- 
-        <div class="password-body">
-            <input type="password" id="oldPassword" placeholder="Old Password">
-            <input type="password" id="newPassword" placeholder="New Password">
-            <input type="password" id="confirmPassword" placeholder="Confirm Password">
-            <button onclick="submitPassword()">Update Password</button>
-        </div>
-    </div>
-</div>
- 
- 
- 
- 
- 
- 
+
+	<!-- SETTINGS PANEL -->
+	<div id="settingsPanel" class="settings-panel">
+		<div class="settings-header">
+			<h3>Settings</h3>
+			<span class="close-btn" onclick="closeSettings()">✖</span>
+		</div>
+
+		<ul class="settings-list">
+			<li onclick="openProfile()">👤 Self Profile</li>
+			<li onclick="openChangePassword()">🔐 Change Password</li>
+			<li onclick="toggleTheme()">🌗 Theme</li>
+		</ul>
+	</div>
+
+	<!-- CHANGE PASSWORD MODAL -->
+	<div id="passwordModal" class="password-modal">
+		<div class="password-box">
+			<div class="password-header">
+				<h4>Change Password</h4>
+				<span class="close-btn" onclick="closeChangePassword()">✖</span>
+			</div>
+
+			<div class="password-body">
+				<input type="password" id="oldPassword" placeholder="Old Password">
+				<input type="password" id="newPassword" placeholder="New Password">
+				<input type="password" id="confirmPassword"
+					placeholder="Confirm Password">
+				<button onclick="submitPassword()">Update Password</button>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
 
 
 	<!-- ===== Top Bar ===== -->
@@ -736,6 +816,7 @@ if ("HolidayAttendance".equals(error)) {
 			<div class="box" id="schedulemeeting" style="display: none;">
 				<h3>Schedule Meeting</h3>
 
+				<!-- ===== Schedule Form ===== -->
 				<form id="scheduleMeetingForm"
 					action="<%=request.getContextPath()%>/schedulemeeting"
 					method="post">
@@ -753,20 +834,82 @@ if ("HolidayAttendance".equals(error)) {
 						(optional)</label> <input class="form-control" type="text"
 						name="meetingLink" placeholder="Zoom / Google Meet link">
 
-					<button class="primary-btn" type="submit">Schedule Meeting</button>
+					<button class="primary-btn" type="submit">Schedule Meeting
+					</button>
 				</form>
+
+				<hr style="margin: 30px 0;">
+
+				<!-- ===== Today’s Meetings (INSIDE SAME TAB) ===== -->
+				<h3>
+					<i class="fa-solid fa-calendar-check"></i> Today’s Meetings
+				</h3>
+
+				<%
+				List<com.smartoffice.model.Meeting> todayMeetings = (List<com.smartoffice.model.Meeting>) request
+						.getAttribute("todayMeetings");
+
+				if (todayMeetings != null && !todayMeetings.isEmpty()) {
+					for (com.smartoffice.model.Meeting m : todayMeetings) {
+				%>
+
+				<div class="employee-card">
+					<div class="emp-header">
+						<i class="fa-solid fa-video"></i> <span class="emp-name"><%=m.getTitle()%></span>
+					</div>
+
+					<div class="emp-body">
+						<div>
+							<b>Start:</b>
+							<%=m.getStartTime()%></div>
+						<div>
+							<b>End:</b>
+							<%=m.getEndTime()%></div>
+
+						<%
+						if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
+						%>
+						<div>
+							<a href="<%=m.getMeetingLink()%>" target="_blank"> Join
+								Meeting </a>
+						</div>
+						<%
+						}
+						%>
+					</div>
+				</div>
+
+				<%
+				}
+				} else {
+				%>
+				<p>No meetings scheduled for today.</p>
+				<%
+				}
+				%>
 			</div>
 
 			<!-- ===== Team Attendance ===== -->
 			<div class="box" id="attendance" style="display: none;">
-				<h3>Team Attendance (Today)</h3>
+				<div class="team-attendance-header">
+					<h3 class="team-title">Team Attendance (Today)</h3>
 
-				<form action="<%=request.getContextPath()%>/exportTeamAttendance"
-					method="get" style="margin-bottom: 20px;">
-					<button type="submit" class="secondary-btn">
-						<i class="fa-solid fa-file-export"></i> Export Attendance
-					</button>
-				</form>
+					<div class="export-actions">
+						<form action="<%=request.getContextPath()%>/exportTeamAttendance"
+							method="get">
+							<button type="submit" class="export-btn">
+								<i class="fa-solid fa-file-export"></i> Export Attendance
+							</button>
+						</form>
+
+						<form action="<%=request.getContextPath()%>/exportTeamPerformance"
+							method="get">
+							<button type="submit" class="export-btn">
+								<i class="fa-solid fa-file-export"></i> Export Performance
+							</button>
+						</form>
+					</div>
+				</div>
 
 				<div class="employee-grid">
 					<%
@@ -1160,7 +1303,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
-<script>
+	<script>
 document.getElementById("meetingForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -1226,7 +1369,7 @@ function showToast(message) {
 }
 </script>
 
-<script>
+	<script>
 
 function openSettings() {
 
@@ -1272,7 +1415,7 @@ function closeAll() {
 
 }
 </script>
- 
+
 
 </body>
 </html>
