@@ -341,6 +341,30 @@ body.dark {
 	margin: 0 auto;
 }
 
+.join-meeting-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 14px;
+	border-radius: 18px;
+	background: #2563eb;
+	color: #ffffff;
+	text-decoration: none;
+	font-size: 13px;
+	font-weight: 600;
+	transition: all 0.2s ease;
+}
+
+.join-meeting-btn i {
+	font-size: 14px;
+}
+
+.join-meeting-btn:hover {
+	background: #1d4ed8;
+	transform: translateY(-1px);
+	box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+}
+
 /* ===== Team Attendance Header ===== */
 .team-attendance-header {
 	display: flex;
@@ -619,6 +643,52 @@ keyframes fadeOut {to { opacity:0;
 	background: #27ae60;
 }
 
+/* ===== Schedule Meeting Grid ===== */
+.meeting-grid {
+	display: grid;
+	grid-template-columns: 1.1fr 0.9fr;
+	gap: 30px;
+	margin-top: 20px;
+}
+
+/* Left: form */
+.meeting-left {
+	background: #f8fafc;
+	padding: 20px;
+	border-radius: 14px;
+}
+
+/* Right: meetings list */
+.meeting-right {
+	background: #ffffff;
+	padding: 20px;
+	border-radius: 14px;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+	max-height: 520px; /* 👈 controls visible height */
+	overflow-y: auto; /* 👈 vertical scroll */
+}
+
+/* Optional: smoother scrollbar (Chrome / Edge) */
+.meeting-right::-webkit-scrollbar {
+	width: 6px;
+}
+
+.meeting-right::-webkit-scrollbar-thumb {
+	background: #c7d2fe;
+	border-radius: 10px;
+}
+
+.meeting-right::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+/* Responsive (mobile friendly) */
+@media ( max-width : 900px) {
+	.meeting-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
 /* ================= DARK THEME ================= */
 .dark-theme {
 	background: #121212;
@@ -812,81 +882,91 @@ if ("HolidayAttendance".equals(error)) {
 				</form>
 			</div>
 
-			<!-- ===== Schedule Meeting ===== -->
 			<div class="box" id="schedulemeeting" style="display: none;">
 				<h3>Schedule Meeting</h3>
 
-				<!-- ===== Schedule Form ===== -->
-				<form id="scheduleMeetingForm"
-					action="<%=request.getContextPath()%>/schedulemeeting"
-					method="post">
+				<!-- GRID WRAPPER -->
+				<div class="meeting-grid">
 
-					<input class="form-control" type="text" name="title"
-						placeholder="Meeting Title" required>
+					<!-- LEFT : Schedule Form -->
+					<div class="meeting-left">
 
-					<textarea class="form-control" name="description"
-						placeholder="Meeting Description" rows="3" required></textarea>
+						<form id="scheduleMeetingForm"
+							action="<%=request.getContextPath()%>/schedulemeeting"
+							method="post">
 
-					<label>Start Time</label> <input class="form-control"
-						type="datetime-local" name="startTime" required> <label>End
-						Time</label> <input class="form-control" type="datetime-local"
-						name="endTime" required> <label>Meeting Link
-						(optional)</label> <input class="form-control" type="text"
-						name="meetingLink" placeholder="Zoom / Google Meet link">
+							<input class="form-control" type="text" name="title"
+								placeholder="Meeting Title" required>
 
-					<button class="primary-btn" type="submit">Schedule Meeting
-					</button>
-				</form>
+							<textarea class="form-control" name="description"
+								placeholder="Meeting Description" rows="3" required></textarea>
 
-				<hr style="margin: 30px 0;">
+							<label>Start Time</label> <input class="form-control"
+								type="datetime-local" name="startTime" required> <label>End
+								Time</label> <input class="form-control" type="datetime-local"
+								name="endTime" required> <label>Meeting Link
+								(optional)</label> <input class="form-control" type="text"
+								name="meetingLink" placeholder="Zoom / Google Meet link">
 
-				<!-- ===== Today’s Meetings (INSIDE SAME TAB) ===== -->
-				<h3>
-					<i class="fa-solid fa-calendar-check"></i> Today’s Meetings
-				</h3>
+							<button class="primary-btn" type="submit">Schedule
+								Meeting</button>
+						</form>
 
-				<%
-				List<com.smartoffice.model.Meeting> todayMeetings = (List<com.smartoffice.model.Meeting>) request
-						.getAttribute("todayMeetings");
-
-				if (todayMeetings != null && !todayMeetings.isEmpty()) {
-					for (com.smartoffice.model.Meeting m : todayMeetings) {
-				%>
-
-				<div class="employee-card">
-					<div class="emp-header">
-						<i class="fa-solid fa-video"></i> <span class="emp-name"><%=m.getTitle()%></span>
 					</div>
 
-					<div class="emp-body">
-						<div>
-							<b>Start:</b>
-							<%=m.getStartTime()%></div>
-						<div>
-							<b>End:</b>
-							<%=m.getEndTime()%></div>
+					<!-- RIGHT : Today's Meetings -->
+					<div class="meeting-right">
+
+						<h4>
+							<i class="fa-solid fa-calendar-check"></i> Today’s Meetings
+						</h4>
 
 						<%
-						if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
+						List<com.smartoffice.model.Meeting> todayMeetings = (List<com.smartoffice.model.Meeting>) request
+								.getAttribute("todayMeetings");
+
+						if (todayMeetings != null && !todayMeetings.isEmpty()) {
+							for (com.smartoffice.model.Meeting m : todayMeetings) {
 						%>
-						<div>
-							<a href="<%=m.getMeetingLink()%>" target="_blank"> Join
-								Meeting </a>
+
+						<div class="employee-card">
+							<div class="emp-header">
+								<i class="fa-solid fa-video"></i> <span class="emp-name"><%=m.getTitle()%></span>
+							</div>
+
+							<div class="emp-body">
+								<div>
+									<b>Start:</b>
+									<%=m.getStartTime()%></div>
+								<div>
+									<b>End:</b>
+									<%=m.getEndTime()%></div>
+
+								<%
+								if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
+								%>
+								<a href="<%=m.getMeetingLink()%>" target="_blank"
+									class="join-meeting-btn"> <i class="fa-solid fa-video"></i>
+									Join Meeting
+								</a>
+								<%
+								}
+								%>
+							</div>
 						</div>
+
+						<%
+						}
+						} else {
+						%>
+						<p>No meetings scheduled for today.</p>
 						<%
 						}
 						%>
-					</div>
-				</div>
 
-				<%
-				}
-				} else {
-				%>
-				<p>No meetings scheduled for today.</p>
-				<%
-				}
-				%>
+					</div>
+
+				</div>
 			</div>
 
 			<!-- ===== Team Attendance ===== -->

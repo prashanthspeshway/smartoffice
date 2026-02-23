@@ -16,6 +16,8 @@ import com.smartoffice.dao.LeaveRequestDAO;
 import com.smartoffice.dao.TaskDAO;
 import com.smartoffice.dao.UserDao;
 import com.smartoffice.model.User;
+import com.smartoffice.dao.MeetingDao;
+import com.smartoffice.model.Meeting;
 
 @SuppressWarnings("serial")
 @WebServlet("/manager")
@@ -51,6 +53,10 @@ public class ManagerDashboardServlet extends HttpServlet {
 				request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
 				request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
 			}
+			
+			// ================= TODAY MEETINGS =================
+			List<Meeting> todayMeetings = MeetingDao.getTodayMeetings(username);
+			request.setAttribute("todayMeetings", todayMeetings);
 
 			// ================= TEAM LIST (COMMON) =================
 			List<User> teamList = UserDao.getUsersByManager(username);
@@ -62,6 +68,7 @@ public class ManagerDashboardServlet extends HttpServlet {
 			// ================= LEAVE REQUESTS =================
 			LeaveRequestDAO leaveDao = new LeaveRequestDAO();
 			request.setAttribute("leaveRequests", leaveDao.getTeamLeaveRequests(username));
+			
 
 			// ================= ASSIGN TASK / VIEW TASK =================
 			if ("assignTask".equals(tab)) {
