@@ -20,7 +20,19 @@ div
 
 
 
+
+
+
+
+
+
  
+
+
+
+
+
+
 
 
 
@@ -32,7 +44,19 @@ class
 
 
 
+
+
+
+
+
+
  
+
+
+
+
+
+
 
 
 
@@ -45,7 +69,19 @@ form-group
 
 
 
+
+
+
+
+
+
  
+
+
+
+
+
+
 
 
 
@@ -61,7 +97,19 @@ Manager
 
 
 
+
+
+
+
+
+
  
+
+
+
+
+
+
 
 
 
@@ -77,7 +125,19 @@ input
 
 
 
+
+
+
+
+
+
  
+
+
+
+
+
+
 
 
 
@@ -89,7 +149,19 @@ type
 
 
 
+
+
+
+
+
+
  
+
+
+
+
+
+
 
 
 
@@ -102,7 +174,19 @@ text
 
 
 
+
+
+
+
+
+
  
+
+
+
+
+
+
 
 
 
@@ -116,7 +200,19 @@ name
 
 
 
+
+
+
+
+
+
 	
+
+
+
+
+
+
 
 
 
@@ -129,7 +225,19 @@ manager
 
 
 
+
+
+
+
+
+
  
+
+
+
+
+
+
 
 
 
@@ -142,7 +250,19 @@ value
 
 
 
+
+
+
+
+
+
  
+
+
+
+
+
+
 
 
 
@@ -150,6 +270,18 @@ value
 
 ="${
 manager
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -423,6 +555,11 @@ required> </div>body {
 
 <body>
 
+
+	<div id="overlay" onclick="closeAll()"
+		style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 99;">
+	</div>
+
 	<!-- SETTINGS PANEL -->
 	<div id="settingsPanel" class="settings-panel">
 		<div class="settings-header">
@@ -447,11 +584,25 @@ required> </div>body {
 			</div>
 
 			<div class="password-body">
-				<input type="password" id="oldPassword" placeholder="Old Password">
 				<input type="password" id="newPassword" placeholder="New Password">
 				<input type="password" id="confirmPassword"
 					placeholder="Confirm Password">
 				<button onclick="submitPassword()">Update Password</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- ===== SELF PROFILE MODAL ===== -->
+	<div id="profileModal" class="password-modal">
+		<div class="password-box" style="width: 600px; height: 450px;">
+			<div class="password-header">
+				<h4>My Profile</h4>
+				<span class="close-btn" onclick="closeProfile()">✖</span>
+			</div>
+
+			<div style="height: 100%;">
+				<iframe id="profileFrame" src=""
+					style="width: 100%; height: 100%; border: none;"> </iframe>
 			</div>
 		</div>
 	</div>
@@ -525,51 +676,68 @@ required> </div>body {
 		function loadPage(page) {
 			document.getElementById("contentFrame").src = page;
 		}
-	</script>
 
-	<script>
 		function openSettings() {
-
 			document.getElementById("settingsPanel").style.right = "0";
-
 			document.getElementById("overlay").style.display = "block";
-
 		}
 
 		function closeSettings() {
-
 			document.getElementById("settingsPanel").style.right = "-320px";
+			document.getElementById("overlay").style.display = "none";
+		}
 
+		function openProfile() {
+			document.getElementById("profileFrame").src = "selfProfile";
+			document.getElementById("profileModal").style.display = "block";
+			document.getElementById("overlay").style.display = "block";
+			closeSettings();
+		}
+		
+		function closeProfile() {
+			document.getElementById("profileModal").style.display = "none";
+			document.getElementById("profileFrame").src = "";
+			document.getElementById("overlay").style.display = "none";
 		}
 
 		function openChangePassword() {
-
 			document.getElementById("passwordModal").style.display = "block";
-
 			document.getElementById("overlay").style.display = "block";
-
 		}
 
 		function closeChangePassword() {
-
 			document.getElementById("passwordModal").style.display = "none";
-
+			document.getElementById("overlay").style.display = "none";
 		}
 
 		function toggleTheme() {
-
 			document.body.classList.toggle("dark-theme");
-
 		}
 
 		function closeAll() {
-
 			closeSettings();
+			closeChangePassword();
+			closeProfile();
+		}
 
+		function submitPassword() {
+			const newPwd = document.getElementById("newPassword").value;
+			const confirmPwd = document.getElementById("confirmPassword").value;
+
+			if (!oldPwd || !newPwd || !confirmPwd) {
+				alert("All fields are required");
+				return;
+			}
+
+			if (newPwd !== confirmPwd) {
+				alert("Passwords do not match");
+				return;
+			}
+
+			alert("Password updated successfully (demo)");
 			closeChangePassword();
 
-			document.getElementById("overlay").style.display = "none";
-
+			oldPassword.value = newPassword.value = confirmPassword.value = "";
 		}
 	</script>
 

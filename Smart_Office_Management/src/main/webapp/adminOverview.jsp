@@ -121,6 +121,38 @@ to {
 .holiday-list li i {
 	margin-right: 8px;
 }
+
+/* ===== Unified Card List Style (USED EVERYWHERE) ===== */
+.card-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.card-list li {
+	background: rgba(255, 255, 255, 0.15);
+	margin-bottom: 10px;
+	padding: 14px 12px;
+	border-radius: 8px;
+	font-size: 20px;
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: 0.25s ease;
+}
+
+/* Last item spacing fix */
+.card-list li:last-child {
+	margin-bottom: 0;
+}
+
+/* Hover effect */
+.card-list li:hover {
+	background: rgba(255, 255, 255, 0.25);
+	transform: scale(1.03);
+}
+
 </style>
 </head>
 
@@ -132,37 +164,46 @@ to {
 
 		<div class="card managers">
 			<h3>Managers</h3>
-			<span>${managers}</span>
+			<ul class="card-list">
+				<li>${managers}</li>
+			</ul>
 		</div>
 
 		<div class="card employees">
 			<h3>Employees</h3>
-			<span>${employees}</span>
+			<ul class="card-list">
+				<li>${employees}</li>
+			</ul>
 		</div>
 
 		<div class="card total">
 			<h3>Total Staff</h3>
-			<span>${totalStaff}</span>
+			<ul class="card-list">
+				<li>${totalStaff}</li>
+			</ul>
 		</div>
 
 		<div class="card present">
 			<h3>Present Today</h3>
-			<span>${presentToday}</span>
+			<ul class="card-list">
+				<li>${presentToday}</li>
+			</ul>
 		</div>
 
-		<div class="card holidays">
+		<div class="card absent">
 			<h3>Absent Today</h3>
-			<span>${absentToday}</span>
+			<ul class="card-list">
+				<li>${absentToday}</li>
+			</ul>
 		</div>
 
 		<div class="card holidays">
 			<h3>Upcoming Holidays</h3>
-
-			<ul class="holiday-list">
+			<ul class="card-list">
 				<c:choose>
 					<c:when test="${not empty holidays}">
 						<c:forEach var="h" items="${holidays}">
-							<li><i class="fa-solid fa-calendar-day"></i> ${h}</li>
+							<li>${h}</li>
 						</c:forEach>
 					</c:when>
 					<c:otherwise>
