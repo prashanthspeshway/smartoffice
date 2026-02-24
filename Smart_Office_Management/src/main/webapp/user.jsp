@@ -4,6 +4,7 @@
 <%@ page import="com.smartoffice.model.Task"%>
 <%@ page import="com.smartoffice.model.Meeting"%>
 <%@ page import="com.smartoffice.model.LeaveRequest"%>
+<%@ page import="com.smartoffice.model.Notification"%>
 
 <%
 String username = (String) session.getAttribute("username");
@@ -337,7 +338,8 @@ button:disabled {
 	background: #dc2626;
 }
 /* Slide from right */
-@keyframes slideIn {from { opacity:0;
+@
+keyframes slideIn {from { opacity:0;
 	transform: translateX(60px);
 }
 
@@ -349,7 +351,8 @@ to {
 }
 
 /* Fade out */
-@keyframes fadeOut {to { opacity:0;
+@
+keyframes fadeOut {to { opacity:0;
 	transform: translateX(60px);
 }
 
@@ -411,139 +414,136 @@ to {
 	font-size: 14px;
 }
 
-
 /* ================= SETTINGS ICON ================= */
 .settings-icon {
-    position:absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 26px;
-    cursor: pointer;
-    background: #ffffff;
-    padding: 10px;
-    border-radius: 50%;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    z-index: 101;
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	font-size: 26px;
+	cursor: pointer;
+	background: #ffffff;
+	padding: 10px;
+	border-radius: 50%;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	z-index: 101;
 }
- 
+
 /* ================= SETTINGS PANEL ================= */
 .settings-panel {
-    position: fixed;
-    top: 0;
-    right: -320px;
-    width: 300px;
-    height: 100%;
-    background: #f9f9f9;
-    box-shadow: -4px 0 10px rgba(0,0,0,0.3);
-    transition: right 0.3s ease;
-    z-index: 100;
+	position: fixed;
+	top: 0;
+	right: -320px;
+	width: 300px;
+	height: 100%;
+	background: #f9f9f9;
+	box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
+	transition: right 0.3s ease;
+	z-index: 100;
 }
- 
+
 .settings-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    background: #2c3e50;
-    color: white;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px;
+	background: #2c3e50;
+	color: white;
 }
- 
+
 .close-btn {
-    cursor: pointer;
-    font-size: 18px;
+	cursor: pointer;
+	font-size: 18px;
 }
- 
+
 .settings-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+	list-style: none;
+	padding: 0;
+	margin: 0;
 }
- 
+
 .settings-list li {
-    padding: 15px;
-    cursor: pointer;
-    border-bottom: 1px solid #ddd;
+	padding: 15px;
+	cursor: pointer;
+	border-bottom: 1px solid #ddd;
 }
- 
+
 .settings-list li:hover {
-    background: #eaeaea;
+	background: #eaeaea;
 }
- 
+
 /* ================= CHANGE PASSWORD MODAL ================= */
 .password-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 200;
+	display: none;
+	position: fixed;
+	inset: 0;
+	z-index: 200;
 }
- 
+
 .password-box {
-    width: 350px;
-    background: #fff;
-    margin: 10% auto;
-    border-radius: 6px;
-    overflow: hidden;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+	width: 350px;
+	background: #fff;
+	margin: 10% auto;
+	border-radius: 6px;
+	overflow: hidden;
+	box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
- 
+
 .password-header {
-    background: #34495e;
-    color: white;
-    padding: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	background: #34495e;
+	color: white;
+	padding: 12px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
- 
+
 .password-body {
-    padding: 20px;
+	padding: 20px;
 }
- 
+
 .password-body input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 12px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
 }
- 
+
 .password-body button {
-    width: 100%;
-    padding: 10px;
-    background: #2ecc71;
-    border: none;
-    color: white;
-    font-size: 15px;
-    cursor: pointer;
-    border-radius: 4px;
+	width: 100%;
+	padding: 10px;
+	background: #2ecc71;
+	border: none;
+	color: white;
+	font-size: 15px;
+	cursor: pointer;
+	border-radius: 4px;
 }
- 
+
 .password-body button:hover {
-    background: #27ae60;
+	background: #27ae60;
 }
- 
+
 /* ================= DARK THEME ================= */
 .dark-theme {
-    background: #121212;
-    color: white;
+	background: #121212;
+	color: white;
 }
- 
+
 .dark-theme .settings-panel {
-    background: #1e1e1e;
+	background: #1e1e1e;
 }
- 
+
 .dark-theme .password-box {
-    background: #1e1e1e;
-    color: white;
+	background: #1e1e1e;
+	color: white;
 }
- 
+
 .dark-theme input {
-    background: #2c2c2c;
-    color: white;
-    border: 1px solid #555;
+	background: #2c2c2c;
+	color: white;
+	border: 1px solid #555;
 }
-
-
 </style>
 </head>
 
@@ -902,16 +902,30 @@ to {
 		</div>
 
 		<div class="notification-list">
-			<div class="notification-item">📅 Meeting Reminder: Project
-				Sync at 3:00 PM</div>
-			<div class="notification-item">📝 Approval Needed: Leave
-				request from Rahul</div>
-			<div class="notification-item">⚠️ System Alert: Printer 2 is
-				out of paper</div>
-			<div class="notification-item">📢 Announcement: Office will be
-				closed on Friday</div>
-			<div class="notification-item">✅ Task Update: Monthly report
-				submitted successfully</div>
+			<%
+			List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
+
+			if (notifications != null && !notifications.isEmpty()) {
+				for (Notification n : notifications) {
+			%>
+			<div class="notification-item" id="notif-<%=n.getId()%>">
+				🔔
+				<%=n.getMessage()%><br> <small>By <%=n.getCreatedBy()%></small>
+
+				<div style="margin-top: 8px; text-align: right;">
+					<button
+						style="background: #2563eb; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;"
+						onclick="markAsRead(<%=n.getId()%>)">Mark as read</button>
+				</div>
+			</div>
+			<%
+			}
+			} else {
+			%>
+			<div class="notification-item">No notifications</div>
+			<%
+			}
+			%>
 		</div>
 	</div>
 
@@ -1085,7 +1099,7 @@ to {
     }
 </script>
 
-<script>
+	<script>
 
 function openSettings() {
 
@@ -1130,8 +1144,24 @@ function closeAll() {
     document.getElementById("overlay").style.display = "none";
 
 }
+
+
+function markAsRead(notificationId) {
+
+    fetch("markNotificationRead?id=" + notificationId, {
+        method: "POST"
+    })
+    .then(response => {
+        if (response.ok) {
+            // Remove notification from UI
+            const el = document.getElementById("notif-" + notificationId);
+            if (el) el.remove();
+        }
+    })
+    .catch(err => console.error(err));
+}
+
 </script>
- 
 
 </body>
 </html>

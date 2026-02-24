@@ -17,135 +17,71 @@ import com.smartoffice.utils.DBConnectionUtil;
 @WebServlet("/viewUser")
 public class ViewUser extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
-    	
-    	    int page = 1;
-    	    int limit = 7;   
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
-    	    if (req.getParameter("page") != null) {
-    	        page = Integer.parseInt(req.getParameter("page"));
-    	    }
+		int page = 1;
+		int limit = 7;
 
-    	    int offset = (page - 1) * limit;
+		if (req.getParameter("page") != null) {
+			page = Integer.parseInt(req.getParameter("page"));
+		}
 
-    	    StringBuilder rows = new StringBuilder();
-    	    int totalUsers = 0;
+		int offset = (page - 1) * limit;
 
-    	    try (Connection con = DBConnectionUtil.getConnection()) {
+		StringBuilder rows = new StringBuilder();
+		int totalUsers = 0;
 
-    	        // Get paginated users
-    	        PreparedStatement ps = con.prepareStatement(
-    	                "SELECT * FROM users LIMIT ? OFFSET ?");
-    	        ps.setInt(1, limit);
-    	        ps.setInt(2, offset);
-    	        ResultSet rs = ps.executeQuery();
+		try (Connection con = DBConnectionUtil.getConnection()) {
 
-    	        while (rs.next()) {
+			// Get paginated users
+			PreparedStatement ps = con.prepareStatement("SELECT * FROM users LIMIT ? OFFSET ?");
+			ps.setInt(1, limit);
+			ps.setInt(2, offset);
 
-    	            int userId = rs.getInt("id");
-    	            String status = rs.getString("status");
+			ResultSet rs = ps.executeQuery();
 
-    	            rows.append("<tr>")
-    	                .append("<td>").append(rs.getString("username")).append("</td>")
-    	                .append("<td>").append(rs.getString("role")).append("</td>")
+			while (rs.next()) {
 
-    	                .append("<td>")
-    	                .append("<span class='badge ")
-    	                .append(status.equalsIgnoreCase("active") ? "active" : "inactive")
-    	                .append("'>")
-    	                .append(status)
-    	                .append("</span>")
-    	                .append("</td>")
+				int userId = rs.getInt("id");
+				String status = rs.getString("status");
 
-    	                .append("<td>").append(rs.getString("fullname")).append("</td>")
-    	                .append("<td>").append(rs.getString("email")).append("</td>")
-    	                .append("<td>").append(rs.getDate("joinedDate")).append("</td>")
+				rows.append("<tr>").append("<td>").append(rs.getString("username")).append("</td>").append("<td>")
+						.append(rs.getString("role")).append("</td>")
 
-    	                .append("<td class='actions'>")
+						.append("<td>").append("<span class='badge ")
+						.append(status.equalsIgnoreCase("active") ? "active" : "inactive").append("'>").append(status)
+						.append("</span>").append("</td>")
 
-    	                .append("<a href='editUser?id=").append(userId)
-    	                .append("' class='icon-btn edit'><i class='fa-solid fa-pen'></i></a>")
+						.append("<td>").append(rs.getString("fullname")).append("</td>").append("<td>")
+						.append(rs.getString("email")).append("</td>").append("<td>").append(rs.getDate("joinedDate"))
+						.append("</td>")
 
-    	                .append("<a href='deleteUser?id=").append(userId)
-    	                .append("' class='icon-btn delete' ")
-    	                .append("onclick=\"return confirm('Delete user?');\">")
-    	                .append("<i class='fa-solid fa-trash'></i></a>")
+						.append("<td class='actions'>").append("<a href='editUser?id=").append(userId)
+						.append("' class='icon-btn edit'><i class='fa-solid fa-pen'></i></a>")
+						.append("<a href='deleteUser?id=").append(userId).append("' class='icon-btn delete' ")
+						.append("onclick=\"return confirm('Delete user?');\">")
+						.append("<i class='fa-solid fa-trash'></i></a>").append("</td>").append("</tr>");
+			}
 
-    	                .append("</td>")
-    	                .append("</tr>");
-    	        }
+			// Total count
+			PreparedStatement countPs = con.prepareStatement("SELECT COUNT(*) FROM users");
+			ResultSet countRs = countPs.executeQuery();
+			if (countRs.next()) {
+				totalUsers = countRs.getInt(1);
+			}
 
-    	        // Get total count
-    	        PreparedStatement countPs = con.prepareStatement("SELECT COUNT(*) FROM users");
-    	        ResultSet countRs = countPs.executeQuery();
-    	        if (countRs.next()) {
-    	            totalUsers = countRs.getInt(1);
-    	        }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-    	    } catch (Exception e) {
-    	        e.printStackTrace();
-    	    }
+		int totalPages = (int) Math.ceil((double) totalUsers / limit);
 
-    	    int totalPages = (int) Math.ceil((double) totalUsers / limit);
+		req.setAttribute("rows", rows.toString());
+		req.setAttribute("currentPage", page);
+		req.setAttribute("totalPages", totalPages);
 
-    	    req.setAttribute("rows", rows.toString());
-    	    req.setAttribute("currentPage", page);
-    	    req.setAttribute("totalPages", totalPages);
-
-    	    req.getRequestDispatcher("viewUser.jsp").forward(req, res);
-    	
-               try (Connection con = DBConnectionUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT * FROM users");
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-
-                int userId = rs.getInt("id");
-                String status = rs.getString("status");
-
-                rows.append("<tr>")
-
-                    .append("<td>").append(rs.getString("username")).append("</td>")
-                    .append("<td>").append(rs.getString("role")).append("</td>")
-
-                    // Status badge
-                    .append("<td>")
-                        .append("<span class='badge ")
-                        .append(status.equalsIgnoreCase("active") ? "active" : "inactive")
-                        .append("'>")
-                        .append(status)
-                        .append("</span>")
-                    .append("</td>")
-
-                    .append("<td>").append(rs.getString("fullname")).append("</td>")
-                    .append("<td>").append(rs.getString("email")).append("</td>")
-                    .append("<td>").append(rs.getDate("joinedDate")).append("</td>")
-
-                    // ICON ACTIONS
-                    .append("<td class='actions'>")
-
-                    	.append("<a href='editUser?id=").append(userId)
-                        .append("' class='icon-btn edit' title='Edit User'>")
-                        .append("<i class='fa-solid fa-pen'></i></a>")
-
-                        .append("<a href='deleteUser?id=").append(userId)
-                        .append("' class='icon-btn delete' title='Delete User' ")
-                        .append("onclick=\"return confirm('Are you sure you want to delete this user?');\">")
-                        .append("<i class='fa-solid fa-trash'></i></a>")
-
-                    .append("</td>")
-
-                .append("</tr>");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        req.setAttribute("rows", rows.toString());
-        req.getRequestDispatcher("viewUser.jsp").forward(req, res);
-        return;
-    }
+		req.getRequestDispatcher("viewUser.jsp").forward(req, res);
+		return; // 🔥 ALWAYS STOP HERE
+	}
 }

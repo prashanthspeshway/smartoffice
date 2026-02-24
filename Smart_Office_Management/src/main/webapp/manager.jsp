@@ -6,6 +6,7 @@
 <%@ page import="com.smartoffice.model.Task"%>
 <%@ page import="com.smartoffice.model.TeamAttendance"%>
 <%@ page import="com.smartoffice.model.LeaveRequest"%>
+<%@ page import="com.smartoffice.model.Notification"%>
 
 
 <%
@@ -709,6 +710,58 @@ keyframes fadeOut {to { opacity:0;
 	color: white;
 	border: 1px solid #555;
 }
+
+/* notification */
+.notification-panel {
+	position: fixed;
+	bottom: 30px;
+	right: -380px;
+	width: 350px;
+	height: auto;
+	background: #ffffff;
+	box-shadow: -3px 0 10px rgba(0, 0, 0, 0.15);
+	border-radius: 14px;
+	transition: right 0.3s ease-in-out;
+	z-index: 1000;
+	font-family: Arial, sans-serif;
+}
+
+.notification-panel.show {
+	right: 25px;
+}
+
+.notification-header {
+	background: #f5fa5c;
+	color: black;
+	padding: 15px;
+	border-radius: 14px 14px 0 0;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.notification-header button {
+	background: none;
+	border: none;
+	color: black;
+	font-size: 18px;
+	cursor: pointer;
+}
+
+.notification-list {
+	padding: 15px;
+	max-height: 250px;
+	overflow-y: auto;
+}
+
+.notification-item {
+	background: #f3f4f6;
+	padding: 12px;
+	margin-bottom: 10px;
+	border-left: 4px solid #2563eb;
+	border-radius: 4px;
+	font-size: 14px;
+}
 </style>
 </head>
 
@@ -759,17 +812,13 @@ if ("HolidayAttendance".equals(error)) {
 		</div>
 	</div>
 
-
-
-
-
-
-
-
 	<!-- ===== Top Bar ===== -->
 	<div class="top-bar">
 		<h2>Smart Office • Manager Dashboard</h2>
 		<div class="user-area">
+		<button class="icon-btn" onclick="openNotifications()">
+			<i class="fa-solid fa-bell"></i>
+		</button>
 			<span>Welcome, <b>${sessionScope.username}</b></span>
 			<button class="icon-btn" onclick="openSettings()">
 				<i class="fa-solid fa-gear"></i>
@@ -1495,6 +1544,65 @@ function closeAll() {
 
 }
 </script>
+
+
+	<script>
+function openNotifications() {
+	document.getElementById("notificationPanel").classList.add("show");
+}
+
+function closeNotifications() {
+	document.getElementById("notificationPanel").classList.remove("show");
+}
+
+function markAsRead(notificationId) {
+	fetch("markNotificationRead?id=" + notificationId, {
+		method: "POST"
+	})
+	.then(response => {
+		if (response.ok) {
+			const el = document.getElementById("notif-" + notificationId);
+			if (el) el.remove();
+		}
+	})
+	.catch(err => console.error(err));
+}
+</script>
+
+
+	<div id="notificationPanel" class="notification-panel">
+		<div class="notification-header">
+			<span>🔔 Smart Office Notifications</span>
+			<button onclick="closeNotifications()">✖</button>
+		</div>
+
+		<div class="notification-list">
+			<%
+			List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
+
+			if (notifications != null && !notifications.isEmpty()) {
+				for (Notification n : notifications) {
+			%>
+			<div class="notification-item" id="notif-<%=n.getId()%>">
+				🔔
+				<%=n.getMessage()%><br> <small>By <%=n.getCreatedBy()%></small>
+
+				<div style="margin-top: 8px; text-align: right;">
+					<button
+						style="background: #2563eb; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;"
+						onclick="markAsRead(<%=n.getId()%>)">Mark as read</button>
+				</div>
+			</div>
+			<%
+			}
+			} else {
+			%>
+			<div class="notification-item">No notifications</div>
+			<%
+			}
+			%>
+		</div>
+	</div>
 
 
 </body>

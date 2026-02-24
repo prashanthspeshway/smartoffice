@@ -19,6 +19,7 @@ import com.smartoffice.dao.LeaveRequestDAO;
 import com.smartoffice.dao.TaskDAO;
 import com.smartoffice.model.LeaveRequest;
 import com.smartoffice.model.Meeting;
+import com.smartoffice.model.Notification;
 import com.smartoffice.utils.DBConnectionUtil;
 
 @SuppressWarnings("serial")
@@ -35,20 +36,21 @@ public class UserDashboardServlet extends HttpServlet {
 			return;
 		}
 
-		TaskDAO.deleteOldCompletedTasks();
 		String username = (String) session.getAttribute("username");
 
 		try {
+
 			/* ================= ATTENDANCE ================= */
 			AttendanceDAO attendanceDAO = new AttendanceDAO();
 			ResultSet rs = attendanceDAO.getTodayAttendance(username);
 
-			if (rs.next()) {
+			if (rs != null && rs.next()) {
 				request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
 				request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
 			}
 
 			/* ================= TASKS ================= */
+			TaskDAO.deleteOldCompletedTasks();
 			request.setAttribute("tasks", TaskDAO.getTasksForEmployee(username));
 
 			/* ================= LEAVES ================= */
@@ -63,9 +65,7 @@ public class UserDashboardServlet extends HttpServlet {
 					    SELECT *
 					    FROM meetings
 					    WHERE created_by = (
-					        SELECT manager
-					        FROM users
-					        WHERE username = ?
+					        SELECT manager FROM users WHERE username = ?
 					    )
 					    AND start_time >= NOW()
 					    ORDER BY start_time
@@ -92,12 +92,44 @@ public class UserDashboardServlet extends HttpServlet {
 
 			request.setAttribute("meetings", meetings);
 
-			/* ================= FORWARD (ONLY ONCE) ================= */
+			/* ================= NOTIFICATIONS ================= */
+			List<Notification> notifications = new ArrayList<>();
+
+			String notificationSql = """
+					    SELECT n.*
+					    FROM notifications n
+					    WHERE NOT EXISTS (
+					        SELECT 1
+					        FROM notification_reads nr
+					        WHERE nr.notification_id = n.id
+					        AND nr.username = ?
+					    )
+					    ORDER BY n.created_at DESC
+					""";
+
+			try (Connection con = DBConnectionUtil.getConnection();
+					PreparedStatement ps = con.prepareStatement(notificationSql)) {
+
+				ps.setString(1, username); // ⭐ IMPORTANT
+				ResultSet rsNotif = ps.executeQuery();
+
+				while (rsNotif.next()) {
+					Notification n = new Notification();
+					n.setId(rsNotif.getInt("id"));
+					n.setMessage(rsNotif.getString("message"));
+					n.setCreatedBy(rsNotif.getString("created_by"));
+					n.setCreatedAt(rsNotif.getTimestamp("created_at"));
+					notifications.add(n);
+				}
+			}
+
+			request.setAttribute("notifications", notifications);
+
+			/* ================= FORWARD ================= */
 			request.getRequestDispatcher("user.jsp").forward(request, response);
 
 		} catch (Exception e) {
 			throw new ServletException("Error loading user dashboard", e);
 		}
 	}
-
 }

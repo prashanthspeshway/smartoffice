@@ -16,16 +16,28 @@
 <
 div
 
+
+
  
+
+
 
 class
 
+
+
  
+
+
 
 ="
 form-group
 
+
+
  
+
+
 
 ">
 <
@@ -33,7 +45,11 @@ label
 >
 Manager
 
+
+
  
+
+
 
 </
 label
@@ -41,38 +57,66 @@ label
 <
 input
 
+
+
  
+
+
 
 type
 
+
+
  
+
+
 
 ="
 text
 
+
+
  
+
+
 
 "
 name
 
 
+
+
 	
+
+
 
 ="
 manager
 
+
+
  
+
+
 
 "
 value
 
+
+
  
+
+
 
 ="${
 manager
 
 
+
+
 	
+
+
 
 
 }
@@ -406,6 +450,10 @@ required> </div>body {
 		<!-- Sidebar -->
 		<div class="left-panel">
 
+			<button class="nav-btn" onclick="loadPage('adminOverview')">
+				<i class="fa-solid fa-chart-pie"></i> Admin Overview
+			</button>
+
 			<button class="nav-btn" onclick="loadPage('addUser')">
 				<i class="fa-solid fa-user-plus"></i> Add User
 			</button>
@@ -425,12 +473,23 @@ required> </div>body {
 				<i class="fa-solid fa-calendar-days"></i> Calendar
 			</button>
 
+			<div class="box">
+				<h3>Send Notification</h3>
+				<form action="addNotification" method="post">
+					<input type="text" name="message"
+						placeholder="Notification message" required
+						style="width: 80%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+					<button type="submit"
+						style="padding: 10px 20px; border: none; border-radius: 6px; background: #3b82f6; color: white;">Send</button>
+				</form>
+			</div>
+
 
 		</div>
 
 		<!-- Content -->
 		<div class="right-panel">
-			<iframe id="contentFrame"></iframe>
+			<iframe id="contentFrame" src="adminOverview"></iframe>
 		</div>
 
 	</div>
