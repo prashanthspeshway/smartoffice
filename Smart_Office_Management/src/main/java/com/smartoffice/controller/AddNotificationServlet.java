@@ -30,6 +30,6 @@ public class AddNotificationServlet extends HttpServlet {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		response.sendRedirect("admin.jsp?success=NotificationSent");
+		response.sendRedirect("sendNotification.jsp?success=true");
 	}
 }

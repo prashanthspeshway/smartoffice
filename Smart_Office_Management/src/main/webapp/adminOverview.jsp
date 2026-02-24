@@ -150,7 +150,7 @@ to {
 			<span>${presentToday}</span>
 		</div>
 
-		<div class="card absent">
+		<div class="card holidays">
 			<h3>Absent Today</h3>
 			<span>${absentToday}</span>
 		</div>
