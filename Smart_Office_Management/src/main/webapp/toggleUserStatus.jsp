@@ -93,6 +93,31 @@ button {
 .toast.error {
     background: #dc2626;
 }
+/* ===== DARK MODE ===== */
+
+body.dark-theme {
+    background: #121212 !important;
+}
+
+body.dark-theme .container {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme h2 {
+    color: #ffffff !important;
+}
+
+body.dark-theme label {
+    color: #ffffff !important;
+}
+
+body.dark-theme input {
+    background: #2c2c2c !important;
+    color: #ffffff !important;
+    border: 1px solid #555 !important;
+}
+
 </style>
 </head>
 

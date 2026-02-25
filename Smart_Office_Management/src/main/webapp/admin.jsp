@@ -550,6 +550,42 @@ required> </div>body {
 	color: white;
 	border: 1px solid #555;
 }
+
+/* ===== DARK MODE OVERRIDES ===== */
+
+.dark-theme .top-bar {
+    background: #1e1e1e;
+}
+
+.dark-theme .left-panel {
+    background: #1e1e1e;
+    color: white;
+}
+
+.dark-theme .right-panel {
+    background: #121212;
+}
+
+.dark-theme #contentFrame {
+    background: #1e1e1e;
+}
+
+.dark-theme .nav-btn {
+    background: #374151;
+}
+
+.dark-theme .nav-btn:hover {
+    background: #4b5563;
+}
+
+.dark-theme .logout-btn {
+    background: #b91c1c;
+}
+
+.dark-theme .settings-panel {
+    background: #1e1e1e;
+}
+
 </style>
 </head>
 
@@ -673,9 +709,79 @@ required> </div>body {
 
 	<!-- ===== JS ===== -->
 	<script>
-		function loadPage(page) {
-			document.getElementById("contentFrame").src = page;
-		}
+	function loadPage(page) {
+	    const iframe = document.getElementById("contentFrame");
+	    iframe.src = page;
+
+	    iframe.onload = function () {
+
+	        if (document.body.classList.contains("dark-theme")) {
+
+	            const doc = iframe.contentDocument;
+	            doc.body.classList.add("dark-theme");
+
+	            const style = doc.createElement("style");
+
+	            style.innerHTML = `
+	            body.dark-theme {
+	                background: #121212 !important;
+	                color: #e5e5e5 !important;
+	            }
+
+	            body.dark-theme .page,
+	            body.dark-theme .card,
+	            body.dark-theme table {
+	                background: #1e1e1e !important;
+	                color: #e5e5e5 !important;
+	            }
+
+	            body.dark-theme h1,
+	            body.dark-theme h2,
+	            body.dark-theme h3,
+	            body.dark-theme h4,
+	            body.dark-theme p,
+	            body.dark-theme span,
+	            body.dark-theme label {
+	                color: #ffffff !important;
+	            }
+
+	            body.dark-theme th {
+	                background: #2c2c2c !important;
+	                color: #ffffff !important;
+	            }
+
+	            body.dark-theme td {
+	                color: #e5e5e5 !important;
+	                border-bottom: 1px solid #444 !important;
+	            }
+
+	            body.dark-theme tr:hover {
+	                background: #2a2a2a !important;
+	            }
+
+	            body.dark-theme input,
+	            body.dark-theme select,
+	            body.dark-theme textarea {
+	                background: #2c2c2c !important;
+	                color: #ffffff !important;
+	                border: 1px solid #555 !important;
+	            }
+
+	            body.dark-theme a {
+	                color: #60a5fa !important;
+	            }
+
+	            body.dark-theme .empty {
+	                color: #9ca3af !important;
+	            }
+	            `;
+
+	            doc.head.appendChild(style);
+	        }
+	    };
+	}
+
+
 
 		function openSettings() {
 			document.getElementById("settingsPanel").style.right = "0";
@@ -711,7 +817,33 @@ required> </div>body {
 		}
 
 		function toggleTheme() {
-			document.body.classList.toggle("dark-theme");
+
+		    // Toggle main page
+		    document.body.classList.toggle("dark-theme");
+
+		    // Save theme state
+		    const isDark = document.body.classList.contains("dark-theme");
+
+		    const iframe = document.getElementById("contentFrame");
+
+		    if (iframe && iframe.contentWindow) {
+
+		        const applyTheme = function () {
+		            if (isDark) {
+		                iframe.contentDocument.body.classList.add("dark-theme");
+		            } else {
+		                iframe.contentDocument.body.classList.remove("dark-theme");
+		            }
+		        };
+
+		        // Apply immediately if already loaded
+		        if (iframe.contentDocument.readyState === "complete") {
+		            applyTheme();
+		        }
+
+		        // Apply after every new load
+		        iframe.onload = applyTheme;
+		    }
 		}
 
 		function closeAll() {

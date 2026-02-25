@@ -111,6 +111,55 @@ to {
 	opacity: 1;
 }
 }
+/* DARK MODE FIX FOR ADD USER PAGE */
+
+body.dark-theme {
+    background: #121212 !important;
+}
+/* FIX CONTAINER BACKGROUND */
+body.dark-theme .container {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+body.dark-theme .form-container,
+body.dark-theme .page,
+body.dark-theme .card {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+/* Labels */
+body.dark-theme label {
+    color: #ffffff !important;
+}
+
+/* Headings */
+body.dark-theme h2,
+body.dark-theme h3 {
+    color: #ffffff !important;
+}
+
+/* Inputs */
+body.dark-theme input,
+body.dark-theme select {
+    background: #2c2c2c !important;
+    color: #ffffff !important;
+    border: 1px solid #555 !important;
+}
+
+/* Placeholder text */
+body.dark-theme input::placeholder {
+    color: #bbbbbb !important;
+}
+
+/* Dropdown options */
+body.dark-theme select option {
+    background: #2c2c2c;
+    color: #ffffff;
+}
+
+
+
 </style>
 </head>
 
@@ -193,15 +242,7 @@ to {
 	</div>
 
 	<script>
-window.onload = function () {
-    <%if (successMsg != null) {%>
-        showToast("<%=successMsg%>", "success");
-    <%}%>
 
-    <%if (errorMsg != null) {%>
-        showToast("<%=errorMsg%>", "error");
-    <%}%>
-};
 
 function showToast(message, type) {
     const toast = document.getElementById("toast");
@@ -239,6 +280,24 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+<script>
+window.onload = function () {
+
+    // ✅ Apply dark theme from parent iframe
+    if (window.parent && window.parent.document.body.classList.contains("dark-theme")) {
+        document.body.classList.add("dark-theme");
+    }
+
+    <% if (successMsg != null) { %>
+        showToast("<%=successMsg%>", "success");
+    <% } %>
+
+    <% if (errorMsg != null) { %>
+        showToast("<%=errorMsg%>", "error");
+    <% } %>
+};
+
+</script>
 
 
 </body>

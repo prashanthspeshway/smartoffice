@@ -52,6 +52,29 @@
 .form-container button:hover {
     background: #2563eb;
 }
+/* ===== DARK MODE ===== */
+
+body.dark-theme {
+    background: #121212 !important;
+}
+
+body.dark-theme .form-container {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .form-container h3 {
+    color: #ffffff !important;
+}
+
+body.dark-theme input,
+body.dark-theme textarea {
+    background: #2c2c2c !important;
+    color: #ffffff !important;
+    border: 1px solid #555 !important;
+}
+
+
 </style>
 </head>
 

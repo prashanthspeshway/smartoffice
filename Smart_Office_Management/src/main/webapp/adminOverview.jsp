@@ -153,6 +153,20 @@ to {
 	transform: scale(1.03);
 }
 
+/* dark mode */
+body.dark-theme .card {
+    background: #1e1e1e !important;
+    color: white !important;
+}
+
+body.dark-theme .card-list li {
+    background: rgba(255,255,255,0.08) !important;
+}
+
+body.dark-theme h2 {
+    color: white !important;
+}
+
 </style>
 </head>
 
