@@ -26,7 +26,9 @@ div
 
 
 
+
  
+
 
 
 
@@ -50,7 +52,9 @@ class
 
 
 
+
  
+
 
 
 
@@ -75,7 +79,9 @@ form-group
 
 
 
+
  
+
 
 
 
@@ -103,7 +109,9 @@ Manager
 
 
 
+
  
+
 
 
 
@@ -131,7 +139,9 @@ input
 
 
 
+
  
+
 
 
 
@@ -155,7 +165,9 @@ type
 
 
 
+
  
+
 
 
 
@@ -180,7 +192,9 @@ text
 
 
 
+
  
+
 
 
 
@@ -206,7 +220,9 @@ name
 
 
 
+
 	
+
 
 
 
@@ -231,7 +247,9 @@ manager
 
 
 
+
  
+
 
 
 
@@ -256,7 +274,9 @@ value
 
 
 
+
  
+
 
 
 
@@ -270,6 +290,8 @@ value
 
 ="${
 manager
+
+
 
 
 
@@ -552,40 +574,38 @@ required> </div>body {
 }
 
 /* ===== DARK MODE OVERRIDES ===== */
-
 .dark-theme .top-bar {
-    background: #1e1e1e;
+	background: #1e1e1e;
 }
 
 .dark-theme .left-panel {
-    background: #1e1e1e;
-    color: white;
+	background: #1e1e1e;
+	color: white;
 }
 
 .dark-theme .right-panel {
-    background: #121212;
+	background: #121212;
 }
 
 .dark-theme #contentFrame {
-    background: #1e1e1e;
+	background: #1e1e1e;
 }
 
 .dark-theme .nav-btn {
-    background: #374151;
+	background: #374151;
 }
 
 .dark-theme .nav-btn:hover {
-    background: #4b5563;
+	background: #4b5563;
 }
 
 .dark-theme .logout-btn {
-    background: #b91c1c;
+	background: #b91c1c;
 }
 
 .dark-theme .settings-panel {
-    background: #1e1e1e;
+	background: #1e1e1e;
 }
-
 </style>
 </head>
 
@@ -687,15 +707,14 @@ required> </div>body {
 			<button class="nav-btn" onclick="loadPage('toggleUserStatus.jsp')">
 				<i class="fa-solid fa-user-lock"></i> Enable / Disable
 			</button>
-
-			<button class="nav-btn export-btn" onclick="loadPage('exportUsers')">
-				<i class="fa-solid fa-file-export"></i> Export Users
-			</button>
 			<button class="nav-btn" onclick="loadPage('calendar.jsp')">
 				<i class="fa-solid fa-calendar-days"></i> Calendar
 			</button>
 			<button class="nav-btn" onclick="loadPage('sendNotification.jsp')">
 				<i class="fa-solid fa-bullhorn"></i> Send Notification
+			</button>
+			<button class="nav-btn export-btn" onclick="loadPage('exportUsers')">
+				<i class="fa-solid fa-file-export"></i> Export Users
 			</button>
 
 		</div>

@@ -21,9 +21,8 @@ body {
 /* Page container */
 .page {
     max-width: 1000px;
-    margin: 30px auto;
     background: white;
-    padding: 25px;
+    padding: 10px;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
@@ -51,7 +50,7 @@ th {
 }
 
 td {
-    padding: 12px;
+    padding: 10px;
     font-size: 14px;
     color: #374151;
     border-bottom: 1px solid #e5e7eb;
@@ -147,7 +146,7 @@ tr:hover {
 <body>
 
 <div class="page">
-    <h2>User List</h2>
+<!--     <h2>User List</h2> -->
 
     <table>
         <tr>

@@ -23,6 +23,7 @@ session.removeAttribute("errorMsg");
 
 body {
 	margin: 0;
+	padding: 30px;
 	font-family: "Segoe UI", Arial, sans-serif;
 	background-color: #f4f6f8;
 	min-height: 100vh;
@@ -32,7 +33,7 @@ body {
 }
 
 .container {
-	width: 420px;
+	width: 100%;
 	background: #ffffff;
 	padding: 28px;
 	border-radius: 8px;

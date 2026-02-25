@@ -8,10 +8,11 @@
 
 <style>
 .form-container {
-    max-width: 450px;
+    width: 50%;
+    height: 50vh;
     margin: 40px auto;
     background: #ffffff;
-    padding: 25px;
+    padding: 50px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }

@@ -22,7 +22,8 @@ body {
 }
 
 .container {
-    width: 360px;
+    width: 98%;
+    height: 94vh;
     background: #fff;
     padding: 26px;
     border-radius: 8px;

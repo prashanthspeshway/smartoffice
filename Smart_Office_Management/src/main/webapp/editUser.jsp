@@ -24,8 +24,7 @@ body {
 
 /* ===== Card ===== */
 .card {
-	width: 420px;
-	margin: 50px auto;
+	width: 100%;
 	background: #ffffff;
 	padding: 30px 28px;
 	border-radius: 12px;
