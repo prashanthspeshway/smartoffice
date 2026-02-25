@@ -17,9 +17,11 @@ import javax.servlet.http.HttpSession;
 import com.smartoffice.dao.AttendanceDAO;
 import com.smartoffice.dao.LeaveRequestDAO;
 import com.smartoffice.dao.TaskDAO;
+import com.smartoffice.dao.UserDao;
 import com.smartoffice.model.LeaveRequest;
 import com.smartoffice.model.Meeting;
 import com.smartoffice.model.Notification;
+import com.smartoffice.model.User;
 import com.smartoffice.utils.DBConnectionUtil;
 
 @SuppressWarnings("serial")
@@ -29,7 +31,6 @@ public class UserDashboardServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		HttpSession session = request.getSession(false);
 		if (session == null || session.getAttribute("username") == null) {
 			response.sendRedirect("login.jsp");
@@ -39,7 +40,9 @@ public class UserDashboardServlet extends HttpServlet {
 		String username = (String) session.getAttribute("username");
 
 		try {
-
+             //USER PROFILe
+			User user = UserDao.getUserByUsername(username);
+            request.setAttribute("user", user);
 			/* ================= ATTENDANCE ================= */
 			AttendanceDAO attendanceDAO = new AttendanceDAO();
 			ResultSet rs = attendanceDAO.getTodayAttendance(username);

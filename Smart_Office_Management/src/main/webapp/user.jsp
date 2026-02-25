@@ -5,6 +5,10 @@
 <%@ page import="com.smartoffice.model.Meeting"%>
 <%@ page import="com.smartoffice.model.LeaveRequest"%>
 <%@ page import="com.smartoffice.model.Notification"%>
+<%@ page import="com.smartoffice.model.User" %>
+<%
+User userObj = (User) request.getAttribute("user");
+%>
 
 <%
 String username = (String) session.getAttribute("username");
@@ -580,6 +584,33 @@ keyframes fadeOut {to { opacity:0;
 			</div>
 		</div>
 	</div>
+	
+	<!-- SELF PROFILE MODAL -->
+<div id="profileModal" class="password-modal">
+    <div class="password-box">
+        <div class="password-header">
+            <h4>My Profile</h4>
+            <span class="close-btn" onclick="closeProfile()">✖</span>
+        </div>
+
+        <div class="password-body">
+        <div class="time-card">
+        Name: <b><%= userObj != null ? userObj.getFullname() : "--" %></b>
+    </div>
+     <div class="time-card">
+        Username: <b><%= userObj != null ? userObj.getUsername() : "--" %></b>
+    </div>
+             <div class="time-card">  
+              Email: <b><%=userObj != null ? userObj.getEmail() : "--"%></b></div>
+              <div class="time-card">  
+             Role: <b><%=userObj != null ? userObj.getRole() : "--"%></b></div>
+<div class="time-card">          
+Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b></div>
+
+        </div>
+    </div>
+</div>
+	
 
 
 
@@ -840,60 +871,6 @@ keyframes fadeOut {to { opacity:0;
 		</div>
 	</div>
 
-	<!-- Settings Popup -->
-	<div class="popup" id="settingsPopup">
-		<div class="popup-content">
-
-			<!-- Settings Menu -->
-			<div id="settingsMenu">
-				<h3>Settings</h3>
-				<button class="update-btn" onclick="showProfile()">View
-					Profile</button>
-				<br> <br>
-				<button class="apply-leave-btn" onclick="showPassword()">Change
-					Password</button>
-				<br> <br>
-				<button class="cancel-btn" onclick="closeSettings()">Close</button>
-			</div>
-
-			<!-- View Profile -->
-			<div id="profileSection" style="display: none;">
-				<h3>My Profile</h3>
-
-				<div class="time-card">
-					Username: <b><%=username%></b>
-				</div>
-				<div class="time-card">
-					Email: <b><%=email != null ? email : "--"%></b>
-				</div>
-				<div class="time-card">
-					Phone: <b><%=phone != null ? phone : "--"%></b>
-				</div>
-				<div class="time-card">
-					Role: <b><%=role != null ? role : "User"%></b>
-				</div>
-
-				<button class="cancel-btn" onclick="backToSettings()">Back</button>
-			</div>
-
-			<!-- Change Password -->
-			<div id="passwordSection" style="display: none;">
-				<h3>Change Password</h3>
-
-				<form action="changePassword" method="post">
-					<input type="password" name="oldPassword"
-						placeholder="Old Password" required> <input
-						type="password" name="newPassword" placeholder="New Password"
-						required> <input type="password" name="confirmPassword"
-						placeholder="Confirm Password" required>
-
-					<button class="update-btn">Update Password</button>
-					<button type="button" class="cancel-btn" onclick="backToSettings()">Back</button>
-				</form>
-			</div>
-
-		</div>
-	</div>
 
 	<div id="notificationPanel" class="notification-panel">
 		<div class="notification-header">
@@ -936,33 +913,41 @@ keyframes fadeOut {to { opacity:0;
 
 	<script>
     // ===== Section Helpers =====
-    function hideAllSections() {
-        attendanceSection.style.display = "none";
-        taskSection.style.display = "none";
-        leaveSection.style.display = "none";
-        calendarSection.style.display = "none";
-        meetingSection.style.display = "none";
-    }
+   function hideAllSections() {
+    document.getElementById("attendanceSection").style.display = "none";
+    document.getElementById("taskSection").style.display = "none";
+    document.getElementById("leaveSection").style.display = "none";
+    document.getElementById("calendarSection").style.display = "none";
+    document.getElementById("meetingSection").style.display = "none";
+}
 
-    function showAttendance() {
-        hideAllSections();
-        attendanceSection.style.display = "block";
-    }
+function showAttendance() {
+    hideAllSections();
+    document.getElementById("attendanceSection").style.display = "block";
+}
 
-    function showTasks() {
-        hideAllSections();
-        taskSection.style.display = "block";
-    }
+function showTasks() {
+    hideAllSections();
+    document.getElementById("taskSection").style.display = "block";
+}
 
-    function showMeetings() {
-        hideAllSections();
-        meetingSection.style.display = "block";
-    }
+function showMeetings() {
+    hideAllSections();
+    document.getElementById("meetingSection").style.display = "block";
+}
 
-    function showLeave() {
-        hideAllSections();
-        leaveSection.style.display = "block";
-    }
+function showLeave() {
+    hideAllSections();
+    document.getElementById("leaveSection").style.display = "block";
+}
+
+function openCalendar() {
+    hideAllSections();
+    document.getElementById("calendarSection").style.display = "block";
+    document.getElementById("calendarFrame").src = "calendar.jsp";
+}
+
+    
 
     function showCalendar() {
         hideAllSections();
@@ -980,34 +965,7 @@ keyframes fadeOut {to { opacity:0;
         document.getElementById("myLeaveSection").style.display = "block";
     }
 
-    // ===== Settings =====
-    function openSettings() {
-        settingsPopup.style.display = "block";
-        backToSettings();
-    }
-
-    function closeSettings() {
-        settingsPopup.style.display = "none";
-    }
-
-    function showProfile() {
-        settingsMenu.style.display = "none";
-        profileSection.style.display = "block";
-        passwordSection.style.display = "none";
-    }
-
-    function showPassword() {
-        settingsMenu.style.display = "none";
-        profileSection.style.display = "none";
-        passwordSection.style.display = "block";
-    }
-
-    function backToSettings() {
-        settingsMenu.style.display = "block";
-        profileSection.style.display = "none";
-        passwordSection.style.display = "none";
-    }
-    function openCalendar() {
+       function openCalendar() {
 			hideAllSections();
 			calendarSection.style.display = "block";
 			document.getElementById("calendarFrame").src = "calendar.jsp";
@@ -1105,7 +1063,7 @@ function openSettings() {
 
     document.getElementById("settingsPanel").style.right = "0";
 
-    document.getElementById("overlay").style.display = "block";
+    
 
 }
  
@@ -1119,7 +1077,6 @@ function openChangePassword() {
 
     document.getElementById("passwordModal").style.display = "block";
 
-    document.getElementById("overlay").style.display = "block";
 
 }
  
@@ -1141,10 +1098,16 @@ function closeAll() {
 
     closeChangePassword();
 
-    document.getElementById("overlay").style.display = "none";
 
 }
+function openProfile() {
+    closeSettings(); // close sliding panel
+    document.getElementById("profileModal").style.display = "block";
+}
 
+function closeProfile() {
+    document.getElementById("profileModal").style.display = "none";
+}
 
 function markAsRead(notificationId) {
 
