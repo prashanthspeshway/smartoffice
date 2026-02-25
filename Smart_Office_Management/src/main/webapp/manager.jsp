@@ -48,10 +48,7 @@ body {
 	background: #f1f5f9;
 }
 
-body.dark {
-	background: #0f172a;
-	color: #e5e7eb;
-}
+ 
 
 /* ===== Top Bar ===== */
 .top-bar {
@@ -762,7 +759,117 @@ keyframes fadeOut {to { opacity:0;
 	border-radius: 4px;
 	font-size: 14px;
 }
+/* ================= FULL DARK MODE ================= */
+
+body.dark-theme {
+    background: #0f172a !important;
+    color: #e5e7eb !important;
+}
+
+/* Top bar */
+body.dark-theme .top-bar {
+    background: linear-gradient(135deg, #0f172a, #1e293b, #1e3a8a);
+}
+
+/* Sidebar */
+body.dark-theme .left-panel {
+    background: #1e293b !important;
+}
+
+body.dark-theme .nav-btn {
+    background: #334155 !important;
+    color: #e5e7eb !important;
+}
+
+body.dark-theme .nav-btn:hover {
+    background: #475569 !important;
+}
+
+/* Right panel */
+body.dark-theme .right-panel {
+    background: #0f172a !important;
+}
+
+/* All boxes */
+body.dark-theme .box {
+    background: #1e293b !important;
+    color: #e5e7eb !important;
+}
+
+/* Cards */
+body.dark-theme .employee-card,
+body.dark-theme .task-card,
+body.dark-theme .meeting-left,
+body.dark-theme .meeting-right {
+    background: #1e293b !important;
+    color: #e5e7eb !important;
+}
+
+/* Text inside cards */
+body.dark-theme .emp-body,
+body.dark-theme .tasks-title,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme p,
+body.dark-theme b,
+body.dark-theme span {
+    color: #e5e7eb !important;
+}
+
+/* Status badges */
+body.dark-theme .emp-status {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+/* Inputs & selects */
+body.dark-theme input,
+body.dark-theme select,
+body.dark-theme textarea {
+    background: #334155 !important;
+    color: #ffffff !important;
+    border: 1px solid #555 !important;
+}
+
+/* Task description */
+body.dark-theme .task-desc {
+    color: #ffffff !important;
+}
+
+/* Notification panel */
+body.dark-theme .notification-panel {
+    background: #1e293b !important;
+}
+
+body.dark-theme .notification-item {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+/* Settings panel */
+body.dark-theme .settings-panel {
+    background: #1e293b !important;
+}
+
+body.dark-theme .settings-list li:hover {
+    background: #334155 !important;
+}
+
 </style>
+<script>
+    // Apply saved theme before page renders
+    if (localStorage.getItem("theme") === "dark") {
+        document.addEventListener("DOMContentLoaded", function () {
+            document.body.classList.add("dark-theme");
+        });
+    }
+</script>
+<script>
+if (localStorage.getItem("theme") === "dark") {
+    document.documentElement.classList.add("dark-theme");
+}
+</script>
+
 </head>
 
 <%
@@ -1332,8 +1439,15 @@ function showSection(id) {
 }
 
 function toggleTheme() {
-	document.body.classList.toggle("dark");
+    document.body.classList.toggle("dark-theme");
+
+    if (document.body.classList.contains("dark-theme")) {
+        localStorage.setItem("theme", "dark");
+    } else {
+        localStorage.setItem("theme", "light");
+    }
 }
+
 function openCalendar() {
     // hide all sections (same logic as showSection)
     document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
@@ -1528,11 +1642,6 @@ function closeChangePassword() {
 
 }
  
-function toggleTheme() {
-
-    document.body.classList.toggle("dark-theme");
-
-}
  
 function closeAll() {
 
