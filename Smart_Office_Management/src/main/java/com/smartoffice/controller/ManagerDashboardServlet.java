@@ -90,6 +90,14 @@ public class ManagerDashboardServlet extends HttpServlet {
 					request.setAttribute("assignTasks", TaskDAO.getTasksAssignedByManager(username, assignEmployee));
 				}
 			}
+			// ================= SELF PROFILE =================
+			if ("selfProfile".equals(tab)) {
+
+			    User profileUser = UserDao.getUserByUsername(username);
+
+			    request.setAttribute("profileUser", profileUser);
+			}
+
 
 			/* ================= NOTIFICATIONS ================= */
 			List<Notification> notifications = new ArrayList<>();

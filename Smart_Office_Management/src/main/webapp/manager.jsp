@@ -11,8 +11,11 @@
 
 <%
 String activeTab = (String) request.getAttribute("tab");
+if (activeTab == null) {
+    activeTab = "selfAttendance";
+}
 %>
-<%
+
 List<Task> assignTasks = (List<Task>) request.getAttribute("assignTasks");
 List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");
 %>
@@ -130,6 +133,7 @@ body {
 	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 	margin-bottom: 30px;
 }
+
 
 /* ===== Buttons ===== */
 .primary-btn, .reject-btn {
@@ -895,7 +899,9 @@ if ("HolidayAttendance".equals(error)) {
 		</div>
 
 		<ul class="settings-list">
-			<li onclick="openProfile()">👤 Self Profile</li>
+			<li onclick="location.href='manager?tab=selfProfile'">
+    <i class="fa-solid fa-user"></i> Self Profile
+</li>
 			<li onclick="openChangePassword()">🔐 Change Password</li>
 			<li onclick="toggleTheme()">🌗 Theme</li>
 		</ul>
@@ -1392,8 +1398,8 @@ if ("HolidayAttendance".equals(error)) {
 
 				<!-- Task list -->
 				<%
-				// 				List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");
-				// 				String viewEmployee = (String) request.getAttribute("viewEmployee");
+							List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");
+							
 				if (viewTasks != null) {
 				%>
 
@@ -1429,6 +1435,35 @@ if ("HolidayAttendance".equals(error)) {
 					%>
 				</div>
 			</div>
+			<!-- ===== Self Profile ===== -->
+<div class="box centered-box" id="selfProfile" style="display:none;">
+
+
+    <h3><i class="fa-solid fa-user"></i> My Profile</h3>
+
+    <%
+    com.smartoffice.model.User profileUser =
+        (com.smartoffice.model.User) request.getAttribute("profileUser");
+
+    if (profileUser != null) {
+    %>
+
+        <p><b>Full Name:</b> <%=profileUser.getFullname()%></p>
+        <p><b>Username:</b> <%=profileUser.getUsername()%></p>
+        <p><b>Email:</b> <%=profileUser.getEmail()%></p>
+        <p><b>Role:</b> <%=profileUser.getRole()%></p>
+        <p><b>Phone:</b> <%=profileUser.getPhone()%></p>
+
+    <%
+    } else {
+    %>
+        <p>No profile data found.</p>
+    <%
+    }
+    %>
+
+</div>
+			
 		</div>
 	</div>
 
@@ -1641,6 +1676,11 @@ function closeChangePassword() {
     document.getElementById("passwordModal").style.display = "none";
 
 }
+function openProfile() {
+    closeSettings();
+    showSection("selfProfile");
+}
+
  
  
 function closeAll() {
