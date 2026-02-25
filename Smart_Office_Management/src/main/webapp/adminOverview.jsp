@@ -59,11 +59,11 @@ h2 {
 } /* Teal */
 .card h3 {
 	margin-bottom: 20px;
-	font-size: 22px;
+	font-size: 15px;
 }
 
 .card span {
-	font-size: 19px;
+	font-size: 15px;
 	font-weight: bold;
 	display: block;
 }
@@ -134,7 +134,7 @@ to {
 	margin-bottom: 10px;
 	padding: 14px 12px;
 	border-radius: 8px;
-	font-size: 20px;
+	font-size: 16px;
 	font-weight: bold;
 	display: flex;
 	align-items: center;
