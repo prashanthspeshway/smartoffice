@@ -15,7 +15,7 @@ if (activeTab == null) {
     activeTab = "selfAttendance";
 }
 %>
-
+<%
 List<Task> assignTasks = (List<Task>) request.getAttribute("assignTasks");
 List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");
 %>
@@ -1398,7 +1398,7 @@ if ("HolidayAttendance".equals(error)) {
 
 				<!-- Task list -->
 				<%
-							List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");
+							viewTasks = (List<Task>) request.getAttribute("viewTasks");
 							
 				if (viewTasks != null) {
 				%>
