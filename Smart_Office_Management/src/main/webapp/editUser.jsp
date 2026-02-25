@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="java.util.List"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -143,20 +144,37 @@ input:focus, select:focus {
 				<label>Password</label> <input type="text" name="password"
 					value="${password}" required>
 			</div>
-			
+
 			<div class="form-group">
 				<label>Phone Number</label> <input type="text" name="number"
 					value="${phone}" required>
 			</div>
-			
+
 			<div class="form-group">
 				<label>Email</label> <input type="email" name="email"
 					value="${email}" required>
 			</div>
-			
+
 			<div class="form-group">
-				<label>Manager</label> <input type="text" name="manager"
-					value="${manager}" required>
+				<label>Manager</label> <select name="manager" id="managerSelect">
+					<option value="">Select Manager</option>
+
+					<%
+					List<String> managers = (List<String>) request.getAttribute("managers");
+					String selectedManager = (String) request.getAttribute("manager");
+
+					if (managers != null) {
+						for (String m : managers) {
+					%>
+					<option value="<%=m%>"
+						<%=m.equals(selectedManager) ? "selected" : ""%>>
+						<%=m%>
+					</option>
+					<%
+					}
+					}
+					%>
+				</select>
 			</div>
 
 			<div class="form-group">
@@ -170,6 +188,27 @@ input:focus, select:focus {
 
 		</form>
 	</div>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+
+			const roleSelect = document.querySelector("select[name='role']");
+			const managerSelect = document.getElementById("managerSelect");
+
+			function toggleManager() {
+				if (roleSelect.value === "manager") {
+					managerSelect.value = "";
+					managerSelect.disabled = true;
+				} else {
+					managerSelect.disabled = false;
+				}
+			}
+
+			roleSelect.addEventListener("change", toggleManager);
+			toggleManager(); // run on page load
+		});
+	</script>
+
 
 </body>
 </html>

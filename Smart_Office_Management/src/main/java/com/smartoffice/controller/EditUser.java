@@ -2,6 +2,8 @@ package com.smartoffice.controller;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
@@ -22,25 +24,42 @@ public class EditUser extends HttpServlet {
 
         int id = Integer.parseInt(req.getParameter("id"));
 
-        try (Connection con = DBConnectionUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(
-                     "SELECT * FROM users WHERE id=?")) {
+        List<String> managers = new ArrayList<>();
 
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
+        try (Connection con = DBConnectionUtil.getConnection()) {
 
-            if (rs.next()) {
-                req.setAttribute("id", id);
-                req.setAttribute("username", rs.getString("username"));
-                req.setAttribute("role", rs.getString("role"));
-                req.setAttribute("status", rs.getString("status"));
-                req.setAttribute("fullname", rs.getString("fullname"));
-                req.setAttribute("password", rs.getString("password"));
-                req.setAttribute("phone", rs.getString("phone"));
-                req.setAttribute("email", rs.getString("email"));
-                req.setAttribute("joinedDate", rs.getDate("joinedDate"));
-                req.setAttribute("manager", rs.getString("manager"));
+            // 🔹 Load user details
+            try (PreparedStatement ps = con.prepareStatement(
+                    "SELECT * FROM users WHERE id=?")) {
+
+                ps.setInt(1, id);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    req.setAttribute("id", id);
+                    req.setAttribute("username", rs.getString("username"));
+                    req.setAttribute("role", rs.getString("role"));
+                    req.setAttribute("status", rs.getString("status"));
+                    req.setAttribute("fullname", rs.getString("fullname"));
+                    req.setAttribute("password", rs.getString("password"));
+                    req.setAttribute("phone", rs.getString("phone"));
+                    req.setAttribute("email", rs.getString("email"));
+                    req.setAttribute("joinedDate", rs.getDate("joinedDate"));
+                    req.setAttribute("manager", rs.getString("manager"));
+                }
             }
+
+            // 🔹 Load managers list
+            try (PreparedStatement ps2 = con.prepareStatement(
+                    "SELECT username FROM users WHERE role='manager' AND status='active'")) {
+
+                ResultSet rs2 = ps2.executeQuery();
+                while (rs2.next()) {
+                    managers.add(rs2.getString("username"));
+                }
+            }
+
+            req.setAttribute("managers", managers);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,6 +85,11 @@ public class EditUser extends HttpServlet {
         String manager = req.getParameter("manager");
         String joinedDateStr = req.getParameter("joinedDate");
 
+        // 🔒 If role is manager, clear manager field
+        if ("manager".equalsIgnoreCase(role)) {
+            manager = null;
+        }
+
         Date joinedDate = null;
         if (joinedDateStr != null && !joinedDateStr.isEmpty()) {
             joinedDate = Date.valueOf(joinedDateStr);
@@ -73,7 +97,7 @@ public class EditUser extends HttpServlet {
 
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                     "UPDATE users SET role=?, status=?, fullname=?, email=?, joinedDate=?, manager=?, password=?,phone=? WHERE id=?")) {
+                     "UPDATE users SET role=?, status=?, fullname=?, email=?, joinedDate=?, manager=?, password=?, phone=? WHERE id=?")) {
 
             ps.setString(1, role);
             ps.setString(2, status);

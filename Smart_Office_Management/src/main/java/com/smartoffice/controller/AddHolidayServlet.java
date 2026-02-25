@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.smartoffice.utils.DBConnectionUtil;
 
+@SuppressWarnings("serial")
 @WebServlet("/addHoliday")
 public class AddHolidayServlet extends HttpServlet {
 
