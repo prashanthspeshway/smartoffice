@@ -42,8 +42,7 @@ List<LeaveRequest> myLeaves = (List<LeaveRequest>) request.getAttribute("myLeave
 <title>Employee Dashboard</title>
 
 <link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 body {
 	margin: 0;
@@ -56,7 +55,7 @@ body {
 	display: flex;
 	align-items: center;
 	padding: 15px 30px;
-	background: #1f2933;
+	background: linear-gradient(135deg,#374151, #7175de, #270e8a);color: #fff;
 	color: white;
 }
 
@@ -91,24 +90,48 @@ body {
 }
 
 .left-panel {
-	width: 240px;
-	background: white;
-	padding: 25px;
-	box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+    width: 230px;
+    background: linear-gradient(135deg, #7175de, #270e8a, #374151);color: #fff;
+	padding: 15px;
 }
 
 .nav-btn {
-	width: 100%;
-	padding: 12px;
-	margin-bottom: 12px;
-	border: none;
-	border-radius: 6px;
-	background: #3b82f6;
-	color: white;
-	cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: #d1d5db;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.right-panel {
+.nav-btn i {
+    font-size: 18px;
+    width: 22px;
+    text-align: center;
+}
+
+/* Hover */
+.nav-btn:hover {
+    background: #374151;
+    color: #ffffff;
+}
+
+/* ACTIVE BUTTON */
+.nav-btn.active {
+    background: linear-gradient(135deg, #7d7d7d, #d15e5e);
+    color: white;
+}
+
+.nav-btn.active i {
+    color: #ffffff;
+}.right-panel {
 	flex: 1;
 	padding: 30px;
 	overflow-y: auto;
@@ -630,17 +653,40 @@ Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b></div>
 	</div>
 
 	<div class="container">
-
+		
+<!-- Font Awesome -->
+		
 		<div class="left-panel">
-			<button class="nav-btn" onclick="showAttendance()">Attendance</button>
-			<button class="nav-btn" onclick="showTasks()">Tasks</button>
-			<button class="nav-btn" onclick="showLeave()">Leave</button>
-			<button class="nav-btn" onclick="showMeetings()">Meetings</button>
-			<button class="nav-btn" onclick="openCalendar()">Calendar</button>
-			<button class="nav-btn" onclick="openNotifications()">Notification</button>
-
-		</div>
-
+		    <button class="nav-btn active" onclick="setActive(this); showAttendance();">
+		        <i class="fa-solid fa-user-check"></i>
+		        <span>My Attendance</span>
+		    </button>
+		
+		    <button class="nav-btn" onclick="setActive(this); showTasks();">
+		        <i class="fa-solid fa-list-check"></i>
+		        <span>Assigned Tasks</span>
+		    </button>
+		
+		    <button class="nav-btn" onclick="setActive(this); showLeave();">
+		        <i class="fa-solid fa-calendar-xmark"></i>
+		        <span>Apply Leave</span>
+		    </button>
+		
+		    <button class="nav-btn" onclick="setActive(this); showMeetings();">
+		        <i class="fa-solid fa-handshake"></i>
+		        <span>Scheduled Meetings</span>
+		    </button>
+		
+		    <button class="nav-btn" onclick="setActive(this); openCalendar();">
+		        <i class="fa-solid fa-calendar-days"></i>
+		        <span>Calendar</span>
+		    </button>
+		
+		    <button class="nav-btn" onclick="setActive(this); openNotifications();">
+		        <i class="fa-solid fa-bell"></i>
+		        <span>Notifications</span>
+		    </button>
+		</div>		
 		<div class="right-panel">
 
 			<!-- Attendance -->
@@ -801,7 +847,7 @@ Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b></div>
 
 				<!-- Leave Tabs -->
 				<div style="display: flex; gap: 12px; margin-bottom: 20px;">
-					<button class="nav-btn" style="flex: 1;" onclick="showApplyLeave()">Apply
+					<button class="nav-btn" style="flex: 1;background:#2563eb;" onclick="showApplyLeave()">Apply
 						Leave</button>
 					<button class="nav-btn" style="flex: 1; background: #6b7280;"
 						onclick="showMyLeaves()">My Leave Requests</button>
@@ -1124,6 +1170,16 @@ function markAsRead(notificationId) {
     .catch(err => console.error(err));
 }
 
+</script>
+<script>
+function setActive(button) {
+    // Remove active class from all buttons
+    const buttons = document.querySelectorAll('.nav-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    // Add active class to clicked button
+    button.classList.add('active');
+}
 </script>
 
 </body>

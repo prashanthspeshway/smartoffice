@@ -80,6 +80,10 @@ th{ background:#f1f5f9; }
     opacity: 1;
     transform: translateY(0);
 }
+
+body.dark-mode #toast {
+    background-color: #48bb78; /* lighter green for dark mode */
+}
 </style>
 </head>
 

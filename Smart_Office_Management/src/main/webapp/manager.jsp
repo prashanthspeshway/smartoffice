@@ -37,7 +37,7 @@ if (punchOut != null)
 <title>Manager Dashboard</title>
 
 <link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 /* ===== Global ===== */
@@ -48,7 +48,7 @@ if (punchOut != null)
 body {
 	margin: 0;
 	font-family: "Segoe UI", Arial, sans-serif;
-	background: #f1f5f9;
+	background: #eee; 
 }
 
  
@@ -56,8 +56,7 @@ body {
 /* ===== Top Bar ===== */
 .top-bar {
 	height: 75px;
-	background: linear-gradient(135deg, #17223d, #2a3c66, #29448a);
-	color: #fff;
+	background: linear-gradient(135deg,#374151, #7175de, #270e8a);color: #fff;
 	display: flex;
 	align-items: center;
 	padding: 0 30px;
@@ -95,29 +94,50 @@ body {
 
 /* ===== Sidebar ===== */
 .left-panel {
-	width: 260px;
-	background: #ffffff;
-	padding: 25px 20px;
-	box-shadow: 3px 0 12px rgba(0, 0, 0, 0.08);
+    width: 240px;
+    background: linear-gradient(135deg, #7175de, #270e8a, #374151);color: #fff;
+	padding: 15px;
 }
 
 .nav-btn {
-	width: 100%;
-	padding: 14px;
-	margin-bottom: 14px;
-	border: none;
-	border-radius: 10px;
-	background: #1c42a5;
-	color: #eee;
-	cursor: pointer;
-	font-size: 15px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: #d1d5db;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
 }
 
+.nav-btn i {
+    font-size: 18px;
+    width: 22px;
+    text-align: center;
+}
+
+/* Hover */
 .nav-btn:hover {
-	background: #2563eb;
+    background: #374151;
+    color: #ffffff;
 }
 
-/* ===== Content ===== */
+/* Active Button */
+.nav-btn.active {
+    background: linear-gradient(135deg, #6b686b, #80066f);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.nav-btn.active i {
+    color: #ffffff;
+}/* ===== Content ===== */
 .right-panel {
 	flex: 1;
 	padding: 30px;
@@ -186,10 +206,12 @@ body {
 
 /* ===== Employee Grid ===== */
 .employee-grid {
+rgb(255, 255, 255)width: 100%;
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 	gap: 16px;
 	margin-top: 15px;
+	
 }
 
 .employee-card {
@@ -204,8 +226,8 @@ body {
 }
 
 .employee-card:hover {
-	transform: translateY(-3px);
-	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+	transform: translateY(-5px);
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.20);
 }
 
 .emp-header {
@@ -242,6 +264,10 @@ body {
 	margin-bottom: 4px;
 }
 
+#leave{
+    max-width: 100%;
+}
+
 /* ===== Form Controls ===== */
 .form-control {
 	width: 100%;
@@ -262,6 +288,10 @@ body {
 	min-width: 100px;
 }
 
+/* calendar */
+#calendarSection{
+	    max-width: 100%;
+}
 /* ===== Settings Module Styles ===== */
 #settings p {
 	margin-bottom: 12px;
@@ -780,9 +810,10 @@ body.dark-theme .left-panel {
     background: #1e293b !important;
 }
 
-body.dark-theme .nav-btn {
-    background: #334155 !important;
-    color: #e5e7eb !important;
+body.dark-theme .nav-btn.active {
+    background: linear-gradient(135deg, #d60f47, #948e90) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5);
 }
 
 body.dark-theme .nav-btn:hover {
@@ -806,7 +837,7 @@ body.dark-theme .task-card,
 body.dark-theme .meeting-left,
 body.dark-theme .meeting-right {
     background: #1e293b !important;
-    color: #e5e7eb !important;
+    color: #eee !important;
 }
 
 /* Text inside cards */
@@ -817,7 +848,7 @@ body.dark-theme h4,
 body.dark-theme p,
 body.dark-theme b,
 body.dark-theme span {
-    color: #e5e7eb !important;
+    color: #eee !important;
 }
 
 /* Status badges */
@@ -850,6 +881,12 @@ body.dark-theme .notification-item {
     color: #ffffff !important;
 }
 
+/* performance matrix */
+body.dark-theme .radio-group label {
+    background: #334155 !important;
+    color: #eee;
+    border: 1px solid #555 !important;
+}
 /* Settings panel */
 body.dark-theme .settings-panel {
     background: #1e293b !important;
@@ -945,24 +982,59 @@ if ("HolidayAttendance".equals(error)) {
 	<div class="container">
 
 		<!-- ===== Sidebar ===== -->
-		<div class="left-panel">
-			<button class="nav-btn" onclick="showSection('selfAttendance')">My
-				Attendance</button>
-			<button class="nav-btn" onclick="showSection('teamSection')">My
-				Team</button>
-			<button class="nav-btn" onclick="showSection('assignTask')">Assign
-				Tasks</button>
-			<button class="nav-btn" onclick="showSection('schedulemeeting')">
-				Schedule Meetings</button>
-			<button class="nav-btn" onclick="showSection('attendance')">Team
-				Attendance</button>
-			<button class="nav-btn"
-				onclick="location.href='<%=request.getContextPath()%>/manager?tab=leave'">
-				Leave Requests</button>
-			<button class="nav-btn" onclick="showSection('performance')">
-				Performance matrix</button>
-			<button class="nav-btn" onclick="openCalendar()">Calendar</button>
-		</div>
+		<!-- Font Awesome -->
+
+<div class="left-panel">
+
+    <button class="nav-btn active"
+        onclick="setActive(this); showSection('selfAttendance')">
+        <i class="fa-solid fa-user-check"></i>
+        <span>My Attendance</span>
+    </button>
+
+    <button class="nav-btn"
+        onclick="setActive(this); showSection('teamSection')">
+        <i class="fa-solid fa-users"></i>
+        <span>My Team</span>
+    </button>
+
+    <button class="nav-btn"
+        onclick="setActive(this); showSection('assignTask')">
+        <i class="fa-solid fa-list-check"></i>
+        <span>Assign Tasks</span>
+    </button>
+
+    <button class="nav-btn"
+        onclick="setActive(this); showSection('schedulemeeting')">
+        <i class="fa-solid fa-handshake"></i>
+        <span>Schedule Meetings</span>
+    </button>
+
+    <button class="nav-btn"
+        onclick="setActive(this); showSection('attendance')">
+        <i class="fa-solid fa-clipboard-user"></i>
+        <span>Team Attendance</span>
+    </button>
+
+    <button class="nav-btn"
+        onclick="setActive(this); location.href='<%=request.getContextPath()%>/manager?tab=leave'">
+        <i class="fa-solid fa-calendar-xmark"></i>
+        <span>Leave Requests</span>
+    </button>
+
+    <button class="nav-btn"
+        onclick="setActive(this); showSection('performance')">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Performance Matrix</span>
+    </button>
+
+    <button class="nav-btn"
+        onclick="setActive(this); openCalendar()">
+        <i class="fa-solid fa-calendar-days"></i>
+        <span>Calendar</span>
+    </button>
+
+</div>
 
 		<!-- ===== Right Panel ===== -->
 		<div class="right-panel">
@@ -1753,6 +1825,15 @@ function markAsRead(notificationId) {
 		</div>
 	</div>
 
+<script>
+function setActive(button) {
+    // remove active from all buttons
+    document.querySelectorAll('.nav-btn')
+        .forEach(btn => btn.classList.remove('active'));
 
+    // add active to clicked button
+    button.classList.add('active');
+}
+</script>
 </body>
 </html>
