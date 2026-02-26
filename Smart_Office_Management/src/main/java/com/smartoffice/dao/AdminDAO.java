@@ -50,7 +50,7 @@ public class AdminDAO {
             FROM holidays
             WHERE holiday_date >= CURDATE()
             ORDER BY holiday_date
-            LIMIT 2
+            LIMIT 1
         """;
 
         try (Connection con = DBConnectionUtil.getConnection();

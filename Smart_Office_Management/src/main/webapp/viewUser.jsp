@@ -16,15 +16,18 @@ body {
 	margin: 0;
 	font-family: "Segoe UI", Arial, sans-serif;
 	background: #f4f6f8;
+	border:1px solid black;
 }
 
 /* Page container */
 .page {
-	max-width: 1000px;
-	background: white;
-	padding: 10px;
-	border-radius: 10px;
+	width: 100%;
+	height: 100vh;
+	background: #f9fafb; ;
+/* 	padding: 10px; */
+/* 	border-radius: 10px; */
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	
 }
 
 /* Heading */
@@ -36,8 +39,9 @@ h2 {
 /* Table */
 table {
 	width: 100%;
+	
 	border-collapse: collapse;
-	border-radius: 8px;
+/* 	border-radius: 8px; */
 	overflow: hidden;
 }
 
@@ -45,12 +49,12 @@ th {
 	background: #e5e7eb;
 	color: #374151;
 	text-align: left;
-	padding: 12px;
+	padding: 10px;
 	font-size: 14px;
 }
 
 td {
-	padding: 10px;
+	padding: 9px;
 	font-size: 14px;
 	color: #374151;
 	border-bottom: 1px solid #e5e7eb;
@@ -159,7 +163,7 @@ tr:hover {
 
 			<%=request.getAttribute("rows") != null
 		? request.getAttribute("rows")
-		: "<tr><td colspan='7' class='empty'>No Data Found</td></tr>"%>
+		: "<tr><td colspan='9' class='empty'>No Data Found</td></tr>"%>
 
 		</table>
 		<div style="margin-top: 15px; text-align: center;">

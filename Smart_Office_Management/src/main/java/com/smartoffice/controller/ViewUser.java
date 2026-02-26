@@ -21,7 +21,7 @@ public class ViewUser extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 		int page = 1;
-		int limit = 7;
+		int limit = 9;
 
 		if (req.getParameter("page") != null) {
 			page = Integer.parseInt(req.getParameter("page"));

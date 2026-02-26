@@ -23,21 +23,20 @@ session.removeAttribute("errorMsg");
 
 body {
 	margin: 0;
-	padding: 30px;
+/* 	padding: 30px; */
 	font-family: "Segoe UI", Arial, sans-serif;
-	background-color: #f4f6f8;
-	min-height: 100vh;
+/* 	 background:#fffafa; */
+	 height: auto;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
 .container {
-	width: 100%;
-	background: #ffffff;
-	padding: 28px;
-	border-radius: 8px;
-	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+height: 100%;	
+		width: 100%;
+	 	background: #c3cfe2;
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
 h2 {
@@ -48,14 +47,14 @@ h2 {
 }
 
 .form-group {
-	margin-bottom: 16px;
+/* 	margin-bottom: 16px; */
 }
 
 label {
 	display: block;
 	margin-bottom: 6px;
 	font-size: 13px;
-	font-weight: 500;
+	font-weight: 600;
 	color: #444;
 }
 
@@ -157,6 +156,118 @@ body.dark-theme select option {
 	background: #2c2c2c;
 	color: #ffffff;
 }
+
+/* ===== Form Container ===== */
+fieldset {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 30px 35px;
+    border-radius: 14px;
+    border: none;
+    background: #c3cfe2;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+/* ===== Legend ===== */
+legend {
+    padding: 8px 18px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #1f2937;
+     background: #f9fafb; 
+    border-radius: 8px;
+}
+
+/* ===== Grid Layout ===== */
+fieldset {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+     gap: 18px 28px; 
+}
+
+/* Full-width items */
+fieldset button {
+    grid-column: span 2;
+}
+
+/* ===== Form Group ===== */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== Labels ===== */
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #374151;
+}
+
+/* ===== Inputs & Select ===== */
+.form-group input,
+.form-group select {
+    padding: 12px 14px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    outline: none;
+    transition: 0.25s ease;
+/*     background: #f9fafb; */
+     background: #f2f0f0;
+}
+
+/* ===== Focus Effect ===== */
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    background: #ffffff;
+}
+
+/* ===== Select Arrow Fix ===== */
+select {
+    cursor: pointer;
+}
+
+/* ===== Button ===== */
+button[type="submit"] {
+    margin-top: 15px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+/* ===== Button Hover ===== */
+button[type="submit"]:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37,99,235,0.35);
+}
+
+/* ===== Button Active ===== */
+button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* ===== Responsive (Mobile) ===== */
+@media (max-width: 768px) {
+    fieldset {
+        grid-template-columns: 1fr;
+    }
+
+    fieldset button {
+        grid-column: span 1;
+    }
+}
+
+
 </style>
 </head>
 
@@ -166,10 +277,11 @@ body.dark-theme select option {
 	<div id="toast" class="toast"></div>
 
 	<div class="container">
-		<h2>Add Employee</h2>
+<!-- 		<h2>Add Employee</h2> -->
 
 		<form action="addUser" method="post">
-
+			<fieldset>
+			    <legend>Add Employee</legend>
 			<div class="form-group">
 				<label>Username</label> <input type="text" name="username" required>
 			</div>
@@ -236,6 +348,7 @@ body.dark-theme select option {
 			</div>
 
 			<button type="submit">Add Employee</button>
+			</fieldset>
 		</form>
 	</div>
 
