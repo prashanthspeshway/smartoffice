@@ -5,7 +5,7 @@
 <%@ page import="com.smartoffice.model.Meeting"%>
 <%@ page import="com.smartoffice.model.LeaveRequest"%>
 <%@ page import="com.smartoffice.model.Notification"%>
-<%@ page import="com.smartoffice.model.User" %>
+<%@ page import="com.smartoffice.model.User"%>
 <%
 User userObj = (User) request.getAttribute("user");
 %>
@@ -42,10 +42,12 @@ List<LeaveRequest> myLeaves = (List<LeaveRequest>) request.getAttribute("myLeave
 <title>Employee Dashboard</title>
 
 <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 body {
 	margin: 0;
+	height: 100vh;
+	overflow: hidden; /* 🔑 FIX */
 	font-family: "Segoe UI", Arial, sans-serif;
 	background: #f4f6f8;
 }
@@ -55,7 +57,8 @@ body {
 	display: flex;
 	align-items: center;
 	padding: 15px 30px;
-	background: linear-gradient(135deg,#374151, #7175de, #270e8a);color: #fff;
+	background: linear-gradient(135deg, #374151, #7175de, #270e8a);
+	color: #fff;
 	color: white;
 }
 
@@ -90,60 +93,62 @@ body {
 }
 
 .left-panel {
-    width: 230px;
-    background: linear-gradient(135deg, #7175de, #270e8a, #374151);color: #fff;
+	width: 230px;
+	background: linear-gradient(135deg, #7175de, #270e8a, #374151);
+	color: #fff;
 	padding: 15px;
 }
 
 .nav-btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 15px;
-    margin-bottom: 10px;
-    font-size: 15px;
-    color: #d1d5db;
-    background: transparent;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 15px;
+	margin-bottom: 10px;
+	font-size: 15px;
+	color: #d1d5db;
+	background: transparent;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.3s ease;
 }
 
 .nav-btn i {
-    font-size: 18px;
-    width: 22px;
-    text-align: center;
+	font-size: 18px;
+	width: 22px;
+	text-align: center;
 }
 
 /* Hover */
 .nav-btn:hover {
-    background: #374151;
-    color: #ffffff;
+	background: #374151;
+	color: #ffffff;
 }
 
 /* ACTIVE BUTTON */
 .nav-btn.active {
-    background: linear-gradient(135deg, #7d7d7d, #d15e5e);
-    color: white;
+	background: linear-gradient(135deg, #7d7d7d, #d15e5e);
+	color: white;
 }
 
 .nav-btn.active i {
-    color: #ffffff;
-}.right-panel {
+	color: #ffffff;
+}
+
+.right-panel {
 	flex: 1;
-	padding: 30px;
-	overflow-y: auto;
+	/* 	padding: 30px; */
+	overflow-y: hidden;
 }
 
 /* ===== Card ===== */
 .box {
-	max-width: auto;
 	background: white;
 	padding: 28px;
-	border-radius: 14px;
 	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+	height: 100%; /* 🔑 remove fixed height */
 }
 
 /* ===== Attendance ===== */
@@ -222,6 +227,19 @@ button:disabled {
 	border: 1px solid #c7d2fe;
 }
 
+#taskSection {
+	max-height: calc(100vh - 160px);
+	overflow-y: auto;
+	padding-right: 10px;
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE */
+}
+
+#taskSection::-webkit-scrollbar {
+	width: 0;
+	background: transparent; /* Chrome/Safari */
+}
+
 .task-left {
 	display: flex;
 	align-items: center;
@@ -269,11 +287,52 @@ button:disabled {
 
 .leave-form textarea {
 	resize: none;
-	height: 90px;
+	height: 40px;
 }
 
 .apply-leave-btn {
 	background: #16a34a;
+}
+
+#leaveSection {
+	max-height: calc(100vh - 160px); /* adjust if needed */
+	overflow-y: auto;
+	padding-right: 10px;
+	/* Hide scrollbar */
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE */
+}
+
+#leaveSection::-webkit-scrollbar {
+	width: 0;
+	background: transparent; /* Chrome / Edge / Safari */
+}
+
+#myLeaveSection {
+	max-height: calc(100vh - 260px);
+	overflow-y: auto;
+	padding-right: 10px;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+#myLeaveSection::-webkit-scrollbar {
+	width: 0;
+}
+
+/* ===== Scheduled Meetings Scroll ===== */
+#meetingSection {
+	max-height: calc(100vh - 160px); /* fits under top bar */
+	overflow-y: auto;
+	padding-right: 10px;
+	/* Hide scrollbar */
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE */
+}
+
+#meetingSection::-webkit-scrollbar {
+	width: 0;
+	background: transparent; /* Chrome / Edge / Safari */
 }
 
 /* ===== Settings Popup ===== */
@@ -341,6 +400,29 @@ button:disabled {
 	font-weight: 600;
 }
 
+/* ===== Calendar Scroll ===== */
+#calendarSection {
+	max-height: calc(100vh - 120px);
+	overflow-y: auto;
+	padding-right: 10px;
+	/* Hide scrollbar */
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE */
+}
+
+#calendarSection::-webkit-scrollbar {
+	width: 0;
+	background: transparent; /* Chrome / Edge / Safari */
+}
+
+#calendarSection h3 {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding-bottom: 10px;
+    z-index: 10;
+}
+
 /* ===== Toast Notification ===== */
 .toast {
 	position: fixed;
@@ -395,7 +477,7 @@ keyframes fadeOut {to { opacity:0;
 	bottom: 30px;
 	right: -380px;
 	width: 350px;
-	height: auto;
+	height: 450px;
 	background: #ffffff;
 	box-shadow: -3px 0 10px rgba(0, 0, 0, 0.15);
 	border-radius: 14px;
@@ -428,7 +510,7 @@ keyframes fadeOut {to { opacity:0;
 
 .notification-list {
 	padding: 15px;
-	max-height: 250px; /* Adjust as needed */
+	max-height: 330px; /* Adjust as needed */
 	overflow-y: auto;
 }
 
@@ -607,33 +689,36 @@ keyframes fadeOut {to { opacity:0;
 			</div>
 		</div>
 	</div>
-	
+
 	<!-- SELF PROFILE MODAL -->
-<div id="profileModal" class="password-modal">
-    <div class="password-box">
-        <div class="password-header">
-            <h4>My Profile</h4>
-            <span class="close-btn" onclick="closeProfile()">✖</span>
-        </div>
+	<div id="profileModal" class="password-modal">
+		<div class="password-box">
+			<div class="password-header">
+				<h4>My Profile</h4>
+				<span class="close-btn" onclick="closeProfile()">✖</span>
+			</div>
 
-        <div class="password-body">
-        <div class="time-card">
-        Name: <b><%= userObj != null ? userObj.getFullname() : "--" %></b>
-    </div>
-     <div class="time-card">
-        Username: <b><%= userObj != null ? userObj.getUsername() : "--" %></b>
-    </div>
-             <div class="time-card">  
-              Email: <b><%=userObj != null ? userObj.getEmail() : "--"%></b></div>
-              <div class="time-card">  
-             Role: <b><%=userObj != null ? userObj.getRole() : "--"%></b></div>
-<div class="time-card">          
-Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b></div>
+			<div class="password-body">
+				<div class="time-card">
+					Name: <b><%=userObj != null ? userObj.getFullname() : "--"%></b>
+				</div>
+				<div class="time-card">
+					Username: <b><%=userObj != null ? userObj.getUsername() : "--"%></b>
+				</div>
+				<div class="time-card">
+					Email: <b><%=userObj != null ? userObj.getEmail() : "--"%></b>
+				</div>
+				<div class="time-card">
+					Role: <b><%=userObj != null ? userObj.getRole() : "--"%></b>
+				</div>
+				<div class="time-card">
+					Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b>
+				</div>
 
-        </div>
-    </div>
-</div>
-	
+			</div>
+		</div>
+	</div>
+
 
 
 
@@ -653,40 +738,37 @@ Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b></div>
 	</div>
 
 	<div class="container">
-		
-<!-- Font Awesome -->
-		
+
+		<!-- Font Awesome -->
+
 		<div class="left-panel">
-		    <button class="nav-btn active" onclick="setActive(this); showAttendance();">
-		        <i class="fa-solid fa-user-check"></i>
-		        <span>My Attendance</span>
-		    </button>
-		
-		    <button class="nav-btn" onclick="setActive(this); showTasks();">
-		        <i class="fa-solid fa-list-check"></i>
-		        <span>Assigned Tasks</span>
-		    </button>
-		
-		    <button class="nav-btn" onclick="setActive(this); showLeave();">
-		        <i class="fa-solid fa-calendar-xmark"></i>
-		        <span>Apply Leave</span>
-		    </button>
-		
-		    <button class="nav-btn" onclick="setActive(this); showMeetings();">
-		        <i class="fa-solid fa-handshake"></i>
-		        <span>Scheduled Meetings</span>
-		    </button>
-		
-		    <button class="nav-btn" onclick="setActive(this); openCalendar();">
-		        <i class="fa-solid fa-calendar-days"></i>
-		        <span>Calendar</span>
-		    </button>
-		
-		    <button class="nav-btn" onclick="setActive(this); openNotifications();">
-		        <i class="fa-solid fa-bell"></i>
-		        <span>Notifications</span>
-		    </button>
-		</div>		
+			<button class="nav-btn active"
+				onclick="setActive(this); showAttendance();">
+				<i class="fa-solid fa-user-check"></i> <span>My Attendance</span>
+			</button>
+
+			<button class="nav-btn" onclick="setActive(this); showTasks();">
+				<i class="fa-solid fa-list-check"></i> <span>Assigned Tasks</span>
+			</button>
+
+			<button class="nav-btn" onclick="setActive(this); showLeave();">
+				<i class="fa-solid fa-calendar-xmark"></i> <span>Apply Leave</span>
+			</button>
+
+			<button class="nav-btn" onclick="setActive(this); showMeetings();">
+				<i class="fa-solid fa-handshake"></i> <span>Scheduled
+					Meetings</span>
+			</button>
+
+			<button class="nav-btn" onclick="setActive(this); openCalendar();">
+				<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
+			</button>
+
+			<button class="nav-btn"
+				onclick="setActive(this); openNotifications();">
+				<i class="fa-solid fa-bell"></i> <span>Notifications</span>
+			</button>
+		</div>
 		<div class="right-panel">
 
 			<!-- Attendance -->
@@ -831,12 +913,10 @@ Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b></div>
 
 			<!-- Calendar -->
 			<div class="box" id="calendarSection" style="display: none;">
-				<h3>
-					<i class="fa-solid fa-calendar-days"></i> Company Calendar
-				</h3>
 
 				<iframe id="calendarFrame" src=""
-					style="width: 100%; height: 600px; border: none;"></iframe>
+					style="width: 100%; height: 100%; border: none;">
+				</iframe>
 
 			</div>
 			<!-- Leave -->
@@ -847,8 +927,8 @@ Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b></div>
 
 				<!-- Leave Tabs -->
 				<div style="display: flex; gap: 12px; margin-bottom: 20px;">
-					<button class="nav-btn" style="flex: 1;background:#2563eb;" onclick="showApplyLeave()">Apply
-						Leave</button>
+					<button class="nav-btn" style="flex: 1; background: #2563eb;"
+						onclick="showApplyLeave()">Apply Leave</button>
 					<button class="nav-btn" style="flex: 1; background: #6b7280;"
 						onclick="showMyLeaves()">My Leave Requests</button>
 				</div>
@@ -924,7 +1004,7 @@ Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b></div>
 			<button onclick="closeNotifications()">✖</button>
 		</div>
 
-		<div class="notification-list">
+		<div class="notification-list" id="notificationList">
 			<%
 			List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
 
@@ -997,7 +1077,7 @@ function openCalendar() {
 
     function showCalendar() {
         hideAllSections();
-        calendarSection.style.display = "block";
+        document.getElementById("calendarSection").style.display = "block";
         document.getElementById("calendarFrame").src = "calendar.jsp";
     }
 
@@ -1010,12 +1090,6 @@ function openCalendar() {
         document.getElementById("applyLeaveSection").style.display = "none";
         document.getElementById("myLeaveSection").style.display = "block";
     }
-
-       function openCalendar() {
-			hideAllSections();
-			calendarSection.style.display = "block";
-			document.getElementById("calendarFrame").src = "calendar.jsp";
-		}
 
     // ===== Notifications =====
     function openNotifications() {
@@ -1047,14 +1121,24 @@ function openCalendar() {
 
     // ---- SUCCESS ----
     if (params.has("success")) {
-        const success = params.get("success");
+    const success = params.get("success");
 
-        if (success === "LeaveApplied") {
-            showToast("Leave applied successfully", false);
-        } else if (success === "PasswordUpdated") {
-            showToast("Password updated successfully", false);
-        }
+    if (success === "LeaveApplied") {
+        showToast("Leave applied successfully", false);
+    } 
+    else if (success === "PasswordUpdated") {
+        showToast("Password updated successfully", false);
     }
+    else if (success === "Login") {
+        showToast("Logged in successfully", false);
+    }
+    else if (success === "PunchIn") {
+        showToast("Punched in successfully 🕘", false);
+    }
+    else if (success === "PunchOut") {
+        showToast("Punched out successfully 🕔", false);
+    }
+}
 
     // ---- ERROR ----
     if (params.has("error")) {
@@ -1162,16 +1246,31 @@ function markAsRead(notificationId) {
     })
     .then(response => {
         if (response.ok) {
+
             // Remove notification from UI
             const el = document.getElementById("notif-" + notificationId);
             if (el) el.remove();
+
+            // ✅ CHECK IF EMPTY
+            const list = document.getElementById("notificationList");
+
+            // Count remaining notification items
+            const remaining = list.querySelectorAll(".notification-item");
+
+            if (remaining.length === 0) {
+                list.innerHTML = `
+                    <div class="notification-item">
+                        No notifications
+                    </div>
+                `;
+            }
         }
     })
     .catch(err => console.error(err));
 }
 
 </script>
-<script>
+	<script>
 function setActive(button) {
     // Remove active class from all buttons
     const buttons = document.querySelectorAll('.nav-btn');

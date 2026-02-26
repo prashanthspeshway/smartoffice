@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
 				// 🔁 Role-based redirect
 				switch (role.toLowerCase()) {
 				case "user":
-					res.sendRedirect("user?login=success");
+					res.sendRedirect("user?success=Login");
 					break;
 				case "manager":
 					res.sendRedirect("manager?login=success");

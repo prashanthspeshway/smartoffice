@@ -748,7 +748,7 @@ keyframes fadeOut {to { opacity:0;
 	bottom: 30px;
 	right: -380px;
 	width: 350px;
-	height: auto;
+	height: 450px;
 	background: #ffffff;
 	box-shadow: -3px 0 10px rgba(0, 0, 0, 0.15);
 	border-radius: 14px;
@@ -781,7 +781,7 @@ keyframes fadeOut {to { opacity:0;
 
 .notification-list {
 	padding: 15px;
-	max-height: 250px;
+	max-height: 380px;
 	overflow-y: auto;
 }
 
@@ -1777,16 +1777,33 @@ function closeNotifications() {
 }
 
 function markAsRead(notificationId) {
-	fetch("markNotificationRead?id=" + notificationId, {
-		method: "POST"
-	})
-	.then(response => {
-		if (response.ok) {
-			const el = document.getElementById("notif-" + notificationId);
-			if (el) el.remove();
-		}
-	})
-	.catch(err => console.error(err));
+
+    fetch("markNotificationRead?id=" + notificationId, {
+        method: "POST"
+    })
+    .then(response => {
+        if (response.ok) {
+
+            // Remove notification from UI
+            const el = document.getElementById("notif-" + notificationId);
+            if (el) el.remove();
+
+            // ✅ CHECK IF EMPTY
+            const list = document.getElementById("notificationList");
+
+            // Count remaining notification items
+            const remaining = list.querySelectorAll(".notification-item");
+
+            if (remaining.length === 0) {
+                list.innerHTML = `
+                    <div class="notification-item">
+                        No notifications
+                    </div>
+                `;
+            }
+        }
+    })
+    .catch(err => console.error(err));
 }
 </script>
 
@@ -1797,7 +1814,7 @@ function markAsRead(notificationId) {
 			<button onclick="closeNotifications()">✖</button>
 		</div>
 
-		<div class="notification-list">
+		<div class="notification-list" id="notificationList">
 			<%
 			List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
 

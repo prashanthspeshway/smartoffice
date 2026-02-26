@@ -7,18 +7,23 @@
 <title>Company Calendar</title>
 
 <style>
+
+
 body {
-	font-family: "Segoe UI";
-	background: #f4f6f8;
+    font-family: "Segoe UI";
+    background: #f4f6f8;
+    margin: 0;          /* ✅ removes outer space */
+    padding: 0;
 }
 
 .calendar-box {
-	max-width: 900px;
-	margin: 20px auto;
-	background: white;
-	padding: 20px;
-	border-radius: 10px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    height: 100%;
+    margin: 0;                 /* ✅ no outer spacing */
+    padding: 12px;             /* 🔹 optional: reduce padding */
+    background: white;
+    border-radius: 0;          /* optional if inside panel */
+    box-shadow: none;          /* optional if parent already has shadow */
 }
 
 .header {
@@ -38,8 +43,9 @@ body {
 }
 
 table {
-	width: 100%;
-	border-collapse: collapse;
+    width: 100%;
+    height: calc(100vh - 80px); /* header height compensation */
+    border-collapse: collapse;
 }
 
 th, td {
@@ -433,7 +439,7 @@ function saveHoliday(){
         loadCalendar();
     })
     .catch(() => showToast("Operation failed","error"));
-}
+}	
 
 /* delete existing holiday */
 function deleteHoliday(){
