@@ -129,7 +129,7 @@ body.dark-theme input {
 <div id="errorToast" class="toast error"></div>
 
 <div class="container">
-    <h2>Enable / Disable User</h2>
+    <h2>Manage Employee Status</h2>
 
     <form action="enableanddisable" method="post">
         <label>Username</label>
@@ -137,10 +137,10 @@ body.dark-theme input {
 
         <div class="buttons">
             <button class="active" type="submit" name="status" value="active">
-                Activate
+                Active
             </button>
             <button class="inactive" type="submit" name="status" value="inactive">
-                Deactivate
+                Inctivate
             </button>
         </div>
     </form>

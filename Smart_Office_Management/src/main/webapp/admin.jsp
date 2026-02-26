@@ -27,7 +27,11 @@ div
 
 
 
+
+
  
+
+
 
 
 
@@ -53,7 +57,11 @@ class
 
 
 
+
+
  
+
+
 
 
 
@@ -80,7 +88,11 @@ form-group
 
 
 
+
+
  
+
+
 
 
 
@@ -110,7 +122,11 @@ Manager
 
 
 
+
+
  
+
+
 
 
 
@@ -140,7 +156,11 @@ input
 
 
 
+
+
  
+
+
 
 
 
@@ -166,7 +186,11 @@ type
 
 
 
+
+
  
+
+
 
 
 
@@ -193,7 +217,11 @@ text
 
 
 
+
+
  
+
+
 
 
 
@@ -221,7 +249,11 @@ name
 
 
 
+
+
 	
+
+
 
 
 
@@ -248,7 +280,11 @@ manager
 
 
 
+
+
  
+
+
 
 
 
@@ -275,7 +311,11 @@ value
 
 
 
+
+
  
+
+
 
 
 
@@ -290,6 +330,10 @@ value
 
 ="${
 manager
+
+
+
+
 
 
 
@@ -697,15 +741,15 @@ required> </div>body {
 			</button>
 
 			<button class="nav-btn" onclick="loadPage('addUser')">
-				<i class="fa-solid fa-user-plus"></i> Add User
+				<i class="fa-solid fa-user-plus"></i> Add Employee
 			</button>
 
 			<button class="nav-btn" onclick="loadPage('viewUser')">
-				<i class="fa-solid fa-users"></i> View Users
+				<i class="fa-solid fa-users"></i> View Employees
 			</button>
 
 			<button class="nav-btn" onclick="loadPage('toggleUserStatus.jsp')">
-				<i class="fa-solid fa-user-lock"></i> Enable / Disable
+				<i class="fa-solid fa-user-lock"></i> Manage Employee Status
 			</button>
 			<button class="nav-btn" onclick="loadPage('calendar.jsp')">
 				<i class="fa-solid fa-calendar-days"></i> Calendar
@@ -713,8 +757,8 @@ required> </div>body {
 			<button class="nav-btn" onclick="loadPage('sendNotification.jsp')">
 				<i class="fa-solid fa-bullhorn"></i> Send Notification
 			</button>
-			<button class="nav-btn export-btn" onclick="loadPage('exportUsers')">
-				<i class="fa-solid fa-file-export"></i> Export Users
+			<button class="nav-btn export-btn" onclick="exportUsers()">
+				<i class="fa-solid fa-file-export"></i> Export Employees
 			</button>
 
 		</div>
@@ -725,6 +769,10 @@ required> </div>body {
 		</div>
 
 	</div>
+
+	<div id="toast"
+		style="position: fixed; top: 150px; right: 20px; background: #10b981; color: white; padding: 12px 18px; border-radius: 8px; font-size: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); opacity: 0; transform: translateY(-10px); transition: 0.4s; z-index: 9999;">
+		Exported successfully</div>
 
 	<!-- ===== JS ===== -->
 	<script>
@@ -890,6 +938,49 @@ required> </div>body {
 
 			oldPassword.value = newPassword.value = confirmPassword.value = "";
 		}
+		
+		function showToast(message, type = "success") {
+			const toast = document.getElementById("toast");
+			toast.innerText = message;
+
+			if (type === "success") {
+				toast.style.background = "#10b981";
+			} else {
+				toast.style.background = "#ef4444";
+			}
+
+			toast.style.opacity = "1";
+			toast.style.transform = "translateY(0)";
+
+			setTimeout(() => {
+				toast.style.opacity = "0";
+				toast.style.transform = "translateY(-10px)";
+			}, 2500);
+		}
+		
+		function exportUsers() {
+			// trigger download in iframe
+			document.getElementById("contentFrame").src = "exportUsers";
+
+			// show success toast
+			showToast("Users exported successfully");
+		}
+		
+		// ===== LOGIN SUCCESS TOAST =====
+		(function () {
+			const params = new URLSearchParams(window.location.search);
+
+			if (params.get("login") === "success") {
+				showToast("Logged in successfully", "success");
+
+				// clean URL so toast doesn't repeat on refresh
+				window.history.replaceState(
+					{},
+					document.title,
+					window.location.pathname
+				);
+			}
+		})();
 	</script>
 
 

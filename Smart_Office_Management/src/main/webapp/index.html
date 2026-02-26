@@ -238,6 +238,19 @@ else if (error === "weakPassword") {
     );
 }
 
+const logout = params.get("logout");
+
+if (logout === "success") {
+    showToast("Logged out successfully", "success");
+
+    // clean URL so toast doesn't repeat on refresh
+    window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+    );
+}
+
 </script>
 
 </body>
