@@ -59,8 +59,8 @@ public class ViewUser extends HttpServlet {
 
 						.append("<td class='actions'>").append("<a href='editUser?id=").append(userId)
 						.append("' class='icon-btn edit'><i class='fa-solid fa-pen'></i></a>")
-						.append("<a href='deleteUser?id=").append(userId).append("' class='icon-btn delete' ")
-						.append("onclick=\"return confirm('Delete user?');\">")
+						.append("<a href='#' class='icon-btn delete' ")
+						.append("onclick=\"openDeleteModal(").append(userId).append(")\">")
 						.append("<i class='fa-solid fa-trash'></i></a>").append("</td>").append("</tr>");
 			}
 

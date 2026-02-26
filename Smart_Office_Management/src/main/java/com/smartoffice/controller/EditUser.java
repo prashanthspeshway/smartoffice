@@ -115,6 +115,6 @@ public class EditUser extends HttpServlet {
             e.printStackTrace();
         }
 
-        res.sendRedirect("viewUser");
+        res.sendRedirect("viewUser?msg=updated");
     }
 }

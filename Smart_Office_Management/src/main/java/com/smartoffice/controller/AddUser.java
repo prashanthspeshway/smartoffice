@@ -53,9 +53,9 @@ public class AddUser extends HttpServlet {
             return;
         }
 
-        // Managers should not have managers
+        // Managers report to admin by default
         if ("manager".equalsIgnoreCase(role)) {
-            manager = null;
+            manager = "admin";
         }
 
         try (Connection con = DBConnectionUtil.getConnection()) {

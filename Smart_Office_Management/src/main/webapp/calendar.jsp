@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,144 +7,246 @@
 <title>Company Calendar</title>
 
 <style>
-body{
-    font-family: "Segoe UI";
-    background:#f4f6f8;
+body {
+	font-family: "Segoe UI";
+	background: #f4f6f8;
 }
-.calendar-box{
-    max-width:900px;
-    margin:20px auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-}
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:15px;
-}
-.header button{
-    border:none;
-    background:#3b82f6;
-    color:white;
-    padding:6px 12px;
-    border-radius:6px;
-    cursor:pointer;
-}
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-th,td{
-    width:14%;
-    height:80px;
-    text-align:center;
-    border:1px solid #eee;
-    vertical-align:top;
-}
-th{ background:#f1f5f9; }
 
-.holiday{
-    background:#fee2e2;
-    color:#b91c1c;
-    font-weight:bold;
+.calendar-box {
+	max-width: 900px;
+	margin: 20px auto;
+	background: white;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
-.today{
-    background:#dbeafe;
-    font-weight:bold;
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 15px;
+}
+
+.header button {
+	border: none;
+	background: #3b82f6;
+	color: white;
+	padding: 6px 12px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+th, td {
+	width: 14%;
+	height: 80px;
+	text-align: center;
+	border: 1px solid #eee;
+	vertical-align: top;
+}
+
+th {
+	background: #f1f5f9;
+}
+
+.holiday {
+	background: #fee2e2;
+	color: #b91c1c;
+	font-weight: bold;
+}
+
+.today {
+	background: #dbeafe;
+	font-weight: bold;
+}
+
+/* ===== MODAL OVERLAY ===== */
+#holidayModal {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.45);
+	z-index: 999;
+}
+
+/* ===== MODAL BOX ===== */
+#holidayModal > div {
+	background: #ffffff;
+	width: 320px;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-family: "Segoe UI";
+}
+
+/* ===== MODAL TITLE ===== */
+#holidayModal h3 {
+	margin: 0 0 12px;
+	font-size: 18px;
+	color: #1f2937;
+}
+
+/* ===== INPUT ===== */
+#holidayNameInput {
+	width: 100%;
+	padding: 8px 10px;
+	font-size: 14px;
+	border-radius: 6px;
+	border: 1px solid #d1d5db;
+	outline: none;
+	box-sizing: border-box;
+}
+
+#holidayNameInput:focus {
+	border-color: #3b82f6;
+}
+
+/* ===== BUTTON ROW ===== */
+#holidayModal .button-row {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 16px;
+}
+
+/* ===== COMMON BUTTON ===== */
+#holidayModal button {
+	padding: 6px 14px;
+	border-radius: 6px;
+	border: none;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+/* Cancel */
+#holidayModal button:first-child {
+	background: #e5e7eb;
+	color: #111827;
+}
+
+#holidayModal button:first-child:hover {
+	background: #d1d5db;
+}
+
+/* Save */
+#holidayModal button:last-child {
+	background: #16a34a;
+	color: white;
+}
+
+#holidayModal button:last-child:hover {
+	background: #15803d;
+}
+
+/* Delete */
+#deleteBtn {
+	background: #dc2626;
+	color: white;
+}
+
+#deleteBtn:hover {
+	background: #b91c1c;
 }
 
 /* ===== TOAST STYLES ===== */
 #toast {
-    visibility: hidden;
-    min-width: 250px;
-    background-color: #16a34a; /* green for success */
-    color: white;
-    text-align: center;
-    border-radius: 8px;
-    padding: 12px 20px;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    font-family: 'Segoe UI';
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: opacity 0.5s, transform 0.5s;
+	visibility: hidden;
+	min-width: 250px;
+	background-color: #16a34a; /* green for success */
+	color: white;
+	text-align: center;
+	border-radius: 8px;
+	padding: 12px 20px;
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	z-index: 1000;
+	font-family: 'Segoe UI';
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	opacity: 0;
+	transform: translateY(-20px);
+	transition: opacity 0.5s, transform 0.5s;
 }
+
 #toast.show {
-    visibility: visible;
-    opacity: 1;
-    transform: translateY(0);
+	visibility: visible;
+	opacity: 1;
+	transform: translateY(0);
 }
 </style>
 </head>
 
 <body>
 
-<div class="calendar-box">
+	<div class="calendar-box">
 
-    <div class="header">
-        <button onclick="changeMonth(-1)">◀</button>
-        <h3 id="monthYear"></h3>
-        <button onclick="changeMonth(1)">▶</button>
-    </div>
+		<div class="header">
+			<button onclick="changeMonth(-1)">◀</button>
+			<h3 id="monthYear"></h3>
+			<button onclick="changeMonth(1)">▶</button>
+		</div>
 
-    <table id="calendar">
-        <thead>
-            <tr>
-                <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th>
-                <th>Thu</th><th>Fri</th><th>Sat</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+		<table id="calendar">
+			<thead>
+				<tr>
+					<th>Sun</th>
+					<th>Mon</th>
+					<th>Tue</th>
+					<th>Wed</th>
+					<th>Thu</th>
+					<th>Fri</th>
+					<th>Sat</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
 
-</div>
+	</div>
 
-<!-- Holiday Modal -->
-<div id="holidayModal" style="display:none; position:fixed; top:0; left:0; 
-width:100%; height:100%; background:rgba(0,0,0,0.4);">
+	<!-- Holiday Modal -->
+	<div id="holidayModal"
+		style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4);">
 
-  <div style="background:white; width:320px; padding:20px; border-radius:8px;
-              position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-              box-shadow:0 4px 10px rgba(0,0,0,0.2);">
+		<div
+			style="background: white; width: 320px; padding: 20px; border-radius: 8px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);">
 
-      <h3 id="modalDate">Add Holiday</h3>
+			<h3 id="modalDate">Add Holiday</h3>
 
-      <input type="text" id="holidayNameInput" placeholder="Holiday Name"
-             style="width:100%; padding:8px; margin-top:10px;">
+			<input type="text" id="holidayNameInput" placeholder="Holiday Name"
+				style="width: 100%; padding: 8px; margin-top: 10px;">
 
-      <div style="margin-top:15px; text-align:right;">
-         <div style="margin-top:15px; text-align:right;">
-    <button onclick="closeModal()">Cancel</button>
+			<div style="margin-top: 15px; text-align: right;">
+				<div style="margin-top: 15px; text-align: right;">
+					<button onclick="closeModal()">Cancel</button>
 
-   <button type="button"
-        id="deleteBtn"
-        onclick="deleteHoliday()"
-        style="background:#dc2626; color:white; border:none; padding:6px 12px; display:none;">
-    Delete
-</button>
+					<button type="button" id="deleteBtn" onclick="deleteHoliday()"
+						style="background: #dc2626; color: white; border: none; padding: 6px 12px; display: none;">
+						Delete</button>
 
 
-    <button onclick="saveHoliday()"
-            style="background:#16a34a; color:white; border:none; padding:6px 12px;">
-        Save
-    </button>
-</div>
+					<button onclick="saveHoliday()"
+						style="background: #16a34a; color: white; border: none; padding: 6px 12px;">
+						Save</button>
+				</div>
 
-      </div>
+			</div>
 
-  </div>
-</div>
+		</div>
+	</div>
 
-<!-- Toast Notification -->
-<div id="toast"></div>
+	<!-- Toast Notification -->
+	<div id="toast"></div>
 
-<script>
+	<script>
 let today = new Date();
 let currentMonth = today.getMonth();
 let currentYear = today.getFullYear();

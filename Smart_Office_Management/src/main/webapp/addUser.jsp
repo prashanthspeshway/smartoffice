@@ -103,7 +103,8 @@ button:hover {
 	animation: slideIn 0.4s ease;
 }
 
-@keyframes slideIn {from { transform:translateX(100%);
+@
+keyframes slideIn {from { transform:translateX(100%);
 	opacity: 0;
 }
 
@@ -111,56 +112,51 @@ to {
 	transform: translateX(0);
 	opacity: 1;
 }
+
 }
 /* DARK MODE FIX FOR ADD USER PAGE */
-
 body.dark-theme {
-    background: #121212 !important;
+	background: #121212 !important;
 }
 /* FIX CONTAINER BACKGROUND */
 body.dark-theme .container {
-    background: #1e1e1e !important;
-    color: #ffffff !important;
+	background: #1e1e1e !important;
+	color: #ffffff !important;
 }
-body.dark-theme .form-container,
-body.dark-theme .page,
-body.dark-theme .card {
-    background: #1e1e1e !important;
-    color: #ffffff !important;
+
+body.dark-theme .form-container, body.dark-theme .page, body.dark-theme .card
+	{
+	background: #1e1e1e !important;
+	color: #ffffff !important;
 }
 
 /* Labels */
 body.dark-theme label {
-    color: #ffffff !important;
+	color: #ffffff !important;
 }
 
 /* Headings */
-body.dark-theme h2,
-body.dark-theme h3 {
-    color: #ffffff !important;
+body.dark-theme h2, body.dark-theme h3 {
+	color: #ffffff !important;
 }
 
 /* Inputs */
-body.dark-theme input,
-body.dark-theme select {
-    background: #2c2c2c !important;
-    color: #ffffff !important;
-    border: 1px solid #555 !important;
+body.dark-theme input, body.dark-theme select {
+	background: #2c2c2c !important;
+	color: #ffffff !important;
+	border: 1px solid #555 !important;
 }
 
 /* Placeholder text */
 body.dark-theme input::placeholder {
-    color: #bbbbbb !important;
+	color: #bbbbbb !important;
 }
 
 /* Dropdown options */
 body.dark-theme select option {
-    background: #2c2c2c;
-    color: #ffffff;
+	background: #2c2c2c;
+	color: #ffffff;
 }
-
-
-
 </style>
 </head>
 
@@ -170,7 +166,7 @@ body.dark-theme select option {
 	<div id="toast" class="toast"></div>
 
 	<div class="container">
-		<h2>Add User</h2>
+		<h2>Add Employee</h2>
 
 		<form action="addUser" method="post">
 
@@ -187,7 +183,7 @@ body.dark-theme select option {
 				<label>Role</label> <select name="role" id="role" required>
 					<option value="">Select Role</option>
 					<option value="manager">Manager</option>
-					<option value="user">User</option>
+					<option value="user">Employee</option>
 				</select>
 			</div>
 
@@ -212,8 +208,10 @@ body.dark-theme select option {
 			</div>
 
 			<div class="form-group">
-				<label>Manager</label> <select name="manager" id="managerSelect">
+				<label>Manager</label> 
+				<select name="manager" id="managerSelect">
 					<option value="">Select Manager</option>
+					<option value="admin">Admin</option>
 
 					<%
 					List<String> managers = (List<String>) request.getAttribute("managers");
@@ -225,7 +223,6 @@ body.dark-theme select option {
 					}
 					}
 					%>
-
 				</select>
 			</div>
 
@@ -238,7 +235,7 @@ body.dark-theme select option {
 					required>
 			</div>
 
-			<button type="submit">Add User</button>
+			<button type="submit">Add Employee</button>
 		</form>
 	</div>
 
@@ -261,7 +258,7 @@ function showToast(message, type) {
 
 </script>
 
-<script>
+	<script>
 document.addEventListener("DOMContentLoaded", function () {
 
     const roleSelect = document.getElementById("role");
@@ -269,10 +266,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function toggleManager() {
         if (roleSelect.value === "manager") {
-            managerSelect.value = "";
+            managerSelect.value = "admin";
             managerSelect.disabled = true;
         } else {
             managerSelect.disabled = false;
+            managerSelect.value = "";
         }
     }
 
@@ -281,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
-<script>
+	<script>
 window.onload = function () {
 
     // ✅ Apply dark theme from parent iframe
@@ -289,13 +287,13 @@ window.onload = function () {
         document.body.classList.add("dark-theme");
     }
 
-    <% if (successMsg != null) { %>
+    <%if (successMsg != null) {%>
         showToast("<%=successMsg%>", "success");
-    <% } %>
+    <%}%>
 
-    <% if (errorMsg != null) { %>
+    <%if (errorMsg != null) {%>
         showToast("<%=errorMsg%>", "error");
-    <% } %>
+    <%}%>
 };
 
 </script>

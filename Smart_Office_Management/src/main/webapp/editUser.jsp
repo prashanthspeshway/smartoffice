@@ -103,7 +103,7 @@ input:focus, select:focus {
 <body>
 
 	<div class="card">
-		<h2>Edit User</h2>
+		<h2>Edit Employee</h2>
 
 		<form action="editUser" method="post">
 
@@ -119,7 +119,7 @@ input:focus, select:focus {
 				<label>Role</label> <select name="role" required>
 					<option value="admin" ${role == 'admin' ? 'selected' : ''}>Admin</option>
 					<option value="manager" ${role == 'manager' ? 'selected' : ''}>Manager</option>
-					<option value="user" ${role == 'user' ? 'selected' : ''}>User</option>
+					<option value="user" ${role == 'user' ? 'selected' : ''}>Employee</option>
 				</select>
 			</div>
 
@@ -182,7 +182,7 @@ input:focus, select:focus {
 			</div>
 
 			<button type="submit" class="btn">
-				<i class="fa-solid fa-floppy-disk"></i> Update User
+				<i class="fa-solid fa-floppy-disk"></i> Update Employee
 			</button>
 
 		</form>
