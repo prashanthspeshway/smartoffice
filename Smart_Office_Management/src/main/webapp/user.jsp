@@ -55,7 +55,7 @@ body {
 /* ================= TOP BAR ================= */
 .top-bar{
     backdrop-filter: blur(10px);
-    background: rgba(255,255,255,0.25);
+    background: #e2ebf0;
     border-bottom:1px solid rgba(255,255,255,0.3);
     padding:15px 30px;
     display:flex;
@@ -109,7 +109,7 @@ body {
 .left-panel{
     width:250px;
     backdrop-filter: blur(10px);
-    background: rgba(255,255,255,0.2);
+    background: #e2ebf0;
     border-right:1px solid rgba(255,255,255,0.3);
     padding:18px 12px;
 }
@@ -328,6 +328,7 @@ body {
 .leave-form textarea{
     padding:8px 8px;
     border-radius:8px;
+    background: #e2ebf0;
     border:1px solid #cbd5e1;
     font-size:14px;
 }
@@ -337,7 +338,7 @@ body {
     resize:none;
 }
 #myLeaveSection h3 {
-	color:white !important;
+	color: black !important;
 }
 .apply-leave-btn{
     margin-top:10px;
@@ -1136,7 +1137,7 @@ keyframes fadeOut {to { opacity:0;
 
         <!-- My Leave Requests -->
         <div id="myLeaveSection" style="display: none;">
-            <h3 style="margin-top: 10px;color:white;">
+            <h3 style="margin-top: 10px; color: black;">
                 <i class="fa-solid fa-list"></i> My Leave Requests
             </h3>
 

@@ -29,7 +29,7 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
 
 		HttpSession session = request.getSession(false);
 		if (session == null || session.getAttribute("username") == null) {
-			response.sendRedirect("login.jsp");
+			response.sendRedirect("login.html");
 			return;
 		}
 
@@ -127,5 +127,7 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
 
 		workbook.write(response.getOutputStream());
 		workbook.close();
+		
+		
 	}
 }

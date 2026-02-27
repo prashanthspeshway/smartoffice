@@ -47,7 +47,7 @@ public class AttendanceServlet extends HttpServlet {
             if ("admin".equalsIgnoreCase(role)) {
                 response.sendRedirect(request.getContextPath() + "/admin?success=" + success);
             } else if ("manager".equalsIgnoreCase(role)) {
-                response.sendRedirect(request.getContextPath() + "/manager?success=" + success);
+                response.sendRedirect(request.getContextPath() + "/manager?success=" + success + "&tab=selfAttendance");
             } else {
                 response.sendRedirect(request.getContextPath() + "/user?success=" + success);
             }

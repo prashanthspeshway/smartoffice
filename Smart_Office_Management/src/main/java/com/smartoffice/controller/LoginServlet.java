@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -66,10 +65,10 @@ public class LoginServlet extends HttpServlet {
 					res.sendRedirect("user?success=Login");
 					break;
 				case "manager":
-					res.sendRedirect("manager?login=success");
+					res.sendRedirect("manager?success=Login");
 					break;
 				case "admin":
-					res.sendRedirect("admin.jsp?login=success");
+					res.sendRedirect("admin.jsp?success=Login");
 					break;
 				default:
 					res.sendRedirect("index.html?error=invalidRole");

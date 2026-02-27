@@ -12,7 +12,7 @@
 <%
 String activeTab = (String) request.getAttribute("tab");
 if (activeTab == null) {
-    activeTab = "selfAttendance";
+	activeTab = "selfAttendance";
 }
 %>
 <%
@@ -37,7 +37,7 @@ if (punchOut != null)
 <title>Manager Dashboard</title>
 
 <link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 /* ===== Global ===== */
@@ -48,15 +48,14 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 body {
 	margin: 0;
 	font-family: "Segoe UI", Arial, sans-serif;
-	background: #eee; 
+	background: #eee;
 }
-
- 
 
 /* ===== Top Bar ===== */
 .top-bar {
 	height: 75px;
-	background: linear-gradient(135deg,#374151, #7175de, #270e8a);color: #fff;
+	background: linear-gradient(135deg, #374151, #7175de, #270e8a);
+	color: #fff;
 	display: flex;
 	align-items: center;
 	padding: 0 30px;
@@ -94,53 +93,54 @@ body {
 
 /* ===== Sidebar ===== */
 .left-panel {
-    width: 240px;
-    background: linear-gradient(135deg, #7175de, #270e8a, #374151);color: #fff;
+	width: 240px;
+	background: linear-gradient(135deg, #7175de, #270e8a, #374151);
+	color: #fff;
 	padding: 15px;
 }
 
 .nav-btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    margin-bottom: 10px;
-    font-size: 15px;
-    color: #d1d5db;
-    background: transparent;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: left;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 16px;
+	margin-bottom: 10px;
+	font-size: 15px;
+	color: #d1d5db;
+	background: transparent;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: left;
 }
 
 .nav-btn i {
-    font-size: 18px;
-    width: 22px;
-    text-align: center;
+	font-size: 18px;
+	width: 22px;
+	text-align: center;
 }
 
 /* Hover */
 .nav-btn:hover {
-    background: #374151;
-    color: #ffffff;
+	background: #374151;
+	color: #ffffff;
 }
 
 /* Active Button */
 .nav-btn.active {
-    background: linear-gradient(135deg, #6b686b, #80066f);
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+	background: linear-gradient(135deg, #6b686b, #80066f);
+	color: #ffffff;
+	box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
 .nav-btn.active i {
-    color: #ffffff;
-}/* ===== Content ===== */
+	color: #ffffff;
+}
+/* ===== Content ===== */
 .right-panel {
 	flex: 1;
-	padding: 30px;
 	overflow-y: auto;
 	background: #f1f5f9;
 }
@@ -148,12 +148,11 @@ body {
 /* ===== Box ===== */
 .box {
 	background: #ffffff;
+	height: auto;
 	padding: 25px 30px;
-	border-radius: 16px;
 	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 	margin-bottom: 30px;
 }
-
 
 /* ===== Buttons ===== */
 .primary-btn, .reject-btn {
@@ -205,13 +204,11 @@ body {
 }
 
 /* ===== Employee Grid ===== */
-.employee-grid {
-rgb(255, 255, 255)width: 100%;
+.employee-grid {rgb (255, 255, 255)width:100%;
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 	gap: 16px;
 	margin-top: 15px;
-	
 }
 
 .employee-card {
@@ -264,8 +261,8 @@ rgb(255, 255, 255)width: 100%;
 	margin-bottom: 4px;
 }
 
-#leave{
-    max-width: 100%;
+#leave {
+	max-width: 100%;
 }
 
 /* ===== Form Controls ===== */
@@ -289,8 +286,8 @@ rgb(255, 255, 255)width: 100%;
 }
 
 /* calendar */
-#calendarSection{
-	    max-width: 100%;
+#calendarSection {
+	max-width: 100%;
 }
 /* ===== Settings Module Styles ===== */
 #settings p {
@@ -479,7 +476,7 @@ rgb(255, 255, 255)width: 100%;
 
 /* ===== Performance Matrix Styling ===== */
 #performance {
-	max-width: 520px;
+	width: 100%;
 }
 
 #performance h3 {
@@ -679,24 +676,25 @@ keyframes fadeOut {to { opacity:0;
 .meeting-grid {
 	display: grid;
 	grid-template-columns: 1.1fr 0.9fr;
-	gap: 30px;
-	margin-top: 20px;
+	gap: 10px;
 }
 
 /* Left: form */
 .meeting-left {
 	background: #f8fafc;
-	padding: 20px;
+	height: 100%;
+	padding: 10px;
 	border-radius: 14px;
+	padding: 10px;
 }
 
 /* Right: meetings list */
 .meeting-right {
 	background: #ffffff;
-	padding: 20px;
+	padding: 10px;
 	border-radius: 14px;
 	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-	max-height: 520px; /* 👈 controls visible height */
+	max-height: 430px; /* 👈 controls visible height */
 	overflow-y: auto; /* 👈 vertical scroll */
 }
 
@@ -719,6 +717,82 @@ keyframes fadeOut {to { opacity:0;
 	.meeting-grid {
 		grid-template-columns: 1fr;
 	}
+}
+
+/* ===== Section Header ===== */
+.section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 15px;
+}
+
+/* View All button */
+.view-all-btn {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 16px;
+	border-radius: 18px;
+	border: none;
+	background: #2563eb;
+	color: #ffffff;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.view-all-btn:hover {
+	background: #1d4ed8;
+	transform: translateY(-1px);
+	box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+}
+
+/* ===== Modal Overlay ===== */
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.5);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	z-index: 2000;
+}
+
+/* Modal box */
+.modal-box {
+	width: 700px;
+	max-height: 80vh;
+	background: #ffffff;
+	border-radius: 14px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Header */
+.modal-header {
+	padding: 15px 20px;
+	background: #2563eb;
+	color: white;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.modal-header button {
+	background: none;
+	border: none;
+	font-size: 18px;
+	color: white;
+	cursor: pointer;
+}
+
+/* Body */
+.modal-body {
+	padding: 20px;
+	overflow-y: auto;
 }
 
 /* ================= DARK THEME ================= */
@@ -794,108 +868,99 @@ keyframes fadeOut {to { opacity:0;
 	font-size: 14px;
 }
 /* ================= FULL DARK MODE ================= */
-
 body.dark-theme {
-    background: #0f172a !important;
-    color: #e5e7eb !important;
+	background: #0f172a !important;
+	color: #e5e7eb !important;
 }
 
 /* Top bar */
 body.dark-theme .top-bar {
-    background: linear-gradient(135deg, #0f172a, #1e293b, #1e3a8a);
+	background: linear-gradient(135deg, #0f172a, #1e293b, #1e3a8a);
 }
 
 /* Sidebar */
 body.dark-theme .left-panel {
-    background: #1e293b !important;
+	background: #1e293b !important;
 }
 
 body.dark-theme .nav-btn.active {
-    background: linear-gradient(135deg, #d60f47, #948e90) !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5);
+	background: linear-gradient(135deg, #d60f47, #948e90) !important;
+	color: #ffffff !important;
+	box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5);
 }
 
 body.dark-theme .nav-btn:hover {
-    background: #475569 !important;
+	background: #475569 !important;
 }
 
 /* Right panel */
 body.dark-theme .right-panel {
-    background: #0f172a !important;
+	background: #0f172a !important;
 }
 
 /* All boxes */
 body.dark-theme .box {
-    background: #1e293b !important;
-    color: #e5e7eb !important;
+	background: #1e293b !important;
+	color: #e5e7eb !important;
 }
 
 /* Cards */
-body.dark-theme .employee-card,
-body.dark-theme .task-card,
-body.dark-theme .meeting-left,
-body.dark-theme .meeting-right {
-    background: #1e293b !important;
-    color: #eee !important;
+body.dark-theme .employee-card, body.dark-theme .task-card, body.dark-theme .meeting-left,
+	body.dark-theme .meeting-right {
+	background: #1e293b !important;
+	color: #eee !important;
 }
 
 /* Text inside cards */
-body.dark-theme .emp-body,
-body.dark-theme .tasks-title,
-body.dark-theme h3,
-body.dark-theme h4,
-body.dark-theme p,
-body.dark-theme b,
-body.dark-theme span {
-    color: #eee !important;
+body.dark-theme .emp-body, body.dark-theme .tasks-title, body.dark-theme h3,
+	body.dark-theme h4, body.dark-theme p, body.dark-theme b, body.dark-theme span
+	{
+	color: #eee !important;
 }
 
 /* Status badges */
 body.dark-theme .emp-status {
-    background: #334155 !important;
-    color: #ffffff !important;
+	background: #334155 !important;
+	color: #ffffff !important;
 }
 
 /* Inputs & selects */
-body.dark-theme input,
-body.dark-theme select,
-body.dark-theme textarea {
-    background: #334155 !important;
-    color: #ffffff !important;
-    border: 1px solid #555 !important;
+body.dark-theme input, body.dark-theme select, body.dark-theme textarea
+	{
+	background: #334155 !important;
+	color: #ffffff !important;
+	border: 1px solid #555 !important;
 }
 
 /* Task description */
 body.dark-theme .task-desc {
-    color: #ffffff !important;
+	color: #ffffff !important;
 }
 
 /* Notification panel */
 body.dark-theme .notification-panel {
-    background: #1e293b !important;
+	background: #1e293b !important;
 }
 
 body.dark-theme .notification-item {
-    background: #334155 !important;
-    color: #ffffff !important;
+	background: #334155 !important;
+	color: #ffffff !important;
 }
 
 /* performance matrix */
 body.dark-theme .radio-group label {
-    background: #334155 !important;
-    color: #eee;
-    border: 1px solid #555 !important;
+	background: #334155 !important;
+	color: #eee;
+	border: 1px solid #555 !important;
 }
 /* Settings panel */
 body.dark-theme .settings-panel {
-    background: #1e293b !important;
+	background: #1e293b !important;
 }
 
 body.dark-theme .settings-list li:hover {
-    background: #334155 !important;
+	background: #334155 !important;
 }
-
 </style>
 <script>
     // Apply saved theme before page renders
@@ -936,9 +1001,8 @@ if ("HolidayAttendance".equals(error)) {
 		</div>
 
 		<ul class="settings-list">
-			<li onclick="location.href='manager?tab=selfProfile'">
-    <i class="fa-solid fa-user"></i> Self Profile
-</li>
+			<li onclick="location.href='manager?tab=selfProfile'"><i
+				class="fa-solid fa-user"></i> Self Profile</li>
 			<li onclick="openChangePassword()">🔐 Change Password</li>
 			<li onclick="toggleTheme()">🌗 Theme</li>
 		</ul>
@@ -966,9 +1030,9 @@ if ("HolidayAttendance".equals(error)) {
 	<div class="top-bar">
 		<h2>Smart Office • Manager Dashboard</h2>
 		<div class="user-area">
-		<button class="icon-btn" onclick="openNotifications()">
-			<i class="fa-solid fa-bell"></i>
-		</button>
+			<button class="icon-btn" onclick="openNotifications()">
+				<i class="fa-solid fa-bell"></i>
+			</button>
 			<span>Welcome, <b>${sessionScope.username}</b></span>
 			<button class="icon-btn" onclick="openSettings()">
 				<i class="fa-solid fa-gear"></i>
@@ -984,57 +1048,51 @@ if ("HolidayAttendance".equals(error)) {
 		<!-- ===== Sidebar ===== -->
 		<!-- Font Awesome -->
 
-<div class="left-panel">
+		<div class="left-panel">
 
-    <button class="nav-btn active"
-        onclick="setActive(this); showSection('selfAttendance')">
-        <i class="fa-solid fa-user-check"></i>
-        <span>My Attendance</span>
-    </button>
+			<button class="nav-btn active"
+				onclick="setActive(this); showSection('selfAttendance')">
+				<i class="fa-solid fa-user-check"></i> <span>My Attendance</span>
+			</button>
 
-    <button class="nav-btn"
-        onclick="setActive(this); showSection('teamSection')">
-        <i class="fa-solid fa-users"></i>
-        <span>My Team</span>
-    </button>
+			<button class="nav-btn"
+				onclick="setActive(this); showSection('teamSection')">
+				<i class="fa-solid fa-users"></i> <span>My Team</span>
+			</button>
 
-    <button class="nav-btn"
-        onclick="setActive(this); showSection('assignTask')">
-        <i class="fa-solid fa-list-check"></i>
-        <span>Assign Tasks</span>
-    </button>
+			<button class="nav-btn"
+				onclick="setActive(this); showSection('assignTask')">
+				<i class="fa-solid fa-list-check"></i> <span>Assign Tasks</span>
+			</button>
 
-    <button class="nav-btn"
-        onclick="setActive(this); showSection('schedulemeeting')">
-        <i class="fa-solid fa-handshake"></i>
-        <span>Schedule Meetings</span>
-    </button>
+			<button class="nav-btn"
+				onclick="setActive(this); showSection('schedulemeeting')">
+				<i class="fa-solid fa-handshake"></i> <span>Schedule Meetings</span>
+			</button>
 
-    <button class="nav-btn"
-        onclick="setActive(this); showSection('attendance')">
-        <i class="fa-solid fa-clipboard-user"></i>
-        <span>Team Attendance</span>
-    </button>
+			<button class="nav-btn"
+				onclick="setActive(this); showSection('attendance')">
+				<i class="fa-solid fa-clipboard-user"></i> <span>Team
+					Attendance</span>
+			</button>
 
-    <button class="nav-btn"
-        onclick="setActive(this); location.href='<%=request.getContextPath()%>/manager?tab=leave'">
-        <i class="fa-solid fa-calendar-xmark"></i>
-        <span>Leave Requests</span>
-    </button>
+			<button class="nav-btn"
+				onclick="setActive(this); location.href='<%=request.getContextPath()%>/manager?tab=leave'">
+				<i class="fa-solid fa-calendar-xmark"></i> <span>Leave
+					Requests</span>
+			</button>
 
-    <button class="nav-btn"
-        onclick="setActive(this); showSection('performance')">
-        <i class="fa-solid fa-chart-line"></i>
-        <span>Performance Matrix</span>
-    </button>
+			<button class="nav-btn"
+				onclick="setActive(this); showSection('performance')">
+				<i class="fa-solid fa-chart-line"></i> <span>Performance
+					Matrix</span>
+			</button>
 
-    <button class="nav-btn"
-        onclick="setActive(this); openCalendar()">
-        <i class="fa-solid fa-calendar-days"></i>
-        <span>Calendar</span>
-    </button>
+			<button class="nav-btn" onclick="setActive(this); openCalendar()">
+				<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
+			</button>
 
-</div>
+		</div>
 
 		<!-- ===== Right Panel ===== -->
 		<div class="right-panel">
@@ -1117,7 +1175,13 @@ if ("HolidayAttendance".equals(error)) {
 			</div>
 
 			<div class="box" id="schedulemeeting" style="display: none;">
-				<h3>Schedule Meeting</h3>
+				<div class="section-header">
+					<h3>Schedule Meeting</h3>
+
+					<button class="view-all-btn" onclick="openAllMeetings()">
+						<i class="fa-solid fa-eye"></i> View All
+					</button>
+				</div>
 
 				<!-- GRID WRAPPER -->
 				<div class="meeting-grid">
@@ -1442,6 +1506,7 @@ if ("HolidayAttendance".equals(error)) {
 				<!-- View tasks form -->
 				<form action="<%=request.getContextPath()%>/viewAssignedTasks"
 					method="post">
+					<h3>View Assigned Tasks</h3>
 					<select class="form-control" name="employeeUsername" required>
 						<option value="">Select Employee</option>
 
@@ -1470,8 +1535,8 @@ if ("HolidayAttendance".equals(error)) {
 
 				<!-- Task list -->
 				<%
-							viewTasks = (List<Task>) request.getAttribute("viewTasks");
-							
+				viewTasks = (List<Task>) request.getAttribute("viewTasks");
+
 				if (viewTasks != null) {
 				%>
 
@@ -1508,34 +1573,59 @@ if ("HolidayAttendance".equals(error)) {
 				</div>
 			</div>
 			<!-- ===== Self Profile ===== -->
-<div class="box centered-box" id="selfProfile" style="display:none;">
+			<div class="box centered-box" id="selfProfile" style="display: none;">
 
 
-    <h3><i class="fa-solid fa-user"></i> My Profile</h3>
+				<h3>
+					<i class="fa-solid fa-user"></i> My Profile
+				</h3>
 
-    <%
-    com.smartoffice.model.User profileUser =
-        (com.smartoffice.model.User) request.getAttribute("profileUser");
+				<%
+				com.smartoffice.model.User profileUser = (com.smartoffice.model.User) request.getAttribute("profileUser");
 
-    if (profileUser != null) {
-    %>
+				if (profileUser != null) {
+				%>
 
-        <p><b>Full Name:</b> <%=profileUser.getFullname()%></p>
-        <p><b>Username:</b> <%=profileUser.getUsername()%></p>
-        <p><b>Email:</b> <%=profileUser.getEmail()%></p>
-        <p><b>Role:</b> <%=profileUser.getRole()%></p>
-        <p><b>Phone:</b> <%=profileUser.getPhone()%></p>
+				<p>
+					<b>Full Name:</b>
+					<%=profileUser.getFullname()%></p>
+				<p>
+					<b>Username:</b>
+					<%=profileUser.getUsername()%></p>
+				<p>
+					<b>Email:</b>
+					<%=profileUser.getEmail()%></p>
+				<p>
+					<b>Role:</b>
+					<%=profileUser.getRole()%></p>
+				<p>
+					<b>Phone:</b>
+					<%=profileUser.getPhone()%></p>
 
-    <%
-    } else {
-    %>
-        <p>No profile data found.</p>
-    <%
-    }
-    %>
+				<%
+				} else {
+				%>
+				<p>No profile data found.</p>
+				<%
+				}
+				%>
 
-</div>
-			
+			</div>
+
+		</div>
+	</div>
+
+	<!-- ===== ALL MEETINGS MODAL ===== -->
+	<div id="allMeetingsModal" class="modal-overlay">
+		<div class="modal-box">
+			<div class="modal-header">
+				<h3>All Scheduled Meetings</h3>
+				<button onclick="closeAllMeetings()">✖</button>
+			</div>
+
+			<div class="modal-body" id="allMeetingsContent">
+				<!-- meetings will load here -->
+			</div>
 		</div>
 	</div>
 
@@ -1597,6 +1687,42 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         document.body.appendChild(toast);
 
+        setTimeout(() => toast.remove(), 4000);
+    }
+    
+ // ---- Manager login toast ----
+    if (success === "Login") {
+        const toast = document.createElement("div");
+        toast.className = "toast-success";
+        toast.innerHTML = `
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Welcome  Logged in successfully</span>
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.remove(), 4000);
+    }
+    
+ // ---- Attendance toasts ----
+    if (success === "PunchIn") {
+        const toast = document.createElement("div");
+        toast.className = "toast-success";
+        toast.innerHTML = `
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Punched in successfully</span>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    if (success === "PunchOut") {
+        const toast = document.createElement("div");
+        toast.className = "toast-success";
+        toast.innerHTML = `
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Punched out successfully</span>
+        `;
+        document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 4000);
     }
 
@@ -1716,6 +1842,26 @@ function showToast(message) {
         toast.style.opacity = "0";
         setTimeout(() => toast.remove(), 300);
     }, 3000);
+}
+</script>
+
+	<script>
+function openAllMeetings() {
+    document.getElementById("allMeetingsModal").style.display = "flex";
+
+    fetch("<%=request.getContextPath()%>/allMeetings")
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById("allMeetingsContent").innerHTML = html;
+        })
+        .catch(() => {
+            document.getElementById("allMeetingsContent").innerHTML =
+                "<p>Error loading meetings</p>";
+        });
+}
+
+function closeAllMeetings() {
+    document.getElementById("allMeetingsModal").style.display = "none";
 }
 </script>
 
@@ -1842,7 +1988,7 @@ function markAsRead(notificationId) {
 		</div>
 	</div>
 
-<script>
+	<script>
 function setActive(button) {
     // remove active from all buttons
     document.querySelectorAll('.nav-btn')
