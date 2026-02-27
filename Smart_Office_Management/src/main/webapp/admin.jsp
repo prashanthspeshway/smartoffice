@@ -146,60 +146,246 @@ body{
     border:none;
 /*     border-radius:15px; */
     background:rgb(255,255,255,0);
-/*     backdrop-filter:blur(10px); */
+/*      backdrop-filter:blur(10px); */
 }
 
 /* ================= MODALS ================= */
+/* ===== Modal Overlay ===== */
 .modal{
-    display:none;
-    position:fixed;
-    inset:0;
-/*     background:rgba(0,0,0,0.4); */
-/*     backdrop-filter:blur(4px); */
-    align-items:center;
-    justify-content:center;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
 }
 
+/* Show Modal */
+.modal.show{
+    display: flex;
+}
+
+/* ===== Modal Box ===== */
 .modal-content{
-    background:white;
-    border-radius:12px;
-    width:90%;
-    max-width:420px;
+    width: 50%;
+    max-width: 700px;
+    height: 420px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalFade 0.35s ease;
 }
 
+/* ===== Header ===== */
 .modal-header{
-    padding:14px;
-    background:linear-gradient(135deg,#667eea,#764ba2);
-    color:white;
-    display:flex;
-    justify-content:space-between;
+    height: 70px;
+    padding: 0 20px;
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.modal-body{
-    padding:20px;
+.modal-header h4{
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
 }
 
-/* ================= SETTINGS DRAWER ================= */
+/* Close Button */
+.modal-close{
+    font-size: 22px;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.modal-close:hover{
+    transform: scale(1.15);
+    opacity: 0.8;
+}
+
+/* ===== Iframe ===== */
+#profileFrame{
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: #f9fafb;
+}
+/* ===== Password Modal Form Styling ONLY ===== */
+#passwordModal .modal-body{
+    padding: 30px 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Inputs */
+#passwordModal input[type="password"]{
+    width: 100%;
+/*     max-width: 320px; */
+    padding: 12px 14px;
+    font-size: 15px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    outline: none;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+/* Input Focus */
+#passwordModal input[type="password"]:focus{
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+}
+
+/* Button */
+#passwordModal button{
+    width: 100%;
+/*     max-width: 320px; */
+    margin-top: 10px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: #ffffff;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Button Hover */
+#passwordModal button:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(99,102,241,0.35);
+}
+
+/* Button Active */
+#passwordModal button:active{
+    transform: scale(0.97);
+}
+
+/* Mobile Friendly */
+@media (max-width: 480px){
+    #passwordModal input[type="password"],
+    #passwordModal button{
+        max-width: 100%;
+    }
+}
+
+/* ===== Animation ===== */
+@keyframes modalFade{
+    from{
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to{
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px){
+    .modal-content{
+        width: 95%;
+        height: 90%;
+    }
+}/* ================= SETTINGS DRAWER ================= */
+/* ===== Settings Drawer ===== */
 .settings-drawer{
-    position:fixed;
-    top:0;
-    right:-320px;
-    width:320px;
-    height:100%;
-    background:rgba(255,255,255,0.35);
-    backdrop-filter:blur(10px);
-    transition:0.35s;
+    position: fixed;
+    top: 0;
+    right: -340px;
+    width: 340px;
+    height: 100%;
+    background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.85),
+        rgba(240,245,255,0.75)
+    );
+    backdrop-filter: blur(16px);
+    box-shadow: -8px 0 25px rgba(0,0,0,0.15);
+    transition: right 0.4s ease, opacity 0.3s ease;
+    z-index: 1000;
+    border-left: 1px solid rgba(255,255,255,0.4);
 }
 
+/* Open State */
 .settings-drawer.open{
-    right:0;
+    right: 0;
 }
 
+/* Header */
+.settings-header{
+    padding: 20px;
+    font-size: 18px;
+    height:100px;
+    font-weight: 600;
+    color: #2d3748;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Close Button */
+.settings-close{
+    cursor: pointer;
+    font-size: 20px;
+    color: #718096;
+    transition: color 0.3s;
+}
+.settings-close:hover{
+    color: #e53e3e;
+}
+
+/* Items Container */
+.settings-list{
+    padding: 10px 0;
+}
+
+/* Individual Item */
 .settings-item{
-    padding:15px 20px;
-    cursor:pointer;
+    padding: 14px 22px;
+    margin: 6px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
 }
 
+/* Hover Effect */
+.settings-item:hover{
+    background: rgba(99,102,241,0.12);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Icon Styling (Font Awesome) */
+.settings-item i{
+    font-size: 18px;
+    color: #6366f1;
+}
+
+/* Active Item */
+.settings-item.active{
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: #fff;
+}
+.settings-item.active i{
+    color: #fff;
+}
 </style>
 </head>
 
@@ -211,7 +397,7 @@ body{
 <div id="settingsPanel" class="settings-drawer">
     <div class="modal-header">
         <h4>Settings</h4>
-        <span onclick="closeSettings()">✕</span>
+        <span onclick="closeSettings()" style="cursor:pointer;">✕</span>
     </div>
     <div class="settings-item" onclick="openProfile()">My Profile</div>
     <div class="settings-item" onclick="openChangePassword()">Change Password</div>
@@ -219,13 +405,14 @@ body{
 
 <!-- PASSWORD MODAL -->
 <div id="passwordModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="text-align:center;">
         <div class="modal-header">
             <h4>Change Password</h4>
-            <span onclick="closeChangePassword()">✕</span>
+            <span onclick="closeChangePassword()"  style="cursor:pointer;" >✕</span>
         </div>
         <div class="modal-body">
             <input type="password" placeholder="New Password"><br><br>
+             <input type="password" placeholder="Confirm Password"><br><br>
             <button onclick="submitPassword()">Update</button>
         </div>
     </div>
@@ -233,12 +420,12 @@ body{
 
 <!-- PROFILE MODAL -->
 <div id="profileModal" class="modal">
-    <div class="modal-content" style="height:500px;">
+    <div class="modal-content">
         <div class="modal-header">
             <h4>My Profile</h4>
-            <span onclick="closeProfile()">✕</span>
+            <span class="modal-close" onclick="closeProfile()" style="cursor:pointer;">✕</span>
         </div>
-        <iframe id="profileFrame" style="width:100%; height:100%; border:none;"></iframe>
+        <iframe id="profileFrame"></iframe>
     </div>
 </div>
 

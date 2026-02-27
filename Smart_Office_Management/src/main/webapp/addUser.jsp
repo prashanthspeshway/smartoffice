@@ -174,7 +174,7 @@ legend {
     font-size: 18px;
     font-weight: bold;
     color: #1f2937;
-     background: #f9fafb; 
+    background:#e2ebf0;
     border-radius: 8px;
 }
 
