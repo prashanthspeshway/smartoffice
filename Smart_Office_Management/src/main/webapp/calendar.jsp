@@ -11,7 +11,7 @@
 
 body {
     font-family: "Segoe UI";
-    background: #f4f6f8;
+    background: #c3cfe2;
     margin: 0;          /* ✅ removes outer space */
     padding: 0;
 }
@@ -20,8 +20,8 @@ body {
     width: 100%;
     height: 100%;
     margin: 0;                 /* ✅ no outer spacing */
-    padding: 12px;             /* 🔹 optional: reduce padding */
-    background: white;
+    padding: 6px;             /* 🔹 optional: reduce padding */
+    background: #c0d1eb;
     border-radius: 0;          /* optional if inside panel */
     box-shadow: none;          /* optional if parent already has shadow */
 }
@@ -30,14 +30,21 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 15px;
+	margin-bottom: 1px;
+}
+
+.header h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1f2937;
 }
 
 .header button {
 	border: none;
-	background: #3b82f6;
-	color: white;
-	padding: 6px 12px;
+	background: #e2ebf0;
+	color: black;
+	font-size: 16px;
+    padding: 8px 14px;
 	border-radius: 6px;
 	cursor: pointer;
 }
@@ -49,26 +56,53 @@ table {
 }
 
 th, td {
-	width: 14%;
-	height: 80px;
-	text-align: center;
-	border: 1px solid #eee;
-	vertical-align: top;
+    width: 14%;
+    height: auto;              /* ⬆ taller cells */
+    text-align: center;         /* center horizontally */
+    vertical-align: middle;     /* center vertically */
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    font-size: 16px;            /* ⬆ bigger date numbers */
+    font-weight: 500;
+    padding: 8px;
+}
+
+td {
+    background: #ffffff;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+td:hover {
+    background: #c3cfe2;
+    transform: scale(1.03);
+    cursor: pointer;
+}
+
+td div {
+    font-size: 13px;           /* ⬆ holiday name size */
+    margin-top: 6px;
+    color: #991b1b;
+    font-weight: 600;
 }
 
 th {
-	background: #f1f5f9;
+    background: #e5e7eb;
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+    height: 50px;
 }
 
 .holiday {
 	background: #fee2e2;
-	color: #b91c1c;
+	color: #7f1d1d;
 	font-weight: bold;
 }
 
 .today {
-	background: #dbeafe;
-	font-weight: bold;
+    background: #dbeafe;
+    border: 2px solid #3b82f6;
+    font-weight: 700;
 }
 
 /* ===== MODAL OVERLAY ===== */
