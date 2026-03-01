@@ -279,26 +279,27 @@ body {
 }
 
 /* ===== Animation ===== */
-@keyframes modalFade {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+@
+keyframes modalFade {from { opacity:0;
+	transform: scale(0.95);
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+to {
+	opacity: 1;
+	transform: scale(1);
+}
+
+}
+@
+keyframes slideIn {from { opacity:0;
+	transform: translateX(40px);
+}
+
+to {
+	opacity: 1;
+	transform: translateX(0);
+}
+
 }
 
 /* ===== Responsive ===== */
@@ -399,33 +400,32 @@ body {
 
 /* ================= TOAST ================= */
 .toast {
-    position: fixed;
-    top: 25px;
-    right: 25px;
-    background: linear-gradient(135deg, #38a169, #48bb78);
-    color: #ffffff;
-    padding: 14px 20px 14px 44px; /* space for icon */
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    display: none;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-    z-index: 3000;
-    animation: slideIn 0.4s ease;
-    line-height: 1.4;
+	position: fixed;
+	top: 25px;
+	right: 25px;
+	background: linear-gradient(135deg, #38a169, #48bb78);
+	color: #ffffff;
+	padding: 14px 20px 14px 44px; /* space for icon */
+	border-radius: 10px;
+	font-size: 15px;
+	font-weight: 500;
+	display: none;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+	z-index: 3000;
+	animation: slideIn 0.4s ease;
+	line-height: 1.4;
 }
 
 /* Small icon */
 .toast::before {
-    content: "✔";
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    font-weight: bold;
+	content: "✔";
+	position: absolute;
+	left: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 16px;
+	font-weight: bold;
 }
-
 </style>
 </head>
 
@@ -452,9 +452,10 @@ body {
 				<span onclick="closeChangePassword()" style="cursor: pointer;">✕</span>
 			</div>
 			<div class="modal-body">
-				<input type="password" placeholder="New Password"><br>
-				<br> <input type="password" placeholder="Confirm Password"><br>
-				<br>
+				<input type="password" id="newPassword" placeholder="New Password"><br>
+				<br> <input type="password" id="confirmPassword"
+					placeholder="Confirm Password"><br> <br>
+
 				<button onclick="submitPassword()">Update</button>
 			</div>
 		</div>
@@ -553,7 +554,48 @@ function closeProfile(){document.getElementById("profileModal").style.display="n
 function openChangePassword(){document.getElementById("passwordModal").style.display="flex";}
 function closeChangePassword(){document.getElementById("passwordModal").style.display="none";}
 function closeAll(){closeSettings();closeProfile();closeChangePassword();}
-function submitPassword(){alert("Password updated");closeChangePassword();}
+function submitPassword() {
+    const newPassword = document.getElementById("newPassword").value.trim();
+    const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+    if (!newPassword || !confirmPassword) {
+        showToast("Please fill all fields");
+        return;
+    }
+
+    fetch("<%=request.getContextPath()%>/changePassword", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            newPassword: newPassword,
+            confirmPassword: confirmPassword
+        })
+    })
+    .then(res => res.text())
+    .then(data => {
+        if (data === "Success") {
+            showToast("Password updated successfully");
+            closeChangePassword();
+            document.getElementById("newPassword").value = "";
+            document.getElementById("confirmPassword").value = "";
+        } 
+        else if (data === "PasswordMismatch") {
+            showToast("Passwords do not match");
+        } 
+        else if (data === "MissingFields") {
+            showToast("All fields are required");
+        } 
+        else {
+            showToast("Something went wrong");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showToast("Server error");
+    });
+}
 function exportUsers(){document.getElementById("contentFrame").src="exportUsers";}
 
 

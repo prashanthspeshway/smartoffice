@@ -46,16 +46,30 @@ public class AttendanceDAO {
 
 	// ✅ Check if today is a holiday
 	public boolean isHoliday(Date date) throws Exception {
+
+		// 1️⃣ Check if Saturday or Sunday
+		java.util.Calendar cal = java.util.Calendar.getInstance();
+		cal.setTime(date);
+
+		int dayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK);
+
+		if (dayOfWeek == java.util.Calendar.SATURDAY || dayOfWeek == java.util.Calendar.SUNDAY) {
+			return true; // 🚫 Weekend = Holiday
+		}
+
+		// 2️⃣ Check admin-declared holidays from DB
 		String sql = "SELECT COUNT(*) FROM holidays WHERE holiday_date=?";
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
 			ps.setDate(1, new java.sql.Date(date.getTime()));
 			ResultSet rs = ps.executeQuery();
+
 			if (rs.next()) {
 				return rs.getInt(1) > 0;
 			}
-			return false;
 		}
+
+		return false;
 	}
 
 	// Punch In with holiday check

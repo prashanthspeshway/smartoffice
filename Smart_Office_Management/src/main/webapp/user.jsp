@@ -53,50 +53,51 @@ body {
 }
 
 /* ================= TOP BAR ================= */
-.top-bar{
-    backdrop-filter: blur(10px);
-    background: #e2ebf0;
-    border-bottom:1px solid rgba(255,255,255,0.3);
-    padding:15px 30px;
-    display:flex;
-    HEIGHT:50px;
-    justify-content:space-between;
-    align-items:center;
+.top-bar {
+	backdrop-filter: blur(10px);
+	background: #e2ebf0;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+	padding: 15px 30px;
+	display: flex;
+	HEIGHT: 50px;
+	justify-content: space-between;
+	align-items: center;
 }
 
-.top-bar h2{
-    font-size:22px;
-    font-weight:600;
-    color:#2d3748;
+.top-bar h2 {
+	font-size: 22px;
+	font-weight: 600;
+	color: #2d3748;
 }
 
-.user-area{
-    display:flex;
-    align-items:center;
-    gap:15px;
+.user-area {
+	display: flex;
+	align-items: center;
+	gap: 15px;
 }
 
-.icon-btn{
-    width:38px;
-    height:38px;
-    border-radius:50%;
-    border:none;
-    background: linear-gradient(135deg,#667eea,#764ba2);
-    color:white;
-    cursor:pointer;
+.icon-btn {
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	border: none;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: white;
+	cursor: pointer;
 }
 
-.icon-btn i{
-    font-size:16px;
-    margin-left: -7px;
+.icon-btn i {
+	font-size: 16px;
+	margin-left: -7px;
 }
-.logout-btn{
-    padding:8px 14px;
-    border-radius:8px;
-    border:none;
-    background:#e53e3e;
-    color:white;
-    cursor:pointer;
+
+.logout-btn {
+	padding: 8px 14px;
+	border-radius: 8px;
+	border: none;
+	background: #e53e3e;
+	color: white;
+	cursor: pointer;
 }
 
 /* ===== Layout ===== */
@@ -106,62 +107,62 @@ body {
 }
 
 /* ================= SIDEBAR  ================= */
-.left-panel{
-    width:250px;
-    backdrop-filter: blur(10px);
-    background: #e2ebf0;
-    border-right:1px solid rgba(255,255,255,0.3);
-    padding:18px 12px;
+.left-panel {
+	width: 250px;
+	backdrop-filter: blur(10px);
+	background: #e2ebf0;
+	border-right: 1px solid rgba(255, 255, 255, 0.3);
+	padding: 18px 12px;
 }
 
 /* BUTTON */
-.nav-btn{
-    width:100%;
-    padding:12px 14px;
-    margin-bottom:10px;
-    border:none;
-    background:transparent;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:14px;
-    font-weight:500;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    color:#2d3748;
-    transition:0.25s;
+.nav-btn {
+	width: 100%;
+	padding: 12px 14px;
+	margin-bottom: 10px;
+	border: none;
+	background: transparent;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: #2d3748;
+	transition: 0.25s;
 }
 
 /* Hover */
-.nav-btn:hover{
-    background:rgba(102,126,234,0.9);
-    color:white;
-    font-size:15px;
+.nav-btn:hover {
+	background: rgba(102, 126, 234, 0.9);
+	color: white;
+	font-size: 15px;
 }
 
 /* Active */
-.nav-btn.active{
-    background: linear-gradient(135deg,#e7e6eb);
-    color:black;
-    box-shadow:0 6px 15px rgba(102,126,234,0.4);
-    position:relative;
-    font-size:15px;
+.nav-btn.active {
+	background: linear-gradient(135deg, #e7e6eb);
+	color: black;
+	box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+	position: relative;
+	font-size: 15px;
 }
 
-.nav-btn.active::before{
-    content:"";
-    position:absolute;
-    left:0;
-    top:10%;
-    width:4px;
-    height:80%;
-    background:white;
-    border-radius:2px;
+.nav-btn.active::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 10%;
+	width: 4px;
+	height: 80%;
+	background: white;
+	border-radius: 2px;
 }
 
 /* ===== Card ===== */
 .box {
-/* 	background: white; */
+	/* 	background: white; */
 	overflow-y: auto;
 	overflow-x: hidden;
 	padding: 28px;
@@ -169,11 +170,11 @@ body {
 	height: 100%; /* 🔑 remove fixed height */
 }
 /* ================= RIGHT PANEL ================= */
-.right-panel{
-    flex:1;
-    background:#c3cfe2;
-/*     padding:25px; */
-    overflow:hidden;
+.right-panel {
+	flex: 1;
+	background: #c3cfe2;
+	/*     padding:25px; */
+	overflow: hidden;
 }
 
 /* Card Box */
@@ -187,267 +188,267 @@ body {
 /* } */
 
 /* ================= ATTENDANCE FIELDSET ================= */
-.attendance-fieldset{
-/*     border: 1px solid rgba(99,102,241,0.35); */
-    border-radius: 10px;
-    padding: 25px 20px 30px;
-    border:none;
-    background:#c3cfe2;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+.attendance-fieldset {
+	/*     border: 1px solid rgba(99,102,241,0.35); */
+	border-radius: 10px;
+	padding: 25px 20px 30px;
+	border: none;
+	background: #c3cfe2;
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 }
 
 /* Legend (Title) */
-.attendance-fieldset legend{
-    padding: 6px 14px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #222;
-    border-radius: 10px;
-    background: #e2ebfa;
-    border: 1px solid rgba(99,102,241,0.35);
+.attendance-fieldset legend {
+	padding: 6px 14px;
+	font-size: 15px;
+	font-weight: 600;
+	color: #222;
+	border-radius: 10px;
+	background: #e2ebfa;
+	border: 1px solid rgba(99, 102, 241, 0.35);
 }
 
 /* Status Badge Center */
-.attendance-fieldset .status-badge{
-    margin: 15px auto 20px;
-    display: inline-block;
+.attendance-fieldset .status-badge {
+	margin: 15px auto 20px;
+	display: inline-block;
 }
 
 /* Time Cards */
-.attendance-fieldset .time-card{
-    margin: 10px 0;
-    padding: 12px 16px;
-    border-radius: 10px;
-    background: rgba(99,102,241,0.08);
-    font-size: 14px;
+.attendance-fieldset .time-card {
+	margin: 10px 0;
+	padding: 12px 16px;
+	border-radius: 10px;
+	background: rgba(99, 102, 241, 0.08);
+	font-size: 14px;
 }
 
 /* Punch Buttons */
-.attendance-fieldset .punch-actions{
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
+.attendance-fieldset .punch-actions {
+	display: flex;
+	gap: 15px;
+	margin-top: 20px;
 }
 
-.attendance-fieldset button{
-    flex:1;
-    padding: 12px;
-    border-radius: 10px;
-    background: #667eea;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
+.attendance-fieldset button {
+	flex: 1;
+	padding: 12px;
+	border-radius: 10px;
+	background: #667eea;
+	border: none;
+	font-weight: 600;
+	cursor: pointer;
 }
 
 /* Disabled State */
-.attendance-fieldset button:disabled{
-    opacity: 0.6;
-    cursor: not-allowed;
+.attendance-fieldset button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
 }
 /* ================= TASK CARD ================= */
-.task-card{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:15px 18px;
-    margin-top:15px;
-    border-radius:12px;
-    background: rgba(99,102,241,0.08);
-    transition:0.3s;
+.task-card {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px 18px;
+	margin-top: 15px;
+	border-radius: 12px;
+	background: rgba(99, 102, 241, 0.08);
+	transition: 0.3s;
 }
 
-.task-card:hover{
-    transform:translateY(-3px);
-    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+.task-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
-.task-left{
-    display:flex;
-    align-items:center;
-    gap:12px;
+.task-left {
+	display: flex;
+	align-items: center;
+	gap: 12px;
 }
 
-.task-left i{
-    font-size:18px;
-    color:#6366f1;
+.task-left i {
+	font-size: 18px;
+	color: #6366f1;
 }
 
 /* Status */
-.task-status{
-    padding:6px 12px;
-    border-radius:20px;
-    font-size:12px;
-    font-weight:600;
+.task-status {
+	padding: 6px 12px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: 600;
 }
 
-.task-status.pending{
-    background:#fff4e5;
-    color:#d97706;
+.task-status.pending {
+	background: #fff4e5;
+	color: #d97706;
 }
 
-.task-status.done{
-    background:#dcfce7;
-    color:#15803d;
+.task-status.done {
+	background: #dcfce7;
+	color: #15803d;
 }
 
 /* Done Button */
-.task-btn{
-    padding:8px 14px;
-    border:none;
-    border-radius:8px;
-    background:linear-gradient(135deg,#6366f1,#818cf8);
-    color:white;
-    font-size:13px;
-    font-weight:600;
-    cursor:pointer;
-    margin-left:10px;
-    transition:0.25s;
+.task-btn {
+	padding: 8px 14px;
+	border: none;
+	border-radius: 8px;
+	background: linear-gradient(135deg, #6366f1, #818cf8);
+	color: white;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	margin-left: 10px;
+	transition: 0.25s;
 }
 
-.task-btn:hover{
-    transform:translateY(-2px);
-    box-shadow:0 6px 15px rgba(99,102,241,0.35);
+.task-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 15px rgba(99, 102, 241, 0.35);
 }
 
 /* Empty Text */
-.no-task-text{
-    margin-top:15px;
-    font-size:14px;
-    color:#6b7280;
+.no-task-text {
+	margin-top: 15px;
+	font-size: 14px;
+	color: #6b7280;
 }
 
 /* ================= LEAVE FORM ================= */
-.leave-form{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
+.leave-form {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
 }
 
-.leave-form input,
-.leave-form select,
-.leave-form textarea{
-    padding:8px 8px;
-    border-radius:8px;
-    background: #e2ebf0;
-    border:1px solid #cbd5e1;
-    font-size:14px;
+.leave-form input, .leave-form select, .leave-form textarea {
+	padding: 8px 8px;
+	border-radius: 8px;
+	background: #e2ebf0;
+	border: 1px solid #cbd5e1;
+	font-size: 14px;
 }
 
-.leave-form textarea{
-    height:50px;
-    resize:none;
+.leave-form textarea {
+	height: 50px;
+	resize: none;
 }
+
 #myLeaveSection h3 {
 	color: black !important;
 }
-.apply-leave-btn{
-    margin-top:10px;
-    padding:12px;
-    border-radius:10px;
-    border:none;
-    font-weight:600;
-    background:linear-gradient(135deg,#2563eb,#4f46e5);
-    color:white;
-    cursor:pointer;
+
+.apply-leave-btn {
+	margin-top: 10px;
+	padding: 12px;
+	border-radius: 10px;
+	border: none;
+	font-weight: 600;
+	background: linear-gradient(135deg, #2563eb, #4f46e5);
+	color: white;
+	cursor: pointer;
 }
 
 /* ===== Scheduled Meetings Scroll ===== */
 /* ================= MEETING FIELDSET BACKGROUND ================= */
-#meetingSection .attendance-fieldset{
-    background: #c3cfe2;
-     max-height: 460px; 
-    overflow-y: auto;
-    border: none;
-    border-radius: 16px;
-    padding: 28px 22px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+#meetingSection .attendance-fieldset {
+	background: #c3cfe2;
+	max-height: 460px;
+	overflow-y: auto;
+	border: none;
+	border-radius: 16px;
+	padding: 28px 22px;
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 /* Legend Styling */
-#meetingSection legend{
-    padding: 6px 16px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #333;
-    background: #e2ebf0;
-    border-radius: 20px;
-    border: 1px solid rgba(99,102,241,0.35);
+#meetingSection legend {
+	padding: 6px 16px;
+	font-size: 15px;
+	font-weight: 600;
+	color: #333;
+	background: #e2ebf0;
+	border-radius: 20px;
+	border: 1px solid rgba(99, 102, 241, 0.35);
 }
 
 /* ================= MEETING CARD ================= */
-#meetingSection .task-card{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:18px 20px;
-    margin-top:18px;
-    border-radius:14px;
-    background: rgba(99,102,241,0.07);
-    overflow:auto;
-    transition: all 0.3s ease;
+#meetingSection .task-card {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 18px 20px;
+	margin-top: 18px;
+	border-radius: 14px;
+	background: rgba(99, 102, 241, 0.07);
+	overflow: auto;
+	transition: all 0.3s ease;
 }
 
 /* Hover Effect */
-#meetingSection .task-card:hover{
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+#meetingSection .task-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* Left Content */
-#meetingSection .task-left{
-    display:flex;
-    gap:14px;
-    align-items:flex-start;
+#meetingSection .task-left {
+	display: flex;
+	gap: 14px;
+	align-items: flex-start;
 }
 
-#meetingSection .task-left i{
-    font-size:20px;
-    color:#444;
-    margin-top:4px;
+#meetingSection .task-left i {
+	font-size: 20px;
+	color: #444;
+	margin-top: 4px;
 }
 
 /* Title */
-#meetingSection .task-left b{
-    font-size:15px;
-    color:#1f2937;
+#meetingSection .task-left b {
+	font-size: 15px;
+	color: #1f2937;
 }
 
 /* Description */
-#meetingSection .task-left small{
-    font-size:13px;
-    color:#444;
+#meetingSection .task-left small {
+	font-size: 13px;
+	color: #444;
 }
 
 /* ================= JOIN BUTTON ================= */
-#meetingSection .task-btn{
-    padding:10px 18px;
-    border-radius:10px;
-    border:none;
-    font-weight:600;
-    background: #4f46e5;
-    color:white;
-    cursor:pointer;
-    transition:0.25s;
+#meetingSection .task-btn {
+	padding: 10px 18px;
+	border-radius: 10px;
+	border: none;
+	font-weight: 600;
+	background: #4f46e5;
+	color: white;
+	cursor: pointer;
+	transition: 0.25s;
 }
 
-#meetingSection .task-btn:hover{
-    transform:translateY(-2px);
-    box-shadow:0 8px 20px rgba(34,197,94,0.35);
+#meetingSection .task-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35);
 }
 
 /* Empty Message */
-#meetingSection .no-task-text{
-    margin-top:15px;
-    font-size:14px;
-    color:#6b7280;
+#meetingSection .no-task-text {
+	margin-top: 15px;
+	font-size: 14px;
+	color: #6b7280;
 }
 
-#meetingSection .attendance-fieldset::-webkit-scrollbar{
-    width:6px;
+#meetingSection .attendance-fieldset::-webkit-scrollbar {
+	width: 6px;
 }
 
-#meetingSection .attendance-fieldset::-webkit-scrollbar-thumb{
-    background:#94a3b8;
-    border-radius:4px;
+#meetingSection .attendance-fieldset::-webkit-scrollbar-thumb {
+	background: #94a3b8;
+	border-radius: 4px;
 }
 /* ===== Settings Popup ===== */
 .popup {
@@ -530,11 +531,11 @@ body {
 }
 
 #calendarSection h3 {
-    position: sticky;
-    top: 0;
-    background: white;
-    padding-bottom: 10px;
-    z-index: 10;
+	position: sticky;
+	top: 0;
+	background: white;
+	padding-bottom: 10px;
+	z-index: 10;
 }
 
 /* ===== Toast Notification ===== */
@@ -637,13 +638,13 @@ keyframes fadeOut {to { opacity:0;
 	font-size: 14px;
 }
 
-.notification-list::-webkit-scrollbar{
-    width: 6px;
+.notification-list::-webkit-scrollbar {
+	width: 6px;
 }
 
-.notification-list::-webkit-scrollbar-thumb{
-    background: rgba(0,0,0,0.25);
-    border-radius: 4px;
+.notification-list::-webkit-scrollbar-thumb {
+	background: rgba(0, 0, 0, 0.25);
+	border-radius: 4px;
 }
 /* ================= SETTINGS ICON ================= */
 .settings-icon {
@@ -663,34 +664,31 @@ keyframes fadeOut {to { opacity:0;
 /* ================= SETTINGS PANEL ================= */
 .settings-panel {
 	position: fixed;
-    top: 0;
-    right: -340px;
-    width: 340px;
-    height: 100%;
-    background: linear-gradient(
-        135deg,
-        rgba(255,255,255,0.85),
-        rgba(240,245,255,0.75)
-    );
-    backdrop-filter: blur(16px);
-    box-shadow: -8px 0 25px rgba(0,0,0,0.15);
-    transition: right 0.4s ease, opacity 0.3s ease;
-    z-index: 1000;
-    border-left: 1px solid rgba(255,255,255,0.4);
+	top: 0;
+	right: -340px;
+	width: 340px;
+	height: 100%;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.85),
+		rgba(240, 245, 255, 0.75));
+	backdrop-filter: blur(16px);
+	box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
+	transition: right 0.4s ease, opacity 0.3s ease;
+	z-index: 1000;
+	border-left: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .settings-header {
 	display: flex;
-	height:50px;
+	height: 50px;
 	justify-content: space-between;
 	align-items: center;
 	padding: 15px;
-	background:linear-gradient(135deg,#6366f1,#818cfa);
+	background: linear-gradient(135deg, #6366f1, #818cfa);
 	color: white;
 }
 /* Open State */
-.settings-panel.open{
-    right: 0;
+.settings-panel.open {
+	right: 0;
 }
 
 .close-btn {
@@ -698,102 +696,103 @@ keyframes fadeOut {to { opacity:0;
 	font-size: 18px;
 }
 
-.settings-item{
-    padding: 14px 22px;
-    margin: 6px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 500;
-    color: #2d3748;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+.settings-item {
+	padding: 14px 22px;
+	margin: 6px 12px;
+	border-radius: 10px;
+	cursor: pointer;
+	font-size: 15px;
+	font-weight: 500;
+	color: #2d3748;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
 }
 
 /* Hover Effect */
-.settings-item:hover{
-    background: rgba(99,102,241,0.12);
-    transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+.settings-item:hover {
+	background: rgba(99, 102, 241, 0.12);
+	transform: translateX(4px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Icon Styling (Font Awesome) */
-.settings-item i{
-    font-size: 18px;
-    color: #6366f1;
+.settings-item i {
+	font-size: 18px;
+	color: #6366f1;
 }
 
 /* Active Item */
-.settings-item.active{
-    background: linear-gradient(135deg, #6366f1, #818cf8);
-    color: #fff;
+.settings-item.active {
+	background: linear-gradient(135deg, #6366f1, #818cf8);
+	color: #fff;
 }
-.settings-item.active i{
-    color: #fff;
+
+.settings-item.active i {
+	color: #fff;
 }
 /* ================= CHANGE PASSWORD MODAL ================= */
 /* ================= MODAL (ADMIN STYLE) ================= */
-.password-modal{
-    position: fixed;
-    inset:0;
-/*     background: rgba(0,0,0,0.45); */
-    backdrop-filter: blur(6px);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:2000;
+.password-modal {
+	position: fixed;
+	inset: 0;
+	/*     background: rgba(0,0,0,0.45); */
+	backdrop-filter: blur(6px);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	z-index: 2000;
 }
 
-.password-box{
-    margin-left: 33%;
-    margin-top: 10%;
-    width:620px;
-    height:420px;
-    background:white;
-    border-radius:14px;
-    box-shadow:0 20px 50px rgba(0,0,0,0.25);
-    overflow:hidden;
+.password-box {
+	margin-left: 33%;
+	margin-top: 10%;
+	width: 620px;
+	height: 420px;
+	background: white;
+	border-radius: 14px;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+	overflow: hidden;
 }
 
-.password-header{
-    padding:10px 15px;
-    background: linear-gradient(135deg, #6366f1, #818cf8);
-    color:white;
-    display:flex;
-    justify-content:space-between;
-    text-align:center;
-    align-items:center;
+.password-header {
+	padding: 10px 15px;
+	background: linear-gradient(135deg, #6366f1, #818cf8);
+	color: white;
+	display: flex;
+	justify-content: space-between;
+	text-align: center;
+	align-items: center;
 }
 
-.password-body{
-	margin-left:18%;
-	border-radius:10px;
-	margin-top:6%;
-	width:50%;
-	background:white;
-	 box-shadow:0 10px 10px rgba(0,0,0,0.5);
-    padding:25px;
+.password-body {
+	margin-left: 18%;
+	border-radius: 10px;
+	margin-top: 6%;
+	width: 50%;
+	background: white;
+	box-shadow: 0 10px 10px rgba(0, 0, 0, 0.5);
+	padding: 25px;
 }
 
-.password-body input{
-/* 	margin:10px; */
-    width:90%;
-    padding:20px;
-    margin-bottom:14px;
-    border-radius:8px;
-    border:1px solid #cbd5e1;
+.password-body input {
+	/* 	margin:10px; */
+	width: 90%;
+	padding: 20px;
+	margin-bottom: 14px;
+	border-radius: 8px;
+	border: 1px solid #cbd5e1;
 }
 
-.password-body button{
-    width:94%;
-    padding:12px;
-    border-radius:8px;
-    border:none;
-    background:#6366f1;
-    color:white;
-    cursor:pointer;
+.password-body button {
+	width: 94%;
+	padding: 12px;
+	border-radius: 8px;
+	border: none;
+	background: #6366f1;
+	color: white;
+	cursor: pointer;
 }
 
 /* ================= DARK THEME ================= */
@@ -828,8 +827,9 @@ keyframes fadeOut {to { opacity:0;
 			<span class="close-btn" onclick="closeSettings()">✖</span>
 		</div>
 
-		 <div class="settings-item" onclick="openProfile()">My Profile</div>
-    <div class="settings-item" onclick="openChangePassword()">Change Password</div>
+		<div class="settings-item" onclick="openProfile()">My Profile</div>
+		<div class="settings-item" onclick="openChangePassword()">Change
+			Password</div>
 	</div>
 
 	<!-- CHANGE PASSWORD MODAL -->
@@ -850,7 +850,7 @@ keyframes fadeOut {to { opacity:0;
 	</div>
 
 	<!-- SELF PROFILE MODAL -->
-	
+
 	<div id="profileModal" class="password-modal">
 		<div class="password-box">
 			<div class="password-header">
@@ -888,8 +888,9 @@ keyframes fadeOut {to { opacity:0;
 		<h2>Smart Office • Employee Dashboard</h2>
 		<div class="user-area">
 			Welcome, <b><%=username%></b>
-			<button class="icon-btn" onclick="openSettings()" style="margin-left: 10px;">
-				<i class="fa-solid fa-gear" style="margin-left:2px;" ></i>
+			<button class="icon-btn" onclick="openSettings()"
+				style="margin-left: 10px;">
+				<i class="fa-solid fa-gear" style="margin-left: 2px;"></i>
 			</button>
 			<a href="<%=request.getContextPath()%>/logout">
 				<button class="logout-btn">Logout</button>
@@ -932,294 +933,288 @@ keyframes fadeOut {to { opacity:0;
 		<div class="right-panel">
 
 			<!-- Attendance -->
-<div class="box" id="attendanceSection">
+			<div class="box" id="attendanceSection">
 
-    <fieldset class="attendance-fieldset">
-        <legend>
-            <i class="fa-solid fa-clock"></i> Attendance
-        </legend>
+				<fieldset class="attendance-fieldset">
+					<legend>
+						<i class="fa-solid fa-clock"></i> Attendance
+					</legend>
 
-        <div
-            class="status-badge <%=status.equals("Punched In") ? "in" : status.equals("Punched Out") ? "out" : "none"%>">
-            <%=status%>
-        </div>
+					<div
+						class="status-badge <%=status.equals("Punched In") ? "in" : status.equals("Punched Out") ? "out" : "none"%>">
+						<%=status%>
+					</div>
 
-        <div class="time-card">
-            Punch In: <b><%=punchIn != null ? punchIn : "--"%></b>
-        </div>
+					<div class="time-card">
+						Punch In: <b><%=punchIn != null ? punchIn : "--"%></b>
+					</div>
 
-        <div class="time-card">
-            Punch Out: <b><%=punchOut != null ? punchOut : "--"%></b>
-        </div>
+					<div class="time-card">
+						Punch Out: <b><%=punchOut != null ? punchOut : "--"%></b>
+					</div>
 
-        <div class="punch-actions">
-            <form action="attendance" method="post">
-                <input type="hidden" name="action" value="punchin">
-                <button class="punch-in-btn"
-                    <%=punchIn != null ? "disabled" : ""%>>
-                    Punch In
-                </button>
-            </form>
+					<div class="punch-actions">
+						<form action="attendance" method="post">
+							<input type="hidden" name="action" value="punchin">
+							<button class="punch-in-btn"
+								<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
+						</form>
 
-            <form action="attendance" method="post">
-                <input type="hidden" name="action" value="punchout">
-                <button class="punch-out-btn"
-                    <%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
-                    Punch Out
-                </button>
-            </form>
-        </div>
+						<form action="attendance" method="post">
+							<input type="hidden" name="action" value="punchout">
+							<button class="punch-out-btn"
+								<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
+								Punch Out</button>
+						</form>
+					</div>
 
-    </fieldset>
+				</fieldset>
 
-</div>	
-<!-- Tasks -->
-<div class="box" id="taskSection" style="display: none;">
+			</div>
+			<!-- Tasks -->
+			<div class="box" id="taskSection" style="display: none;">
 
-    <fieldset class="attendance-fieldset">
-        <legend>
-            <i class="fa-solid fa-list-check"></i> My Tasks
-        </legend>
+				<fieldset class="attendance-fieldset">
+					<legend>
+						<i class="fa-solid fa-list-check"></i> My Tasks
+					</legend>
 
-        <%
-        List<Task> tasks = (List<Task>) request.getAttribute("tasks");
+					<%
+					List<Task> tasks = (List<Task>) request.getAttribute("tasks");
 
-        if (tasks == null || tasks.isEmpty()) {
-        %>
-            <p class="no-task-text">No tasks assigned.</p>
-        <%
-        } else {
-        for (Task t : tasks) {
-        %>
+					if (tasks == null || tasks.isEmpty()) {
+					%>
+					<p class="no-task-text">No tasks assigned.</p>
+					<%
+					} else {
+					for (Task t : tasks) {
+					%>
 
-        <div class="task-card">
-            <div class="task-left">
-                <i class="fa-solid fa-file-lines"></i>
-                <div>
-                    <b><%=t.getDescription()%></b><br>
-                    <small>Assigned by: <%=t.getAssignedBy()%></small>
-                </div>
-            </div>
+					<div class="task-card">
+						<div class="task-left">
+							<i class="fa-solid fa-file-lines"></i>
+							<div>
+								<b><%=t.getDescription()%></b><br> <small>Assigned
+									by: <%=t.getAssignedBy()%></small>
+							</div>
+						</div>
 
-            <div class="task-actions">
+						<div class="task-actions">
 
-                <%
-                if (!"COMPLETED".equals(t.getStatus())) {
-                %>
+							<%
+							if (!"COMPLETED".equals(t.getStatus())) {
+							%>
 
-                    <span class="task-status pending">PENDING</span>
+							<span class="task-status pending">PENDING</span>
 
-                    <form action="updateTaskStatus" method="post" style="display:inline;">
-                        <input type="hidden" name="taskId" value="<%=t.getId()%>">
-                        <input type="hidden" name="status" value="COMPLETED">
-                        <button class="task-btn">Done</button>
-                    </form>
+							<form action="updateTaskStatus" method="post"
+								style="display: inline;">
+								<input type="hidden" name="taskId" value="<%=t.getId()%>">
+								<input type="hidden" name="status" value="COMPLETED">
+								<button class="task-btn">Done</button>
+							</form>
 
-                <%
-                } else {
-                %>
+							<%
+							} else {
+							%>
 
-                    <span class="task-status done">✔ Completed</span>
+							<span class="task-status done">✔ Completed</span>
 
-                <%
-                }
-                %>
+							<%
+							}
+							%>
 
-            </div>
-        </div>
+						</div>
+					</div>
 
-        <%
-        }
-        }
-        %>
+					<%
+					}
+					}
+					%>
 
-    </fieldset>
+				</fieldset>
 
-</div>		
+			</div>
 
-<!-- Meetings -->
-<div class="box" id="meetingSection" style="display: none;">
+			<!-- Meetings -->
+			<div class="box" id="meetingSection" style="display: none;">
 
-    <fieldset class="attendance-fieldset">
-        <legend>
-            <i class="fa-solid fa-video"></i> Scheduled Meetings
-        </legend>
+				<fieldset class="attendance-fieldset">
+					<legend>
+						<i class="fa-solid fa-video"></i> Scheduled Meetings
+					</legend>
 
-        <%
-        List<Meeting> meetings = (List<Meeting>) request.getAttribute("meetings");
+					<%
+					List<Meeting> meetings = (List<Meeting>) request.getAttribute("meetings");
 
-        if (meetings == null || meetings.isEmpty()) {
-        %>
-            <p class="no-task-text">No upcoming meetings.</p>
-        <%
-        } else {
-        for (Meeting m : meetings) {
-        %>
+					if (meetings == null || meetings.isEmpty()) {
+					%>
+					<p class="no-task-text">No upcoming meetings.</p>
+					<%
+					} else {
+					for (Meeting m : meetings) {
+					%>
 
-        <div class="task-card">
-            <div class="task-left">
-                <i class="fa-solid fa-users"></i>
-                <div>
-                    <b><%=m.getTitle()%></b><br>
-                    <small><%=m.getDescription()%></small><br>
-                    <small> 🕒 <%=m.getStartTime()%> → <%=m.getEndTime()%></small>
-                </div>
-            </div>
+					<div class="task-card">
+						<div class="task-left">
+							<i class="fa-solid fa-users"></i>
+							<div>
+								<b><%=m.getTitle()%></b><br> <small><%=m.getDescription()%></small><br>
+								<small> 🕒 <%=m.getStartTime()%> → <%=m.getEndTime()%></small>
+							</div>
+						</div>
 
-            <%
-            if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
-            %>
-                <a href="<%=m.getMeetingLink()%>" target="_blank">
-                    <button class="task-btn">Join</button>
-                </a>
-            <%
-            }
-            %>
-        </div>
+						<%
+						if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
+						%>
+						<a href="<%=m.getMeetingLink()%>" target="_blank">
+							<button class="task-btn">Join</button>
+						</a>
+						<%
+						}
+						%>
+					</div>
 
-        <%
-        }
-        }
-        %>
+					<%
+					}
+					}
+					%>
 
-    </fieldset>
+				</fieldset>
 
-</div>
+			</div>
 
 			<!-- Calendar -->
 			<div class="box" id="calendarSection" style="display: none;">
 
 				<iframe id="calendarFrame" src=""
-					style="width: 100%; height: 100%; border: none;">
-				</iframe>
+					style="width: 100%; height: 100%; border: none;"> </iframe>
 
 			</div>
-			
-		<!-- Leave -->
-<div class="box" id="leaveSection" style="display: none;">
 
-    <fieldset class="attendance-fieldset">
-        <legend>
-            <i class="fa-solid fa-calendar-days"></i> Leave
-        </legend>
+			<!-- Leave -->
+			<div class="box" id="leaveSection" style="display: none;">
 
-        <!-- Leave Tabs -->
-        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-            <button class="nav-btn" style="flex:1; background:#2563eb;color:white;"
-                onclick="showApplyLeave()">Apply Leave</button>
-            <button class="nav-btn" style="flex:1; background:#6b7280;color:white;"
-                onclick="showMyLeaves()">My Leave Requests</button>
-        </div>
+				<fieldset class="attendance-fieldset">
+					<legend>
+						<i class="fa-solid fa-calendar-days"></i> Leave
+					</legend>
 
-        <!-- Apply Leave -->
-        <div id="applyLeaveSection">
-            <form class="leave-form" action="applyLeave" method="post">
-                <label>Leave Type</label>
-                <select name="leaveType" required>
-                    <option value="">Select</option>
-                    <option>Casual Leave</option>
-                    <option>Sick Leave</option>
-                    <option>Earned Leave</option>
-                </select>
+					<!-- Leave Tabs -->
+					<div style="display: flex; gap: 12px; margin-bottom: 20px;">
+						<button class="nav-btn"
+							style="flex: 1; background: #2563eb; color: white;"
+							onclick="showApplyLeave()">Apply Leave</button>
+						<button class="nav-btn"
+							style="flex: 1; background: #6b7280; color: white;"
+							onclick="showMyLeaves()">My Leave Requests</button>
+					</div>
 
-                <label>From Date</label>
-                <input type="date" name="fromDate" required>
+					<!-- Apply Leave -->
+					<div id="applyLeaveSection">
+						<form class="leave-form" action="applyLeave" method="post">
+							<label>Leave Type</label> <select name="leaveType" required>
+								<option value="">Select</option>
+								<option>Casual Leave</option>
+								<option>Sick Leave</option>
+								<option>Earned Leave</option>
+							</select> <label>From Date</label> <input type="date" name="fromDate"
+								required> <label>To Date</label> <input type="date"
+								name="toDate" required> <label>Reason</label>
+							<textarea name="reason" required></textarea>
 
-                <label>To Date</label>
-                <input type="date" name="toDate" required>
+							<button class="apply-leave-btn" style="color: white;">Apply
+								Leave</button>
+						</form>
+					</div>
 
-                <label>Reason</label>
-                <textarea name="reason" required></textarea>
+					<!-- My Leave Requests -->
+					<div id="myLeaveSection" style="display: none;">
+						<h3 style="margin-top: 10px; color: black;">
+							<i class="fa-solid fa-list"></i> My Leave Requests
+						</h3>
 
-                <button class="apply-leave-btn" style="color:white;">Apply Leave</button>
-            </form>
-        </div>
+						<%
+						if (myLeaves == null || myLeaves.isEmpty()) {
+						%>
+						<p>No leave requests found.</p>
+						<%
+						} else {
+						for (LeaveRequest lr : myLeaves) {
+						%>
 
-        <!-- My Leave Requests -->
-        <div id="myLeaveSection" style="display: none;">
-            <h3 style="margin-top: 10px; color: black;">
-                <i class="fa-solid fa-list"></i> My Leave Requests
-            </h3>
+						<div class="task-card">
+							<div class="task-left">
+								<i class="fa-solid fa-plane-departure"></i>
+								<div>
+									<b><%=lr.getLeaveType()%></b><br> <small><%=lr.getFromDate()%>
+										→ <%=lr.getToDate()%></small>
+								</div>
+							</div>
 
-            <%
-            if (myLeaves == null || myLeaves.isEmpty()) {
-            %>
-                <p>No leave requests found.</p>
-            <%
-            } else {
-            for (LeaveRequest lr : myLeaves) {
-            %>
+							<%
+							String st = lr.getStatus();
+							String cls = "pending";
+							if ("APPROVED".equalsIgnoreCase(st))
+								cls = "done";
+							if ("REJECTED".equalsIgnoreCase(st))
+								cls = "out";
+							%>
 
-            <div class="task-card">
-                <div class="task-left">
-                    <i class="fa-solid fa-plane-departure"></i>
-                    <div>
-                        <b><%=lr.getLeaveType()%></b><br>
-                        <small><%=lr.getFromDate()%> → <%=lr.getToDate()%></small>
-                    </div>
-                </div>
+							<span class="task-status <%=cls%>"><%=st%></span>
+						</div>
 
-                <%
-                String st = lr.getStatus();
-                String cls = "pending";
-                if ("APPROVED".equalsIgnoreCase(st)) cls = "done";
-                if ("REJECTED".equalsIgnoreCase(st)) cls = "out";
-                %>
+						<%
+						}
+						}
+						%>
+					</div>
 
-                <span class="task-status <%=cls%>"><%=st%></span>
-            </div>
+				</fieldset>
 
-            <%
-            }
-            }
-            %>
-        </div>
-
-    </fieldset>
-
-</div>
+			</div>
 
 
-	<div id="notificationPanel" class="notification-panel">
-		<div class="notification-header">
-			<span>🔔 Smart Office Notifications</span>
-			<button onclick="closeNotifications()">✖</button>
-		</div>
+			<div id="notificationPanel" class="notification-panel">
+				<div class="notification-header">
+					<span>🔔 Smart Office Notifications</span>
+					<button onclick="closeNotifications()">✖</button>
+				</div>
 
-		<div class="notification-list" id="notificationList">
-			<%
-			List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
+				<div class="notification-list" id="notificationList">
+					<%
+					List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
 
-			if (notifications != null && !notifications.isEmpty()) {
-				for (Notification n : notifications) {
-			%>
-			<div class="notification-item" id="notif-<%=n.getId()%>">
-				🔔
-				<%=n.getMessage()%><br> <small>By <%=n.getCreatedBy()%></small>
+					if (notifications != null && !notifications.isEmpty()) {
+						for (Notification n : notifications) {
+					%>
+					<div class="notification-item" id="notif-<%=n.getId()%>">
+						🔔
+						<%=n.getMessage()%><br> <small>By <%=n.getCreatedBy()%></small>
 
-				<div style="margin-top: 8px; text-align: right;">
-					<button
-						style="background: #2563eb; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;"
-						onclick="markAsRead(<%=n.getId()%>)">Mark as read</button>
+						<div style="margin-top: 8px; text-align: right;">
+							<button
+								style="background: #2563eb; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;"
+								onclick="markAsRead(<%=n.getId()%>)">Mark as read</button>
+						</div>
+					</div>
+					<%
+					}
+					} else {
+					%>
+					<div class="notification-item">No notifications</div>
+					<%
+					}
+					%>
 				</div>
 			</div>
-			<%
-			}
-			} else {
-			%>
-			<div class="notification-item">No notifications</div>
-			<%
-			}
-			%>
-		</div>
-	</div>
 
-	<!-- Toast Notification -->
-	<div id="toast" class="toast"></div>
+			<!-- Toast Notification -->
+			<div id="toast" class="toast"></div>
 
 
 
-	<script>
+			<script>
     // ===== Section Helpers =====
    function hideAllSections() {
     document.getElementById("attendanceSection").style.display = "none";
@@ -1369,7 +1364,7 @@ function openCalendar() {
     }
 </script>
 
-	<script>
+			<script>
 
 function openSettings() {
     document.getElementById("settingsPanel").classList.add("open");
@@ -1446,7 +1441,57 @@ function markAsRead(notificationId) {
 }
 
 </script>
-	<script>
+
+			<script>
+function submitPassword() {
+    const newPassword = document.getElementById("newPassword").value.trim();
+    const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+    if (!newPassword || !confirmPassword) {
+        showToast("Please fill all fields", true);
+        return;
+    }
+
+    fetch("<%=request.getContextPath()%>/changePassword", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            newPassword: newPassword,
+            confirmPassword: confirmPassword
+        })
+    })
+    .then(res => res.text())
+    .then(data => {
+        if (data === "Success") {
+            showToast("Password updated successfully", false);
+            closeChangePassword();
+
+            document.getElementById("newPassword").value = "";
+            document.getElementById("confirmPassword").value = "";
+        }
+        else if (data === "PasswordMismatch") {
+            showToast("Passwords do not match", true);
+        }
+        else if (data === "MissingFields") {
+            showToast("All fields are required", true);
+        }
+        else if (data === "Unauthorized") {
+            showToast("Session expired. Please login again.", true);
+        }
+        else {
+            showToast("Something went wrong", true);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showToast("Server error", true);
+    });
+}
+</script>
+
+			<script>
 function setActive(button) {
     // Remove active class from all buttons
     const buttons = document.querySelectorAll('.nav-btn');
@@ -1458,6 +1503,5 @@ function setActive(button) {
 
 
 </script>
-
 </body>
 </html>
