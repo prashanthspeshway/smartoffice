@@ -922,6 +922,7 @@ to {
     border-radius: 14px;
     padding: 20px 24px 26px;
     margin-bottom: 25px;
+    overflow-y: auto;
     background:#c3cfe2;
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
 }

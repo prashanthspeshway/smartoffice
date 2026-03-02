@@ -103,21 +103,78 @@ button[type="submit"]:active {
     transform: scale(0.98);
 }
 
-/* ===== Toast (unchanged functionality) ===== */
-#toast {
+/* ================= TOAST ================= */
+.toast {
     position: fixed;
-    top: 80px;
-    right: 20px;
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-    padding: 14px 20px;
+    top: 20px;
+    right: 25px;
+    background: #e2ebf0;
+    color: black;
+    padding: 14px 20px 14px 44px;
     border-radius: 10px;
-    font-size: 14px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: all 0.4s ease;
-    z-index: 9999;
+    font-size: 15px;
+    font-weight: 500;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    z-index: 3000;
+    line-height: 1.4;
+    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toast.hide {
+    animation: toastOut 0.4s ease forwards;
+}
+
+/* Icon */
+.toast::before {
+    content: "✔";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* SUCCESS */
+.toast.success {
+    background: #e2ebf0;
+    color: black;
+}
+
+/* ERROR */
+.toast.error {
+    background: #e2ebf0;
+    color: black;
+}
+
+/* INFO */
+.toast.info {
+    background: #e2ebf0;
+    color: black;
+}
+
+/* Animations */
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(120px);
+    }
 }
 
 /* ===== Dark Mode (same logic preserved) ===== */
@@ -164,25 +221,34 @@ body.dark-theme input {
     </form>
 </div>
 
-<div id="toast">Notification sent successfully</div>
+<div id="toast" class="toast"></div>
 
 <script>
-function showToast(message) {
+function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
-    toast.innerText = message;
-    toast.style.opacity = "1";
-    toast.style.transform = "translateY(0)";
+
+    toast.style.display = "none";
+    toast.className = "toast";
+    toast.offsetHeight; // force reflow
+
+    toast.classList.add(type);
+    toast.textContent = message;
+    toast.style.display = "block";
 
     setTimeout(() => {
-        toast.style.opacity = "0";
-        toast.style.transform = "translateY(-10px)";
+        toast.classList.add("hide");
+
+        setTimeout(() => {
+            toast.style.display = "none";
+            toast.className = "toast";
+        }, 400);
     }, 2500);
 }
 
 window.onload = function () {
     const params = new URLSearchParams(window.location.search);
     if (params.get("success") === "true") {
-        showToast("Notification sent successfully");
+        showToast("Notification sent successfully", "success");
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 };

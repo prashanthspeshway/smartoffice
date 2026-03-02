@@ -197,32 +197,80 @@ th {
 	background: #b91c1c;
 }
 
-/* ===== TOAST STYLES ===== */
-#toast {
-	visibility: hidden;
-	min-width: 250px;
-	background-color: #16a34a; /* green for success */
-	color: white;
-	text-align: center;
-	border-radius: 8px;
-	padding: 12px 20px;
-	position: fixed;
-	top: 20px;
-	right: 20px;
-	z-index: 1000;
-	font-family: 'Segoe UI';
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-	opacity: 0;
-	transform: translateY(-20px);
-	transition: opacity 0.5s, transform 0.5s;
+
+/* ================= TOAST ================= */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 25px;
+    background: #e2ebf0;
+    color: black;
+    padding: 14px 20px 14px 44px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    z-index: 3000;
+    line-height: 1.4;
+    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-#toast.show {
-	visibility: visible;
-	opacity: 1;
-	transform: translateY(0);
+.toast.hide {
+    animation: toastOut 0.4s ease forwards;
 }
 
+/* Icon */
+.toast::before {
+    content: "✔";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* SUCCESS */
+.toast.success {
+    background: #e2ebf0;
+    color: black;
+}
+
+/* ERROR */
+.toast.error {
+    background: #e2ebf0;
+    color: black;
+}
+
+/* INFO */
+.toast.info {
+    background: #e2ebf0;
+    color: black;
+}
+
+/* Animations */
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+}
 body.dark-mode #toast {
     background-color: #48bb78; /* lighter green for dark mode */
 }
@@ -288,7 +336,7 @@ body.dark-mode #toast {
 	</div>
 
 	<!-- Toast Notification -->
-	<div id="toast"></div>
+	<div id="toast" class="toast"></div>
 
 	<script>
 let today = new Date();
@@ -434,19 +482,26 @@ function closeModal(){
 }
 
 /* ===== SHOW TOAST ===== */
-function showToast(message, type="success"){
+function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
-    toast.innerText = message;
 
-    // change color based on type
-    if(type === "success") toast.style.backgroundColor = "#16a34a"; // green
-    else if(type === "error") toast.style.backgroundColor = "#b91c1c"; // red
+    // full reset
+    toast.style.display = "none";
+    toast.className = "toast";
+    toast.offsetHeight; // force reflow
 
-    toast.classList.add("show");
+    toast.classList.add(type);
+    toast.textContent = message;
+    toast.style.display = "block";
 
     setTimeout(() => {
-        toast.classList.remove("show");
-    }, 2500); // visible for 2.5s
+        toast.classList.add("hide");
+
+        setTimeout(() => {
+            toast.style.display = "none";
+            toast.className = "toast";
+        }, 400);
+    }, 2500);
 }
 
 /* ===== SAVE HOLIDAY ===== */

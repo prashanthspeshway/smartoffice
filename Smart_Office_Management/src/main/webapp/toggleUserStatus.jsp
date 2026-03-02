@@ -120,21 +120,82 @@ button:active {
     transform: scale(0.97);
 }
 
-/* ===== Toast ===== */
+/* ===== TOAST (SAME STYLE AS DASHBOARD) ===== */
 .toast {
     position: fixed;
     top: 20px;
-    right: 20px;
-    padding: 14px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #ffffff;
+    right: 25px;
+    background: #e2ebf0;
+    color: black;
+    padding: 14px 20px 14px 44px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
     display: none;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    z-index: 3000;
+    line-height: 1.4;
+    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.toast.success { background: #16a34a; }
-.toast.error { background: #dc2626; }
+/* Toast Types */
+.toast.success {
+    background: #e2ebf0;
+    color: black;
+}
+
+.toast.error {
+    background: #e2ebf0;
+    color: black;
+}
+
+.toast.warning {
+    background: #e2ebf0;
+    color: black;
+}
+
+.toast.info {
+    background: #e2ebf0;
+    color: black;
+}
+
+.toast.hide {
+    animation: toastOut 0.4s ease forwards;
+}
+
+/* Icon */
+.toast::before {
+    content: "✔";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Animations */
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+}
 
 /* ===== Dark Mode (kept intact) ===== */
 body.dark-theme {
@@ -166,8 +227,7 @@ body.dark-theme input {
 <body>
 
 <!-- Toasts -->
-<div id="successToast" class="toast success"></div>
-<div id="errorToast" class="toast error"></div>
+<div id="toast" class="toast"></div>
 
 <div class="container">
 
@@ -198,18 +258,35 @@ body.dark-theme input {
 <script>
 const params = new URLSearchParams(window.location.search);
 
-if (params.get("msg")) {
-    const toast = document.getElementById("successToast");
-    toast.innerText = params.get("msg").replace("_", " ");
+function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+
+    toast.className = "toast " + type;
+    toast.textContent = message;
     toast.style.display = "block";
-    setTimeout(() => toast.style.display = "none", 3000);
+
+    setTimeout(() => {
+        toast.classList.add("hide");
+
+        setTimeout(() => {
+            toast.style.display = "none";
+            toast.classList.remove("hide");
+        }, 400);
+    }, 2500);
+}
+
+// Handle messages
+if (params.get("msg")) {
+    showToast(params.get("msg").replaceAll("_", " "), "success");
 }
 
 if (params.get("error")) {
-    const toast = document.getElementById("errorToast");
-    toast.innerText = "Update Failed";
-    toast.style.display = "block";
-    setTimeout(() => toast.style.display = "none", 3000);
+    showToast("Update Failed", "error");
+}
+
+// Clean URL
+if (params.get("msg") || params.get("error")) {
+    window.history.replaceState({}, document.title, window.location.pathname);
 }
 </script>
 

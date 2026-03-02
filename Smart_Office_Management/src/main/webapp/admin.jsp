@@ -402,7 +402,7 @@ to {
 .toast {
     position: fixed;
     top: 80px;
-    right: 25px;
+    right: 15px;
     background: #e2ebf0;
     color: black;
     padding: 14px 20px 14px 44px;
@@ -513,7 +513,7 @@ to {
 				<i class="fa fa-gear"></i>
 			</button>
 			<a href="<%=request.getContextPath()%>/logout">
-				<button class="logout-btn">Logout</button>
+				<button class="logout-btn">Logout <i class="fa-solid fa-right-to-bracket"></i></button>
 			</a>
 		</div>
 	</div>
