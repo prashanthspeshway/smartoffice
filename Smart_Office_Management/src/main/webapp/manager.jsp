@@ -1624,7 +1624,7 @@ body.dark-theme .settings-item i {
 	<div id="settingsPanel" class="settings-drawer">
 		<div class="modal-header">
 			<h4>Settings</h4>
-			<span onclick="closeSettings()" style="cursor: pointer;">✕</span>
+			<span onclick="closeSettings()" style="cursor: pointer;">X</span>
 		</div>
 		<div class="settings-item" onclick="openProfile()">
 			<i class="fa-solid fa-user"></i> My Profile
