@@ -7,189 +7,233 @@
 
 <!-- Font Awesome -->
 <link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 * {
-box-sizing: border-box;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	box-sizing: border-box;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-margin: 0;
-height: 100vh;
-display: flex;
-align-items: center;
-justify-content: center;
-background: linear-gradient(135deg, #c3cfe2 0%, #e2ebf0 100%);
-color: #333;
+	margin: 0;
+	height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(135deg, #c3cfe2 0%, #e2ebf0 100%);
+	color: #333;
 }
 
 .login-box {
-width: min(90%, 380px);
-padding: 40px 30px;
-background: rgba(255, 255, 255, 0.155); 
-/* background:transparent; */
-backdrop-filter: blur(10px);
-border-radius: 16px;
-box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-border: 1px solid rgba(255, 255, 255, 0.2);
-transition: transform 0.3s ease, box-shadow 0.3s ease;
+	width: min(90%, 380px);
+	padding: 40px 30px;
+	background: rgba(255, 255, 255, 0.155);
+	/* background:transparent; */
+	backdrop-filter: blur(10px);
+	border-radius: 16px;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .login-box:hover {
-transform: translateY(-2px);
-box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+	transform: translateY(-2px);
+	box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
 }
 
 .login-box h1 {
-text-align: center;
-margin-top: -10px;
-margin-bottom: 20px;
-color: #2d3748;
-font-size: 29px;
-font-weight: 700;
-letter-spacing: -0.2px;
+	text-align: center;
+	margin-top: -10px;
+	margin-bottom: 20px;
+	color: #2d3748;
+	font-size: 29px;
+	font-weight: 700;
+	letter-spacing: -0.2px;
 }
 
 .login-box label {
-display: block;
-margin-bottom: 8px;
-font-size: 15px;
-color: #000;
-font-weight: 500;
+	display: block;
+	margin-bottom: 8px;
+	font-size: 15px;
+	color: #000;
+	font-weight: 500;
 }
 
 .login-box input {
-width: 100%;
-margin-bottom: 16px;
-padding: 12px 16px;
-border-radius: 8px;
-border: 1px solid #000;
-font-size: 15px;
-background: #f7fafc;
-transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+	width: 100%;
+	margin-bottom: 16px;
+	padding: 12px 16px;
+	border-radius: 8px;
+	border: 1px solid #000;
+	font-size: 15px;
+	background: #f7fafc;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease,
+		background-color 0.2s ease;
 }
 
 .login-box input:focus {
-outline: none;
-border-color: #667eea;
-background: #fff;
-box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+	outline: none;
+	border-color: #667eea;
+	background: #fff;
+	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .login-box input::placeholder {
-color: #444;
+	color: #444;
 }
 
 /* ===== Password Wrapper ===== */
 .password-wrapper {
-position: relative;
-margin-bottom: 20px;
+	position: relative;
+	margin-bottom: 20px;
 }
 
 .password-wrapper input {
-padding-right: 48px;
+	padding-right: 48px;
 }
 
 .password-wrapper i {
-position: absolute;
-right: 16px;
-top: 37%;
-transform: translateY(-50%);
-cursor: pointer;
-color: #444;
-transition: color 0.2s ease;
-font-size: 16px;
+	position: absolute;
+	right: 16px;
+	top: 37%;
+	transform: translateY(-50%);
+	cursor: pointer;
+	color: #444;
+	transition: color 0.2s ease;
+	font-size: 16px;
 }
 
 .password-wrapper i:hover {
-color: #667eea;
+	color: #667eea;
 }
 
 /* ===== Button ===== */
 .login-box button {
-width: 100%;
-padding: 12px;
-border: none;
-border-radius: 8px;
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-color: white;
-font-size: 16px;
-font-weight: 500;
-cursor: pointer;
-transition: transform 0.2s ease, box-shadow 0.2s ease;
-letter-spacing: 0.5px;
+	width: 100%;
+	padding: 12px;
+	border: none;
+	border-radius: 8px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	font-size: 16px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	letter-spacing: 0.5px;
 }
 
 .login-box button:hover {
-transform: translateY(-1px);
-box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+	transform: translateY(-1px);
+	box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
 }
 
 .login-box button:active {
-transform: translateY(0);
+	transform: translateY(0);
 }
 
-/* ===== TOASTER ===== */
-#toast {
-position: fixed;
-top: 20px;
-right: 20px;
-min-width: 280px;
-padding: 16px 20px;
-border-radius: 10px;
-color: white;
-font-size: 14px;
-font-weight: 500;
-box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-display: none;
-z-index: 999;
-animation: slideIn 0.3s ease-out;
+/* ================= TOAST ================= */
+.toast {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    background: #e2ebf0;
+    color: black;
+    padding: 14px 20px 14px 44px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    z-index: 3000;
+    line-height: 1.4;
+    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes slideIn {
-from {
-transform: translateX(100%);
-opacity: 0;
-}
-to {
-transform: translateX(0);
-opacity: 1;
-}
+.toast.hide {
+    animation: toastOut 0.4s ease forwards;
 }
 
-#toast.success {
-background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+/* Icon */
+.toast::before {
+    content: "✔";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
 }
 
-#toast.error {
-background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+/* ===== TOAST TYPES ===== */
+
+/* SUCCESS */
+.toast.success {
+    background: linear-gradient(135deg, #38a169, #48bb78);
+    color: #fff;
 }
+.toast.success::before {
+    content: "✔";
+}
+
+/* ERROR */
+.toast.error {
+    background: linear-gradient(135deg, #e53e3e, #f56565);
+    color: #fff;
+}
+.toast.error::before {
+    content: "✖";
+}
+
+/* Animations */
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+
 </style>
 </head>
 
 <body>
 
-<div class="login-box">
-<h1>Login</h1>
-<form action="Login" method="post">
-<label for="username">Username</label> 
-<input type="text" id="username" name="username" placeholder="Enter your username" required>
-<label for="password">Password</label>
-<div class="password-wrapper">
-<input type="password" id="password" name="password" placeholder="Enter your password" required>
-<i class="fa-solid fa-eye" id="eyeIcon" title="Hold to view password"></i>
-</div>
+	<div class="login-box">
+		<h1>Login</h1>
+		<form action="Login" method="post">
+			<label for="username">Username</label> <input type="text"
+				id="username" name="username" placeholder="Enter your username"
+				required> <label for="password">Password</label>
+			<div class="password-wrapper">
+				<input type="password" id="password" name="password"
+					placeholder="Enter your password" required> <i
+					class="fa-solid fa-eye" id="eyeIcon" title="Hold to view password"></i>
+			</div>
 
-<button type="submit">Login</button>
-</form>
-</div>
+			<button type="submit">Login</button>
+		</form>
+	</div>
 
-<!-- TOAST -->
-<div id="toast"></div>
+	<!-- TOAST -->
+	<div id="toast" class="toast"></div>
 
-<script>
+	<script>
 /* ===== Password View (Hold) ===== */
 const eyeIcon = document.getElementById("eyeIcon");
 const password = document.getElementById("password");
@@ -202,17 +246,27 @@ eyeIcon.addEventListener("touchstart", () => password.type = "text");
 eyeIcon.addEventListener("touchend", () => password.type = "password");
 
 /* ===== TOASTER FUNCTION ===== */
-function showToast(message, type) {
+function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
-    toast.innerText = message;
 
-    toast.className = type === "error" ? "error" : "success";
+    // FULL reset
+    toast.style.display = "none";
+    toast.className = "toast"; 
+    toast.offsetHeight; // force reflow (important!)
 
+    // Apply new state
+    toast.classList.add(type);
+    toast.textContent = message;
     toast.style.display = "block";
 
     setTimeout(() => {
-        toast.style.display = "none";
-    }, 3000);
+        toast.classList.add("hide");
+
+        setTimeout(() => {
+            toast.style.display = "none";
+            toast.className = "toast"; // reset completely
+        }, 400);
+    }, 2500);
 }
 
 /* ===== Read URL Error ===== */
@@ -220,7 +274,7 @@ const params = new URLSearchParams(window.location.search);
 const error = params.get("error");
 
 if (error === "invalid") {
-    showToast("Invalid username or password", "error");
+	showToast("Invalid username or password", "error");
 }
 else if (error === "inactive") {
     showToast("Your account is inactive. Contact admin.", "error");
@@ -241,14 +295,10 @@ else if (error === "weakPassword") {
 const logout = params.get("logout");
 
 if (logout === "success") {
-    showToast("Logged out successfully", "success");
+    showToast("Logged-out successfully", "success");
 
-    // clean URL so toast doesn't repeat on refresh
-    window.history.replaceState(
-        {},
-        document.title,
-        window.location.pathname
-    );
+    // Optional: clean URL after showing toast
+    window.history.replaceState({}, document.title, window.location.pathname);
 }
 
 document.addEventListener('contextmenu', e => e.preventDefault());

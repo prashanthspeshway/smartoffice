@@ -88,31 +88,85 @@ button:hover {
 	background-color: #3f5eea;
 }
 
-/* 🔔 Toast */
+/* ================= TOAST ================= */
 .toast {
-	position: fixed;
-	top: 20px;
-	right: 20px;
-	padding: 14px 20px;
-	color: white;
-	font-size: 14px;
-	border-radius: 6px;
-	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-	display: none;
-	animation: slideIn 0.4s ease;
+    position: fixed;
+    top: 30px;
+    right: 25px;
+    background: #e2ebf0;
+    color: black;
+    padding: 14px 20px 14px 44px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    z-index: 3000;
+    line-height: 1.4;
+    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@
-keyframes slideIn {from { transform:translateX(100%);
-	opacity: 0;
+.toast.hide {
+    animation: toastOut 0.4s ease forwards;
 }
 
-to {
-	transform: translateX(0);
-	opacity: 1;
+/* Icon */
+.toast::before { 
+     content: "✔"; 
+     position: absolute; 
+     left: 16px; 
+     top: 50px; 
+     transform: translateY(-50%); 
+     font-size: 16px; */
+     font-weight: bold; 
+ } 
+
+/* SUCCESS */
+.toast.success {
+    background: #e2ebf0;
+    color: black;
 }
 
+/* ERROR */
+.toast.error {
+    background: #e2ebf0;
+    color: black;
 }
+.toast.error::before {
+    content: "✖";
+}
+
+/* INFO */
+.toast.info {
+    background: #e2ebf0;
+    color: black;
+}
+.toast.info::before {
+    content: "ℹ";
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+}
+
 /* DARK MODE FIX FOR ADD USER PAGE */
 body.dark-theme {
 	background: #121212 !important;
@@ -355,19 +409,22 @@ button[type="submit"]:active {
 	<script>
 
 
-function showToast(message, type) {
-    const toast = document.getElementById("toast");
-    toast.innerText = message;
+	function showToast(message, type = "success") {
+	    const toast = document.getElementById("toast");
 
-    toast.style.background =
-        type === "error" ? "#dc2626" : "#16a34a";
+	    toast.className = "toast " + type;
+	    toast.textContent = message;
+	    toast.style.display = "block";
 
-    toast.style.display = "block";
+	    setTimeout(() => {
+	        toast.classList.add("hide");
 
-    setTimeout(() => {
-        toast.style.display = "none";
-    }, 3000);
-}
+	        setTimeout(() => {
+	            toast.style.display = "none";
+	            toast.classList.remove("hide");
+	        }, 400);
+	    }, 2500);
+	}
 
 </script>
 

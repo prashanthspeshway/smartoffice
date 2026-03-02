@@ -47,7 +47,7 @@ public class AddUser extends HttpServlet {
         if ("user".equalsIgnoreCase(role) && (manager == null || manager.isEmpty())) {
             req.getSession().setAttribute(
                 "errorMsg",
-                "Please select a manager for the user."
+                "Please select a manager for the Employee."
             );
             res.sendRedirect("addUser");
             return;
@@ -78,12 +78,12 @@ public class AddUser extends HttpServlet {
 
             ps.executeUpdate();
 
-            req.getSession().setAttribute("successMsg", "User added successfully!");
+            req.getSession().setAttribute("successMsg", "Employee added successfully!");
             res.sendRedirect("addUser");
 
         } catch (Exception e) {
             e.printStackTrace();
-            req.getSession().setAttribute("errorMsg", "Failed to add user!");
+            req.getSession().setAttribute("errorMsg", "Failed to add Employee!");
             res.sendRedirect("addUser");
         }
     }

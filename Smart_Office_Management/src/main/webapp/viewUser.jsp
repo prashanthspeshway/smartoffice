@@ -127,20 +127,84 @@ tr:hover {
 	background: #fecaca;
 }
 
-/* Toast Notification */
-#toast {
-	position: fixed;
-	top: 20px;
-	right: 20px;
-	min-width: 260px;
-	padding: 14px 18px;
-	border-radius: 8px;
-	color: white;
-	font-size: 14px;
-	font-weight: 500;
-	box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-	display: none;
-	z-index: 9999;
+/* ================= TOAST ================= */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 25px;
+    background: #e2ebf0;
+    color: black;
+    padding: 14px 20px 14px 44px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    z-index: 3000;
+    line-height: 1.4;
+    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Success */
+.toast.success {
+    background: #e2ebf0;
+    color: black;
+}
+
+/* Error */
+.toast.error {
+    background: #e2ebf0;
+    color: black;
+}
+
+/* Warning */
+.toast.warning {
+    background: #e2ebf0;
+    color: black;
+}
+
+/* Info */
+.toast.info {
+    background: #e2ebf0;
+    color: black;
+}
+
+.toast.hide {
+    animation: toastOut 0.4s ease forwards;
+}
+
+/* Icon */
+.toast::before {
+    content: "✔";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Animations */
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(120px);
+    }
 }
 </style>
 
@@ -190,7 +254,7 @@ tr:hover {
 
 	</div>
 
-	<div id="toast"></div>
+	<div id="toast" class="toast"></div>
 
 
 
@@ -240,19 +304,22 @@ function confirmDelete() {
 
 
 	<script>
-function showToast(message, type) {
-    const toast = document.getElementById("toast");
+	function showToast(message, type = "success") {
+	    const toast = document.getElementById("toast");
 
-    toast.innerText = message;
-    toast.style.background =
-        type === "error" ? "#dc2626" : "#16a34a";
+	    toast.className = "toast " + type;
+	    toast.textContent = message;
+	    toast.style.display = "block";
 
-    toast.style.display = "block";
+	    setTimeout(() => {
+	        toast.classList.add("hide");
 
-    setTimeout(() => {
-        toast.style.display = "none";
-    }, 3000);
-}
+	        setTimeout(() => {
+	            toast.style.display = "none";
+	            toast.classList.remove("hide");
+	        }, 400);
+	    }, 2500);
+	}
 
 // Read URL parameter
 const params = new URLSearchParams(window.location.search);

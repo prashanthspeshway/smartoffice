@@ -400,20 +400,25 @@ to {
 
 /* ================= TOAST ================= */
 .toast {
-	position: fixed;
-	top: 25px;
-	right: 25px;
-	background: linear-gradient(135deg, #38a169, #48bb78);
-	color: #ffffff;
-	padding: 14px 20px 14px 44px; /* space for icon */
-	border-radius: 10px;
-	font-size: 15px;
-	font-weight: 500;
-	display: none;
-	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-	z-index: 3000;
-	animation: slideIn 0.4s ease;
-	line-height: 1.4;
+    position: fixed;
+    top: 80px;
+    right: 25px;
+    background: #e2ebf0;
+    color: black;
+    padding: 14px 20px 14px 44px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    z-index: 3000;
+    line-height: 1.4;
+
+    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toast.hide {
+    animation: toastOut 0.4s ease forwards;
 }
 
 /* Small icon */
@@ -426,6 +431,32 @@ to {
 	font-size: 16px;
 	font-weight: bold;
 }
+
+/* Toast enters from right */
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Toast exits upward */
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+}
+
+
 </style>
 </head>
 
@@ -576,16 +607,16 @@ function submitPassword() {
     .then(res => res.text())
     .then(data => {
         if (data === "Success") {
-            showToast("Password updated successfully");
+        	showToast("Password updated successfully", "success");
             closeChangePassword();
             document.getElementById("newPassword").value = "";
             document.getElementById("confirmPassword").value = "";
         } 
         else if (data === "PasswordMismatch") {
-            showToast("Passwords do not match");
+        	showToast("Passwords do not match", "error");
         } 
         else if (data === "MissingFields") {
-            showToast("All fields are required");
+        	showToast("Please fill all fields", "warning");
         } 
         else {
             showToast("Something went wrong");
@@ -606,7 +637,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const success = params.get("success");
 
     if (success === "Login") {
-        showToast("Login successful");
+    	showToast("Logged-In Successfully", "info");
         
         // remove ?success=Login from URL
         window.history.replaceState(
@@ -617,15 +648,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-function showToast(message){
+function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
 
+    // Reset
+    toast.className = "toast " + type;
     toast.textContent = message;
     toast.style.display = "block";
 
+    // Auto hide
     setTimeout(() => {
-        toast.style.display = "none";
-    }, 4000);
+        toast.classList.add("hide");
+
+        // Fully remove after animation
+        setTimeout(() => {
+            toast.style.display = "none";
+            toast.classList.remove("hide");
+        }, 400);
+    }, 2500);
 }
 
 
