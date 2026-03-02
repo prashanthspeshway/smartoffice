@@ -13,181 +13,167 @@
 /* ===== Reset ===== */
 * {
 	box-sizing: border-box;
+	background:#c3cfe2;
 }
 
-/* ===== Base ===== */
-body {
-	margin: 0;
-	background: #f4f6f8;
-	font-family: "Segoe UI", Arial, sans-serif;
+.form-fieldset {
+	border:none;
+/*     border: 1px solid rgba(0, 0, 0, 0.15); */
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    background: #c3cfe2;
 }
 
-/* ===== Card ===== */
-.card {
-	width: 100%;
-	background: #ffffff;
-	padding: 30px 28px;
-	border-radius: 12px;
-	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+.form-fieldset legend {
+    padding: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    background:#e2ebf0;
+    border-radius:14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.form-fieldset legend i{
+	background:#e2ebf0;
 }
 
-/* ===== Heading ===== */
-.card h2 {
-	text-align: center;
-	margin: 0 0 24px;
-	font-size: 18px;
-	font-weight: 600;
-	color: #1f2933;
-}
-
-/* ===== Form ===== */
 .form-group {
-	display: flex;
-	flex-direction: column;
-	margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
 }
 
-label {
-	margin-bottom: 6px;
-	font-size: 13px;
-	font-weight: 500;
-	color: #374151;
+.form-group label {
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #444;
 }
 
-/* ===== Inputs ===== */
-input, select {
-	height: 42px;
-	padding: 0 12px;
-	font-size: 14px;
-	border: 1px solid #d1d5db;
-	border-radius: 8px;
-	background-color: #fafafa;
+.form-group input,
+.form-group select {
+    padding: 9px;
+    border-radius: 6px;
+    background:#e2ebf0;
+    border: 0.5px solid #ccc;
+    font-size: 14px;
 }
 
-input[readonly] {
-	background-color: #f1f5f9;
-	color: #6b7280;
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #6a7be7;
+    box-shadow: 0 0 0 2px rgba(106, 123, 231, 0.2);
 }
-
-input:focus, select:focus {
-	outline: none;
-	border-color: #3b82f6;
-	background-color: #ffffff;
-}
-
-/* ===== Button ===== */
-.btn {
-	margin-top: 10px;
-	width: 100%;
-	height: 44px;
-	background: #3b82f6;
-	color: #ffffff;
+.btn{
+	width: 20%;
+	padding: 12px;
 	border: none;
 	border-radius: 8px;
-	font-size: 14px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	font-size: 16px;
 	font-weight: 500;
 	cursor: pointer;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 6px;
-	transition: background 0.2s;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	letter-spacing: 0.5px;
 }
 
-.btn:hover {
-	background: #2563eb;
-}
 </style>
 </head>
 
 <body>
 
 	<div class="card">
-		<h2>Edit Employee</h2>
+    <fieldset class="form-fieldset">
+        <legend>
+            <i class="fa-solid fa-user-pen"></i> Edit Employee
+        </legend>
 
-		<form action="editUser" method="post">
+        <form action="editUser" method="post">
 
-			<!-- Hidden ID -->
-			<input type="hidden" name="id" value="${id}">
+            <!-- Hidden ID -->
+            <input type="hidden" name="id" value="${id}">
 
-			<div class="form-group">
-				<label>Username</label> <input type="text" value="${username}"
-					readonly>
-			</div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" value="${username}" readonly>
+            </div>
 
-			<div class="form-group">
-				<label>Role</label> <select name="role" required>
-					<option value="admin" ${role == 'admin' ? 'selected' : ''}>Admin</option>
-					<option value="manager" ${role == 'manager' ? 'selected' : ''}>Manager</option>
-					<option value="user" ${role == 'user' ? 'selected' : ''}>Employee</option>
-				</select>
-			</div>
+            <div class="form-group">
+                <label>Role</label>
+                <select name="role" required>
+                    <option value="admin" ${role == 'admin' ? 'selected' : ''}>Admin</option>
+                    <option value="manager" ${role == 'manager' ? 'selected' : ''}>Manager</option>
+                    <option value="user" ${role == 'user' ? 'selected' : ''}>Employee</option>
+                </select>
+            </div>
 
-			<div class="form-group">
-				<label>Status</label> <select name="status" required>
-					<option value="active" ${status == 'active' ? 'selected' : ''}>Active</option>
-					<option value="inactive" ${status == 'inactive' ? 'selected' : ''}>Inactive</option>
-					<option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
-					<option value="banned" ${status == 'banned' ? 'selected' : ''}>Banned</option>
-					<option value="suspended"
-						${status == 'suspended' ? 'selected' : ''}>Suspended</option>
-				</select>
-			</div>
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status" required>
+                    <option value="active" ${status == 'active' ? 'selected' : ''}>Active</option>
+                    <option value="inactive" ${status == 'inactive' ? 'selected' : ''}>Inactive</option>
+                    <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
+                    <option value="banned" ${status == 'banned' ? 'selected' : ''}>Banned</option>
+                    <option value="suspended" ${status == 'suspended' ? 'selected' : ''}>Suspended</option>
+                </select>
+            </div>
 
-			<div class="form-group">
-				<label>Full Name</label> <input type="text" name="fullname"
-					value="${fullname}" required>
-			</div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="fullname" value="${fullname}" required>
+            </div>
 
-			<div class="form-group">
-				<label>Password</label> <input type="text" name="password"
-					value="${password}" required>
-			</div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="text" name="password" value="${password}" required>
+            </div>
 
-			<div class="form-group">
-				<label>Phone Number</label> <input type="text" name="number"
-					value="${phone}" required>
-			</div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" name="number" value="${phone}" required>
+            </div>
 
-			<div class="form-group">
-				<label>Email</label> <input type="email" name="email"
-					value="${email}" required>
-			</div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" value="${email}" required>
+            </div>
 
-			<div class="form-group">
-				<label>Manager</label> <select name="manager" id="managerSelect">
-					<option value="">Select Manager</option>
+            <div class="form-group">
+                <label>Manager</label>
+                <select name="manager" id="managerSelect">
+                    <option value="">Select Manager</option>
+                    <%
+                        List<String> managers = (List<String>) request.getAttribute("managers");
+                        String selectedManager = (String) request.getAttribute("manager");
+                        if (managers != null) {
+                            for (String m : managers) {
+                    %>
+                    <option value="<%=m%>" <%=m.equals(selectedManager) ? "selected" : ""%>>
+                        <%=m%>
+                    </option>
+                    <%
+                            }
+                        }
+                    %>
+                </select>
+            </div>
 
-					<%
-					List<String> managers = (List<String>) request.getAttribute("managers");
-					String selectedManager = (String) request.getAttribute("manager");
+            <div class="form-group">
+                <label>Joined Date</label>
+                <input type="date" name="joinedDate" value="${joinedDate}">
+            </div>
 
-					if (managers != null) {
-						for (String m : managers) {
-					%>
-					<option value="<%=m%>"
-						<%=m.equals(selectedManager) ? "selected" : ""%>>
-						<%=m%>
-					</option>
-					<%
-					}
-					}
-					%>
-				</select>
-			</div>
+            <button type="submit" class="btn">
+                <i class="fa-solid fa-floppy-disk"></i> Update Employee
+            </button>
 
-			<div class="form-group">
-				<label>Joined Date</label> <input type="date" name="joinedDate"
-					value="${joinedDate}">
-			</div>
-
-			<button type="submit" class="btn">
-				<i class="fa-solid fa-floppy-disk"></i> Update Employee
-			</button>
-
-		</form>
-	</div>
-
+        </form>
+    </fieldset>
+</div>
 	<script>
 		document.addEventListener("DOMContentLoaded", function() {
 

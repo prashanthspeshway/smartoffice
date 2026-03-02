@@ -1675,7 +1675,7 @@ body.dark-theme .settings-item i {
 				<i class="fa-solid fa-gear"></i>
 			</button>
 			<a href="<%=request.getContextPath()%>/logout">
-				<button class="logout-btn">Logout</button>
+				<button class="logout-btn">Logout  <i class="fa-solid fa-right-to-bracket"></i></button>
 			</a>
 		</div>
 	</div>

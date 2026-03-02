@@ -25,6 +25,35 @@ body {
 	color: #333;
 }
 
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+   background:
+    repeating-linear-gradient(
+        120deg,
+       rgba(255, 255, 255, 1) ,    /* pure white (solid) */
+		rgba(255, 255, 255, 0.9)  , /* almost solid */
+		rgba(255, 255, 255, 0.7),   /* strong */
+		rgba(255, 255, 255, 0.5),   /* medium */
+		rgba(255, 255, 255, 0.3),   /* light */
+		rgba(255, 255, 255, 0.15),  /* very subtle */
+		rgba(255, 255, 255, 0.08),  /* ultra subtle */
+		rgba(255, 255, 255, 0.04),  /* barely visible */ 1px,
+        transparent 1px,
+        transparent 80px
+    );
+    animation: linesDrift 20s linear infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes linesDrift {
+    from { background-position: 0 0; }
+    to { background-position: 200px 200px; }
+}
+
+
 .login-box {
 	width: min(90%, 380px);
 	padding: 40px 30px;
@@ -122,6 +151,10 @@ body {
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 	letter-spacing: 0.5px;
 }
+.login-box button i {
+    margin-left: 8px;
+    transition: transform 0.2s ease;
+}
 
 .login-box button:hover {
 	transform: translateY(-1px);
@@ -208,7 +241,71 @@ body {
     }
 }
 
+/* Container animation */
+.login-box {
+    animation: fadeSlideIn 0.8s ease-out forwards;
+}
 
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* ===== Background Lines ===== */
+.bg-lines {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.bg-lines span {
+    position: absolute;
+    width: 2px;
+    height: 120%;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(255, 255, 255, 0.5),
+        transparent
+    );
+    animation: moveLines 8s linear infinite;
+    opacity: 0.4;
+}
+
+/* Different positions & speeds */
+.bg-lines span:nth-child(1) {
+    left: 20%;
+    animation-duration: 9s;
+}
+.bg-lines span:nth-child(2) {
+    left: 45%;
+    animation-duration: 12s;
+}
+.bg-lines span:nth-child(3) {
+    left: 65%;
+    animation-duration: 10s;
+}
+.bg-lines span:nth-child(4) {
+    left: 85%;
+    animation-duration: 14s;
+}
+
+@keyframes moveLines {
+    from {
+        transform: translateY(-120%);
+    }
+    to {
+        transform: translateY(120%);
+    }
+}
 </style>
 </head>
 
@@ -226,12 +323,22 @@ body {
 					class="fa-solid fa-eye" id="eyeIcon" title="Hold to view password"></i>
 			</div>
 
-			<button type="submit">Login</button>
+			<button type="submit">Login<i class="fa-solid fa-right-to-bracket"></i></button>
 		</form>
 	</div>
 
 	<!-- TOAST -->
 	<div id="toast" class="toast"></div>
+
+
+<!-- 		nothing -->
+
+<div class="bg-lines">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
 
 	<script>
 /* ===== Password View (Hold) ===== */

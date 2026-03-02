@@ -893,7 +893,7 @@ keyframes fadeOut {to { opacity:0;
 				<i class="fa-solid fa-gear" style="margin-left: 2px;"></i>
 			</button>
 			<a href="<%=request.getContextPath()%>/logout">
-				<button class="logout-btn">Logout</button>
+				<button class="logout-btn">Logout <i class="fa-solid fa-right-to-bracket"></i></button>
 			</a>
 		</div>
 	</div>
