@@ -25,6 +25,8 @@ List<Meeting> meetings = (List<Meeting>) request.getAttribute("allMeetings");
                 <% } %>
             </div>
         </div>
+        
+        
     <% } %>
 <% } else { %>
     <p>No meetings found.</p>
