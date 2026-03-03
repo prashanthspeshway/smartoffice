@@ -115,9 +115,9 @@ button:hover {
      content: "✔"; 
      position: absolute; 
      left: 16px; 
-     top: 50px; 
+     top: 50%; 
      transform: translateY(-50%); 
-     font-size: 16px; */
+     font-size: 16px; 
      font-weight: bold; 
  } 
 

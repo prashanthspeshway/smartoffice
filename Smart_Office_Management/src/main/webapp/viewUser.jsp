@@ -23,7 +23,7 @@ body {
 .page {
 	width: 100%;
 	height: 100vh;
-	background: #f9fafb; ;
+	background: #c3cfe2 ;
 /* 	padding: 10px; */
 /* 	border-radius: 10px; */
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -61,7 +61,7 @@ td {
 }
 
 tr:hover {
-	background: #f9fafb;
+	background: #e2ebf0;
 }
 
 /* Empty state */

@@ -361,7 +361,7 @@ body {
 	max-height: 460px;
 	overflow-y: auto;
 	border: none;
-	border-radius: 16px;
+	border-radius: 8px;
 	padding: 28px 22px;
 	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }
@@ -372,7 +372,7 @@ body {
 	font-weight: 600;
 	color: #333;
 	background: #e2ebf0;
-	border-radius: 20px;
+	border-radius: 10px;
 	border: 1px solid rgba(99, 102, 241, 0.35);
 }
 
