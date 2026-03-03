@@ -129,7 +129,9 @@ body {
 
 .login-box button:hover {
 	transform: translateY(-1px);
+	transition: transform 1.5s ease;
 	box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+	background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
 
 .login-box button:active {
@@ -288,8 +290,7 @@ to {
 .divider-line {
 	flex: 1;
 	height: 1px;
-	background: linear-gradient(90deg, transparent, rgba(100, 120, 160, 0.2),
-		transparent);
+	background: grey;
 }
 
 .divider span {
