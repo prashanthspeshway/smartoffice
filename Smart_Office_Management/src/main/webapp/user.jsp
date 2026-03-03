@@ -216,11 +216,10 @@ body {
 
 /* Time Cards */
 .attendance-fieldset .time-card {
-	margin: 10px 0;
-	padding: 12px 16px;
-	border-radius: 10px;
-	background: rgba(99, 102, 241, 0.08);
-	font-size: 14px;
+	display: flex;
+	justify-content: space-between;
+	padding: 10px 0;
+	border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 /* Punch Buttons */
@@ -232,17 +231,20 @@ body {
 
 .attendance-fieldset button {
 	flex: 1;
-	padding: 12px;
-	border-radius: 10px;
-	background: #667eea;
+	padding: 10px  22px;
+	border-radius:22px;
+	background: linear-gradient(135deg, #6366f1, #818cf8);
+	color: white;
 	border: none;
 	font-weight: 600;
+	transition:all ease  0.2s;
 	cursor: pointer;
 }
 
 /* Disabled State */
 .attendance-fieldset button:disabled {
 	opacity: 0.6;
+	background: #a0aec0;
 	cursor: not-allowed;
 }
 /* ================= TASK CARD ================= */
@@ -1019,11 +1021,9 @@ body {
 						<i class="fa-solid fa-clock"></i> Attendance
 					</legend>
 
-					<div
-						class="status-badge <%=status.equals("Punched In") ? "in" : status.equals("Punched Out") ? "out" : "none"%>">
-						<%=status%>
+					<div class="time-card">
+						<span class="label">Status</span> <span class="value"><%=status%></span>
 					</div>
-
 					<div class="time-card">
 						Punch In: <b><%=punchIn != null ? punchIn : "--"%></b>
 					</div>
