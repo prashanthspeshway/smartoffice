@@ -198,7 +198,7 @@ body {
 /* ===== Modal Box ===== */
 .modal-content {
 	width: 70%;
-/* 	max-width: 700px; */
+	/* 	max-width: 700px; */
 	height: 420px;
 	background: #ffffff;
 	border-radius: 14px;
@@ -241,150 +241,149 @@ body {
 /* ===== Iframe ===== */
 #profileFrame {
 	flex: 1;
-	width:300px
-	border: none;
+	width: 300px border: none;
 	background: #c3cfe2;
 }
 
 /* ===== Modal Overlay ===== */
 .modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    display: none;                 /* toggle with JS */
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.45);
+	display: none; /* toggle with JS */
+	justify-content: center;
+	align-items: center;
+	z-index: 9999;
 }
 
 /* ===== Modal Box ===== */
 .modal-content {
-    width: 720px;
-    max-width: 92%;
-    max-height: 85vh;
-    background: #f8fbff;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
-    animation: modalFade 0.3s ease;
+	width: 720px;
+	max-width: 92%;
+	max-height: 85vh;
+	background: #f8fbff;
+	border-radius: 14px;
+	overflow: hidden;
+	box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+	animation: modalFade 0.3s ease;
 }
 
 /* ===== Header ===== */
 .modal-header {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #ffffff;
-    padding: 14px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: #ffffff;
+	padding: 14px 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .modal-header h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
+	margin: 0;
+	font-size: 18px;
+	font-weight: 600;
 }
 
 .modal-close {
-    font-size: 22px;
-    cursor: pointer;
-    opacity: 0.85;
+	font-size: 22px;
+	cursor: pointer;
+	opacity: 0.85;
 }
 
 .modal-close:hover {
-    opacity: 1;
+	opacity: 1;
 }
 
 /* ===== Body ===== */
 .modal-body {
-    padding: 18px;
-    overflow-y: auto;
-    max-height: calc(85vh - 60px);
+	padding: 18px;
+	overflow-y: auto;
+	max-height: calc(85vh - 60px);
 }
 
 /* ===== Scrollbar ===== */
 .modal-body::-webkit-scrollbar {
-    width: 8px;
+	width: 8px;
 }
 
 .modal-body::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #c3cfe2, #9faed9);
-    border-radius: 10px;
+	background: linear-gradient(180deg, #c3cfe2, #9faed9);
+	border-radius: 10px;
 }
 
 .modal-body::-webkit-scrollbar-track {
-    background: #eef2f7;
+	background: #eef2f7;
 }
 
 /* ===== Meeting Card ===== */
 .meeting-item {
-    background: #f2f7ff;
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-    box-shadow: inset 4px 0 0 #3b82f6,
-                0 4px 12px rgba(0, 0, 0, 0.06);
+	background: #f2f7ff;
+	border-radius: 12px;
+	padding: 14px 16px;
+	margin-bottom: 14px;
+	box-shadow: inset 4px 0 0 #3b82f6, 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 /* ===== Meeting Title ===== */
 .meeting-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    color: #1e3a8a;
-    margin-bottom: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 600;
+	color: #1e3a8a;
+	margin-bottom: 8px;
 }
 
 .meeting-title i {
-    color: #2563eb;
+	color: #2563eb;
 }
 
 /* ===== Meeting Info ===== */
 .meeting-info {
-    font-size: 14px;
-    color: #475569;
-    margin-bottom: 4px;
+	font-size: 14px;
+	color: #475569;
+	margin-bottom: 4px;
 }
 
 .meeting-info b {
-    color: #334155;
+	color: #334155;
 }
 
 /* ===== Join Button ===== */
 .join-btn {
-    margin-top: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    background: #93c5fd;
-    color: #1e3a8a;
-    border-radius: 18px;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.2s ease;
+	margin-top: 10px;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 14px;
+	background: #93c5fd;
+	color: #1e3a8a;
+	border-radius: 18px;
+	font-size: 13px;
+	font-weight: 600;
+	text-decoration: none;
+	transition: 0.2s ease;
 }
 
 .join-btn i {
-    font-size: 14px;
+	font-size: 14px;
 }
 
 .join-btn:hover {
-    background: #60a5fa;
+	background: #60a5fa;
 }
 
 /* ===== Animation ===== */
-@keyframes modalFade {
-    from {
-        opacity: 0;
-        transform: scale(0.96);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+@
+keyframes modalFade {from { opacity:0;
+	transform: scale(0.96);
+}
+
+to {
+	opacity: 1;
+	transform: scale(1);
+}
+
 }
 /* ===== Password Modal Form Styling ONLY ===== */
 #passwordModal .modal-body {
@@ -392,7 +391,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	width:80%;
+	width: 80%;
 }
 
 /* Inputs */
@@ -674,7 +673,7 @@ to {
 .employee-card {
 	background: #C3CFE2;
 	border-radius: 12px;
-	padding:8px;
+	padding: 8px;
 	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
 	transition: 0.3s ease;
 }
@@ -918,270 +917,270 @@ to {
 }
 /* ===== Task Fieldset ===== */
 .task-fieldset {
-    border: 2px solid #c3cfe2;
-    border-radius: 14px;
-    padding: 20px 24px 26px;
-    margin-bottom: 25px;
-    overflow-y: auto;
-    background:#c3cfe2;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+	border: 2px solid #c3cfe2;
+	border-radius: 14px;
+	padding: 20px 24px 26px;
+	margin-bottom: 25px;
+	overflow-y: auto;
+	background: #c3cfe2;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
 }
 
 .task-fieldset legend {
-    padding: 6px;
-    font-size: 18px;
-    font-weight: 600;
-    border-radius: 14px;
-    background: #e2ebf0;
-    color: #2d3748;
+	padding: 6px;
+	font-size: 18px;
+	font-weight: 600;
+	border-radius: 14px;
+	background: #e2ebf0;
+	color: #2d3748;
 }
 
 /* ===== Error ===== */
 .task-error {
-    color: #c53030;
-    font-weight: 600;
-    margin-bottom: 15px;
+	color: #c53030;
+	font-weight: 600;
+	margin-bottom: 15px;
 }
 
 /* ===== Task List ===== */
 .task-list {
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+	margin-top: 15px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 }
 
 /* ===== Task Card ===== */
 .task-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 14px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+	background: #ffffff;
+	border-radius: 12px;
+	padding: 14px 16px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
 }
 
 .task-card.completed {
-    opacity: 0.75;
+	opacity: 0.75;
 }
 
 /* Leave request  */
 /* ===== Leave Fieldset ===== */
 .leave-fieldset {
-    border: 2px solid #c3cfe2;
-    border-radius: 14px;
-    padding: 20px 24px 26px;
-    background:  #c3cfe2;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8);
+	border: 2px solid #c3cfe2;
+	border-radius: 14px;
+	padding: 20px 24px 26px;
+	background: #c3cfe2;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8);
 }
 
 .leave-fieldset legend {
-    padding: 8px;
-    font-size: 18px;
-    border-radius:14px;
-    font-weight: 600;
-    background:#e2ebf0;
-    color: #2d3748;
+	padding: 8px;
+	font-size: 18px;
+	border-radius: 14px;
+	font-weight: 600;
+	background: #e2ebf0;
+	color: #2d3748;
 }
 
 /* ===== Scroll Area ===== */
 .leave-scroll {
-    max-height: 460px;
-    overflow-y: auto;
-    padding-right: 6px;
-    scroll-behavior: smooth;
+	max-height: 460px;
+	overflow-y: auto;
+	padding-right: 6px;
+	scroll-behavior: smooth;
 }
 
 /* Scrollbar */
 .leave-scroll::-webkit-scrollbar {
-    width: 2px;
+	width: 2px;
 }
 
 .leave-scroll::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #c3cfe2, #9faed9);
-    border-radius: 10px;
+	background: linear-gradient(180deg, #c3cfe2, #9faed9);
+	border-radius: 10px;
 }
 
 .leave-scroll::-webkit-scrollbar-track {
-    background: #e2ebf0;
+	background: #e2ebf0;
 }
 
 /* ===== Action Buttons ===== */
 .leave-actions {
-    margin-top: 12px;
-    display: flex;
-    gap: 12px;
+	margin-top: 12px;
+	display: flex;
+	gap: 12px;
 }
 
 /* Optional status color tuning */
 .emp-status {
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 20px;
-    background: #c3cfe2;
-    color: #2d3748;
+	padding: 4px 10px;
+	font-size: 12px;
+	font-weight: 600;
+	border-radius: 20px;
+	background: #c3cfe2;
+	color: #2d3748;
 }
 
 /* ===== Status Badge ===== */
 /* ===== Meeting Fieldset ===== */
 .meeting-fieldset {
-    border: 2px solid #c3cfe2;
-    border-radius: 14px;
-    padding: 20px 24px 26px;
-    background:#c3cfe2;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+	border: 2px solid #c3cfe2;
+	border-radius: 14px;
+	padding: 20px 24px 26px;
+	background: #c3cfe2;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
 }
 
 .meeting-fieldset legend {
-    padding:8px;
-    background: #e2ebf0;
-    border-radius: 14px;
-    font-size: 18px;
-    font-weight: 600;
-    color: #2d3748;
+	padding: 8px;
+	background: #e2ebf0;
+	border-radius: 14px;
+	font-size: 18px;
+	font-weight: 600;
+	color: #2d3748;
 }
 
 /* ===== Header ===== */
 .section-header {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 25px;
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 25px;
 }
 
 /* ===== Grid ===== */
 .meeting-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 15px;
 }
 
 /* ===== Right Scroll ===== */
 .meeting-scroll {
-	padding:10px;
-    max-height: 360px;
-    overflow-y: auto;
-    padding-right: 6px;
-    scroll-behavior: smooth;
+	padding: 10px;
+	max-height: 360px;
+	overflow-y: auto;
+	padding-right: 6px;
+	scroll-behavior: smooth;
 }
 
 /* Scrollbar */
 .meeting-scroll::-webkit-scrollbar {
-    width: 8px;
+	width: 8px;
 }
 
 .meeting-scroll::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #c3cfe2, #9faed9);
-    border-radius: 10px;
+	background: linear-gradient(180deg, #c3cfe2, #9faed9);
+	border-radius: 10px;
 }
 
 .meeting-scroll::-webkit-scrollbar-track {
-    background: #e2ebf0;
+	background: #e2ebf0;
 }
 
 /* ===== Join Button ===== */
 .join-meeting-btn {
-    margin-top: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    background: #bee3f8;
-    color: #2b6cb0;
-    font-weight: 600;
-    font-size: 13px;
-    text-decoration: none;
+	margin-top: 10px;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border-radius: 20px;
+	background: #bee3f8;
+	color: #2b6cb0;
+	font-weight: 600;
+	font-size: 13px;
+	text-decoration: none;
 }
 
 .join-meeting-btn:hover {
-    background: #90cdf4;
+	background: #90cdf4;
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 900px) {
-    .meeting-grid {
-        grid-template-columns: 1fr;
-    }
+@media ( max-width : 900px) {
+	.meeting-grid {
+		grid-template-columns: 1fr;
+	}
 }
 /* ===== Attendance Fieldset ===== */
 .attendance-fieldset {
-    border: 2px solid #c3cfe2;
-    border-radius: 14px;
-    padding: 20px 24px 26px;
-    background: #c3cfe2;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8);
+	border: 2px solid #c3cfe2;
+	border-radius: 14px;
+	padding: 20px 24px 26px;
+	background: #c3cfe2;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8);
 }
 
 .attendance-fieldset legend {
-    padding: 8px;
-    font-size: 18px;
-    font-weight: 600;
-    color: #2d3748;
+	padding: 8px;
+	font-size: 18px;
+	font-weight: 600;
+	color: #2d3748;
 }
 
 /* ===== Header ===== */
 .team-attendance-header {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 15px;
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 15px;
 }
 
 /* ===== Export Buttons ===== */
 .export-actions {
-    display: flex;
-    gap: 12px;
+	display: flex;
+	gap: 12px;
 }
 
 .export-btn {
-    padding: 8px 14px;
-    background: #c3cfe2;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    color: #3b5bcc;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+	padding: 8px 14px;
+	background: #c3cfe2;
+	border: none;
+	border-radius: 8px;
+	font-weight: 600;
+	color: #3b5bcc;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 6px;
 }
 
 .export-btn:hover {
-    background: #dbe4ff;
+	background: #dbe4ff;
 }
 
 /* ===== Scroll Area ===== */
 .attendance-scroll {
-    max-height: 420px;
-    overflow-y: auto;
-    border-radius:8px;
-    padding-right: 6px;
-    scroll-behavior: smooth;
+	max-height: 420px;
+	overflow-y: auto;
+	border-radius: 8px;
+	padding-right: 6px;
+	scroll-behavior: smooth;
 }
 
 /* Scrollbar */
 .attendance-scroll::-webkit-scrollbar {
-    width: 8px;
+	width: 8px;
 }
 
 .attendance-scroll::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #c3cfe2, #9faed9);
-    border-radius: 10px;
+	background: linear-gradient(180deg, #c3cfe2, #9faed9);
+	border-radius: 10px;
 }
 
 .attendance-scroll::-webkit-scrollbar-track {
-    background: #e2ebf0;
+	background: #e2ebf0;
 }
 
 /* ===== Status Badge ===== */
 .emp-status {
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 20px;
-    background-color: #c3cfe2;
-    color: #2d3748;
+	padding: 4px 10px;
+	font-size: 12px;
+	font-weight: 600;
+	border-radius: 20px;
+	background-color: #c3cfe2;
+	color: #2d3748;
 }
 /* Button container */
 .export-actions {
@@ -1208,8 +1207,8 @@ to {
 
 .export-btn:hover {
 	transform: translateY(-2px);
-	background:#c3cfe2;
-	color:black;
+	background: #c3cfe2;
+	color: black;
 	box-shadow: 0 8px 18px rgba(99, 102, 241, 0.35);
 }
 
@@ -1259,64 +1258,64 @@ to {
 
 /* ===== Performance Fieldset ===== */
 .performance-fieldset {
-    border: 2px solid #c3cfe2;
-    border-radius: 14px;
-    padding: 22px 26px 28px;
-    background:  #c3cfe2;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+	border: 2px solid #c3cfe2;
+	border-radius: 14px;
+	padding: 22px 26px 28px;
+	background: #c3cfe2;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
 }
 
 .performance-fieldset legend {
-    padding:8px;
-    background:#e2ebf0;
-    border-radius:14px;
-    font-size: 18px;
-    font-weight: 600;
-    color: #2d3748;
+	padding: 8px;
+	background: #e2ebf0;
+	border-radius: 14px;
+	font-size: 18px;
+	font-weight: 600;
+	color: #2d3748;
 }
 
 /* ===== Form Layout ===== */
 .performance-fieldset form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
 }
 
 /* ===== Radio Group ===== */
 .radio-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
-    margin-top: 5px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 12px;
+	margin-top: 5px;
 }
 
 .radio-group label {
-    background: #ffffff;
-    padding: 10px 14px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    transition: 0.2s ease;
+	background: #ffffff;
+	padding: 10px 14px;
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 500;
+	cursor: pointer;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+	transition: 0.2s ease;
 }
 
 .radio-group label:hover {
-    transform: translateY(-2px);
+	transform: translateY(-2px);
 }
 
 /* Highlight selected */
-.radio-group input[type="radio"]:checked + span {
-    font-weight: 600;
+.radio-group input[type="radio"]:checked+span {
+	font-weight: 600;
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 600px) {
-    .radio-group {
-        grid-template-columns: 1fr;
-    }
+@media ( max-width : 600px) {
+	.radio-group {
+		grid-template-columns: 1fr;
+	}
 }
 /* ===== Toast Notification ===== */
 .toast-success {
@@ -1342,24 +1341,26 @@ to {
 }
 
 /* Slide from right */
-@
-keyframes slideIn {from { opacity:0;
-	transform: translateX(60px);
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
-to {
-	opacity: 1;
-	transform: translateX(0);
-}
-
-}
-
-/* Fade out */
-@
-keyframes fadeOut {to { opacity:0;
-	transform: translateX(60px);
-}
-
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(120px);
+    }
 }
 
 /* ===== Schedule Meeting Grid ===== */
@@ -1381,7 +1382,7 @@ keyframes fadeOut {to { opacity:0;
 /* Right: meetings list */
 .meeting-right {
 	background: #c3cfe2;
-	padding:18px;
+	padding: 18px;
 	border-radius: 14px;
 	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
 	max-height: 430px; /* 👈 controls visible height */
@@ -1415,7 +1416,6 @@ keyframes fadeOut {to { opacity:0;
 	align-items: center;
 	justify-content: space-between;
 	margin-bottom: 3px;
-	
 }
 
 /* View All button */
@@ -1675,7 +1675,9 @@ body.dark-theme .settings-item i {
 				<i class="fa-solid fa-gear"></i>
 			</button>
 			<a href="<%=request.getContextPath()%>/logout">
-				<button class="logout-btn">Logout  <i class="fa-solid fa-right-to-bracket"></i></button>
+				<button class="logout-btn">
+					Logout <i class="fa-solid fa-right-to-bracket"></i>
+				</button>
 			</a>
 		</div>
 	</div>
@@ -1768,315 +1770,302 @@ body.dark-theme .settings-item i {
 				</fieldset>
 			</div>
 
-		<!-- ===== Performance Matrix ===== -->
-<div class="box centered-box" id="performance" style="display: none;">
+			<!-- ===== Performance Matrix ===== -->
+			<div class="box centered-box" id="performance" style="display: none;">
 
-    <fieldset class="performance-fieldset">
-        <legend>
-            <i class="fa-solid fa-chart-line"></i> Performance Matrix
-        </legend>
+				<fieldset class="performance-fieldset">
+					<legend>
+						<i class="fa-solid fa-chart-line"></i> Performance Matrix
+					</legend>
 
-        <form id="performanceForm"
-              action="<%=request.getContextPath()%>/submitPerformance"
-              method="post">
+					<form id="performanceForm"
+						action="<%=request.getContextPath()%>/submitPerformance"
+						method="post">
 
-            <!-- Employee Dropdown -->
-            <select class="form-control" name="employee" required>
-                <option value="">Select Employee</option>
-                <%
-                List<User> teamPerf =
-                    (List<User>) request.getAttribute("teamList");
-                if (teamPerf != null) {
-                    for (User u : teamPerf) {
-                %>
-                <option value="<%=u.getUsername()%>">
-                    <%=u.getFullname()%> (<%=u.getUsername()%>)
-                </option>
-                <%
-                    }
-                }
-                %>
-            </select>
+						<!-- Employee Dropdown -->
+						<select class="form-control" name="employee" required>
+							<option value="">Select Employee</option>
+							<%
+							List<User> teamPerf = (List<User>) request.getAttribute("teamList");
+							if (teamPerf != null) {
+								for (User u : teamPerf) {
+							%>
+							<option value="<%=u.getUsername()%>">
+								<%=u.getFullname()%> (<%=u.getUsername()%>)
+							</option>
+							<%
+							}
+							}
+							%>
+						</select>
 
-            <!-- Rating Options -->
-            <div class="radio-group">
-                <label>
-                    <input type="radio" name="rating" value="EXCELLENCE" required>
-                    Excellence
-                </label>
+						<!-- Rating Options -->
+						<div class="radio-group">
+							<label> <input type="radio" name="rating"
+								value="EXCELLENCE" required> Excellence
+							</label> <label> <input type="radio" name="rating" value="GOOD">
+								Good
+							</label> <label> <input type="radio" name="rating"
+								value="AVERAGE"> Average
+							</label> <label> <input type="radio" name="rating"
+								value="BELOW_AVERAGE"> Below Average
+							</label>
+						</div>
 
-                <label>
-                    <input type="radio" name="rating" value="GOOD">
-                    Good
-                </label>
+						<button class="primary-btn" type="submit">Submit
+							Performance</button>
 
-                <label>
-                    <input type="radio" name="rating" value="AVERAGE">
-                    Average
-                </label>
+					</form>
+				</fieldset>
+			</div>
 
-                <label>
-                    <input type="radio" name="rating" value="BELOW_AVERAGE">
-                    Below Average
-                </label>
-            </div>
+			<!-- ===== Schedule Meeting ===== -->
+			<div class="box" id="schedulemeeting" style="display: none;">
 
-            <button class="primary-btn" type="submit">
-                Submit Performance
-            </button>
+				<fieldset class="meeting-fieldset">
+					<legend>Schedule Meeting</legend>
 
-        </form>
-    </fieldset>
-</div>
+					<div class="section-header">
+						<button class="view-all-btn" onclick="openAllMeetings()">
+							<i class="fa-solid fa-eye"></i> View All
+						</button>
+					</div>
 
-		<!-- ===== Schedule Meeting ===== -->
-<div class="box" id="schedulemeeting" style="display: none;">
+					<!-- GRID WRAPPER -->
+					<div class="meeting-grid">
 
-    <fieldset class="meeting-fieldset">
-        <legend>Schedule Meeting</legend>
+						<!-- LEFT : Schedule Form -->
+						<div class="meeting-left">
 
-        <div class="section-header">
-            <button class="view-all-btn" onclick="openAllMeetings()">
-                <i class="fa-solid fa-eye"></i> View All
-            </button>
-        </div>
+							<form id="scheduleMeetingForm"
+								action="<%=request.getContextPath()%>/schedulemeeting"
+								method="post">
 
-        <!-- GRID WRAPPER -->
-        <div class="meeting-grid">
+								<input class="form-control" type="text" name="title"
+									placeholder="Meeting Title" required>
 
-            <!-- LEFT : Schedule Form -->
-            <div class="meeting-left">
+								<textarea class="form-control" name="description"
+									placeholder="Meeting Description" rows="3" required></textarea>
 
-                <form id="scheduleMeetingForm"
-                      action="<%=request.getContextPath()%>/schedulemeeting"
-                      method="post">
+								<label>Start Time</label> <input class="form-control"
+									type="datetime-local" name="startTime" required> <label>End
+									Time</label> <input class="form-control" type="datetime-local"
+									name="endTime" required> <label>Meeting Link
+									(optional)</label> <input class="form-control" type="text"
+									name="meetingLink" placeholder="Zoom / Google Meet link">
 
-                    <input class="form-control" type="text" name="title"
-                           placeholder="Meeting Title" required>
+								<button class="primary-btn" type="submit">Schedule
+									Meeting</button>
+							</form>
 
-                    <textarea class="form-control" name="description"
-                              placeholder="Meeting Description" rows="3" required></textarea>
+						</div>
 
-                    <label>Start Time</label>
-                    <input class="form-control" type="datetime-local"
-                           name="startTime" required>
+						<!-- RIGHT : Today's Meetings -->
+						<div class="meeting-right">
 
-                    <label>End Time</label>
-                    <input class="form-control" type="datetime-local"
-                           name="endTime" required>
+							<h4>
+								<i class="fa-solid fa-calendar-check"></i> Today’s Meetings
+							</h4>
 
-                    <label>Meeting Link (optional)</label>
-                    <input class="form-control" type="text"
-                           name="meetingLink"
-                           placeholder="Zoom / Google Meet link">
+							<div class="meeting-scroll">
 
-                    <button class="primary-btn" type="submit">
-                        Schedule Meeting
-                    </button>
-                </form>
+								<%
+								List<com.smartoffice.model.Meeting> todayMeetings = (List<com.smartoffice.model.Meeting>) request
+										.getAttribute("todayMeetings");
 
-            </div>
+								if (todayMeetings != null && !todayMeetings.isEmpty()) {
+									for (com.smartoffice.model.Meeting m : todayMeetings) {
+								%>
 
-            <!-- RIGHT : Today's Meetings -->
-            <div class="meeting-right">
+								<div class="employee-card">
+									<div class="emp-header">
+										<i class="fa-solid fa-video"></i> <span class="emp-name"><%=m.getTitle()%></span>
+									</div>
 
-                <h4>
-                    <i class="fa-solid fa-calendar-check"></i>
-                    Today’s Meetings
-                </h4>
+									<div class="emp-body">
+										<div>
+											<b>Start:</b>
+											<%=m.getStartTime()%></div>
+										<div>
+											<b>End:</b>
+											<%=m.getEndTime()%></div>
 
-                <div class="meeting-scroll">
+										<%
+										if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
+										%>
+										<a href="<%=m.getMeetingLink()%>" target="_blank"
+											class="join-meeting-btn"> <i class="fa-solid fa-video"></i>
+											Join Meeting
+										</a>
+										<%
+										}
+										%>
+									</div>
+								</div>
 
-                    <%
-                    List<com.smartoffice.model.Meeting> todayMeetings =
-                        (List<com.smartoffice.model.Meeting>) request.getAttribute("todayMeetings");
+								<%
+								}
+								} else {
+								%>
+								<p class="no-data">No meetings scheduled for today.</p>
+								<%
+								}
+								%>
 
-                    if (todayMeetings != null && !todayMeetings.isEmpty()) {
-                        for (com.smartoffice.model.Meeting m : todayMeetings) {
-                    %>
+							</div>
+						</div>
 
-                    <div class="employee-card">
-                        <div class="emp-header">
-                            <i class="fa-solid fa-video"></i>
-                            <span class="emp-name"><%= m.getTitle() %></span>
-                        </div>
-
-                        <div class="emp-body">
-                            <div><b>Start:</b> <%= m.getStartTime() %></div>
-                            <div><b>End:</b> <%= m.getEndTime() %></div>
-
-                            <%
-                            if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
-                            %>
-                            <a href="<%= m.getMeetingLink() %>" target="_blank"
-                               class="join-meeting-btn">
-                                <i class="fa-solid fa-video"></i> Join Meeting
-                            </a>
-                            <%
-                            }
-                            %>
-                        </div>
-                    </div>
-
-                    <%
-                        }
-                    } else {
-                    %>
-                        <p class="no-data">No meetings scheduled for today.</p>
-                    <%
-                    }
-                    %>
-
-                </div>
-            </div>
-
-        </div>
-    </fieldset>
-</div>
+					</div>
+				</fieldset>
+			</div>
 
 			<!-- ===== Team Attendance ===== -->
-<div class="box" id="attendance" style="display: none;">
+			<div class="box" id="attendance" style="display: none;">
 
-    <fieldset class="attendance-fieldset">
-        <legend>Team Attendance (Today)</legend>
+				<fieldset class="attendance-fieldset">
+					<legend>Team Attendance (Today)</legend>
 
-        <!-- Header Actions -->
-        <div class="team-attendance-header">
+					<!-- Header Actions -->
+					<div class="team-attendance-header">
 
-            <div class="export-actions">
-                <form action="<%=request.getContextPath()%>/exportTeamAttendance"
-                      method="get">
-                    <button type="submit" class="export-btn">
-                        <i class="fa-solid fa-file-export"></i> Export Attendance
-                    </button>
-                </form>
+						<div class="export-actions">
+							<form action="<%=request.getContextPath()%>/exportTeamAttendance"
+								method="get">
+								<button type="submit" class="export-btn">
+									<i class="fa-solid fa-file-export"></i> Export Attendance
+								</button>
+							</form>
 
-                <form action="<%=request.getContextPath()%>/exportTeamPerformance"
-                      method="get">
-                    <button type="submit" class="export-btn">
-                        <i class="fa-solid fa-file-export"></i> Export Performance
-                    </button>
-                </form>
-            </div>
-        </div>
+							<form
+								action="<%=request.getContextPath()%>/exportTeamPerformance"
+								method="get">
+								<button type="submit" class="export-btn">
+									<i class="fa-solid fa-file-export"></i> Export Performance
+								</button>
+							</form>
+						</div>
+					</div>
 
-        <!-- Attendance Grid -->
-        <div class="attendance-scroll">
-            <div class="employee-grid">
+					<!-- Attendance Grid -->
+					<div class="attendance-scroll">
+						<div class="employee-grid">
 
-                <%
-                List<TeamAttendance> teamAttendance =
-                        (List<TeamAttendance>) request.getAttribute("teamAttendance");
+							<%
+							List<TeamAttendance> teamAttendance = (List<TeamAttendance>) request.getAttribute("teamAttendance");
 
-                if (teamAttendance != null && !teamAttendance.isEmpty()) {
-                    for (TeamAttendance ta : teamAttendance) {
-                %>
+							if (teamAttendance != null && !teamAttendance.isEmpty()) {
+								for (TeamAttendance ta : teamAttendance) {
+							%>
 
-                <div class="employee-card">
-                    <div class="emp-header">
-                        <div class="emp-left">
-                            <i class="fa-solid fa-user"></i>
-                            <span class="emp-name"><%= ta.getFullName() %></span>
-                        </div>
-                        <span class="emp-status"><%= ta.getStatus() %></span>
-                    </div>
+							<div class="employee-card">
+								<div class="emp-header">
+									<div class="emp-left">
+										<i class="fa-solid fa-user"></i> <span class="emp-name"><%=ta.getFullName()%></span>
+									</div>
+									<span class="emp-status"><%=ta.getStatus()%></span>
+								</div>
 
-                    <div class="emp-body">
-                        <div>
-                            <b>Punch In:</b>
-                            <%= ta.getPunchIn() != null ? ta.getPunchIn() : "--" %>
-                        </div>
-                        <div>
-                            <b>Punch Out:</b>
-                            <%= ta.getPunchOut() != null ? ta.getPunchOut() : "--" %>
-                        </div>
-                    </div>
-                </div>
+								<div class="emp-body">
+									<div>
+										<b>Punch In:</b>
+										<%=ta.getPunchIn() != null ? ta.getPunchIn() : "--"%>
+									</div>
+									<div>
+										<b>Punch Out:</b>
+										<%=ta.getPunchOut() != null ? ta.getPunchOut() : "--"%>
+									</div>
+								</div>
+							</div>
 
-                <%
-                    }
-                } else {
-                %>
-                    <p class="no-data">No attendance data available for today.</p>
-                <%
-                }
-                %>
+							<%
+							}
+							} else {
+							%>
+							<p class="no-data">No attendance data available for today.</p>
+							<%
+							}
+							%>
 
-            </div>
-        </div>
+						</div>
+					</div>
 
-    </fieldset>
-</div>			
+				</fieldset>
+			</div>
 
-<!-- ===== Leave Requests ===== -->
-<div class="box centered-box" id="leave" style="display: none;">
+			<!-- ===== Leave Requests ===== -->
+			<div class="box centered-box" id="leave" style="display: none;">
 
-    <fieldset class="leave-fieldset">
-        <legend>Leave Requests</legend>
+				<fieldset class="leave-fieldset">
+					<legend>Leave Requests</legend>
 
-        <div class="leave-scroll">
+					<div class="leave-scroll">
 
-            <%
-            List<LeaveRequest> leaveRequests =
-                (List<LeaveRequest>) request.getAttribute("leaveRequests");
+						<%
+						List<LeaveRequest> leaveRequests = (List<LeaveRequest>) request.getAttribute("leaveRequests");
 
-            if (leaveRequests != null && !leaveRequests.isEmpty()) {
-                for (LeaveRequest lr : leaveRequests) {
-            %>
+						if (leaveRequests != null && !leaveRequests.isEmpty()) {
+							for (LeaveRequest lr : leaveRequests) {
+						%>
 
-            <div class="employee-card">
-                <div class="emp-header">
-                    <div class="emp-left">
-                        <i class="fa-solid fa-calendar-xmark"></i>
-                        <span class="emp-name"><%= lr.getUsername() %></span>
-                    </div>
-                    <span class="emp-status"><%= lr.getStatus() %></span>
-                </div>
+						<div class="employee-card">
+							<div class="emp-header">
+								<div class="emp-left">
+									<i class="fa-solid fa-calendar-xmark"></i> <span
+										class="emp-name"><%=lr.getUsername()%></span>
+								</div>
+								<span class="emp-status"><%=lr.getStatus()%></span>
+							</div>
 
-                <div class="emp-body">
-                    <div><b>Type:</b> <%= lr.getLeaveType() %></div>
-                    <div><b>From:</b> <%= lr.getFromDate() %></div>
-                    <div><b>To:</b> <%= lr.getToDate() %></div>
-                    <div><b>Reason:</b> <%= lr.getReason() %></div>
-                </div>
+							<div class="emp-body">
+								<div>
+									<b>Type:</b>
+									<%=lr.getLeaveType()%></div>
+								<div>
+									<b>From:</b>
+									<%=lr.getFromDate()%></div>
+								<div>
+									<b>To:</b>
+									<%=lr.getToDate()%></div>
+								<div>
+									<b>Reason:</b>
+									<%=lr.getReason()%></div>
+							</div>
 
-                <%
-                if ("PENDING".equals(lr.getStatus())) {
-                %>
-                <form action="leave-approval" method="post" class="leave-actions">
-                    <input type="hidden" name="leaveId" value="<%= lr.getId() %>">
+							<%
+							if ("PENDING".equals(lr.getStatus())) {
+							%>
+							<form action="leave-approval" method="post" class="leave-actions">
+								<input type="hidden" name="leaveId" value="<%=lr.getId()%>">
 
-                    <button class="primary-btn" name="action" value="approve">
-                        Approve
-                    </button>
+								<button class="primary-btn" name="action" value="approve">
+									Approve</button>
 
-                    <button class="reject-btn" name="action" value="reject">
-                        Reject
-                    </button>
-                </form>
-                <%
-                }
-                %>
-            </div>
+								<button class="reject-btn" name="action" value="reject">
+									Reject</button>
+							</form>
+							<%
+							}
+							%>
+						</div>
 
-            <%
-                }
-            } else {
-            %>
-                <p class="no-data">No leave requests.</p>
-            <%
-            }
-            %>
+						<%
+						}
+						} else {
+						%>
+						<p class="no-data">No leave requests.</p>
+						<%
+						}
+						%>
 
-        </div>
-    </fieldset>
-</div>
+					</div>
+				</fieldset>
+			</div>
 			<!-- Calendar -->
 			<div class="box centered-box" id="calendarSection"
 				style="display: none;">
-<!-- 				<h3> -->
-<!-- <!-- 					<i class="fa-solid fa-calendar-days"></i> Company Calendar --> 
-<!-- 				</h3> -->
+				<!-- 				<h3> -->
+				<!-- <!-- 					<i class="fa-solid fa-calendar-days"></i> Company Calendar -->
+				<!-- 				</h3> -->
 
 				<iframe id="calendarFrame" src=""
 					style="width: 100%; height: 600px; border: none;"></iframe>
@@ -2146,118 +2135,126 @@ body.dark-theme .settings-item i {
 				</fieldset>
 			</div>
 			<!-- ===== Assign Tasks ===== -->
-<div class="box" id="assignTask" style="display: none;">
+			<div class="box" id="assignTask" style="display: none;">
 
-    <!-- ===== Assign Task Fieldset ===== -->
-    <fieldset class="task-fieldset">
-        <legend>Assign Task</legend>
+				<!-- ===== Assign Task Fieldset ===== -->
+				<fieldset class="task-fieldset">
+					<legend>Assign Task</legend>
 
-        <% 
-        String errorMessage = (String) request.getAttribute("errorMessage");
-        if (errorMessage != null) { 
-        %>
-            <div class="task-error"><%= errorMessage %></div>
-        <% } %>
+					<%
+					String errorMessage = (String) request.getAttribute("errorMessage");
+					if (errorMessage != null) {
+					%>
+					<div class="task-error"><%=errorMessage%></div>
+					<%
+					}
+					%>
 
-        <form action="<%=request.getContextPath()%>/assignTask" method="post">
-            <select class="form-control" name="employeeUsername" required>
-                <option value="">Select Employee</option>
+					<form action="<%=request.getContextPath()%>/assignTask"
+						method="post">
+						<select class="form-control" name="employeeUsername" required>
+							<option value="">Select Employee</option>
 
-                <%
-                String assignEmployee = (String) request.getAttribute("assignEmployee");
+							<%
+							String assignEmployee = (String) request.getAttribute("assignEmployee");
 
-                if (team != null && !team.isEmpty()) {
-                    for (User u : team) {
-                %>
-                <option value="<%=u.getUsername()%>"
-                    <%=u.getUsername().equals(assignEmployee) ? "selected" : ""%>>
-                    <%=u.getFullname()%> (<%=u.getUsername()%>)
-                </option>
-                <%
-                    }
-                } else {
-                %>
-                    <option disabled>No employees available</option>
-                <%
-                }
-                %>
-            </select>
+							if (team != null && !team.isEmpty()) {
+								for (User u : team) {
+							%>
+							<option value="<%=u.getUsername()%>"
+								<%=u.getUsername().equals(assignEmployee) ? "selected" : ""%>>
+								<%=u.getFullname()%> (<%=u.getUsername()%>)
+							</option>
+							<%
+							}
+							} else {
+							%>
+							<option disabled>No employees available</option>
+							<%
+							}
+							%>
+						</select>
 
-            <textarea class="form-control" name="taskDesc" rows="4"
-                placeholder="Task Description" required></textarea>
+						<textarea class="form-control" name="taskDesc" rows="4"
+							placeholder="Task Description" required></textarea>
 
-            <button class="primary-btn">Assign Task</button>
-        </form>
-    </fieldset>
+						<button class="primary-btn">Assign Task</button>
+					</form>
+				</fieldset>
 
-    <!-- ===== View Tasks Fieldset ===== -->
-    <fieldset class="task-fieldset">
-        <legend>View Assigned Tasks</legend>
+				<!-- ===== View Tasks Fieldset ===== -->
+				<fieldset class="task-fieldset">
+					<legend>View Assigned Tasks</legend>
 
-        <form action="<%=request.getContextPath()%>/viewAssignedTasks" method="post">
-            <select class="form-control" name="employeeUsername" required>
-                <option value="">Select Employee</option>
+					<form action="<%=request.getContextPath()%>/viewAssignedTasks"
+						method="post">
+						<select class="form-control" name="employeeUsername" required>
+							<option value="">Select Employee</option>
 
-                <%
-                String viewEmployee = (String) request.getAttribute("viewEmployee");
+							<%
+							String viewEmployee = (String) request.getAttribute("viewEmployee");
 
-                if (team != null && !team.isEmpty()) {
-                    for (User u : team) {
-                %>
-                <option value="<%=u.getUsername()%>"
-                    <%=u.getUsername().equals(viewEmployee) ? "selected" : ""%>>
-                    <%=u.getFullname()%> (<%=u.getUsername()%>)
-                </option>
-                <%
-                    }
-                } else {
-                %>
-                    <option disabled>No employees available</option>
-                <%
-                }
-                %>
-            </select>
+							if (team != null && !team.isEmpty()) {
+								for (User u : team) {
+							%>
+							<option value="<%=u.getUsername()%>"
+								<%=u.getUsername().equals(viewEmployee) ? "selected" : ""%>>
+								<%=u.getFullname()%> (<%=u.getUsername()%>)
+							</option>
+							<%
+							}
+							} else {
+							%>
+							<option disabled>No employees available</option>
+							<%
+							}
+							%>
+						</select>
 
-            <button class="secondary-btn">View Tasks</button>
-        </form>
+						<button class="secondary-btn">View Tasks</button>
+					</form>
 
-        <%
-        viewTasks = (List<Task>) request.getAttribute("viewTasks");
-        if (viewTasks != null) {
-        %>
+					<%
+					viewTasks = (List<Task>) request.getAttribute("viewTasks");
+					if (viewTasks != null) {
+					%>
 
-        <h4 class="tasks-title">Tasks for <%= viewEmployee %></h4>
+					<h4 class="tasks-title">
+						Tasks for
+						<%=viewEmployee%></h4>
 
-        <div class="task-list">
-            <%
-            if (viewTasks.isEmpty()) {
-            %>
-                <p class="no-data">No tasks found.</p>
-            <%
-            } else {
-                for (Task t : viewTasks) {
-            %>
+					<div class="task-list">
+						<%
+						if (viewTasks.isEmpty()) {
+						%>
+						<p class="no-data">No tasks found.</p>
+						<%
+						} else {
+						for (Task t : viewTasks) {
+						%>
 
-            <div class="task-card <%= t.getStatus().equals("COMPLETED") ? "completed" : "" %>">
-                <div class="task-desc"><%= t.getDescription() %></div>
-                <span class="task-status
-                    <%= t.getStatus().equals("COMPLETED") ? "completed" : "assigned" %>">
-                    <%= t.getStatus() %>
-                </span>
-            </div>
+						<div
+							class="task-card <%=t.getStatus().equals("COMPLETED") ? "completed" : ""%>">
+							<div class="task-desc"><%=t.getDescription()%></div>
+							<span
+								class="task-status
+                    <%=t.getStatus().equals("COMPLETED") ? "completed" : "assigned"%>">
+								<%=t.getStatus()%>
+							</span>
+						</div>
 
-            <%
-                }
-            }
-            %>
-        </div>
+						<%
+						}
+						}
+						%>
+					</div>
 
-        <%
-        }
-        %>
+					<%
+					}
+					%>
 
-    </fieldset>
-</div>
+				</fieldset>
+			</div>
 
 			<!-- ===== Self Profile ===== -->
 			<div class="box centered-box" id="selfProfile" style="display: none;">

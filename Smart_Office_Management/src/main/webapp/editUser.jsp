@@ -16,7 +16,7 @@
 }
  
 body {
-    background:#c3cfe2;
+    background: #c3cfe2;
     font-family: Arial, sans-serif;
     display:flex;
     justify-content:center;
@@ -24,7 +24,7 @@ body {
 }
  
 .card {
-    width: 500px;
+    width: 100%;
 }
  
 .form-fieldset {
@@ -32,7 +32,7 @@ body {
     border-radius: 12px;
     padding: 25px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    background: #e2ebf0;
+    background: #c3cfe2;
 }
  
 .form-fieldset legend {
@@ -63,7 +63,7 @@ body {
 .form-group select {
     padding: 9px;
     border-radius: 6px;
-    background:#fff;
+    background: #e2ebf0;
     border: 1px solid #ccc;
     font-size: 14px;
 }

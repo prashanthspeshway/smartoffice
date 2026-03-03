@@ -172,7 +172,7 @@ body {
 .modal-content {
 	width: 50%;
 	max-width: 700px;
-	height: 420px;
+	height: 500px;
 	background: #ffffff;
 	border-radius: 14px;
 	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
@@ -401,7 +401,7 @@ to {
 /* ================= TOAST ================= */
 .toast {
     position: fixed;
-    top: 80px;
+    top: 90px;
     right: 15px;
     background: #e2ebf0;
     color: black;
@@ -413,7 +413,9 @@ to {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
     z-index: 3000;
     line-height: 1.4;
+}
 
+.toast.show {
     animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -421,18 +423,31 @@ to {
     animation: toastOut 0.4s ease forwards;
 }
 
-/* Small icon */
 .toast::before {
-	content: "✔";
-	position: absolute;
-	left: 16px;
-	top: 50%;
-	transform: translateY(-50%);
-	font-size: 16px;
-	font-weight: bold;
+    content: "✔";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
 }
 
-/* Toast enters from right */
+/* SUCCESS */
+.toast.success::before {
+    content: "✔";
+}
+
+/* ERROR */
+.toast.error::before {
+    content: "✖";
+}
+
+/* INFO */
+.toast.info::before {
+    content: "✔";
+}
+
 @keyframes toastIn {
     from {
         opacity: 0;
@@ -444,7 +459,6 @@ to {
     }
 }
 
-/* Toast exits upward */
 @keyframes toastOut {
     from {
         opacity: 1;
@@ -651,23 +665,26 @@ document.addEventListener("DOMContentLoaded", function () {
 function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
 
-    // Reset
-    toast.className = "toast " + type;
+    toast.style.display = "none";
+    toast.className = "toast";
+    toast.offsetHeight; // force reflow
+
+    toast.classList.add(type);
     toast.textContent = message;
     toast.style.display = "block";
 
-    // Auto hide
+    toast.classList.add("show");
+
     setTimeout(() => {
+        toast.classList.remove("show");
         toast.classList.add("hide");
 
-        // Fully remove after animation
         setTimeout(() => {
             toast.style.display = "none";
-            toast.classList.remove("hide");
+            toast.className = "toast";
         }, 400);
     }, 2500);
 }
-
 
 </script>
 

@@ -59,7 +59,7 @@ body {
 	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 	padding: 15px 30px;
 	display: flex;
-	HEIGHT: 50px;
+	height: 50px;
 	justify-content: space-between;
 	align-items: center;
 }
@@ -194,7 +194,7 @@ body {
 	padding: 25px 20px 30px;
 	border: none;
 	background: #c3cfe2;
-	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
 /* Legend (Title) */
@@ -325,7 +325,7 @@ body {
 }
 
 .leave-form input, .leave-form select, .leave-form textarea {
-	padding: 8px 8px;
+	padding: 6px 6px;
 	border-radius: 8px;
 	background: #e2ebf0;
 	border: 1px solid #cbd5e1;
@@ -361,7 +361,7 @@ body {
 	border: none;
 	border-radius: 16px;
 	padding: 28px 22px;
-	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }
 /* Legend Styling */
 #meetingSection legend {
@@ -538,49 +538,93 @@ body {
 	z-index: 10;
 }
 
-/* ===== Toast Notification ===== */
+/* ================= TOAST ================= */
 .toast {
-	position: fixed;
-	top: 80px;
-	right: 500px;
-	background: #16a34a;
-	color: white;
-	padding: 14px 20px;
-	border-radius: 10px;
-	font-weight: 600;
-	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-	opacity: 0;
-	z-index: 2000;
+    position: fixed;
+    top: 90px;
+    right: 15px;
+    background: #e2ebf0;
+    color: black;
+    padding: 14px 20px 14px 44px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    z-index: 3000;
+    line-height: 1.4;
 }
 
 .toast.show {
-	opacity: 1;
-	animation: slideIn 0.4s ease, fadeOut 0.4s ease 3.6s forwards;
+    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.toast.hide {
+    animation: toastOut 0.4s ease forwards;
+}
+
+.toast::before {
+    content: "✔";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* SUCCESS */
+.toast.success {
+    background: #e2ebf0;
+    color: black;
+}
+
+.toast.success::before {
+    content: "✔";
+}
+
+/* ERROR */
 .toast.error {
-	background: #dc2626;
-}
-/* Slide from right */
-@
-keyframes slideIn {from { opacity:0;
-	transform: translateX(60px);
+    background: #e2ebf0;
+    color: black;
 }
 
-to {
-	opacity: 1;
-	transform: translateX(0);
+.toast.error::before {
+    content: "✖";
 }
 
+/* INFO */
+.toast.info {
+    background: #e2ebf0;
+    color: black;
 }
 
-/* Fade out */
-@
-keyframes fadeOut {to { opacity:0;
-	transform: translateX(60px);
+.toast.info::before {
+    content: "✔";
 }
 
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(120px);
+    }
+}
+
 .task-status.out {
 	background: #fecaca;
 	color: #7f1d1d;
@@ -734,65 +778,100 @@ keyframes fadeOut {to { opacity:0;
 }
 /* ================= CHANGE PASSWORD MODAL ================= */
 /* ================= MODAL (ADMIN STYLE) ================= */
+/* ================= MODAL ================= */
 .password-modal {
-	position: fixed;
-	inset: 0;
-	/*     background: rgba(0,0,0,0.45); */
-	backdrop-filter: blur(6px);
-	display: none;
-	align-items: center;
-	justify-content: center;
-	z-index: 2000;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 2000;
+
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.25s ease;
 }
 
+/* Centered Box */
 .password-box {
-	margin-left: 33%;
-	margin-top: 10%;
-	width: 620px;
-	height: 420px;
-	background: white;
-	border-radius: 14px;
-	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-	overflow: hidden;
+    width: 400px;          /* fixed clean width */
+    max-width: 90%;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: fadeIn 0.25s ease;
 }
 
+/* Header */
 .password-header {
-	padding: 10px 15px;
-	background: linear-gradient(135deg, #6366f1, #818cf8);
-	color: white;
-	display: flex;
-	justify-content: space-between;
-	text-align: center;
-	align-items: center;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
+.password-header h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* Body */
 .password-body {
-	margin-left: 18%;
-	border-radius: 10px;
-	margin-top: 6%;
-	width: 50%;
-	background: white;
-	box-shadow: 0 10px 10px rgba(0, 0, 0, 0.5);
-	padding: 25px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
+/* Profile Cards */
+.password-body .time-card {
+    background: #f3f4f6;
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* Inputs */
 .password-body input {
-	/* 	margin:10px; */
-	width: 90%;
-	padding: 20px;
-	margin-bottom: 14px;
-	border-radius: 8px;
-	border: 1px solid #cbd5e1;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    box-sizing: border-box;
 }
 
+/* Button */
 .password-body button {
-	width: 94%;
-	padding: 12px;
-	border-radius: 8px;
-	border: none;
-	background: #6366f1;
-	color: white;
-	cursor: pointer;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.password-body button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 /* ================= DARK THEME ================= */
@@ -1278,17 +1357,28 @@ function openCalendar() {
     }
 
     // ===== Toast =====
-    function showToast(message, isError) {
-    if (!message) return; // 🔒 SAFETY
-
+    function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
-    toast.innerText = message;
-    toast.className = "toast show" + (isError ? " error" : "");
+
+    toast.style.display = "none";
+    toast.className = "toast";
+    toast.offsetHeight; // force reflow
+
+    toast.classList.add(type);
+    toast.textContent = message;
+    toast.style.display = "block";
+
+    toast.classList.add("show");
 
     setTimeout(() => {
-        toast.className = "toast";
-        toast.innerText = "";
-    }, 4000);
+        toast.classList.remove("show");
+        toast.classList.add("hide");
+
+        setTimeout(() => {
+            toast.style.display = "none";
+            toast.className = "toast";
+        }, 400);
+    }, 2500);
 }
 
     // ===== URL PARAM HANDLING (IMPORTANT PART) =====
@@ -1301,19 +1391,19 @@ function openCalendar() {
     const success = params.get("success");
 
     if (success === "LeaveApplied") {
-        showToast("Leave applied successfully", false);
+        showToast("Leave applied successfully", success);
     } 
     else if (success === "PasswordUpdated") {
-        showToast("Password updated successfully", false);
+        showToast("Password updated successfully", success);
     }
     else if (success === "Login") {
-        showToast("Logged in successfully", false);
+        showToast("Logged in successfully", success);
     }
     else if (success === "PunchIn") {
-        showToast("Punched in successfully 🕘", false);
+        showToast("Punched in successfully 🕘", success);
     }
     else if (success === "PunchOut") {
-        showToast("Punched out successfully 🕔", false);
+        showToast("Punched out successfully 🕔", success);
     }
 }
 
@@ -1322,13 +1412,13 @@ function openCalendar() {
         const error = params.get("error");
 
         if (error === "WrongOldPassword") {
-            showToast("Old password is incorrect", true);
+            showToast("Old password is incorrect", error);
         } else if (error === "PasswordMismatch") {
-            showToast("Passwords do not match", true);
+            showToast("Passwords do not match", error);
         } else if (error === "HolidayAttendance") {
-            showToast("Today is a holiday. Attendance not allowed.", true);
+            showToast("Today is a holiday. Attendance not allowed.", error);
         } else {
-            showToast("Something went wrong", true);
+            showToast("Something went wrong", error);
         }
     }
 
@@ -1375,16 +1465,16 @@ function closeSettings() {
 }
  
 function openChangePassword() {
-
-    document.getElementById("passwordModal").style.display = "block";
-
-
+    closeSettings();
+    const modal = document.getElementById("passwordModal");
+    modal.style.visibility = "visible";
+    modal.style.opacity = "1";
 }
- 
+
 function closeChangePassword() {
-
-    document.getElementById("passwordModal").style.display = "none";
-
+    const modal = document.getElementById("passwordModal");
+    modal.style.visibility = "hidden";
+    modal.style.opacity = "0";
 }
  
 function toggleTheme() {
@@ -1402,12 +1492,16 @@ function closeAll() {
 
 }
 function openProfile() {
-    closeSettings(); // close sliding panel
-    document.getElementById("profileModal").style.display = "block";
+    closeSettings();
+    const modal = document.getElementById("profileModal");
+    modal.style.visibility = "visible";
+    modal.style.opacity = "1";
 }
 
 function closeProfile() {
-    document.getElementById("profileModal").style.display = "none";
+    const modal = document.getElementById("profileModal");
+    modal.style.visibility = "hidden";
+    modal.style.opacity = "0";
 }
 
 function markAsRead(notificationId) {
@@ -1443,52 +1537,53 @@ function markAsRead(notificationId) {
 </script>
 
 			<script>
-function submitPassword() {
-    const newPassword = document.getElementById("newPassword").value.trim();
-    const confirmPassword = document.getElementById("confirmPassword").value.trim();
+			function submitPassword() {
+			    const newPassword = document.getElementById("newPassword").value.trim();
+			    const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
-    if (!newPassword || !confirmPassword) {
-        showToast("Please fill all fields", true);
-        return;
-    }
+			    if (!newPassword || !confirmPassword) {
+			        showToast("Please fill all fields", "error");
+			        return;
+			    }
 
-    fetch("<%=request.getContextPath()%>/changePassword", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams({
-            newPassword: newPassword,
-            confirmPassword: confirmPassword
-        })
-    })
-    .then(res => res.text())
-    .then(data => {
-        if (data === "Success") {
-            showToast("Password updated successfully", false);
-            closeChangePassword();
+			    fetch("<%=request.getContextPath()%>/changePassword", {
+			        method: "POST",
+			        headers: {
+			            "Content-Type": "application/x-www-form-urlencoded"
+			        },
+			        body: new URLSearchParams({
+			            newPassword: newPassword,
+			            confirmPassword: confirmPassword
+			        })
+			    })
+			    .then(res => res.text())
+			    .then(data => {
 
-            document.getElementById("newPassword").value = "";
-            document.getElementById("confirmPassword").value = "";
-        }
-        else if (data === "PasswordMismatch") {
-            showToast("Passwords do not match", true);
-        }
-        else if (data === "MissingFields") {
-            showToast("All fields are required", true);
-        }
-        else if (data === "Unauthorized") {
-            showToast("Session expired. Please login again.", true);
-        }
-        else {
-            showToast("Something went wrong", true);
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        showToast("Server error", true);
-    });
-}
+			        if (data === "Success") {
+			            showToast("Password updated successfully", "success");
+			            closeChangePassword();
+
+			            document.getElementById("newPassword").value = "";
+			            document.getElementById("confirmPassword").value = "";
+			        }
+			        else if (data === "PasswordMismatch") {
+			            showToast("Passwords do not match", "error");
+			        }
+			        else if (data === "MissingFields") {
+			            showToast("All fields are required", "error");
+			        }
+			        else if (data === "Unauthorized") {
+			            showToast("Session expired. Please login again.", "error");
+			        }
+			        else {
+			            showToast("Something went wrong", "error");
+			        }
+			    })
+			    .catch(err => {
+			        console.error(err);
+			        showToast("Server error", "error");
+			    });
+			}
 </script>
 
 			<script>
@@ -1501,6 +1596,13 @@ function setActive(button) {
     button.classList.add('active');
 }
 
+window.onclick = function(e) {
+    const modal = document.getElementById("passwordModal");
+    const profile = document.getElementById("profileModal");
+
+    if (e.target === modal) closeChangePassword();
+    if (e.target === profile) closeProfile();
+};
 
 </script>
 </body>

@@ -180,6 +180,9 @@ body::after {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
     z-index: 3000;
     line-height: 1.4;
+}
+
+.toast.show {
     animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -202,8 +205,17 @@ body::after {
 
 /* SUCCESS */
 .toast.success {
-    background: linear-gradient(135deg, #38a169, #48bb78);
-    color: #fff;
+    background: #e2ebf0;
+    color: black;
+}
+/* INFO */
+.toast.info {
+    background: #e2ebf0;
+    color: black;
+}
+
+.toast.info::before {
+    content: "✔";
 }
 .toast.success::before {
     content: "✔";
@@ -211,8 +223,8 @@ body::after {
 
 /* ERROR */
 .toast.error {
-    background: linear-gradient(135deg, #e53e3e, #f56565);
-    color: #fff;
+    background: #e2ebf0;
+    color: black;
 }
 .toast.error::before {
     content: "✖";
@@ -233,11 +245,11 @@ body::after {
 @keyframes toastOut {
     from {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(0);
     }
     to {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateX(120px);
     }
 }
 
@@ -356,22 +368,24 @@ eyeIcon.addEventListener("touchend", () => password.type = "password");
 function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
 
-    // FULL reset
     toast.style.display = "none";
-    toast.className = "toast"; 
-    toast.offsetHeight; // force reflow (important!)
+    toast.className = "toast";
+    toast.offsetHeight; // force reflow
 
-    // Apply new state
     toast.classList.add(type);
     toast.textContent = message;
     toast.style.display = "block";
 
+    // ADD SHOW CLASS
+    toast.classList.add("show");
+
     setTimeout(() => {
+        toast.classList.remove("show");
         toast.classList.add("hide");
 
         setTimeout(() => {
             toast.style.display = "none";
-            toast.className = "toast"; // reset completely
+            toast.className = "toast";
         }, 400);
     }, 2500);
 }
@@ -402,7 +416,7 @@ else if (error === "weakPassword") {
 const logout = params.get("logout");
 
 if (logout === "success") {
-    showToast("Logged-out successfully", "success");
+    showToast("Logged out successfully", "info");
 
     // Optional: clean URL after showing toast
     window.history.replaceState({}, document.title, window.location.pathname);
