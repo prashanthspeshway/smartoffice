@@ -1317,52 +1317,79 @@ to {
 		grid-template-columns: 1fr;
 	}
 }
-/* ===== Toast Notification ===== */
-.toast-success {
+
+/* ================= TOAST ================= */
+.toast {
 	position: fixed;
 	top: 80px;
-	right: 20px;
-	background: linear-gradient(135deg, #16a34a, #22c55e);
-	color: white;
-	padding: 14px 22px;
-	border-radius: 12px;
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	font-size: 14px;
+	right: 30px;
+	background: #e2ebf0;
+	color: black;
+	padding: 14px 20px 14px 44px;
+	border-radius: 10px;
+	font-size: 15px;
 	font-weight: 500;
-	box-shadow: 0 10px 25px rgba(34, 197, 94, 0.35);
-	animation: slideIn 0.4s ease, fadeOut 0.4s ease 3.6s forwards;
+	display: none;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
 	z-index: 9999;
+	line-height: 1.4;
+	animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.toast-success i {
-	font-size: 18px;
+.toast.hide {
+	animation: toastOut 0.4s ease forwards;
 }
 
-/* Slide from right */
-@keyframes toastIn {
-    from {
-        opacity: 0;
-        transform: translateX(120px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+.toast::before {
+	content: "✔";
+	position: absolute;
+	left: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 16px;
+	font-weight: bold;
 }
 
-@keyframes toastOut {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(120px);
-    }
+/* SUCCESS */
+.toast.success {
+	background: #e2ebf0;
+	color: black;
 }
 
+.toast.success::before {
+	content: "✔";
+}
+
+/* ERROR */
+.toast.error {
+	background: #e2ebf0;
+	color: black;
+}
+
+.toast.error::before {
+	content: "✖";
+}
+
+@keyframes toastIn {from { opacity:0;
+	transform: translateX(120px);
+}
+
+to {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+}
+@keyframes toastOut {from { opacity:1;
+	transform: translateX(0);
+}
+
+to {
+	opacity: 0;
+	transform: translateX(120px);
+}
+
+}
 /* ===== Schedule Meeting Grid ===== */
 .meeting-grid {
 	display: grid;
@@ -1650,18 +1677,6 @@ body.dark-theme .settings-item i {
 			</div>
 		</div>
 	</div>
-
-	<%
-	String error = request.getParameter("error");
-	if ("HolidayAttendance".equals(error)) {
-	%>
-	<div id="toast" class="toast-success">
-		<i class="fa-solid fa-circle-check"></i> <span>Today is a
-			holiday. Attendance is disabled.</span>
-	</div>
-	<%
-	}
-	%>
 
 	<!-- TOP BAR -->
 	<div class="top-bar">
@@ -2348,350 +2363,256 @@ body.dark-theme .settings-item i {
 	</div>
 
 	<script>
-    // Apply saved theme before page renders
-    if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark-theme");
-    }
-</script>
+/* ================= INITIAL THEME ================= */
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark-theme");
+}
 
-	<script>
-    setTimeout(() => {
-        const toast = document.getElementById("toast");
-        if (toast) toast.remove();
-    }, 4200);
-</script>
+/* ================= MAIN ================= */
+document.addEventListener("DOMContentLoaded", function () {
 
-	<script>
-    document.addEventListener("DOMContentLoaded", function () {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    const success = params.get("success");
+    const error = params.get("error");
 
-        const params = new URLSearchParams(window.location.search);
-        const tab = params.get("tab");
-        const success = params.get("success");
+    /* -------- Restore Tab -------- */
+    showSection(tab || "selfAttendance");
 
-        // ---- Restore correct tab ----
-        if (tab) {
-            showSection(tab);
-        } else {
-            showSection("selfAttendance"); // default
-        }
+    /* -------- SUCCESS MESSAGES -------- */
+    if (success === "Login")
+        showToast("Welcome! Logged in successfully");
 
-        // ---- Success toast (optional, safe) ----
-        if (success === "MeetingScheduled") {
-            const toast = document.createElement("div");
-            toast.className = "toast-success";
-            toast.innerHTML = `
-                <i class="fa-solid fa-circle-check"></i>
-                <span>Meeting scheduled successfully</span>
-            `;
-            document.body.appendChild(toast);
+    else if (success === "MeetingScheduled")
+        showToast("Meeting scheduled successfully");
 
-            setTimeout(() => toast.remove(), 4000);
-        }
+    else if (success === "PunchIn")
+        showToast("Punched in successfully");
 
-        // ---- Manager login toast ----
-        if (success === "Login") {
-            const toast = document.createElement("div");
-            toast.className = "toast-success";
-            toast.innerHTML = `
-                <i class="fa-solid fa-circle-check"></i>
-                <span>Welcome Logged in successfully</span>
-            `;
-            document.body.appendChild(toast);
+    else if (success === "PunchOut")
+        showToast("Punched out successfully");
 
-            setTimeout(() => toast.remove(), 4000);
-        }
+    else if (success === "PerformanceSaved")
+        showToast("Performance submitted successfully");
 
-        // ---- Attendance toasts ----
-        if (success === "PunchIn") {
-            const toast = document.createElement("div");
-            toast.className = "toast-success";
-            toast.innerHTML = `
-                <i class="fa-solid fa-circle-check"></i>
-                <span>Punched in successfully</span>
-            `;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
+    else if (success === "TaskAssigned")
+        showToast("Task assigned successfully");
 
-        if (success === "PunchOut") {
-            const toast = document.createElement("div");
-            toast.className = "toast-success";
-            toast.innerHTML = `
-                <i class="fa-solid fa-circle-check"></i>
-                <span>Punched out successfully</span>
-            `;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
 
-        // ---- Clean URL (prevents reload issues) ----
-        if (tab || success) {
-            setTimeout(() => {
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }, 100);
-        }
+    /* -------- ERROR MESSAGES -------- */
+    if (error === "SelectEmployee")
+        showToast("Please select an employee", "error");
 
-        if (params.get("success") === "PerformanceSaved") {
-            const toast = document.createElement("div");
-            toast.className = "toast-success";
-            toast.innerHTML = `
-                <i class="fa-solid fa-circle-check"></i>
-                <span>Performance submitted successfully</span>
-            `;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
+    else if (error === "InvalidEmployee")
+        showToast("You cannot assign task to this employee", "error");
 
-        // ---- Assign Task messages ----
-        if (params.get("success") === "TaskAssigned") {
-            const toast = document.createElement("div");
-            toast.className = "toast-success";
-            toast.innerHTML = `
-                <i class="fa-solid fa-circle-check"></i>
-                <span>Task assigned successfully</span>
-            `;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
+    else if (error === "EmptyTask")
+        showToast("Task description cannot be empty", "error");
 
-        if (params.get("error") === "SelectEmployee") {
-            alert("Please select an employee");
-        }
-        if (params.get("error") === "InvalidEmployee") {
-            alert("You cannot assign task to this employee");
-        }
-        if (params.get("error") === "EmptyTask") {
-            alert("Task description cannot be empty");
-        }
-        if (params.get("error") === "AlreadyRated") {
-            const toast = document.createElement("div");
-            toast.className = "toast-success";
-            toast.innerHTML = `
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span>Performance already submitted for this employee this month</span>
-            `;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
+    else if (error === "AlreadyRated")
+        showToast("Performance already submitted for this employee this month", "error");
 
-    });
-</script>
-
-	<script>
-    document.getElementById("meetingForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        const form = e.target;
-        const formData = new FormData(form);
-
-        fetch("schedulemeeting", {
-            method: "POST",
-            body: formData
-        })
-        .then(res => res.text())
-        .then(text => {
-            switch (text.trim()) {
-                case "SUCCESS":
-                    showToast("Meeting scheduled successfully ✅");
-                    form.reset();
-                    break;
-
-                case "INVALID":
-                    showToast("Please fill all required fields ❌");
-                    break;
-
-                case "INVALID_TIME":
-                    showToast("End time must be after start time ⏰");
-                    break;
-
-                default:
-                    showToast("Something went wrong ❌");
-            }
-        })
-        .catch(() => {
-            showToast("Server error ❌");
-        });
-    });
-
-    function showToast(message) {
-        const toast = document.createElement("div");
-        toast.textContent = message;
-
-        Object.assign(toast.style, {
-            position: "fixed",
-            bottom: "20px",
-            right: "20px",
-            background: "linear-gradient(135deg, #6366f1, #818cf8)",
-            color: "#fff",
-            padding: "12px 18px",
-            borderRadius: "6px",
-            fontSize: "14px",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-            zIndex: "9999",
-            opacity: "0",
-            transition: "opacity 0.3s ease"
-        });
-
-        document.body.appendChild(toast);
-
-        requestAnimationFrame(() => toast.style.opacity = "1");
-
+    /* -------- Clean URL -------- */
+    if (tab || success || error) {
         setTimeout(() => {
-            toast.style.opacity = "0";
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }, 100);
     }
-</script>
 
-	<script>
-    function openAllMeetings() {
-        document.getElementById("allMeetingsModal").classList.add("show");
+    /* -------- Meeting Form AJAX -------- */
+    const meetingForm = document.getElementById("meetingForm");
 
-        fetch("<%=request.getContextPath()%>/allMeetings")
+    if (meetingForm) {
+        meetingForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(meetingForm);
+
+            fetch("schedulemeeting", {
+                method: "POST",
+                body: formData
+            })
             .then(res => res.text())
-            .then(html => {
-                document.getElementById("allMeetingsContent").innerHTML = html;
+            .then(text => {
+                switch (text.trim()) {
+                    case "SUCCESS":
+                        showToast("Meeting scheduled successfully");
+                        meetingForm.reset();
+                        break;
+
+                    case "INVALID":
+                        showToast("Please fill all required fields", "error");
+                        break;
+
+                    case "INVALID_TIME":
+                        showToast("End time must be after start time", "error");
+                        break;
+
+                    default:
+                        showToast("Something went wrong", "error");
+                }
             })
             .catch(() => {
-                document.getElementById("allMeetingsContent").innerHTML =
-                    "<p>Error loading meetings</p>";
+                showToast("Server error", "error");
             });
-    }
-
-    function closeAllMeetings() {
-        document.getElementById("allMeetingsModal").classList.remove("show");
-    }
-</script>
-
-	<script>
-    /* Adapted functions from admin */
-    function openSettings(){
-        document.getElementById("settingsPanel").classList.add("open");
-    }
-    function closeSettings(){
-        document.getElementById("settingsPanel").classList.remove("open");
-    }
-    function openProfile(){
-        closeSettings();
-        showSection("selfProfile");
-    }
-    function closeProfile(){
-        document.getElementById("profileModal").classList.remove("show");
-    }
-    function openChangePassword(){
-        document.getElementById("passwordModal").classList.add("show");
-    }
-    function closeChangePassword(){
-        document.getElementById("passwordModal").classList.remove("show");
-    }
-    function closeAll(){
-        closeSettings();
-        closeProfile();
-        closeChangePassword();
-        closeAllMeetings();
-    }
-    function submitPassword() {
-        const newPassword = document.getElementById("newPassword").value.trim();
-        const confirmPassword = document.getElementById("confirmPassword").value.trim();
-
-        if (!newPassword || !confirmPassword) {
-            showToast("Please fill all fields ❌");
-            return;
-        }
-
-        fetch("<%=request.getContextPath()%>/changePassword", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: new URLSearchParams({
-                newPassword: newPassword,
-                confirmPassword: confirmPassword
-            })
-        })
-        .then(res => res.text())
-        .then(response => {
-            switch (response.trim()) {
-                case "Success":
-                    showToast("Password updated successfully ✅");
-                    closeChangePassword();
-
-                    document.getElementById("newPassword").value = "";
-                    document.getElementById("confirmPassword").value = "";
-                    break;
-
-                case "PasswordMismatch":
-                    showToast("Passwords do not match ❌");
-                    break;
-
-                case "MissingFields":
-                    showToast("All fields are required ❌");
-                    break;
-
-                case "Unauthorized":
-                    showToast("Session expired. Please login again ❌");
-                    break;
-
-                default:
-                    showToast("Something went wrong ❌");
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            showToast("Server error ❌");
         });
     }
 
-    function showSection(id) {
-        document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
+});
+
+/* ================= TOAST FUNCTION ================= */
+function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+
+    toast.style.display = "none";
+    toast.className = "toast";
+    toast.offsetHeight;
+
+    toast.classList.add(type);
+    toast.textContent = message;
+    toast.style.display = "block";
+
+    setTimeout(() => {
+        toast.classList.add("hide");
+
+        setTimeout(() => {
+            toast.style.display = "none";
+            toast.className = "toast";
+        }, 400);
+    }, 2500);
+}
+
+/* ================= UI FUNCTIONS ================= */
+
+function showSection(id) {
+    document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
+    if (document.getElementById(id))
         document.getElementById(id).style.display = 'block';
-    }
+}
 
-    function toggleTheme() {
-        document.body.classList.toggle("dark-theme");
+function toggleTheme() {
+    document.body.classList.toggle("dark-theme");
+    localStorage.setItem("theme",
+        document.body.classList.contains("dark-theme") ? "dark" : "light"
+    );
+}
 
-        if (document.body.classList.contains("dark-theme")) {
-            localStorage.setItem("theme", "dark");
-        } else {
-            localStorage.setItem("theme", "light");
-        }
-    }
+function openAllMeetings() {
+    document.getElementById("allMeetingsModal").classList.add("show");
 
-    function openCalendar() {
-        // hide all sections (same logic as showSection)
-        document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
-
-        // show calendar section
-        document.getElementById("calendarSection").style.display = "block";
-
-        // load calendar jsp in iframe
-        document.getElementById("calendarFrame").src = "<%=request.getContextPath()%>/calendar.jsp";
-    }
-
-    function openNotifications() {
-        document.getElementById("notificationPanel").classList.add("show");
-    }
-
-    function closeNotifications() {
-        document.getElementById("notificationPanel").classList.remove("show");
-    }
-
-    function markAsRead(notificationId) {
-
-        fetch("markNotificationRead?id=" + notificationId, {
-            method: "POST"
+    fetch("<%=request.getContextPath()%>/allMeetings")
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById("allMeetingsContent").innerHTML = html;
         })
+        .catch(() => {
+            document.getElementById("allMeetingsContent").innerHTML =
+                "<p>Error loading meetings</p>";
+        });
+}
+
+function closeAllMeetings() {
+    document.getElementById("allMeetingsModal").classList.remove("show");
+}
+
+function openSettings(){ document.getElementById("settingsPanel").classList.add("open"); }
+function closeSettings(){ document.getElementById("settingsPanel").classList.remove("open"); }
+
+function openProfile(){
+    closeSettings();
+    showSection("selfProfile");
+}
+
+function closeProfile(){
+    document.getElementById("profileModal").classList.remove("show");
+}
+
+function openChangePassword(){
+    document.getElementById("passwordModal").classList.add("show");
+}
+
+function closeChangePassword(){
+    document.getElementById("passwordModal").classList.remove("show");
+}
+
+function closeAll(){
+    closeSettings();
+    closeProfile();
+    closeChangePassword();
+    closeAllMeetings();
+}
+
+function submitPassword() {
+    const newPassword = document.getElementById("newPassword").value.trim();
+    const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+    if (!newPassword || !confirmPassword) {
+        showToast("Please fill all fields", "error");
+        return;
+    }
+
+    fetch("<%=request.getContextPath()%>/changePassword", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+            newPassword: newPassword,
+            confirmPassword: confirmPassword
+        })
+    })
+    .then(res => res.text())
+    .then(response => {
+        switch (response.trim()) {
+            case "Success":
+                showToast("Password updated successfully");
+                closeChangePassword();
+                document.getElementById("newPassword").value = "";
+                document.getElementById("confirmPassword").value = "";
+                break;
+
+            case "PasswordMismatch":
+                showToast("Passwords do not match", "error");
+                break;
+
+            case "MissingFields":
+                showToast("All fields are required", "error");
+                break;
+
+            case "Unauthorized":
+                showToast("Session expired. Please login again", "error");
+                break;
+
+            default:
+                showToast("Something went wrong", "error");
+        }
+    })
+    .catch(() => {
+        showToast("Server error", "error");
+    });
+}
+
+function openCalendar() {
+    document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
+    document.getElementById("calendarSection").style.display = "block";
+    document.getElementById("calendarFrame").src =
+        "<%=request.getContextPath()%>/calendar.jsp";
+}
+
+function openNotifications() {
+    document.getElementById("notificationPanel").classList.add("show");
+}
+
+function closeNotifications() {
+    document.getElementById("notificationPanel").classList.remove("show");
+}
+
+function markAsRead(notificationId) {
+    fetch("markNotificationRead?id=" + notificationId, { method: "POST" })
         .then(response => {
             if (response.ok) {
-
-                // Remove notification from UI
                 const el = document.getElementById("notif-" + notificationId);
                 if (el) el.remove();
 
-                // ✅ CHECK IF EMPTY
                 const list = document.getElementById("notificationList");
-
-                // Count remaining notification items
                 const remaining = list.querySelectorAll(".notification-item");
 
                 if (remaining.length === 0) {
@@ -2704,17 +2625,15 @@ body.dark-theme .settings-item i {
             }
         })
         .catch(err => console.error(err));
-    }
+}
 
-    function setActive(button) {
-        // remove active from all buttons
-        document.querySelectorAll('.sidebar-btn')
-            .forEach(btn => btn.classList.remove('active'));
-
-        // add active to clicked button
-        button.classList.add('active');
-    }
+function setActive(button) {
+    document.querySelectorAll('.sidebar-btn')
+        .forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+}
 </script>
-
+<!-- Toast -->
+	<div id="toast" class="toast"></div>
 </body>
 </html>

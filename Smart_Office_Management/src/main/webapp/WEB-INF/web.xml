@@ -5,19 +5,5 @@
 	id="WebApp_ID" version="4.0">
 	<display-name>Smart_Office_Management</display-name>
 
-	<servlet>
-
-		<servlet-name>LoginServlet</servlet-name>
-		<servlet-class>com.smartoffice.controller.LoginServlet</servlet-class>
-
-	</servlet>
-
-	<servlet-mapping>
-
-		<servlet-name>LoginServlet</servlet-name>
-		<url-pattern>/Login</url-pattern>
-
-	</servlet-mapping>
-
 
 </web-app>
