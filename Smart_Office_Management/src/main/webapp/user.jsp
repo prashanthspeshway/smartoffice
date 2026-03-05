@@ -88,7 +88,7 @@ body {
 
 .icon-btn i {
 	font-size: 16px;
-	margin-left: -7px;
+	margin-right: 2px;
 }
 
 .logout-btn {
@@ -319,6 +319,51 @@ body {
 	color: #6b7280;
 }
 
+/* ================= MY TASK ================= */
+
+#taskSection {
+
+    max-height: auto;   /* height of the scroll area */
+
+    overflow-y: auto;    /* vertical scroll */
+
+    overflow-x: hidden;  /* hide horizontal scroll */
+
+    padding: 10px;
+
+}
+ 
+/* Optional: Custom Scrollbar (for Chrome, Edge, Safari) */
+
+#taskSection::-webkit-scrollbar {
+
+    width: 4px;
+
+}
+ 
+#taskSection::-webkit-scrollbar-track {
+
+    background: #e2ebf0;
+
+    border-radius: 10px;
+
+}
+ 
+#taskSection::-webkit-scrollbar-thumb {
+
+    background: #e2ebf0;
+
+    border-radius: 8px;
+
+}
+ 
+#taskSection::-webkit-scrollbar-thumb:hover {
+
+    background: #c3cfe2;
+
+}
+ 
+
 /* ================= LEAVE FORM ================= */
 .leave-form {
 	display: flex;
@@ -342,6 +387,49 @@ body {
 #myLeaveSection h3 {
 	color: black !important;
 }
+
+#myLeaveSection {
+
+    max-height: 300px;   /* height of the scroll area */
+
+    overflow-y: auto;    /* vertical scroll */
+
+    overflow-x: hidden;  /* hide horizontal scroll */
+
+    padding: 10px;
+
+}
+ 
+/* Optional: Custom Scrollbar (for Chrome, Edge, Safari) */
+
+#myLeaveSection::-webkit-scrollbar {
+
+    width: 4px;
+
+}
+ 
+#myLeaveSection::-webkit-scrollbar-track {
+
+    background: #e2ebf0;
+
+    border-radius: 10px;
+
+}
+ 
+#myLeaveSection::-webkit-scrollbar-thumb {
+
+    background: #c3cfe2;
+
+    border-radius: 8px;
+
+}
+ 
+#myLeaveSection::-webkit-scrollbar-thumb:hover {
+
+    background: #c3cfe2;
+
+}
+ 
 
 .apply-leave-btn {
 	margin-top: 10px;
@@ -420,6 +508,8 @@ body {
 	color: #444;
 }
 
+
+
 /* ================= JOIN BUTTON ================= */
 #meetingSection .task-btn {
 	padding: 10px 18px;
@@ -445,11 +535,11 @@ body {
 }
 
 #meetingSection .attendance-fieldset::-webkit-scrollbar {
-	width: 6px;
+	width: 4px;
 }
 
 #meetingSection .attendance-fieldset::-webkit-scrollbar-thumb {
-	background: #94a3b8;
+	background: #e2ebf0;
 	border-radius: 4px;
 }
 /* ===== Settings Popup ===== */
@@ -671,7 +761,7 @@ body {
 
 .notification-list {
 	padding: 15px;
-	max-height: 330px; /* Adjust as needed */
+	max-height: 350px; /* Adjust as needed */
 	overflow-y: auto;
 }
 

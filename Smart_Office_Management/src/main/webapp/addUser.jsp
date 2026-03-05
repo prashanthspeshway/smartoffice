@@ -25,18 +25,18 @@ body {
 	margin: 0;
 /* 	padding: 30px; */
 	font-family: "Segoe UI", Arial, sans-serif;
-/* 	 background:#fffafa; */
-	 height: auto;
+/* 	background:#fffafa; */
+	height: auto;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
 .container {
-height: 100%;	
-		width: 100%;
-	 	background: #c3cfe2;
-		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+	height: 100%;	
+	width: 100%;
+	background: #c3cfe2;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
 h2 {
@@ -213,7 +213,7 @@ body.dark-theme select option {
 
 /* ===== Form Container ===== */
 fieldset {
-    max-width: 900px;
+    width: 96%;
     margin: 30px auto;
     padding: 30px 35px;
     border-radius: 14px;

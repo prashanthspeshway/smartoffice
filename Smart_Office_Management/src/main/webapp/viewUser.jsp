@@ -22,10 +22,10 @@ body {
 /* Page container */
 .page {
 	width: 100%;
-	height: 100vh;
+	height: 105vh;
 	background: #c3cfe2 ;
 /* 	padding: 10px; */
-/* 	border-radius: 10px; */
+ 	border-radius: 10px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 	
 }
@@ -39,9 +39,10 @@ h2 {
 /* Table */
 table {
 	width: 100%;
+	border :none;
 	
 	border-collapse: collapse;
-/* 	border-radius: 8px; */
+ 	border-radius: 8px;
 	overflow: hidden;
 }
 

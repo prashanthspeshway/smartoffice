@@ -137,8 +137,8 @@ body {
 /* ================= CONTENT ================= */
 .content-area {
 	flex: 1;
-	/*     padding:25px; */
-	background: #fffafa;
+	padding:25px;
+	background: #c3cfe2;
 }
 
 #contentFrame {
@@ -146,7 +146,7 @@ body {
 	height: 100%;
 	border: none;
 	/*     border-radius:15px; */
-	background: rgb(255, 255, 255, 0);
+	background: #c3cfe2;
 	/*      backdrop-filter:blur(10px); */
 }
 
@@ -279,8 +279,7 @@ body {
 }
 
 /* ===== Animation ===== */
-@
-keyframes modalFade {from { opacity:0;
+@keyframes modalFade {from { opacity:0;
 	transform: scale(0.95);
 }
 
@@ -290,8 +289,7 @@ to {
 }
 
 }
-@
-keyframes slideIn {from { opacity:0;
+@keyframes slideIn {from { opacity:0;
 	transform: translateX(40px);
 }
 
@@ -568,7 +566,7 @@ to {
 			</button>
 		</div>
 
-		<div class="content-area">
+		<div class="content-area" id="contentArea">
 			<iframe id="contentFrame" src="adminOverview"></iframe>
 		</div>
 	</div>

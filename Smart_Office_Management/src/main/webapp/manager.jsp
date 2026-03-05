@@ -167,7 +167,7 @@ body {
 	flex: 1;
 	padding: 25px;
 	background: #c3cfe2;
-	overflow-y: auto;
+	overflow-y: hidden;
 }
 
 #contentFrame {
@@ -600,6 +600,8 @@ to {
 
 .attendance-row .value {
 	color: #2d3748;
+	font-style: bold;
+	font-weight: 900;
 }
 
 /* field set for my team */
@@ -963,6 +965,33 @@ to {
 
 .task-card.completed {
 	opacity: 0.75;
+}
+#assignTask {
+    height: 550px;                 /* scroll area height */
+    overflow-y: auto;              /* enable vertical scroll */
+    overflow-x: hidden;
+    padding: 15px;
+    background: c3cfe2;
+    border-radius: 12px;
+}
+ 
+/* Scrollbar styling */
+#assignTask::-webkit-scrollbar {
+    width: 8px;
+}
+ 
+#assignTask::-webkit-scrollbar-track {
+    background: #e2ebf0;
+    border-radius: 10px;
+}
+ 
+#assignTask::-webkit-scrollbar-thumb {
+    background: #c3cfe2;
+    border-radius: 10px;
+}
+ 
+#assignTask::-webkit-scrollbar-thumb:hover {
+    background: #aebed6;
 }
 
 /* Leave request  */
@@ -1397,13 +1426,59 @@ to {
 	gap: 8px;
 }
 
+#schedulemeeting {
+
+    max-height: 500px;          /* scroll area height */
+
+    overflow-y: auto;           /* vertical scroll */
+
+	padding: 6px;          /* space for scrollbar */
+
+    overflow-x: hidden;
+
+    border-radius: 10px;
+
+}
+ 
+/* Scrollbar style */
+
+#schedulemeeting::-webkit-scrollbar {
+
+    width: 8px;
+
+}
+ 
+#schedulemeeting::-webkit-scrollbar-track {
+
+    background: #e2ebf0;
+
+    border-radius: 10px;
+
+}
+ 
+#schedulemeeting::-webkit-scrollbar-thumb {
+
+    background: #c3cfe2;
+
+    border-radius: 10px;
+
+}
+ 
+#schedulemeeting::-webkit-scrollbar-thumb:hover {
+
+    background: #b2c2d8;
+
+}
+ 
+
 /* Left: form */
 .meeting-left {
 	background: #c3cfe2;
 	height: 100%;
-	padding: 10px;
+	padding: 18px;
 	border-radius: 14px;
 	overflow-y: hidden;
+	margin-top: -18px;
 }
 
 /* Right: meetings list */
@@ -1472,59 +1547,63 @@ to {
 /* Notification Panel (adapted to drawer style) */
 .notification-panel {
 	position: fixed;
-	top: 0;
-	right: -340px;
-	width: 340px;
-	height: 100vh;
-	background: linear-gradient(135deg, rgba(255, 255, 255, 0.85),
-		rgba(240, 245, 255, 0.75));
-	backdrop-filter: blur(16px);
-	box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
-	transition: right 0.4s ease;
+	bottom: 30px;
+	right: -380px;
+	width: 350px;
+	height: 450px;
+	background: #c3cfe2;
+	box-shadow: -3px 0 10px rgba(0, 0, 0, 0.15);
+	border-radius: 14px;
+	transition: right 0.3s ease-in-out;
 	z-index: 1000;
-	border-left: 1px solid rgba(255, 255, 255, 0.4);
-	border-radius: 0;
+	font-family: Arial, sans-serif;
 }
 
 .notification-panel.show {
-	right: 0;
+	right: 25px;
 }
 
 .notification-header {
-	padding: 20px;
-	background: linear-gradient(135deg, #6366f1, #818cf8);
-	color: white;
+	background: #e2ebf0;
+	color: black;
+	padding: 15px;
 	border-radius: 14px 14px 0 0;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	height: 70px;
 }
 
 .notification-header button {
 	background: none;
 	border: none;
-	color: white;
+	color: black;
 	font-size: 18px;
 	cursor: pointer;
 }
 
 .notification-list {
 	padding: 15px;
-	max-height: calc(100vh - 100px);
+	max-height: 380px; /* Adjust as needed */
 	overflow-y: auto;
 }
 
 .notification-item {
-	background: rgba(99, 102, 241, 0.12);
+	background: #f3f4f6;
 	padding: 12px;
 	margin-bottom: 10px;
 	border-left: 4px solid #2563eb;
 	border-radius: 4px;
 	font-size: 14px;
-	color: #2d3748;
 }
 
+.notification-list::-webkit-scrollbar {
+	width: 6px;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+	background: rgba(0, 0, 0, 0.25);
+	border-radius: 4px;
+}
 /* ================= FULL DARK MODE ================= */
 body.dark-theme {
 	background: #0f172a !important;

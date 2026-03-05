@@ -17,7 +17,7 @@ body {
 }
 
 .calendar-box {
-    width: 100%;
+    width: 97%;
     height: 100%;
     margin: 0;                 /* ✅ no outer spacing */
     padding: 6px;             /* 🔹 optional: reduce padding */
@@ -249,6 +249,54 @@ th {
     color: black;
 }
 
+
+#calendarBox {
+
+    height: 500px;                 /* scroll area height */
+
+    overflow-y: auto;              /* vertical scroll */
+
+    overflow-x: hidden;
+
+    padding: 15px;
+
+    background: linear-gradient(135deg, #e2ebf0, #c3cfe2);
+
+    border-radius: 12px;
+
+}
+ 
+/* Scrollbar style */
+
+#calendarBox::-webkit-scrollbar {
+
+    width: 8px;
+
+}
+ 
+#calendarBox::-webkit-scrollbar-track {
+
+    background: #e2ebf0;
+
+    border-radius: 10px;
+
+}
+ 
+#calendarBox::-webkit-scrollbar-thumb {
+
+    background: #c3cfe2;
+
+    border-radius: 10px;
+
+}
+ 
+#calendarBox::-webkit-scrollbar-thumb:hover {
+
+    background: #aebed6;
+
+}
+ 
+
 /* Animations */
 @keyframes toastIn {
     from {
@@ -279,7 +327,7 @@ body.dark-mode #toast {
 
 <body>
 
-	<div class="calendar-box">
+	<div class="calendar-box" id="calendarBox">
 
 		<div class="header">
 			<button onclick="changeMonth(-1)">◀</button>
