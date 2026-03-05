@@ -379,8 +379,7 @@ body {
 }
 
 /* ===== Animation ===== */
-@
-keyframes modalFade {from { opacity:0;
+@keyframes modalFade {from { opacity:0;
 	transform: scale(0.96);
 }
 
@@ -451,8 +450,7 @@ to {
 }
 
 /* ===== Animation ===== */
-@
-keyframes modalFade {from { opacity:0;
+@keyframes modalFade {from { opacity:0;
 	transform: scale(0.95);
 }
 
@@ -1405,8 +1403,7 @@ to {
 	content: "✖";
 }
 
-@
-keyframes toastIn {from { opacity:0;
+@keyframes toastIn {from { opacity:0;
 	transform: translateX(120px);
 }
 
@@ -1416,8 +1413,7 @@ to {
 }
 
 }
-@
-keyframes toastOut {from { opacity:1;
+@keyframes toastOut {from { opacity:1;
 	transform: translateX(0);
 }
 
@@ -2805,6 +2801,12 @@ function setActive(button) {
         .forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
 }
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.onkeydown = e =>
+  e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))
+    ? false
+    : true;
 </script>
 	<!-- Toast -->
 	<div id="toast" class="toast"></div>

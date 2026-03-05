@@ -466,6 +466,12 @@ window.onload = function () {
     <%}%>
 };
 
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.onkeydown = e =>
+  e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))
+    ? false
+    : true;
+
 </script>
 
 

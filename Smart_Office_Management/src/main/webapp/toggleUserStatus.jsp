@@ -288,6 +288,13 @@ if (params.get("error")) {
 if (params.get("msg") || params.get("error")) {
     window.history.replaceState({}, document.title, window.location.pathname);
 }
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.onkeydown = e =>
+  e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))
+    ? false
+    : true;
+
 </script>
 
 </body>
