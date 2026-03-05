@@ -63,7 +63,6 @@ public class ManagerDashboardServlet extends HttpServlet {
 			List<Meeting> todayMeetings = MeetingDao.getTodayMeetings(username);
 			request.setAttribute("todayMeetings", todayMeetings);
 
-			// ================= TEAM LIST =================
 			List<User> teamList = UserDao.getUsersByManager(username);
 			request.setAttribute("teamList", teamList);
 
@@ -91,12 +90,8 @@ public class ManagerDashboardServlet extends HttpServlet {
 				}
 			}
 			// ================= SELF PROFILE =================
-			if ("selfProfile".equals(tab)) {
-
-			    User profileUser = UserDao.getUserByUsername(username);
-
-			    request.setAttribute("profileUser", profileUser);
-			}
+			User user = UserDao.getUserByUsername(username);
+			request.setAttribute("user", user);
 
 
 			/* ================= NOTIFICATIONS ================= */

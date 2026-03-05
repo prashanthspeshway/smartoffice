@@ -28,6 +28,9 @@ if (punchIn != null && punchOut == null)
 if (punchOut != null)
 	status = "Punched Out";
 %>
+<%
+User userObj = (User) request.getAttribute("user");
+%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -260,6 +263,7 @@ body {
 .modal-content {
 	width: 720px;
 	max-width: 92%;
+	align-items: center;
 	max-height: 85vh;
 	background: #f8fbff;
 	border-radius: 14px;
@@ -272,6 +276,7 @@ body {
 .modal-header {
 	background: linear-gradient(135deg, #667eea, #764ba2);
 	color: #ffffff;
+	width: 100%;
 	padding: 14px 20px;
 	display: flex;
 	justify-content: space-between;
@@ -966,32 +971,33 @@ to {
 .task-card.completed {
 	opacity: 0.75;
 }
+
 #assignTask {
-    height: 550px;                 /* scroll area height */
-    overflow-y: auto;              /* enable vertical scroll */
-    overflow-x: hidden;
-    padding: 15px;
-    background: c3cfe2;
-    border-radius: 12px;
+	height: 550px; /* scroll area height */
+	overflow-y: auto; /* enable vertical scroll */
+	overflow-x: hidden;
+	padding: 15px;
+	background: c3cfe2;
+	border-radius: 12px;
 }
- 
+
 /* Scrollbar styling */
 #assignTask::-webkit-scrollbar {
-    width: 8px;
+	width: 8px;
 }
- 
+
 #assignTask::-webkit-scrollbar-track {
-    background: #e2ebf0;
-    border-radius: 10px;
+	background: #e2ebf0;
+	border-radius: 10px;
 }
- 
+
 #assignTask::-webkit-scrollbar-thumb {
-    background: #c3cfe2;
-    border-radius: 10px;
+	background: #c3cfe2;
+	border-radius: 10px;
 }
- 
+
 #assignTask::-webkit-scrollbar-thumb:hover {
-    background: #aebed6;
+	background: #aebed6;
 }
 
 /* Leave request  */
@@ -1399,7 +1405,8 @@ to {
 	content: "✖";
 }
 
-@keyframes toastIn {from { opacity:0;
+@
+keyframes toastIn {from { opacity:0;
 	transform: translateX(120px);
 }
 
@@ -1409,7 +1416,8 @@ to {
 }
 
 }
-@keyframes toastOut {from { opacity:1;
+@
+keyframes toastOut {from { opacity:1;
 	transform: translateX(0);
 }
 
@@ -1427,49 +1435,31 @@ to {
 }
 
 #schedulemeeting {
-
-    max-height: 500px;          /* scroll area height */
-
-    overflow-y: auto;           /* vertical scroll */
-
-	padding: 6px;          /* space for scrollbar */
-
-    overflow-x: hidden;
-
-    border-radius: 10px;
-
+	max-height: 500px; /* scroll area height */
+	overflow-y: auto; /* vertical scroll */
+	padding: 6px; /* space for scrollbar */
+	overflow-x: hidden;
+	border-radius: 10px;
 }
- 
+
 /* Scrollbar style */
-
 #schedulemeeting::-webkit-scrollbar {
-
-    width: 8px;
-
+	width: 8px;
 }
- 
+
 #schedulemeeting::-webkit-scrollbar-track {
-
-    background: #e2ebf0;
-
-    border-radius: 10px;
-
+	background: #e2ebf0;
+	border-radius: 10px;
 }
- 
+
 #schedulemeeting::-webkit-scrollbar-thumb {
-
-    background: #c3cfe2;
-
-    border-radius: 10px;
-
+	background: #c3cfe2;
+	border-radius: 10px;
 }
- 
+
 #schedulemeeting::-webkit-scrollbar-thumb:hover {
-
-    background: #b2c2d8;
-
+	background: #b2c2d8;
 }
- 
 
 /* Left: form */
 .meeting-left {
@@ -1604,6 +1594,112 @@ to {
 	background: rgba(0, 0, 0, 0.25);
 	border-radius: 4px;
 }
+
+.password-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 2000;
+
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+/* Centered Box */
+.password-box {
+    width: 400px;          /* fixed clean width */
+    max-width: 90%;
+    background: white;
+    align-items: center;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: fadeIn 0.25s ease;
+}
+
+/* Header */
+.password-header {
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.password-header .close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.password-header h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* Body */
+.password-body {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Profile Cards */
+.password-body .time-card {
+    background: #f3f4f6;
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* Inputs */
+.password-body input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Button */
+.password-body button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.password-body button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+
 /* ================= FULL DARK MODE ================= */
 body.dark-theme {
 	background: #0f172a !important;
@@ -1863,6 +1959,42 @@ body.dark-theme .settings-item i {
 
 				</fieldset>
 			</div>
+			
+			<!-- ===== Self Profile ===== -->
+				<div id="profileModal" class="password-modal">
+					<div class="password-box">
+
+						<div class="password-header">
+							<h4>My Profile</h4>
+							<span class="close-btn" onclick="closeProfile()">✖</span>
+						</div>
+
+						<div class="password-body">
+
+							<div class="time-card">
+								Name: <b><%=userObj != null ? userObj.getFullname() : "--"%></b>
+							</div>
+
+							<div class="time-card">
+								Username: <b><%=userObj != null ? userObj.getUsername() : "--"%></b>
+							</div>
+
+							<div class="time-card">
+								Email: <b><%=userObj != null ? userObj.getEmail() : "--"%></b>
+							</div>
+
+							<div class="time-card">
+								Role: <b><%=userObj != null ? userObj.getRole() : "--"%></b>
+							</div>
+
+							<div class="time-card">
+								Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b>
+							</div>
+
+						</div>
+
+					</div>
+				</div>
 
 			<!-- ===== Performance Matrix ===== -->
 			<div class="box centered-box" id="performance" style="display: none;">
@@ -2228,6 +2360,7 @@ body.dark-theme .settings-item i {
 
 				</fieldset>
 			</div>
+			
 			<!-- ===== Assign Tasks ===== -->
 			<div class="box" id="assignTask" style="display: none;">
 
@@ -2348,46 +2481,6 @@ body.dark-theme .settings-item i {
 					%>
 
 				</fieldset>
-			</div>
-
-			<!-- ===== Self Profile ===== -->
-			<div class="box centered-box" id="selfProfile" style="display: none;">
-
-
-				<h3>
-					<i class="fa-solid fa-user"></i> My Profile
-				</h3>
-
-				<%
-				com.smartoffice.model.User profileUser = (com.smartoffice.model.User) request.getAttribute("profileUser");
-
-				if (profileUser != null) {
-				%>
-
-				<p>
-					<b>Full Name:</b>
-					<%=profileUser.getFullname()%></p>
-				<p>
-					<b>Username:</b>
-					<%=profileUser.getUsername()%></p>
-				<p>
-					<b>Email:</b>
-					<%=profileUser.getEmail()%></p>
-				<p>
-					<b>Role:</b>
-					<%=profileUser.getRole()%></p>
-				<p>
-					<b>Phone:</b>
-					<%=profileUser.getPhone()%></p>
-
-				<%
-				} else {
-				%>
-				<p>No profile data found.</p>
-				<%
-				}
-				%>
-
 			</div>
 
 		</div>
@@ -2597,13 +2690,14 @@ function closeAllMeetings() {
 function openSettings(){ document.getElementById("settingsPanel").classList.add("open"); }
 function closeSettings(){ document.getElementById("settingsPanel").classList.remove("open"); }
 
-function openProfile(){
-    closeSettings();
-    showSection("selfProfile");
+function openProfile() {
+    document.getElementById("profileModal").style.visibility = "visible";
+    document.getElementById("profileModal").style.opacity = "1";
 }
 
-function closeProfile(){
-    document.getElementById("profileModal").classList.remove("show");
+function closeProfile() {
+    document.getElementById("profileModal").style.visibility = "hidden";
+    document.getElementById("profileModal").style.opacity = "0";
 }
 
 function openChangePassword(){
@@ -2712,7 +2806,7 @@ function setActive(button) {
     button.classList.add('active');
 }
 </script>
-<!-- Toast -->
+	<!-- Toast -->
 	<div id="toast" class="toast"></div>
 </body>
 </html>
