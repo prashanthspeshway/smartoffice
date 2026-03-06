@@ -9,7 +9,7 @@
 <%@ page import="com.smartoffice.model.Notification"%>
 
 <%
-String activeTab = (String) request.getAttribute("tab");
+String activeTab = request.getParameter("tab");
 if (activeTab == null) {
 	activeTab = "selfAttendance";
 }
@@ -302,6 +302,7 @@ body {
 /* ===== Body ===== */
 .modal-body {
 	padding: 18px;
+	width: 100%;
 	overflow-y: auto;
 	max-height: calc(85vh - 60px);
 }
@@ -1592,109 +1593,111 @@ to {
 }
 
 .password-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
-    backdrop-filter: blur(6px);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    z-index: 2000;
-
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.25s ease;
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.35);
+	backdrop-filter: blur(6px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 2000;
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 0.25s ease;
 }
 
 /* Centered Box */
 .password-box {
-    width: 400px;          /* fixed clean width */
-    max-width: 90%;
-    background: white;
-    align-items: center;
-    border-radius: 14px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    animation: fadeIn 0.25s ease;
+	width: 400px; /* fixed clean width */
+	max-width: 90%;
+	background: white;
+	align-items: center;
+	border-radius: 14px;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+	overflow: hidden;
+	animation: fadeIn 0.25s ease;
 }
 
 /* Header */
 .password-header {
-    padding: 14px 18px;
-    background: linear-gradient(135deg, #6366f1, #818cf8);
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	padding: 14px 18px;
+	background: linear-gradient(135deg, #6366f1, #818cf8);
+	color: white;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .password-header .close-btn {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
+	background: none;
+	border: none;
+	color: white;
+	font-size: 18px;
+	cursor: pointer;
 }
 
 .password-header h4 {
-    margin: 0;
-    font-size: 16px;
+	margin: 0;
+	font-size: 16px;
 }
 
 /* Body */
 .password-body {
-    padding: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+	padding: 25px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
 }
 
 /* Profile Cards */
 .password-body .time-card {
-    background: #f3f4f6;
-    padding: 12px 14px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-size: 14px;
+	background: #f3f4f6;
+	padding: 12px 14px;
+	border-radius: 8px;
+	margin-bottom: 10px;
+	font-size: 14px;
 }
 
 /* Inputs */
 .password-body input {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    font-size: 14px;
-    box-sizing: border-box;
+	width: 100%;
+	padding: 12px 14px;
+	border-radius: 8px;
+	border: 1px solid #d1d5db;
+	font-size: 14px;
+	box-sizing: border-box;
 }
 
 /* Button */
 .password-body button {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    background: linear-gradient(135deg, #6366f1, #818cf8);
-    color: white;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: 0.25s;
+	width: 100%;
+	padding: 12px;
+	border-radius: 8px;
+	border: none;
+	background: linear-gradient(135deg, #6366f1, #818cf8);
+	color: white;
+	font-weight: 600;
+	font-size: 14px;
+	cursor: pointer;
+	transition: 0.25s;
 }
 
 .password-body button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
 }
 
 /* Animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+@keyframes fadeIn {from { opacity:0;
+	transform: scale(0.95);
 }
 
+to {
+	opacity: 1;
+	transform: scale(1);
+}
+
+}
 
 /* ================= FULL DARK MODE ================= */
 body.dark-theme {
@@ -1871,47 +1874,58 @@ body.dark-theme .settings-item i {
 	<!-- MAIN -->
 	<div class="main-container">
 		<div class="sidebar">
-			<button class="sidebar-btn active"
+
+			<button
+				class="sidebar-btn <%=activeTab.equals("selfAttendance") ? "active" : ""%>"
 				onclick="setActive(this); showSection('selfAttendance')">
 				<i class="fa-solid fa-user-check"></i> <span>My Attendance</span>
 			</button>
 
-			<button class="sidebar-btn"
+			<button
+				class="sidebar-btn <%=activeTab.equals("teamSection") ? "active" : ""%>"
 				onclick="setActive(this); showSection('teamSection')">
 				<i class="fa-solid fa-users"></i> <span>My Team</span>
 			</button>
 
-			<button class="sidebar-btn"
+			<button
+				class="sidebar-btn <%=activeTab.equals("assignTask") ? "active" : ""%>"
 				onclick="setActive(this); showSection('assignTask')">
 				<i class="fa-solid fa-list-check"></i> <span>Assign Tasks</span>
 			</button>
 
-			<button class="sidebar-btn"
+			<button
+				class="sidebar-btn <%=activeTab.equals("schedulemeeting") ? "active" : ""%>"
 				onclick="setActive(this); showSection('schedulemeeting')">
 				<i class="fa-solid fa-handshake"></i> <span>Schedule Meetings</span>
 			</button>
 
-			<button class="sidebar-btn"
+			<button
+				class="sidebar-btn <%=activeTab.equals("attendance") ? "active" : ""%>"
 				onclick="setActive(this); showSection('attendance')">
 				<i class="fa-solid fa-clipboard-user"></i> <span>Team
 					Attendance</span>
 			</button>
 
-			<button class="sidebar-btn"
+			<button
+				class="sidebar-btn <%=activeTab.equals("leave") ? "active" : ""%>"
 				onclick="setActive(this); location.href='<%=request.getContextPath()%>/manager?tab=leave'">
 				<i class="fa-solid fa-calendar-xmark"></i> <span>Leave
 					Requests</span>
 			</button>
 
-			<button class="sidebar-btn"
+			<button
+				class="sidebar-btn <%=activeTab.equals("performance") ? "active" : ""%>"
 				onclick="setActive(this); showSection('performance')">
 				<i class="fa-solid fa-chart-line"></i> <span>Performance
 					Matrix</span>
 			</button>
 
-			<button class="sidebar-btn" onclick="setActive(this); openCalendar()">
+			<button
+				class="sidebar-btn <%=activeTab.equals("calendar") ? "active" : ""%>"
+				onclick="setActive(this); openCalendar()">
 				<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
 			</button>
+
 		</div>
 
 		<div class="content-area">
@@ -1955,42 +1969,42 @@ body.dark-theme .settings-item i {
 
 				</fieldset>
 			</div>
-			
-			<!-- ===== Self Profile ===== -->
-				<div id="profileModal" class="password-modal">
-					<div class="password-box">
 
-						<div class="password-header">
-							<h4>My Profile</h4>
-							<span class="close-btn" onclick="closeProfile()">✖</span>
+			<!-- ===== Self Profile ===== -->
+			<div id="profileModal" class="password-modal">
+				<div class="password-box">
+
+					<div class="password-header">
+						<h4>My Profile</h4>
+						<span class="close-btn" onclick="closeProfile()">✖</span>
+					</div>
+
+					<div class="password-body">
+
+						<div class="time-card">
+							Name: <b><%=userObj != null ? userObj.getFullname() : "--"%></b>
 						</div>
 
-						<div class="password-body">
+						<div class="time-card">
+							Username: <b><%=userObj != null ? userObj.getUsername() : "--"%></b>
+						</div>
 
-							<div class="time-card">
-								Name: <b><%=userObj != null ? userObj.getFullname() : "--"%></b>
-							</div>
+						<div class="time-card">
+							Email: <b><%=userObj != null ? userObj.getEmail() : "--"%></b>
+						</div>
 
-							<div class="time-card">
-								Username: <b><%=userObj != null ? userObj.getUsername() : "--"%></b>
-							</div>
+						<div class="time-card">
+							Role: <b><%=userObj != null ? userObj.getRole() : "--"%></b>
+						</div>
 
-							<div class="time-card">
-								Email: <b><%=userObj != null ? userObj.getEmail() : "--"%></b>
-							</div>
-
-							<div class="time-card">
-								Role: <b><%=userObj != null ? userObj.getRole() : "--"%></b>
-							</div>
-
-							<div class="time-card">
-								Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b>
-							</div>
-
+						<div class="time-card">
+							Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b>
 						</div>
 
 					</div>
+
 				</div>
+			</div>
 
 			<!-- ===== Performance Matrix ===== -->
 			<div class="box centered-box" id="performance" style="display: none;">
@@ -2356,7 +2370,7 @@ body.dark-theme .settings-item i {
 
 				</fieldset>
 			</div>
-			
+
 			<!-- ===== Assign Tasks ===== -->
 			<div class="box" id="assignTask" style="display: none;">
 
@@ -2563,7 +2577,7 @@ document.addEventListener("DOMContentLoaded", function () {
     else if (success === "PerformanceSaved")
         showToast("Performance submitted successfully");
 
-    else if (success === "TaskAssigned")
+    else if (success === "true")
         showToast("Task assigned successfully");
 
 

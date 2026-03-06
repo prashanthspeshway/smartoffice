@@ -1075,31 +1075,29 @@ body {
 
 		<div class="left-panel">
 			<button class="nav-btn active"
-				onclick="setActive(this); showAttendance();">
-				<i class="fa-solid fa-user-check"></i> <span>My Attendance</span>
-			</button>
+onclick="setActive(this); showAttendance(); setTab('attendance');">
+<i class="fa-solid fa-user-check"></i> <span>My Attendance</span>
+</button>
 
-			<button class="nav-btn" onclick="setActive(this); showTasks();">
-				<i class="fa-solid fa-list-check"></i> <span>Assigned Tasks</span>
-			</button>
+<button class="nav-btn"
+onclick="setActive(this); showTasks(); setTab('tasks');">
+<i class="fa-solid fa-list-check"></i> <span>Assigned Tasks</span>
+</button>
 
-			<button class="nav-btn" onclick="setActive(this); showLeave();">
-				<i class="fa-solid fa-calendar-xmark"></i> <span>Apply Leave</span>
-			</button>
+<button class="nav-btn"
+onclick="setActive(this); showLeave(); setTab('leave');">
+<i class="fa-solid fa-calendar-xmark"></i> <span>Apply Leave</span>
+</button>
 
-			<button class="nav-btn" onclick="setActive(this); showMeetings();">
-				<i class="fa-solid fa-handshake"></i> <span>Scheduled
-					Meetings</span>
-			</button>
+<button class="nav-btn"
+onclick="setActive(this); showMeetings(); setTab('meetings');">
+<i class="fa-solid fa-handshake"></i> <span>Scheduled Meetings</span>
+</button>
 
-			<button class="nav-btn" onclick="setActive(this); openCalendar();">
-				<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
-			</button>
-
-			<button class="nav-btn"
-				onclick="setActive(this); openNotifications();">
-				<i class="fa-solid fa-bell"></i> <span>Notifications</span>
-			</button>
+<button class="nav-btn"
+onclick="setActive(this); openCalendar(); setTab('calendar');">
+<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
+</button>
 		</div>
 		<div class="right-panel">
 
@@ -1384,6 +1382,32 @@ body {
 
 
 			<script>
+			
+			
+			window.addEventListener("load", function () {
+
+			    let activeTab = sessionStorage.getItem("activeTab");
+
+			    if (!activeTab) {
+			        activeTab = "attendance";
+			    }
+
+			    if (activeTab === "tasks") showTasks();
+			    if (activeTab === "leave") showLeave();
+			    if (activeTab === "meetings") showMeetings();
+			    if (activeTab === "calendar") openCalendar();
+			    if (activeTab === "attendance") showAttendance();
+
+			});
+			
+			window.addEventListener("beforeunload", function () {
+
+			    if (performance.navigation.type === 1) {
+			        sessionStorage.removeItem("activeTab");
+			    }
+
+			});
+			
     // ===== Section Helpers =====
    function hideAllSections() {
     document.getElementById("attendanceSection").style.display = "none";
@@ -1470,6 +1494,8 @@ function openCalendar() {
         }, 400);
     }, 2500);
 }
+    
+    
 
     // ===== URL PARAM HANDLING (IMPORTANT PART) =====
     const params = new URLSearchParams(window.location.search);
@@ -1515,25 +1541,32 @@ function openCalendar() {
     // ---- TAB RESTORE LOGIC ----
     if (tab === "leave") {
         showLeave();
+        document.querySelectorAll(".nav-btn")[1].classList.add("active");
 
         if (sub === "apply") {
             showApplyLeave();
+            document.querySelectorAll(".nav-btn")[1].classList.add("active");
         } else if (sub === "myLeaves") {
             showMyLeaves();
+            document.querySelectorAll(".nav-btn")[1].classList.add("active");
         }
     }
     else if (tab === "tasks") {
         showTasks();
+        document.querySelectorAll(".nav-btn")[1].classList.add("active");
     }
     else if (tab === "meetings") {
         showMeetings();
+        document.querySelectorAll(".nav-btn")[1].classList.add("active");
     }
     else if (tab === "calendar") {
     	openCalendar();
+    	document.querySelectorAll(".nav-btn")[1].classList.add("active");
     }
     else {
         // Default view
         showAttendance();
+        document.querySelectorAll(".nav-btn")[1].classList.add("active");
     }
 
     // ---- Clean URL ----
@@ -1677,14 +1710,14 @@ function markAsRead(notificationId) {
 </script>
 
 			<script>
-function setActive(button) {
-    // Remove active class from all buttons
-    const buttons = document.querySelectorAll('.nav-btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
+			function setActive(btn) {
 
-    // Add active class to clicked button
-    button.classList.add('active');
-}
+			    document.querySelectorAll(".nav-btn").forEach(b => {
+			        b.classList.remove("active");
+			    });
+
+			    btn.classList.add("active");
+			}
 
 window.onclick = function(e) {
     const modal = document.getElementById("passwordModal");
@@ -1693,6 +1726,42 @@ window.onclick = function(e) {
     if (e.target === modal) closeChangePassword();
     if (e.target === profile) closeProfile();
 };
+
+
+function setTab(tabName) {
+    sessionStorage.setItem("activeTab", tabName);
+}
+
+window.onload = function () {
+
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+
+    const buttons = document.querySelectorAll(".nav-btn");
+
+    if (tab === "tasks") {
+        showTasks();
+        setActive(buttons[1]);
+    }
+    else if (tab === "leave") {
+        showLeave();
+        setActive(buttons[2]);
+    }
+    else if (tab === "meetings") {
+        showMeetings();
+        setActive(buttons[3]);
+    }
+    else if (tab === "calendar") {
+        openCalendar();
+        setActive(buttons[4]);
+    }
+    else {
+        showAttendance();
+        setActive(buttons[0]);
+    }
+
+};
+
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.onkeydown = e =>

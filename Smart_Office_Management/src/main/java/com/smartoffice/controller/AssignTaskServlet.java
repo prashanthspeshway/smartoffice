@@ -36,11 +36,8 @@ public class AssignTaskServlet extends HttpServlet {
 		} else if (desc == null || desc.trim().isEmpty()) {
 			request.setAttribute("errorMessage", "Task description cannot be empty.");
 		} else {
-			TaskDAO.assignTask(employee, manager, desc);
-			employee = null;
+		    TaskDAO.assignTask(employee, manager, desc);
 		}
-
-		TaskDAO.assignTask(employee, manager, desc);
 
 		// ✅ Assign module attributes
 		request.setAttribute("assignEmployee", employee);
@@ -50,6 +47,6 @@ public class AssignTaskServlet extends HttpServlet {
 		request.setAttribute("teamList", TaskDAO.getEmployeesUnderManager(manager));
 
 		// ✅ Correct tab (ONLY ONE)
-		response.sendRedirect(request.getContextPath() + "/manager?tab=assignTask&success=TaskAssigned");
+		response.sendRedirect(request.getContextPath() + "/manager?tab=assignTask&success=true");
 	}
 }
