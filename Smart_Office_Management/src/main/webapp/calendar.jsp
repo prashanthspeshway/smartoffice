@@ -51,20 +51,21 @@ body {
 
 table {
     width: 100%;
-    height: calc(100vh - 80px); /* header height compensation */
+    height: calc(100vh - 80px);
     border-collapse: collapse;
+    table-layout: fixed;   /* VERY IMPORTANT */
 }
-
 th, td {
     width: 14%;
-    height: auto;              /* ⬆ taller cells */
-    text-align: center;         /* center horizontally */
-    vertical-align: middle;     /* center vertically */
+    height: 50px;          /* fixed height */
+    text-align: center;
+    vertical-align: middle;
     border: 1px solid #cbd5e1;
     border-radius: 5px;
-    font-size: 16px;            /* ⬆ bigger date numbers */
+    font-size: 16px;
     font-weight: 500;
-    padding: 8px;
+    padding: 6px;
+    overflow: hidden;      /* prevent expansion */
 }
 
 td {
@@ -79,10 +80,15 @@ td:hover {
 }
 
 td div {
-    font-size: 13px;           /* ⬆ holiday name size */
-    margin-top: 6px;
+    font-size: 11px;
+    margin-top: 4px;
     color: #991b1b;
     font-weight: 600;
+
+    max-height: 18px;      /* prevent expansion */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 th {

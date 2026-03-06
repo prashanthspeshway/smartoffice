@@ -1,5 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	
+	<%
+String username = (String) session.getAttribute("username");
+if (username == null) {
+	response.sendRedirect(request.getContextPath() + "/index.html");
+	return;
+}
+
+String email = (String) session.getAttribute("email");
+String role = (String) session.getAttribute("role");
+String phone = (String) session.getAttribute("phone");
+
+%>
+	
 <!DOCTYPE html>
 <html lang="en">
 <head>

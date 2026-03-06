@@ -14,6 +14,20 @@ if (activeTab == null) {
 	activeTab = "selfAttendance";
 }
 %>
+
+<%
+String username = (String) session.getAttribute("username");
+if (username == null) {
+	response.sendRedirect(request.getContextPath() + "/index.html");
+	return;
+}
+
+String email = (String) session.getAttribute("email");
+String role = (String) session.getAttribute("role");
+String phone = (String) session.getAttribute("phone");
+
+%>
+
 <%
 List<Task> assignTasks = (List<Task>) request.getAttribute("assignTasks");
 List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");

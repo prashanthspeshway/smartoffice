@@ -86,8 +86,13 @@ public class EditUser extends HttpServlet {
         String joinedDateStr = req.getParameter("joinedDate");
 
         // 🔒 If role is manager, clear manager field
+
         if ("manager".equalsIgnoreCase(role)) {
-            manager = null;
+            manager = "";
+        }
+
+        if (manager == null || manager.trim().isEmpty()) {
+            manager = "";
         }
 
         Date joinedDate = null;
