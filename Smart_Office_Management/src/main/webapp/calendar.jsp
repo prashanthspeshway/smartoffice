@@ -260,7 +260,7 @@ th {
 
     padding: 15px;
 
-    background: linear-gradient(135deg, #e2ebf0, #c3cfe2);
+    background:  #c3cfe2;
 
     border-radius: 12px;
 

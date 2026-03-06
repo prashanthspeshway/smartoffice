@@ -60,8 +60,8 @@ label {
 
 input, select {
 	width: 100%;
-	height: 40px;
-	padding: 0 12px;
+	height: 44px;
+	padding: 8px;
 	font-size: 14px;
 	border: 1px solid #ccc;
 	border-radius: 5px;
