@@ -23,6 +23,7 @@ public class ChangeUserPassword extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
+        // Check session
         if (session == null || session.getAttribute("username") == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Unauthorized");
@@ -33,7 +34,7 @@ public class ChangeUserPassword extends HttpServlet {
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
 
-        // Validation
+        // Validate empty fields
         if (newPassword == null || confirmPassword == null ||
             newPassword.isEmpty() || confirmPassword.isEmpty()) {
 
@@ -42,20 +43,27 @@ public class ChangeUserPassword extends HttpServlet {
             return;
         }
 
+        // Check password match
         if (!newPassword.equals(confirmPassword)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("PasswordMismatch");
             return;
         }
 
-        // Update password (no old password check)
+        // Strong password validation
+        if (!isStrongPassword(newPassword)) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("WeakPassword");
+            return;
+        }
+
         String sql = "UPDATE users SET password = ? WHERE username = ?";
 
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, newPassword); // ⚠️ hash later (BCrypt recommended)
-            ps.setString(2, username);
+            ps.setString(1, newPassword);   // password
+            ps.setString(2, username);      // username
 
             int updated = ps.executeUpdate();
 
@@ -73,5 +81,19 @@ public class ChangeUserPassword extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("ServerError");
         }
+    }
+
+    // Strong Password Validation Method
+    private boolean isStrongPassword(String password) {
+
+        if (password == null) return false;
+
+        return password.matches(
+                "^(?=.*[a-z])" +      // at least one lowercase
+                "(?=.*[A-Z])" +       // at least one uppercase
+                "(?=.*\\d)" +         // at least one number
+                "(?=.*[@$!%*?&])" +   // at least one special character
+                ".{8,}$"              // minimum 8 characters
+        );
     }
 }
