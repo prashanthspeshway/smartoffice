@@ -29,7 +29,7 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
 
 		HttpSession session = request.getSession(false);
 		if (session == null || session.getAttribute("username") == null) {
-			response.sendRedirect("login.html");
+			response.sendRedirect("index.html");
 			return;
 		}
 

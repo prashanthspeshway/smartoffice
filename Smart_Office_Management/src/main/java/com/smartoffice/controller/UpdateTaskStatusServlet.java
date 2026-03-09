@@ -18,7 +18,7 @@ public class UpdateTaskStatusServlet extends HttpServlet {
 
 		HttpSession session = req.getSession(false);
 		if (session == null) {
-			resp.sendRedirect("login.jsp");
+			resp.sendRedirect("index.html");
 			return;
 		}
 

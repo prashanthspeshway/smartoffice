@@ -23,7 +23,7 @@ public class ViewAssignedTasksServlet extends HttpServlet {
 
 		HttpSession session = request.getSession(false);
 		if (session == null || session.getAttribute("username") == null) {
-			response.sendRedirect("login.jsp");
+			response.sendRedirect("index.html");
 			return;
 		}
 

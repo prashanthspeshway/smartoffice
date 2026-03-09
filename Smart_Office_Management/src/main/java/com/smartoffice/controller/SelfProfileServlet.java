@@ -24,14 +24,14 @@ public class SelfProfileServlet extends HttpServlet {
 		HttpSession session = request.getSession(false);
 
 		if (session == null) {
-			response.sendRedirect("login.jsp");
+			response.sendRedirect("index.html");
 			return;
 		}
 
 		String username = (String) session.getAttribute("username");
 
 		if (username == null) {
-			response.sendRedirect("login.jsp");
+			response.sendRedirect("index.html");
 			return;
 		}
 
