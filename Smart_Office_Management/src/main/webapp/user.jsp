@@ -1098,6 +1098,11 @@ onclick="setActive(this); showMeetings(); setTab('meetings');">
 onclick="setActive(this); openCalendar(); setTab('calendar');">
 <i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
 </button>
+
+<button class="nav-btn"
+onclick="setActive(this); openNotifications(); setTab('notificationPanel');">
+<i class="fa-solid fa-bell"></i> <span>Notifications</span>
+</button>
 		</div>
 		<div class="right-panel">
 
