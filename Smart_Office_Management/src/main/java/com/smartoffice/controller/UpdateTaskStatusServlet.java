@@ -24,7 +24,6 @@ public class UpdateTaskStatusServlet extends HttpServlet {
 
 		int taskId = Integer.parseInt(req.getParameter("taskId"));
 		String status = req.getParameter("status");
-
 		TaskDAO.updateStatus(taskId, status);
 
 		// user updates → go back to user dashboard

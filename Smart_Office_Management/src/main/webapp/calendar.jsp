@@ -9,324 +9,202 @@
 <style>
 
 
-body {
+body{
     font-family: "Segoe UI";
-    background: #c3cfe2;
-    margin: 0;          /* ✅ removes outer space */
-    padding: 0;
+    margin:0;
+    padding:0;
+    background: linear-gradient(135deg,#764ba2,#6366f1);
 }
 
-.calendar-box {
-    width: 97%;
-    height: 100%;
-    margin: 0;                 /* ✅ no outer spacing */
-    padding: 6px;             /* 🔹 optional: reduce padding */
-    background: #c0d1eb;
-    border-radius: 0;          /* optional if inside panel */
-    box-shadow: none;          /* optional if parent already has shadow */
+/* CALENDAR BOX */
+.calendar-box{
+    width:97%;
+    margin:auto;
+    padding:15px;
+    background:#f0ede9;
+/*     border-radius:14px; */
+    box-shadow:0 15px 35px rgba(0,0,0,0.2);
 }
 
-.header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 1px;
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
 }
 
-.header h3 {
-    font-size: 22px;
-    font-weight: 600;
-    color: #1f2937;
+.header h3{
+    font-size:22px;
+    font-weight:600;
+    color:#6366f1;
 }
 
-.header button {
-	border: none;
-	background: #e2ebf0;
-	color: black;
-	font-size: 16px;
-    padding: 8px 14px;
-	border-radius: 6px;
-	cursor: pointer;
+.header button{
+    border:none;
+    background:#6366f1;
+    color:white;
+    font-size:16px;
+    padding:8px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.3s;
 }
 
-table {
-    width: 100%;
-    height: calc(100vh - 80px);
-    border-collapse: collapse;
-    table-layout: fixed;   /* VERY IMPORTANT */
-}
-th, td {
-    width: 14%;
-    height: 50px;          /* fixed height */
-    text-align: center;
-    vertical-align: middle;
-    border: 1px solid #cbd5e1;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 6px;
-    overflow: hidden;      /* prevent expansion */
+.header button:hover{
+    background:#764ba2;
 }
 
-td {
-    background: #ffffff;
-    transition: background 0.3s ease, transform 0.3s ease;
+/* TABLE */
+table{
+    width:100%;
+    height:calc(100vh - 100px);
+    border-collapse:collapse;
+    table-layout:fixed;
 }
 
-td:hover {
-    background: #c3cfe2;
-    transform: scale(1.03);
-    cursor: pointer;
+/* HEADER DAYS */
+th{
+    background:#6366f1;
+    color:white;
+    font-size:14px;
+    height:45px;
 }
 
-td div {
-    font-size: 11px;
-    margin-top: 4px;
-    color: #991b1b;
-    font-weight: 600;
-
-    max-height: 18px;      /* prevent expansion */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+/* CELLS */
+td{
+    background:white;
+    border:1px solid #e5e7eb;
+    height:55px;
+    text-align:center;
+    font-weight:500;
+    border-radius:6px;
+    transition:0.25s;
 }
 
-th {
-    background: #e5e7eb;
-    font-size: 15px;
-    font-weight: 600;
-    color: #374151;
-    height: 50px;
+/* HOVER EFFECT */
+td:hover{	
+    background:#764ba2;
+/*     transform:scale(1.05); */
+    cursor:pointer;
 }
 
-.holiday {
-	background: #fee2e2;
-	color: #7f1d1d;
-	font-weight: bold;
+/* HOLIDAY */
+.holiday{
+    background:#5b8e92;
+    color:#eee;
+    font-weight:600;
 }
-
-.today {
-    background: #dbeafe;
-    border: 2px solid #3b82f6;
-    font-weight: 700;
-}
-
-/* ===== MODAL OVERLAY ===== */
-#holidayModal {
-	display: none;
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.45);
-	z-index: 999;
-}
-
-/* ===== MODAL BOX ===== */
-#holidayModal > div {
-	background: #ffffff;
-	width: 320px;
-	padding: 20px;
-	border-radius: 10px;
-	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	font-family: "Segoe UI";
-}
-
-/* ===== MODAL TITLE ===== */
-#holidayModal h3 {
-	margin: 0 0 12px;
-	font-size: 18px;
-	color: #1f2937;
-}
-
-/* ===== INPUT ===== */
-#holidayNameInput {
-	width: 100%;
-	padding: 8px 10px;
-	font-size: 14px;
-	border-radius: 6px;
-	border: 1px solid #d1d5db;
-	outline: none;
-	box-sizing: border-box;
-}
-
-#holidayNameInput:focus {
-	border-color: #3b82f6;
-}
-
-/* ===== BUTTON ROW ===== */
-#holidayModal .button-row {
-	display: flex;
-	justify-content: flex-end;
-	gap: 8px;
-	margin-top: 16px;
-}
-
-/* ===== COMMON BUTTON ===== */
-#holidayModal button {
-	padding: 6px 14px;
-	border-radius: 6px;
-	border: none;
-	font-size: 13px;
-	cursor: pointer;
-}
-
-/* Cancel */
-#holidayModal button:first-child {
-	background: #e5e7eb;
-	color: #111827;
-}
-
-#holidayModal button:first-child:hover {
-	background: #d1d5db;
-}
-
-/* Save */
-#holidayModal button:last-child {
-	background: #16a34a;
-	color: white;
-}
-
-#holidayModal button:last-child:hover {
-	background: #15803d;
-}
-
-/* Delete */
-#deleteBtn {
-	background: #dc2626;
-	color: white;
-}
-
-#deleteBtn:hover {
-	background: #b91c1c;
+.holiday:hover{
+    background:#1aa2ac;
+     transform:none;
 }
 
 
-/* ================= TOAST ================= */
-.toast {
-    position: fixed;
-    top: 20px;
-    right: 25px;
-    background: #e2ebf0;
-    color: black;
-    padding: 14px 20px 14px 44px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    display: none;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-    z-index: 3000;
-    line-height: 1.4;
-    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+/* TODAY */
+.today{
+    background:#dbeafe;
+    border:2px solid #6366f1;
+    font-weight:700;
 }
 
-.toast.hide {
-    animation: toastOut 0.4s ease forwards;
+/* HOLIDAY NAME */
+td div{
+    font-size:13px;
+    margin-top:4px;
+    color:#eee;
+    font-weight:800;
 }
 
-/* Icon */
-.toast::before {
-    content: "✔";
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    font-weight: bold;
+/* MODAL */
+#holidayModal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.45);
+    z-index:999;
 }
 
-/* SUCCESS */
-.toast.success {
-    background: #e2ebf0;
-    color: black;
+#holidayModal>div{
+    background:white;
+    width:320px;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.3);
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
 }
 
-/* ERROR */
-.toast.error {
-    background: #e2ebf0;
-    color: black;
+#holidayModal h3{
+    color:#6366f1;
 }
 
-/* INFO */
-.toast.info {
-    background: #e2ebf0;
-    color: black;
+/* INPUT */
+#holidayNameInput{
+    width:100%;
+    padding:9px;
+    border-radius:8px;
+    border:1px solid #d1d5db;
+    margin-top:10px;
 }
 
-
-#calendarBox {
-
-    height: 500px;                 /* scroll area height */
-
-    overflow-y: auto;              /* vertical scroll */
-
-    overflow-x: hidden;
-
-    padding: 15px;
-
-    background:  #c3cfe2;
-
-    border-radius: 12px;
-
-}
- 
-/* Scrollbar style */
-
-#calendarBox::-webkit-scrollbar {
-
-    width: 8px;
-
-}
- 
-#calendarBox::-webkit-scrollbar-track {
-
-    background: #e2ebf0;
-
-    border-radius: 10px;
-
-}
- 
-#calendarBox::-webkit-scrollbar-thumb {
-
-    background: #c3cfe2;
-
-    border-radius: 10px;
-
-}
- 
-#calendarBox::-webkit-scrollbar-thumb:hover {
-
-    background: #aebed6;
-
-}
- 
-
-/* Animations */
-@keyframes toastIn {
-    from {
-        opacity: 0;
-        transform: translateX(120px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+#holidayNameInput:focus{
+    outline:none;
+    border-color:#6366f1;
 }
 
-@keyframes toastOut {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(120px);
-    }
+/* BUTTONS */
+#holidayModal button{
+    padding:7px 14px;
+    border:none;
+    border-radius:7px;
+    font-size:13px;
+    cursor:pointer;
 }
-body.dark-mode #toast {
-    background-color: #48bb78; /* lighter green for dark mode */
+
+#holidayModal button:first-child{
+    background:#e5e7eb;
+}
+
+#holidayModal button:last-child{
+    background:#10b981;
+    color:white;
+}
+
+#deleteBtn{
+    background:#ef4444;
+    color:white;
+}
+
+/* TOAST */
+.toast{
+    position:fixed;
+    top:20px;
+    right:25px;
+    background:#6366f1;
+    color:white;
+    padding:12px 18px;
+    border-radius:10px;
+    font-size:14px;
+    display:none;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
+
+/* SCROLLBAR */
+#calendarBox{
+    height:500px;
+    overflow-y:auto;
+}
+
+#calendarBox::-webkit-scrollbar{
+    width:8px;
+}
+
+#calendarBox::-webkit-scrollbar-thumb{
+    background:#6366f1;
+    border-radius:10px;
 }
 </style>
 </head>

@@ -47,43 +47,53 @@ List<LeaveRequest> myLeaves = (List<LeaveRequest>) request.getAttribute("myLeave
 body {
 	margin: 0;
 	height: 100vh;
-	overflow: hidden; /* 🔑 FIX */
+	overflow: hidden;
 	font-family: "Segoe UI", Arial, sans-serif;
-	background: #f4f6f8;
+	background: #f0f2ff;
 }
 
 /* ================= TOP BAR ================= */
 .top-bar {
 	backdrop-filter: blur(10px);
-	background: #e2ebf0;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 	padding: 15px 30px;
 	display: flex;
 	height: 50px;
 	justify-content: space-between;
 	align-items: center;
+	box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
 }
 
 .top-bar h2 {
 	font-size: 22px;
-	font-weight: 600;
-	color: #2d3748;
+	font-weight: 700;
+	color: #ffffff;
+	letter-spacing: 0.5px;
 }
 
 .user-area {
 	display: flex;
 	align-items: center;
 	gap: 15px;
+	color: rgba(255,255,255,0.9);
+	font-weight: 500;
 }
 
 .icon-btn {
 	width: 38px;
 	height: 38px;
 	border-radius: 50%;
-	border: none;
-	background: linear-gradient(135deg, #667eea, #764ba2);
+	border: 2px solid rgba(255,255,255,0.4);
+	background: rgba(255,255,255,0.2);
 	color: white;
 	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.icon-btn:hover {
+	background: rgba(255,255,255,0.35);
+	transform: rotate(30deg);
 }
 
 .icon-btn i {
@@ -92,134 +102,123 @@ body {
 }
 
 .logout-btn {
-	padding: 8px 14px;
-	border-radius: 8px;
-	border: none;
-	background: #e53e3e;
+	padding: 8px 16px;
+	border-radius: 20px;
+	border: 2px solid rgba(255,255,255,0.4);
+	background: rgba(255,255,255,0.15);
 	color: white;
 	cursor: pointer;
+	font-weight: 600;
+	transition: all 0.2s;
+}
+
+.logout-btn:hover {
+	background: rgba(255,255,255,0.3);
 }
 
 /* ===== Layout ===== */
 .container {
 	display: flex;
-	height: calc(100vh - 60px);
+	height: calc(100vh - 80px);
 }
 
 /* ================= SIDEBAR  ================= */
 .left-panel {
 	width: 250px;
-	backdrop-filter: blur(10px);
-	background: #e2ebf0;
-	border-right: 1px solid rgba(255, 255, 255, 0.3);
+	background: linear-gradient(180deg, #1a2980 0%, #26d0ce 100%);
+	border-right: 1px solid rgba(255, 255, 255, 0.1);
 	padding: 18px 12px;
+	box-shadow: 4px 0 20px rgba(0,0,0,0.2);
 }
 
 /* BUTTON */
 .nav-btn {
 	width: 100%;
 	padding: 12px 14px;
-	margin-bottom: 10px;
+	margin-bottom: 8px;
 	border: none;
 	background: transparent;
-	border-radius: 8px;
+	border-radius: 10px;
 	cursor: pointer;
 	font-size: 14px;
 	font-weight: 500;
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	color: #2d3748;
+	color:#f0f4ff;
 	transition: 0.25s;
 }
 
 /* Hover */
 .nav-btn:hover {
-	background: rgba(102, 126, 234, 0.9);
+	background: rgba(102, 126, 234, 0.73);
 	color: white;
-	font-size: 15px;
+	transform: translateX(4px);
+	box-shadow: 0 4px 12px rgba(10, 16, 34, 0.4);
 }
 
 /* Active */
+.nav-btn{
+	transition: 
+	background 0.35s ease,
+	color 0.25s ease,
+	box-shadow 0.35s ease,
+	transform 0.25s ease;
+}
+
 .nav-btn.active {
-	background: linear-gradient(135deg, #e7e6eb);
+	background: linear-gradient(180deg, #36d1dc 0%, #5b86e5 100%);
 	color: black;
-	box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
-	position: relative;
+	box-shadow: 0 6px 15px rgba(102, 126, 234, 0.5);
+	font-weight: 400;
 	font-size: 15px;
 }
 
-.nav-btn.active::before {
-	content: "";
-	position: absolute;
-	left: 0;
-	top: 10%;
-	width: 4px;
-	height: 80%;
-	background: white;
-	border-radius: 2px;
-}
 
 /* ===== Card ===== */
 .box {
-	/* 	background: white; */
 	overflow-y: auto;
 	overflow-x: hidden;
 	padding: 28px;
-	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-	height: 100%; /* 🔑 remove fixed height */
+	height: 100%;
 }
+
 /* ================= RIGHT PANEL ================= */
 .right-panel {
 	flex: 1;
-	background: #c3cfe2;
-	/*     padding:25px; */
+	background: linear-gradient(45deg,#8fd2ee, #a78bfa);
 	overflow: hidden;
 }
 
-/* Card Box */
-/* .box{ */
-/*     background:white; */
-/*     border-radius:14px; */
-/*     padding:25px; */
-/*     height:100%; */
-/*     overflow-y:auto; */
-/*     box-shadow:0 10px 25px rgba(0,0,0,0.1); */
-/* } */
-
 /* ================= ATTENDANCE FIELDSET ================= */
 .attendance-fieldset {
-	/*     border: 1px solid rgba(99,102,241,0.35); */
-	border-radius: 10px;
+	border-radius: 16px;
 	padding: 25px 20px 30px;
 	border: none;
-	background: #c3cfe2;
-	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+	background: #fbfbff;
+	box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
 }
 
 /* Legend (Title) */
 .attendance-fieldset legend {
-	padding: 6px 14px;
+	padding: 8px 18px;
 	font-size: 15px;
-	font-weight: 600;
-	color: #222;
-	border-radius: 10px;
-	background: #e2ebfa;
-	border: 1px solid rgba(99, 102, 241, 0.35);
-}
-
-/* Status Badge Center */
-.attendance-fieldset .status-badge {
-	margin: 15px auto 20px;
-	display: inline-block;
+	font-weight: 700;
+	color: #fff;
+	border-radius: 20px;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	border: none;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 /* Time Cards */
 .attendance-fieldset .time-card {
 	display: flex;
 	justify-content: space-between;
-	padding: 10px 0;
-	border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+	padding: 12px 0;
+	border-bottom: 1px dashed rgba(102, 126, 234, 0.2);
+	color: #4a5568;
+	font-weight: 500;
 }
 
 /* Punch Buttons */
@@ -231,22 +230,31 @@ body {
 
 .attendance-fieldset button {
 	flex: 1;
-	padding: 10px  22px;
-	border-radius:22px;
-	background: linear-gradient(135deg, #6366f1, #818cf8);
+	padding: 12px 22px;
+	border-radius: 25px;
+	background: linear-gradient(135deg, #667eea, #764ba2);
 	color: white;
 	border: none;
-	font-weight: 600;
-	transition:all ease  0.2s;
+	font-weight: 700;
+	font-size: 14px;
+	transition: all ease 0.2s;
 	cursor: pointer;
+	box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.attendance-fieldset button:hover:not(:disabled) {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
 }
 
 /* Disabled State */
 .attendance-fieldset button:disabled {
-	opacity: 0.6;
+	opacity: 0.5;
 	background: #a0aec0;
 	cursor: not-allowed;
+	box-shadow: none;
 }
+
 /* ================= TASK CARD ================= */
 .task-card {
 	display: flex;
@@ -255,13 +263,15 @@ body {
 	padding: 15px 18px;
 	margin-top: 15px;
 	border-radius: 12px;
-	background: rgba(99, 102, 241, 0.08);
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+	border: 1px solid rgba(102, 126, 234, 0.15);
 	transition: 0.3s;
 }
 
 .task-card:hover {
 	transform: translateY(-3px);
-	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+	box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+	border-color: rgba(102, 126, 234, 0.3);
 }
 
 .task-left {
@@ -272,44 +282,48 @@ body {
 
 .task-left i {
 	font-size: 18px;
-	color: #6366f1;
+	color: #667eea;
 }
 
 /* Status */
 .task-status {
-	padding: 6px 12px;
+	padding: 6px 14px;
 	border-radius: 20px;
 	font-size: 12px;
-	font-weight: 600;
+	font-weight: 700;
+	letter-spacing: 0.5px;
 }
 
 .task-status.pending {
-	background: #fff4e5;
+	background: linear-gradient(135deg, #fff4e5, #ffe8cc);
 	color: #d97706;
+	border: 1px solid rgba(217, 119, 6, 0.2);
 }
 
 .task-status.done {
-	background: #dcfce7;
+	background: linear-gradient(135deg, #dcfce7, #bbf7d0);
 	color: #15803d;
+	border: 1px solid rgba(21, 128, 61, 0.2);
 }
 
 /* Done Button */
 .task-btn {
-	padding: 8px 14px;
+	padding: 8px 16px;
 	border: none;
-	border-radius: 8px;
-	background: linear-gradient(135deg, #6366f1, #818cf8);
+	border-radius: 20px;
+	background: linear-gradient(135deg, #667eea, #764ba2);
 	color: white;
 	font-size: 13px;
-	font-weight: 600;
+	font-weight: 700;
 	cursor: pointer;
 	margin-left: 10px;
 	transition: 0.25s;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
 }
 
 .task-btn:hover {
 	transform: translateY(-2px);
-	box-shadow: 0 6px 15px rgba(99, 102, 241, 0.35);
+	box-shadow: 0 6px 18px rgba(102, 126, 234, 0.5);
 }
 
 /* Empty Text */
@@ -319,50 +333,31 @@ body {
 	color: #6b7280;
 }
 
+.task-dropdown{
+padding:6px 10px;
+border-radius:16px;
+border:1px solid #ccc;
+font-size:13px;
+cursor:pointer;
+background:#f8f9ff;
+transition:all 0.2s ease;
+}
+
+.task-dropdown:hover{
+border-color:#667eea;
+}
 /* ================= MY TASK ================= */
-
 #taskSection {
-
-    max-height: auto;   /* height of the scroll area */
-
-    overflow-y: auto;    /* vertical scroll */
-
-    overflow-x: hidden;  /* hide horizontal scroll */
-
-    padding: 10px;
-
+	max-height: auto;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: 10px;
 }
- 
-/* Optional: Custom Scrollbar (for Chrome, Edge, Safari) */
 
-#taskSection::-webkit-scrollbar {
-
-    width: 4px;
-
-}
- 
-#taskSection::-webkit-scrollbar-track {
-
-    background: #e2ebf0;
-
-    border-radius: 10px;
-
-}
- 
-#taskSection::-webkit-scrollbar-thumb {
-
-    background: #e2ebf0;
-
-    border-radius: 8px;
-
-}
- 
-#taskSection::-webkit-scrollbar-thumb:hover {
-
-    background: #c3cfe2;
-
-}
- 
+#taskSection::-webkit-scrollbar { width: 4px; }
+#taskSection::-webkit-scrollbar-track { background: #f0f2ff; border-radius: 10px; }
+#taskSection::-webkit-scrollbar-thumb { background: #667eea; border-radius: 8px; }
+#taskSection::-webkit-scrollbar-thumb:hover { background: #764ba2; }
 
 /* ================= LEAVE FORM ================= */
 .leave-form {
@@ -372,11 +367,18 @@ body {
 }
 
 .leave-form input, .leave-form select, .leave-form textarea {
-	padding: 6px 6px;
-	border-radius: 8px;
-	background: #e2ebf0;
-	border: 1px solid #cbd5e1;
+	padding: 10px 12px;
+	border-radius: 10px;
+	background: #f8f9ff;
+	border: 2px solid #e0e4ff;
 	font-size: 14px;
+	transition: border-color 0.2s;
+	outline: none;
+}
+
+.leave-form input:focus, .leave-form select:focus, .leave-form textarea:focus {
+	border-color: #667eea;
+	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .leave-form textarea {
@@ -385,86 +387,62 @@ body {
 }
 
 #myLeaveSection h3 {
-	color: black !important;
+	color: #667eea !important;
+	font-weight: 700;
 }
 
 #myLeaveSection {
-
-    max-height: 300px;   /* height of the scroll area */
-
-    overflow-y: auto;    /* vertical scroll */
-
-    overflow-x: hidden;  /* hide horizontal scroll */
-
-    padding: 10px;
-
+	max-height: 300px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: 10px;
 }
- 
-/* Optional: Custom Scrollbar (for Chrome, Edge, Safari) */
 
-#myLeaveSection::-webkit-scrollbar {
-
-    width: 4px;
-
-}
- 
-#myLeaveSection::-webkit-scrollbar-track {
-
-    background: #e2ebf0;
-
-    border-radius: 10px;
-
-}
- 
-#myLeaveSection::-webkit-scrollbar-thumb {
-
-    background: #c3cfe2;
-
-    border-radius: 8px;
-
-}
- 
-#myLeaveSection::-webkit-scrollbar-thumb:hover {
-
-    background: #c3cfe2;
-
-}
- 
+#myLeaveSection::-webkit-scrollbar { width: 4px; }
+#myLeaveSection::-webkit-scrollbar-track { background: #f0f2ff; border-radius: 10px; }
+#myLeaveSection::-webkit-scrollbar-thumb { background: #667eea; border-radius: 8px; }
+#myLeaveSection::-webkit-scrollbar-thumb:hover { background: #764ba2; }
 
 .apply-leave-btn {
 	margin-top: 10px;
 	padding: 12px;
-	border-radius: 10px;
+	border-radius: 25px;
 	border: none;
-	font-weight: 600;
-	background: linear-gradient(135deg, #2563eb, #4f46e5);
+	font-weight: 700;
+	background: linear-gradient(135deg, #667eea, #764ba2);
 	color: white;
 	cursor: pointer;
+	box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+	transition: all 0.2s;
+}
+
+.apply-leave-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
 }
 
 /* ===== Scheduled Meetings Scroll ===== */
-/* ================= MEETING FIELDSET BACKGROUND ================= */
 #meetingSection .attendance-fieldset {
-	background: #c3cfe2;
+	background: #ffffff;
 	max-height: 460px;
 	overflow-y: auto;
 	border: none;
-	border-radius: 8px;
+	border-radius: 16px;
 	padding: 28px 22px;
-	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-}
-/* Legend Styling */
-#meetingSection legend {
-	padding: 6px 16px;
-	font-size: 15px;
-	font-weight: 600;
-	color: #333;
-	background: #e2ebf0;
-	border-radius: 10px;
-	border: 1px solid rgba(99, 102, 241, 0.35);
+	box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
 }
 
-/* ================= MEETING CARD ================= */
+#meetingSection legend {
+	padding: 8px 18px;
+	font-size: 15px;
+	font-weight: 700;
+	color: #fff;
+	border-radius: 20px;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	border: none;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
 #meetingSection .task-card {
 	display: flex;
 	justify-content: space-between;
@@ -472,18 +450,17 @@ body {
 	padding: 18px 20px;
 	margin-top: 18px;
 	border-radius: 14px;
-	background: rgba(99, 102, 241, 0.07);
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+	border: 1px solid rgba(102, 126, 234, 0.15);
 	overflow: auto;
 	transition: all 0.3s ease;
 }
 
-/* Hover Effect */
 #meetingSection .task-card:hover {
 	transform: translateY(-4px);
-	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 10px 28px rgba(102, 126, 234, 0.2);
 }
 
-/* Left Content */
 #meetingSection .task-left {
 	display: flex;
 	gap: 14px;
@@ -492,56 +469,46 @@ body {
 
 #meetingSection .task-left i {
 	font-size: 20px;
-	color: #444;
+	color: #667eea;
 	margin-top: 4px;
 }
 
-/* Title */
 #meetingSection .task-left b {
 	font-size: 15px;
 	color: #1f2937;
 }
 
-/* Description */
 #meetingSection .task-left small {
 	font-size: 13px;
-	color: #444;
+	color: #6b7280;
 }
 
-
-
-/* ================= JOIN BUTTON ================= */
 #meetingSection .task-btn {
-	padding: 10px 18px;
-	border-radius: 10px;
+	padding: 10px 20px;
+	border-radius: 20px;
 	border: none;
-	font-weight: 600;
-	background: #4f46e5;
+	font-weight: 700;
+	background: linear-gradient(135deg, #667eea, #764ba2);
 	color: white;
 	cursor: pointer;
 	transition: 0.25s;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 #meetingSection .task-btn:hover {
 	transform: translateY(-2px);
-	box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35);
+	box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
 }
 
-/* Empty Message */
 #meetingSection .no-task-text {
 	margin-top: 15px;
 	font-size: 14px;
 	color: #6b7280;
 }
 
-#meetingSection .attendance-fieldset::-webkit-scrollbar {
-	width: 4px;
-}
+#meetingSection .attendance-fieldset::-webkit-scrollbar { width: 4px; }
+#meetingSection .attendance-fieldset::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
 
-#meetingSection .attendance-fieldset::-webkit-scrollbar-thumb {
-	background: #e2ebf0;
-	border-radius: 4px;
-}
 /* ===== Settings Popup ===== */
 .popup {
 	display: none;
@@ -555,18 +522,18 @@ body {
 	background: white;
 	width: 420px;
 	padding: 30px;
-	border-radius: 14px; /* FIXED */
+	border-radius: 16px;
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	box-sizing: border-box;
-	border-radius: 14px;
 }
 
 .popup-content h3 {
 	text-align: center;
 	margin-bottom: 20px;
+	color: #667eea;
 }
 
 .popup-content form {
@@ -578,33 +545,42 @@ body {
 .popup-content input, .popup-content button {
 	width: 100%;
 	padding: 12px;
-	border-radius: 8px;
+	border-radius: 10px;
 	font-size: 14px;
 	box-sizing: border-box;
 }
 
 .popup-content input {
-	border: 1px solid #d1d5db;
+	border: 2px solid #e0e4ff;
+	outline: none;
+}
+
+.popup-content input:focus {
+	border-color: #667eea;
 }
 
 .update-btn {
-	background: #2563eb;
+	background: linear-gradient(135deg, #667eea, #764ba2);
 	color: white;
-	font-weight: 600;
+	font-weight: 700;
+	border: none;
+	cursor: pointer;
 }
 
 #settingsMenu button {
 	width: 100%;
 	padding: 12px;
-	border-radius: 8px;
+	border-radius: 10px;
 	font-size: 14px;
-	font-weight: 600;
+	font-weight: 700;
 }
 
 .cancel-btn {
 	background: #6b7280;
 	color: white;
-	font-weight: 600;
+	font-weight: 700;
+	border: none;
+	cursor: pointer;
 }
 
 /* ===== Calendar Scroll ===== */
@@ -612,114 +588,94 @@ body {
 	max-height: calc(100vh - 120px);
 	overflow-y: auto;
 	padding-right: 10px;
-	/* Hide scrollbar */
-	scrollbar-width: none; /* Firefox */
-	-ms-overflow-style: none; /* IE */
+	scrollbar-width: none;
+	-ms-overflow-style: none;
 }
 
 #calendarSection::-webkit-scrollbar {
 	width: 0;
-	background: c3cfe2; /* Chrome / Edge / Safari */
+	background: transparent;
 }
 
 #calendarSection h3 {
 	position: sticky;
 	top: 0;
-	background: white;
+	background: #f0f2ff;
 	padding-bottom: 10px;
 	z-index: 10;
+	color: #667eea;
 }
 
 /* ================= TOAST ================= */
 .toast {
-    position: fixed;
-    top: 90px;
-    right: 15px;
-    background: #e2ebf0;
-    color: black;
-    padding: 14px 20px 14px 44px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    display: none;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-    z-index: 3000;
-    line-height: 1.4;
+	position: fixed;
+	top: 90px;
+	right: 15px;
+	background: #ffffff;
+	color: #1a1a2e;
+	padding: 14px 20px 14px 50px;
+	border-radius: 12px;
+	font-size: 15px;
+	font-weight: 600;
+	display: none;
+	box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+	z-index: 3000;
+	line-height: 1.4;
+	border-left: 4px solid #667eea;
+	min-width: 240px;
 }
 
 .toast.show {
-    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+	animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toast.hide {
-    animation: toastOut 0.4s ease forwards;
+	animation: toastOut 0.4s ease forwards;
 }
 
 .toast::before {
-    content: "✔";
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    font-weight: bold;
+	content: "✔";
+	position: absolute;
+	left: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 16px;
+	font-weight: bold;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	line-height: 26px;
 }
 
-/* SUCCESS */
-.toast.success {
-    background: #e2ebf0;
-    color: black;
-}
+.toast.success { border-left-color: #10b981; }
+.toast.success::before { content: "✔"; background: linear-gradient(135deg, #10b981, #059669); }
 
-.toast.success::before {
-    content: "✔";
-}
+.toast.error { border-left-color: #ef4444; }
+.toast.error::before { content: "✖"; background: linear-gradient(135deg, #ef4444, #dc2626); }
 
-/* ERROR */
-.toast.error {
-    background: #e2ebf0;
-    color: black;
-}
-
-.toast.error::before {
-    content: "✖";
-}
-
-/* INFO */
-.toast.info {
-    background: #e2ebf0;
-    color: black;
-}
-
-.toast.info::before {
-    content: "✔";
-}
+.toast.info { border-left-color: #667eea; }
+.toast.info::before { content: "ℹ"; background: linear-gradient(135deg, #667eea, #764ba2); }
 
 @keyframes toastIn {
-    from {
-        opacity: 0;
-        transform: translateX(120px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+	from { opacity: 0; transform: translateX(120px); }
+	to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes toastOut {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(120px);
-    }
+	from { opacity: 1; transform: translateX(0); }
+	to { opacity: 0; transform: translateX(120px); }
 }
 
 .task-status.out {
-	background: #fecaca;
+	background: linear-gradient(135deg, #fecaca, #fca5a5);
 	color: #7f1d1d;
+	border: 1px solid rgba(127, 29, 29, 0.2);
 }
 
 /* notification */
@@ -729,12 +685,13 @@ body {
 	right: -380px;
 	width: 350px;
 	height: 450px;
-	background: #c3cfe2;
-	box-shadow: -3px 0 10px rgba(0, 0, 0, 0.15);
-	border-radius: 14px;
+	background: #ffffff;
+	box-shadow: -3px 0 30px rgba(102, 126, 234, 0.2);
+	border-radius: 16px;
 	transition: right 0.3s ease-in-out;
 	z-index: 1000;
 	font-family: Arial, sans-serif;
+	border: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .notification-panel.show {
@@ -742,60 +699,45 @@ body {
 }
 
 .notification-header {
-	background: #e2ebf0;
-	color: black;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: white;
 	padding: 15px;
-	border-radius: 14px 14px 0 0;
+	border-radius: 16px 16px 0 0;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	font-weight: 700;
 }
 
 .notification-header button {
-	background: none;
-	border: none;
-	color: black;
-	font-size: 18px;
+	background: rgba(255,255,255,0.2);
+	border: 1px solid rgba(255,255,255,0.3);
+	border-radius: 50%;
+	color: white;
+	font-size: 16px;
 	cursor: pointer;
+	width: 28px;
+	height: 28px;
 }
 
 .notification-list {
 	padding: 15px;
-	max-height: 350px; /* Adjust as needed */
+	max-height: 350px;
 	overflow-y: auto;
 }
 
 .notification-item {
-	background: #f3f4f6;
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
 	padding: 12px;
 	margin-bottom: 10px;
-	border-left: 4px solid #2563eb;
-	border-radius: 4px;
+	border-left: 4px solid #667eea;
+	border-radius: 8px;
 	font-size: 14px;
+	border: 1px solid rgba(102, 126, 234, 0.15);
 }
 
-.notification-list::-webkit-scrollbar {
-	width: 6px;
-}
-
-.notification-list::-webkit-scrollbar-thumb {
-	background: rgba(0, 0, 0, 0.25);
-	border-radius: 4px;
-}
-/* ================= SETTINGS ICON ================= */
-.settings-icon {
-	position: absolute;
-	top: 20px;
-	left: 20px;
-	font-size: 26px;
-	margin-left: 20px;
-	cursor: pointer;
-	background: #ffffff;
-	padding: 10px;
-	border-radius: 50%;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	z-index: 101;
-}
+.notification-list::-webkit-scrollbar { width: 6px; }
+.notification-list::-webkit-scrollbar-thumb { background: rgba(102, 126, 234, 0.4); border-radius: 4px; }
 
 /* ================= SETTINGS PANEL ================= */
 .settings-panel {
@@ -804,25 +746,30 @@ body {
 	right: -340px;
 	width: 340px;
 	height: 100%;
-	background: linear-gradient(135deg, rgba(255, 255, 255, 0.85),
-		rgba(240, 245, 255, 0.75));
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 242, 255, 0.95));
 	backdrop-filter: blur(16px);
-	box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
+	box-shadow: -8px 0 30px rgba(102, 126, 234, 0.2);
 	transition: right 0.4s ease, opacity 0.3s ease;
 	z-index: 1000;
-	border-left: 1px solid rgba(255, 255, 255, 0.4);
+	border-left: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .settings-header {
 	display: flex;
-	height: 50px;
+	height: 60px;
 	justify-content: space-between;
 	align-items: center;
-	padding: 15px;
-	background: linear-gradient(135deg, #6366f1, #818cfa);
+	padding: 15px 20px;
+	background: linear-gradient(135deg, #667eea, #764ba2);
 	color: white;
 }
-/* Open State */
+
+.settings-header h3 {
+	font-size: 18px;
+	font-weight: 700;
+	margin: 0;
+}
+
 .settings-panel.open {
 	right: 0;
 }
@@ -830,140 +777,148 @@ body {
 .close-btn {
 	cursor: pointer;
 	font-size: 18px;
+	background: rgba(255,255,255,0.2);
+	border: 1px solid rgba(255,255,255,0.3);
+	border-radius: 50%;
+	width: 30px;
+	height: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
 }
 
 .settings-item {
-	padding: 14px 22px;
+	padding: 16px 22px;
 	margin: 6px 12px;
-	border-radius: 10px;
+	border-radius: 12px;
 	cursor: pointer;
 	font-size: 15px;
-	font-weight: 500;
-	color: #2d3748;
+	font-weight: 600;
+	color: #4a5568;
 	display: flex;
 	align-items: center;
 	gap: 12px;
 	transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+	border: 1px solid transparent;
 }
 
-/* Hover Effect */
 .settings-item:hover {
-	background: rgba(99, 102, 241, 0.12);
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
 	transform: translateX(4px);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+	border-color: rgba(102, 126, 234, 0.2);
+	color: #667eea;
 }
 
-/* Icon Styling (Font Awesome) */
 .settings-item i {
 	font-size: 18px;
-	color: #6366f1;
+	color: #667eea;
 }
 
-/* Active Item */
 .settings-item.active {
-	background: linear-gradient(135deg, #6366f1, #818cf8);
+	background: linear-gradient(135deg, #667eea, #764ba2);
 	color: #fff;
 }
 
 .settings-item.active i {
 	color: #fff;
 }
-/* ================= CHANGE PASSWORD MODAL ================= */
-/* ================= MODAL (ADMIN STYLE) ================= */
+
 /* ================= MODAL ================= */
 .password-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
-    backdrop-filter: blur(6px);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    z-index: 2000;
-
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.25s ease;
+	position: fixed;
+	inset: 0;
+	background: rgba(0,0,0,0.45);
+	backdrop-filter: blur(6px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 2000;
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 0.25s ease;
 }
 
-/* Centered Box */
 .password-box {
-    width: 400px;          /* fixed clean width */
-    max-width: 90%;
-    background: white;
-    border-radius: 14px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    animation: fadeIn 0.25s ease;
+	width: 400px;
+	max-width: 90%;
+	background: white;
+	border-radius: 16px;
+	box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+	overflow: hidden;
+	animation: fadeIn 0.25s ease;
 }
 
-/* Header */
 .password-header {
-    padding: 14px 18px;
-    background: linear-gradient(135deg, #6366f1, #818cf8);
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	padding: 16px 20px;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: white;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .password-header h4 {
-    margin: 0;
-    font-size: 16px;
+	margin: 0;
+	font-size: 16px;
+	font-weight: 700;
 }
 
-/* Body */
 .password-body {
-    padding: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+	padding: 25px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
 }
 
-/* Profile Cards */
 .password-body .time-card {
-    background: #f3f4f6;
-    padding: 12px 14px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-size: 14px;
+	background: #f8f9ff;
+	padding: 12px 14px;
+	border-radius: 10px;
+	margin-bottom: 10px;
+	font-size: 14px;
+	border: 1px solid #e0e4ff;
 }
 
-/* Inputs */
 .password-body input {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    font-size: 14px;
-    box-sizing: border-box;
+	width: 100%;
+	padding: 12px 14px;
+	border-radius: 10px;
+	border: 2px solid #e0e4ff;
+	font-size: 14px;
+	box-sizing: border-box;
+	outline: none;
+	transition: border-color 0.2s;
 }
 
-/* Button */
+.password-body input:focus {
+	border-color: #667eea;
+	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
 .password-body button {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    background: linear-gradient(135deg, #6366f1, #818cf8);
-    color: white;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: 0.25s;
+	width: 100%;
+	padding: 12px;
+	border-radius: 25px;
+	border: none;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: white;
+	font-weight: 700;
+	font-size: 14px;
+	cursor: pointer;
+	transition: 0.25s;
+	box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .password-body button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
 }
 
-/* Animation */
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+	from { opacity: 0; transform: scale(0.95); }
+	to { opacity: 1; transform: scale(1); }
 }
 
 /* ================= DARK THEME ================= */
@@ -986,6 +941,171 @@ body {
 	color: white;
 	border: 1px solid #555;
 }
+
+/* ================= BREAK TIME ================= */
+.break-fieldset {
+	border-radius: 16px;
+	padding: 22px 20px 26px;
+	border: none;
+	background: #ffffff;
+	box-shadow: 0 8px 32px rgba(14, 165, 233, 0.15);
+	height: auto;
+	margin-top: 18px;
+}
+
+.break-fieldset legend {
+	padding: 8px 18px;
+	font-size: 15px;
+	font-weight: 700;
+	color: #fff;
+	border-radius: 20px;
+	background: linear-gradient(135deg, #0ea5e9, #6c63ff);
+	border: none;
+	box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+}
+
+.break-timer-display {
+	font-size: 28px;
+	font-weight: 900;
+	color: #0ea5e9;
+	text-align: center;
+	padding: 18px;
+	background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(99,102,241,0.08));
+	border-radius: 12px;
+	letter-spacing: 4px;
+	margin: 16px 0 14px;
+	border: 1px solid rgba(14,165,233,0.2);
+	text-shadow: 0 0 20px rgba(14,165,233,0.3);
+}
+
+.break-actions {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 14px;
+}
+
+.break-actions button {
+	flex: 1;
+	padding: 11px 10px;
+	border-radius: 25px;
+	border: none;
+	font-weight: 700;
+	font-size: 13px;
+	cursor: pointer;
+	transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+}
+
+.break-actions button:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+	transform: none !important;
+	box-shadow: none !important;
+}
+
+#startBreakBtn {
+	background: linear-gradient(135deg, #0ea5e9, #0284c7);
+	color: white;
+	box-shadow: 0 4px 14px rgba(14,165,233,0.4);
+}
+
+#startBreakBtn:hover:not(:disabled) {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 22px rgba(14,165,233,0.5);
+}
+
+#endBreakBtn {
+	background: linear-gradient(135deg, #f59e0b, #d97706);
+	color: white;
+	box-shadow: 0 4px 14px rgba(245,158,11,0.4);
+}
+
+#endBreakBtn:hover:not(:disabled) {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 22px rgba(245,158,11,0.5);
+}
+
+.break-total-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 14px;
+	background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(99,102,241,0.08));
+	border-radius: 10px;
+	border: 1px solid rgba(14,165,233,0.15);
+	margin-bottom: 12px;
+}
+
+.break-total-row .tr-label {
+	font-size: 12px;
+	color: #6b7280;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.break-total-row .tr-val {
+	font-size: 15px;
+	font-weight: 800;
+	color: #0ea5e9;
+	letter-spacing: 1px;
+}
+
+.break-status-badge {
+	display: none;
+	align-items: center;
+	gap: 7px;
+	padding: 6px 14px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: 700;
+	background: rgba(14,165,233,0.1);
+	color: #0ea5e9;
+	border: 1px solid rgba(14,165,233,0.25);
+	margin-bottom: 10px;
+}
+
+.break-status-badge .bdot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #0ea5e9;
+	animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+	0%,100% { opacity:1; }
+	50% { opacity:0.3; }
+}
+
+.break-log {
+	max-height: 110px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 10px;
+	gap: 6px;
+}
+
+.break-log::-webkit-scrollbar { width: 3px; }
+.break-log::-webkit-scrollbar-thumb { background: rgba(14,165,233,0.3); border-radius: 3px; }
+
+.break-entry {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 8px 12px;
+	background: #f8f9ff;
+	border-radius: 8px;
+	font-size: 12px;
+	border: 1px solid rgba(14,165,233,0.15);
+}
+
+.be-label { color: #4a5568; font-weight: 600; }
+.be-dur   { color: #0ea5e9; font-weight: 800; }
 </style>
 </head>
 
@@ -998,9 +1118,8 @@ body {
 			<span class="close-btn" onclick="closeSettings()">✖</span>
 		</div>
 
-		<div class="settings-item" onclick="openProfile()">My Profile</div>
-		<div class="settings-item" onclick="openChangePassword()">Change
-			Password</div>
+		<div class="settings-item" onclick="openProfile()"><i class="fa-solid fa-user"></i> My Profile</div>
+		<div class="settings-item" onclick="openChangePassword()"><i class="fa-solid fa-lock"></i> Change Password</div>
 	</div>
 
 	<!-- CHANGE PASSWORD MODAL -->
@@ -1013,15 +1132,13 @@ body {
 
 			<div class="password-body">
 				<input type="password" id="newPassword" placeholder="New Password">
-				<input type="password" id="confirmPassword"
-					placeholder="Confirm Password">
+				<input type="password" id="confirmPassword" placeholder="Confirm Password">
 				<button onclick="submitPassword()">Update Password</button>
 			</div>
 		</div>
 	</div>
 
 	<!-- SELF PROFILE MODAL -->
-
 	<div id="profileModal" class="password-modal">
 		<div class="password-box">
 			<div class="password-header">
@@ -1045,22 +1162,20 @@ body {
 				<div class="time-card">
 					Phone: <b><%=userObj != null ? userObj.getPhone() : "--"%></b>
 				</div>
-
 			</div>
 		</div>
 	</div>
 
-
-
-
-
-
 	<div class="top-bar">
 		<h2>Smart Office • Employee Dashboard</h2>
+		
 		<div class="user-area">
+			<button class="icon-btn"
+				onclick="setActive(this); openNotifications(); setTab('notificationPanel');">
+				<i class="fa-solid fa-bell"></i>
+			</button>
 			Welcome, <b><%=username%></b>
-			<button class="icon-btn" onclick="openSettings()"
-				style="margin-left: 10px;">
+			<button class="icon-btn" onclick="openSettings()" style="margin-left: 10px;">
 				<i class="fa-solid fa-gear" style="margin-left: 2px;"></i>
 			</button>
 			<a href="<%=request.getContextPath()%>/logout">
@@ -1071,39 +1186,38 @@ body {
 
 	<div class="container">
 
-		<!-- Font Awesome -->
-
 		<div class="left-panel">
 			<button class="nav-btn active"
-onclick="setActive(this); showAttendance(); setTab('attendance');">
-<i class="fa-solid fa-user-check"></i> <span>My Attendance</span>
-</button>
+				onclick="setActive(this); showAttendance(); setTab('attendance');">
+				<i class="fa-solid fa-user-check"></i> <span>My Attendance</span>
+			</button>
 
-<button class="nav-btn"
-onclick="setActive(this); showTasks(); setTab('tasks');">
-<i class="fa-solid fa-list-check"></i> <span>Assigned Tasks</span>
-</button>
+			<button class="nav-btn"
+				onclick="setActive(this); showTasks(); setTab('tasks');">
+				<i class="fa-solid fa-list-check"></i> <span>Assigned Tasks</span>
+			</button>
 
-<button class="nav-btn"
-onclick="setActive(this); showLeave(); setTab('leave');">
-<i class="fa-solid fa-calendar-xmark"></i> <span>Apply Leave</span>
-</button>
+			<button class="nav-btn"
+				onclick="setActive(this); showLeave(); setTab('leave');">
+				<i class="fa-solid fa-calendar-xmark"></i> <span>Apply Leave</span>
+			</button>
 
-<button class="nav-btn"
-onclick="setActive(this); showMeetings(); setTab('meetings');">
-<i class="fa-solid fa-handshake"></i> <span>Scheduled Meetings</span>
-</button>
+			<button class="nav-btn"
+				onclick="setActive(this); showMeetings(); setTab('meetings');">
+				<i class="fa-solid fa-handshake"></i> <span>Scheduled Meetings</span>
+			</button>
 
-<button class="nav-btn"
-onclick="setActive(this); openCalendar(); setTab('calendar');">
-<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
-</button>
+			<button class="nav-btn"
+				onclick="setActive(this); openCalendar(); setTab('calendar');">
+				<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
+			</button>
 
-<button class="nav-btn"
-onclick="setActive(this); openNotifications(); setTab('notificationPanel');">
-<i class="fa-solid fa-bell"></i> <span>Notifications</span>
-</button>
-		</div>
+<!-- 			<button class="nav-btn" -->
+<!-- 				onclick="setActive(this); openNotifications(); setTab('notificationPanel');"> -->
+<!-- 				<i class="fa-solid fa-bell"></i> <span>Notifications</span> -->
+<!-- 			</button> -->
+	</div>
+
 		<div class="right-panel">
 
 			<!-- Attendance -->
@@ -1120,7 +1234,6 @@ onclick="setActive(this); openNotifications(); setTab('notificationPanel');">
 					<div class="time-card">
 						Punch In: <b><%=punchIn != null ? punchIn : "--"%></b>
 					</div>
-
 					<div class="time-card">
 						Punch Out: <b><%=punchOut != null ? punchOut : "--"%></b>
 					</div>
@@ -1139,16 +1252,48 @@ onclick="setActive(this); openNotifications(); setTab('notificationPanel');">
 								Punch Out</button>
 						</form>
 					</div>
+				</fieldset>
 
+				<!-- ====== BREAK TIME TRACKER ====== -->
+				<fieldset class="break-fieldset">
+					<legend>
+						<i class="fa-solid fa-mug-hot"></i> Break Time
+					</legend>
+
+					<div class="break-status-badge" id="breakStatusBadge">
+						<span class="bdot"></span> On Break
+					</div>
+
+					<div class="break-timer-display" id="breakTimer">00:00:00</div>
+
+					<div class="break-total-row">
+						<span class="tr-label">Total Break Today</span>
+						<span class="tr-val" id="totalBreakTime">00:00:00</span>
+					</div>
+					
+					<div class="break-log" id="breakLog"></div>
+
+					<div class="break-actions">
+						<button id="startBreakBtn" onclick="startBreak()"
+							<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
+							<i class="fa-solid fa-play"></i> Start Break
+						</button>
+						<button id="endBreakBtn" onclick="endBreak()" disabled>
+							<i class="fa-solid fa-stop"></i> End Break
+						</button>
+					</div>
+
+					
 				</fieldset>
 
 			</div>
+
 			<!-- Tasks -->
 			<div class="box" id="taskSection" style="display: none;">
 
 				<fieldset class="attendance-fieldset">
 					<legend>
-						<i class="fa-solid fa-list-check"></i> My Tasks
+						<i class="fa-solid fa-list-check"></i> Assigned Tasks
 					</legend>
 
 					<%
@@ -1173,28 +1318,37 @@ onclick="setActive(this); openNotifications(); setTab('notificationPanel');">
 
 						<div class="task-actions">
 
-							<%
-							if (!"COMPLETED".equals(t.getStatus())) {
-							%>
-
-							<span class="task-status pending">PENDING</span>
-
-							<form action="updateTaskStatus" method="post"
-								style="display: inline;">
+								<form action="updateTaskStatus" method="post">
+								
 								<input type="hidden" name="taskId" value="<%=t.getId()%>">
-								<input type="hidden" name="status" value="COMPLETED">
-								<button class="task-btn">Done</button>
-							</form>
-
-							<%
-							} else {
-							%>
-
-							<span class="task-status done">✔ Completed</span>
-
-							<%
-							}
-							%>
+								
+								<select name="status" class="task-dropdown" onchange="this.form.submit()">
+								
+								<option value="">Update Status</option>
+								
+								<option value="COMPLETED"
+								<%= "COMPLETED".equals(t.getStatus()) ? "selected" : "" %>>
+								Complete
+								</option>
+								
+								<option value="INCOMPLETE"
+								<%= "INCOMPLETE".equals(t.getStatus()) ? "selected" : "" %>>
+								Incomplete
+								</option>
+								
+								<option value="ERRORS_RAISED"
+								<%= "ERRORS_RAISED".equals(t.getStatus()) ? "selected" : "" %>>
+								Errors Raised
+								</option>
+								
+								<option value="DOCUMENT_VERIFICATION"
+								<%= "DOCUMENT_VERIFICATION".equals(t.getStatus()) ? "selected" : "" %>>
+								Document Verification
+								</option>
+								
+								</select>
+								
+								</form>
 
 						</div>
 					</div>
@@ -1258,10 +1412,8 @@ onclick="setActive(this); openNotifications(); setTab('notificationPanel');">
 
 			<!-- Calendar -->
 			<div class="box" id="calendarSection" style="display: none;">
-
 				<iframe id="calendarFrame" src=""
 					style="width: 100%; height: 100%; border: none;"> </iframe>
-
 			</div>
 
 			<!-- Leave -->
@@ -1275,34 +1427,36 @@ onclick="setActive(this); openNotifications(); setTab('notificationPanel');">
 					<!-- Leave Tabs -->
 					<div style="display: flex; gap: 12px; margin-bottom: 20px;">
 						<button class="nav-btn"
-							style="flex: 1; background: #2563eb; color: white;"
+							style="flex: 1; background: linear-gradient(135deg,#667eea,#764ba2); color: white; border-radius:20px;"
 							onclick="showApplyLeave()">Apply Leave</button>
 						<button class="nav-btn"
-							style="flex: 1; background: #6b7280; color: white;"
+							style="flex: 1; background: #6b7280; color: white; border-radius:20px;"
 							onclick="showMyLeaves()">My Leave Requests</button>
 					</div>
 
 					<!-- Apply Leave -->
 					<div id="applyLeaveSection">
 						<form class="leave-form" action="applyLeave" method="post">
-							<label>Leave Type</label> <select name="leaveType" required>
+							<label>Leave Type</label>
+							<select name="leaveType" required>
 								<option value="">Select</option>
 								<option>Casual Leave</option>
 								<option>Sick Leave</option>
 								<option>Earned Leave</option>
-							</select> <label>From Date</label> <input type="date" name="fromDate"
-								required> <label>To Date</label> <input type="date"
-								name="toDate" required> <label>Reason</label>
+							</select>
+							<label>From Date</label>
+							<input type="date" name="fromDate" required>
+							<label>To Date</label>
+							<input type="date" name="toDate" required>
+							<label>Reason</label>
 							<textarea name="reason" required></textarea>
-
-							<button class="apply-leave-btn" style="color: white;">Apply
-								Leave</button>
+							<button class="apply-leave-btn" style="color: white;">Apply Leave</button>
 						</form>
 					</div>
 
 					<!-- My Leave Requests -->
 					<div id="myLeaveSection" style="display: none;">
-						<h3 style="margin-top: 10px; color: black;">
+						<h3 style="margin-top: 10px;">
 							<i class="fa-solid fa-list"></i> My Leave Requests
 						</h3>
 
@@ -1366,7 +1520,7 @@ onclick="setActive(this); openNotifications(); setTab('notificationPanel');">
 
 						<div style="margin-top: 8px; text-align: right;">
 							<button
-								style="background: #2563eb; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;"
+								style="background: linear-gradient(135deg,#667eea,#764ba2); color: white; border: none; padding: 4px 10px; border-radius: 12px; cursor: pointer; font-size: 12px; font-weight:600;"
 								onclick="markAsRead(<%=n.getId()%>)">Mark as read</button>
 						</div>
 					</div>
@@ -1388,33 +1542,25 @@ onclick="setActive(this); openNotifications(); setTab('notificationPanel');">
 
 			<script>
 			
-			
 			window.addEventListener("load", function () {
-
 			    let activeTab = sessionStorage.getItem("activeTab");
-
 			    if (!activeTab) {
 			        activeTab = "attendance";
 			    }
-
 			    if (activeTab === "tasks") showTasks();
 			    if (activeTab === "leave") showLeave();
 			    if (activeTab === "meetings") showMeetings();
 			    if (activeTab === "calendar") openCalendar();
 			    if (activeTab === "attendance") showAttendance();
-
 			});
 			
 			window.addEventListener("beforeunload", function () {
-
 			    if (performance.navigation.type === 1) {
 			        sessionStorage.removeItem("activeTab");
 			    }
-
 			});
 			
-    // ===== Section Helpers =====
-   function hideAllSections() {
+    function hideAllSections() {
     document.getElementById("attendanceSection").style.display = "none";
     document.getElementById("taskSection").style.display = "none";
     document.getElementById("leaveSection").style.display = "none";
@@ -1448,8 +1594,6 @@ function openCalendar() {
     document.getElementById("calendarFrame").src = "calendar.jsp";
 }
 
-    
-
     function showCalendar() {
         hideAllSections();
         document.getElementById("calendarSection").style.display = "block";
@@ -1466,7 +1610,6 @@ function openCalendar() {
         document.getElementById("myLeaveSection").style.display = "block";
     }
 
-    // ===== Notifications =====
     function openNotifications() {
         document.getElementById("notificationPanel").classList.add("show");
     }
@@ -1475,42 +1618,31 @@ function openCalendar() {
         document.getElementById("notificationPanel").classList.remove("show");
     }
 
-    // ===== Toast =====
     function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
-
     toast.style.display = "none";
     toast.className = "toast";
-    toast.offsetHeight; // force reflow
-
+    toast.offsetHeight;
     toast.classList.add(type);
     toast.textContent = message;
     toast.style.display = "block";
-
     toast.classList.add("show");
-
     setTimeout(() => {
         toast.classList.remove("show");
         toast.classList.add("hide");
-
         setTimeout(() => {
             toast.style.display = "none";
             toast.className = "toast";
         }, 400);
     }, 2500);
 }
-    
-    
 
-    // ===== URL PARAM HANDLING (IMPORTANT PART) =====
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab");
     const sub = params.get("sub");
 
-    // ---- SUCCESS ----
     if (params.has("success")) {
     const success = params.get("success");
-
     if (success === "LeaveApplied") {
         showToast("Leave applied successfully", success);
     } 
@@ -1528,10 +1660,8 @@ function openCalendar() {
     }
 }
 
-    // ---- ERROR ----
     if (params.has("error")) {
         const error = params.get("error");
-
         if (error === "WrongOldPassword") {
             showToast("Old password is incorrect", error);
         } else if (error === "PasswordMismatch") {
@@ -1543,11 +1673,9 @@ function openCalendar() {
         }
     }
 
-    // ---- TAB RESTORE LOGIC ----
     if (tab === "leave") {
         showLeave();
         document.querySelectorAll(".nav-btn")[1].classList.add("active");
-
         if (sub === "apply") {
             showApplyLeave();
             document.querySelectorAll(".nav-btn")[1].classList.add("active");
@@ -1569,12 +1697,10 @@ function openCalendar() {
     	document.querySelectorAll(".nav-btn")[1].classList.add("active");
     }
     else {
-        // Default view
         showAttendance();
         document.querySelectorAll(".nav-btn")[1].classList.add("active");
     }
 
-    // ---- Clean URL ----
     if (params.has("success") || params.has("error")) {
         setTimeout(() => {
             window.history.replaceState({}, document.title, window.location.pathname);
@@ -1606,19 +1732,14 @@ function closeChangePassword() {
 }
  
 function toggleTheme() {
-
     document.body.classList.toggle("dark-theme");
-
 }
  
 function closeAll() {
-
     closeSettings();
-
     closeChangePassword();
-
-
 }
+
 function openProfile() {
     closeSettings();
     const modal = document.getElementById("profileModal");
@@ -1633,29 +1754,17 @@ function closeProfile() {
 }
 
 function markAsRead(notificationId) {
-
     fetch("markNotificationRead?id=" + notificationId, {
         method: "POST"
     })
     .then(response => {
         if (response.ok) {
-
-            // Remove notification from UI
             const el = document.getElementById("notif-" + notificationId);
             if (el) el.remove();
-
-            // ✅ CHECK IF EMPTY
             const list = document.getElementById("notificationList");
-
-            // Count remaining notification items
             const remaining = list.querySelectorAll(".notification-item");
-
             if (remaining.length === 0) {
-                list.innerHTML = `
-                    <div class="notification-item">
-                        No notifications
-                    </div>
-                `;
+                list.innerHTML = `<div class="notification-item">No notifications</div>`;
             }
         }
     })
@@ -1686,11 +1795,9 @@ function markAsRead(notificationId) {
 			    })
 			    .then(res => res.text())
 			    .then(data => {
-
 			        if (data === "Success") {
 			            showToast("Password updated successfully", "success");
 			            closeChangePassword();
-
 			            document.getElementById("newPassword").value = "";
 			            document.getElementById("confirmPassword").value = "";
 			        }
@@ -1716,32 +1823,26 @@ function markAsRead(notificationId) {
 
 			<script>
 			function setActive(btn) {
-
 			    document.querySelectorAll(".nav-btn").forEach(b => {
 			        b.classList.remove("active");
 			    });
-
 			    btn.classList.add("active");
 			}
 
 window.onclick = function(e) {
     const modal = document.getElementById("passwordModal");
     const profile = document.getElementById("profileModal");
-
     if (e.target === modal) closeChangePassword();
     if (e.target === profile) closeProfile();
 };
-
 
 function setTab(tabName) {
     sessionStorage.setItem("activeTab", tabName);
 }
 
 window.onload = function () {
-
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab");
-
     const buttons = document.querySelectorAll(".nav-btn");
 
     if (tab === "tasks") {
@@ -1764,9 +1865,7 @@ window.onload = function () {
         showAttendance();
         setActive(buttons[0]);
     }
-
 };
-
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.onkeydown = e =>
@@ -1775,5 +1874,70 @@ document.onkeydown = e =>
     : true;
 
 </script>
+
+			<!-- ====== BREAK TIME SCRIPT ====== -->
+			<script>
+			let breakStartTime = null;
+			let breakInterval  = null;
+			let totalBreakMs   = 0;
+			let breakEntries   = [];
+
+			function fmtTime(ms) {
+			    const s  = Math.floor(ms / 1000);
+			    const h  = Math.floor(s / 3600);
+			    const m  = Math.floor((s % 3600) / 60);
+			    const sc = s % 60;
+			    return [h, m, sc].map(x => String(x).padStart(2, '0')).join(':');
+			}
+
+			function startBreak() {
+			    if (breakStartTime) return;
+			    breakStartTime = Date.now();
+			    document.getElementById('startBreakBtn').disabled = true;
+			    document.getElementById('endBreakBtn').disabled   = false;
+			    document.getElementById('breakStatusBadge').style.display = 'flex';
+
+			    breakInterval = setInterval(() => {
+			        const elapsed = Date.now() - breakStartTime;
+			        document.getElementById('breakTimer').textContent = fmtTime(elapsed);
+			    }, 1000);
+			}
+
+			function endBreak() {
+			    if (!breakStartTime) return;
+			    clearInterval(breakInterval);
+
+			    const dur   = Date.now() - breakStartTime;
+			    totalBreakMs += dur;
+
+			    const start = new Date(breakStartTime);
+			    const end   = new Date();
+			    breakEntries.push({ start, end, dur });
+
+			    renderBreakLog();
+
+			    breakStartTime = null;
+			    document.getElementById('startBreakBtn').disabled = false;
+			    document.getElementById('endBreakBtn').disabled   = true;
+			    document.getElementById('breakStatusBadge').style.display = 'none';
+			    document.getElementById('breakTimer').textContent = '00:00:00';
+			    document.getElementById('totalBreakTime').textContent = fmtTime(totalBreakMs);
+			}
+
+			function renderBreakLog() {
+			    const log = document.getElementById('breakLog');
+			    log.innerHTML = '';
+			    breakEntries.forEach((e, i) => {
+			        const fmt = t => t.toTimeString().substring(0, 8);
+			        const div = document.createElement('div');
+			        div.className = 'break-entry';
+			        div.innerHTML =
+			            '<span class="be-label">Break ' + (i + 1) + ' &nbsp; ' + fmt(e.start) + ' – ' + fmt(e.end) + '</span>' +
+			            '<span class="be-dur">' + fmtTime(e.dur) + '</span>';
+			        log.appendChild(div);
+			    });
+			}
+			</script>
+
 </body>
 </html>
