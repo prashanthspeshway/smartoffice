@@ -169,17 +169,6 @@ body {
 				</div>
 
 				<div class="form-group">
-					<label>Password</label>
-
-					<div class="password-wrapper">
-						<input type="password" id="passwordField" name="password"
-							value="${password}" required> <i
-							class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
-					</div>
-
-				</div>
-
-				<div class="form-group">
 					<label>Phone Number</label> <input type="text" name="number"
 						value="${phone}" required>
 				</div>

@@ -23,9 +23,9 @@ session.removeAttribute("errorMsg");
 
 body {
 	margin: 0;
-/* 	padding: 30px; */
+	/* 	padding: 30px; */
 	font-family: "Segoe UI", Arial, sans-serif;
-/* 	background:#fffafa; */
+	/* 	background:#fffafa; */
 	height: auto;
 	display: flex;
 	justify-content: center;
@@ -33,7 +33,7 @@ body {
 }
 
 .container {
-	height: 100%;	
+	height: 100%;
 	width: 100%;
 	background: #c3cfe2;
 	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
@@ -47,7 +47,8 @@ h2 {
 }
 
 .form-group {
-/* 	margin-bottom: 16px; */
+	/* 	margin-bottom: 16px; */
+	
 }
 
 label {
@@ -90,81 +91,84 @@ button:hover {
 
 /* ================= TOAST ================= */
 .toast {
-    position: fixed;
-    top: 30px;
-    right: 25px;
-    background: #e2ebf0;
-    color: black;
-    padding: 14px 20px 14px 44px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    display: none;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-    z-index: 3000;
-    line-height: 1.4;
-    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+	position: fixed;
+	top: 30px;
+	right: 25px;
+	background: #e2ebf0;
+	color: black;
+	padding: 14px 20px 14px 44px;
+	border-radius: 10px;
+	font-size: 15px;
+	font-weight: 500;
+	display: none;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+	z-index: 3000;
+	line-height: 1.4;
+	animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toast.hide {
-    animation: toastOut 0.4s ease forwards;
+	animation: toastOut 0.4s ease forwards;
 }
 
 /* Icon */
-.toast::before { 
-     content: "✔"; 
-     position: absolute; 
-     left: 16px; 
-     top: 50%; 
-     transform: translateY(-50%); 
-     font-size: 16px; 
-     font-weight: bold; 
- } 
+.toast::before {
+	content: "✔";
+	position: absolute;
+	left: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 16px;
+	font-weight: bold;
+}
 
 /* SUCCESS */
 .toast.success {
-    background: #e2ebf0;
-    color: black;
+	background: #e2ebf0;
+	color: black;
 }
 
 /* ERROR */
 .toast.error {
-    background: #e2ebf0;
-    color: black;
+	background: #e2ebf0;
+	color: black;
 }
+
 .toast.error::before {
-    content: "✖";
+	content: "✖";
 }
 
 /* INFO */
 .toast.info {
-    background: #e2ebf0;
-    color: black;
+	background: #e2ebf0;
+	color: black;
 }
+
 .toast.info::before {
-    content: "ℹ";
+	content: "ℹ";
 }
 
-@keyframes toastIn {
-    from {
-        opacity: 0;
-        transform: translateX(120px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+@
+keyframes toastIn {from { opacity:0;
+	transform: translateX(120px);
 }
 
-@keyframes toastOut {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(120px);
-    }
+to {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+}
+@
+keyframes toastOut {from { opacity:1;
+	transform: translateX(0);
+}
+
+to {
+	opacity: 0;
+	transform: translateX(120px);
+}
+
 }
 
 /* DARK MODE FIX FOR ADD USER PAGE */
@@ -213,115 +217,110 @@ body.dark-theme select option {
 
 /* ===== Form Container ===== */
 fieldset {
-    width: 96%;
-    margin: 30px auto;
-    padding: 30px 35px;
-    border-radius: 14px;
-    border: none;
-    background: #c3cfe2;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+	width: 96%;
+	margin: 30px auto;
+	padding: 30px 35px;
+	border-radius: 14px;
+	border: none;
+	background: #c3cfe2;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
 /* ===== Legend ===== */
 legend {
-    padding: 8px 18px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #1f2937;
-    background:#e2ebf0;
-    border-radius: 8px;
+	padding: 8px 18px;
+	font-size: 18px;
+	font-weight: bold;
+	color: #1f2937;
+	background: #e2ebf0;
+	border-radius: 8px;
 }
 
 /* ===== Grid Layout ===== */
 fieldset {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-     gap: 18px 28px; 
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 18px 28px;
 }
 
 /* Full-width items */
 fieldset button {
-    grid-column: span 2;
+	grid-column: span 2;
 }
 
 /* ===== Form Group ===== */
 .form-group {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 /* ===== Labels ===== */
 .form-group label {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: #374151;
+	font-size: 14px;
+	font-weight: 600;
+	margin-bottom: 6px;
+	color: #374151;
 }
 
 /* ===== Inputs & Select ===== */
-.form-group input,
-.form-group select {
-    padding: 12px 14px;
-    font-size: 14px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    outline: none;
-    transition: 0.25s ease;
-/*     background: #f9fafb; */
-     background: #f2f0f0;
+.form-group input, .form-group select {
+	padding: 12px 14px;
+	font-size: 14px;
+	border-radius: 8px;
+	border: 1px solid #d1d5db;
+	outline: none;
+	transition: 0.25s ease;
+	/*     background: #f9fafb; */
+	background: #f2f0f0;
 }
 
 /* ===== Focus Effect ===== */
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-    background: #ffffff;
+.form-group input:focus, .form-group select:focus {
+	border-color: #2563eb;
+	box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+	background: #ffffff;
 }
 
 /* ===== Select Arrow Fix ===== */
 select {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 /* ===== Button ===== */
 button[type="submit"] {
-    margin-top: 15px;
-    padding: 14px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #ffffff;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.3s ease;
+	margin-top: 15px;
+	padding: 14px;
+	font-size: 16px;
+	font-weight: bold;
+	color: #ffffff;
+	background: linear-gradient(135deg, #2563eb, #1d4ed8);
+	border: none;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: 0.3s ease;
 }
 
 /* ===== Button Hover ===== */
 button[type="submit"]:hover {
-    background: linear-gradient(135deg, #1d4ed8, #1e40af);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(37,99,235,0.35);
+	background: linear-gradient(135deg, #1d4ed8, #1e40af);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
 }
 
 /* ===== Button Active ===== */
 button[type="submit"]:active {
-    transform: scale(0.98);
+	transform: scale(0.98);
 }
 
 /* ===== Responsive (Mobile) ===== */
-@media (max-width: 768px) {
-    fieldset {
-        grid-template-columns: 1fr;
-    }
-
-    fieldset button {
-        grid-column: span 1;
-    }
+@media ( max-width : 768px) {
+	fieldset {
+		grid-template-columns: 1fr;
+	}
+	fieldset button {
+		grid-column: span 1;
+	}
 }
-
-
 </style>
 </head>
 
@@ -331,78 +330,95 @@ button[type="submit"]:active {
 	<div id="toast" class="toast"></div>
 
 	<div class="container">
-<!-- 		<h2>Add Employee</h2> -->
+		<!-- 		<h2>Add Employee</h2> -->
 
 		<form action="addUser" method="post">
 			<fieldset>
-			    <legend>Add Employee</legend>
-			<div class="form-group">
-				<label>Username</label> <input type="text" name="username" required>
-			</div>
+				<legend>Add Employee</legend>
+				<div class="form-group">
+					<label>Username</label> <input type="text" name="username" required>
+				</div>
 
-			<div class="form-group">
-				<label>Password</label> <input type="password" name="password"
-					required>
-			</div>
+				<div class="form-group">
+					<label>Password</label> <input type="password" name="password"
+						required>
+				</div>
 
-			<div class="form-group">
-				<label>Role</label> <select name="role" id="role" required>
-					<option value="">Select Role</option>
-					<option value="manager">Manager</option>
-					<option value="user">Employee</option>
-				</select>
-			</div>
+				<div class="form-group">
+					<label>Role</label> <select name="role" id="role" required>
+						<option value="">Select Role</option>
+						<option value="manager">Manager</option>
+						<option value="user">Employee</option>
+					</select>
+				</div>
 
-			<div class="form-group">
-				<label>Status</label> <select name="status" required>
-					<option value="">Select Status</option>
-					<option value="active">Active</option>
-					<option value="inactive">Inactive</option>
-					<option value="banned">Banned</option>
-					<option value="pending">Pending</option>
-					<option value="suspended">Suspended</option>
-				</select>
-			</div>
+				<div class="form-group">
+					<label>Status</label> <select name="status" required>
+						<option value="">Select Status</option>
+						<option value="active">Active</option>
+						<option value="inactive">Inactive</option>
+						<option value="banned">Banned</option>
+						<option value="pending">Pending</option>
+						<option value="suspended">Suspended</option>
+					</select>
+				</div>
 
-			<div class="form-group">
-				<label>Full Name</label> <input type="text" name="fullname" required>
-			</div>
+				<div class="form-group">
+					<label>Full Name</label> <input type="text" name="fullname"
+						required>
+				</div>
 
-			<div class="form-group">
-				<label>Phone Number</label> <input type="number" name="phonenumber"
-					required>
-			</div>
+				<div class="form-group">
+					<label>Phone Number</label> <input type="number" name="phonenumber"
+						required>
+				</div>
 
-			<div class="form-group">
-				<label>Manager</label> 
-				<select name="manager" id="managerSelect">
-					<option value="">Select Manager</option>
-					<option value="admin">Admin</option>
+				<div class="form-group">
+					<label>Manager</label> <select name="manager" id="managerSelect">
+						<option value="">Select Manager</option>
+						<option value="admin">Admin</option>
 
-					<%
-					List<String> managers = (List<String>) request.getAttribute("managers");
-					if (managers != null) {
-						for (String m : managers) {
-					%>
-					<option value="<%=m%>"><%=m%></option>
-					<%
-					}
-					}
-					%>
-				</select>
-			</div>
+						<%
+						List<String> managers = (List<String>) request.getAttribute("managers");
+						if (managers != null) {
+							for (String m : managers) {
+						%>
+						<option value="<%=m%>"><%=m%></option>
+						<%
+						}
+						}
+						%>
+					</select>
+				</div>
 
-			<div class="form-group">
-				<label>Email</label> <input type="email" name="email" required>
-			</div>
+				<div class="form-group">
+					<label>Email</label> <input type="email" name="email" required>
+				</div>
 
-			<div class="form-group">
-				<label>Joined Date</label> <input type="date" name="joinedDate"
-					required>
-			</div>
+				<div class="form-group">
+					<label>Joined Date</label> <input type="date" name="joinedDate"
+						required>
+				</div>
 
-			<button type="submit">Add Employee</button>
+				<button type="submit">Add Employee</button>
 			</fieldset>
+		</form>
+		<hr style="margin: 30px 0">
+
+		<form action="bulkUploadEmployees" method="post"
+			enctype="multipart/form-data">
+
+			<fieldset>
+				<legend>Upload Bulk Employees</legend>
+
+				<div class="form-group">
+					<input type="file" name="excelFile" accept=".xlsx,.csv" required>
+				</div>
+
+				<button type="submit">Add Bulk Employees</button>
+
+			</fieldset>
+
 		</form>
 	</div>
 

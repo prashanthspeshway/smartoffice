@@ -534,6 +534,11 @@ to {
 	<div class="top-bar">
 		<h2>Smart Office • Admin Dashboard</h2>
 		<div class="user-area">
+		
+			<button class="settings-btn"
+				onclick="loadPage(this,'sendNotification.jsp')">
+				<i class="fa-solid fa-bell"></i>
+			</button>
 			<span class="welcome">Welcome, <strong>${sessionScope.username}</strong></span>
 			<button class="settings-btn" onclick="openSettings()">
 				<i class="fa fa-gear"></i>
@@ -568,12 +573,6 @@ to {
 			<button class="sidebar-btn" onclick="loadPage(this,'calendar.jsp')">
 				<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
 			</button>
-
-			<button class="sidebar-btn"
-				onclick="loadPage(this,'sendNotification.jsp')">
-				<i class="fa-solid fa-bell"></i> <span>Send Notifications</span>
-			</button>
-
 			<button class="sidebar-btn" onclick="exportUsers()">
 				<i class="fa-solid fa-file-export"></i> <span>Export
 					Employees</span>
@@ -645,7 +644,7 @@ function submitPassword() {
         	showToast("Please fill all fields", "warning");
         } 
         else {
-            showToast("Something went wrong");
+            showToast("Password must be at least 8 characters with uppercase, lowercase, number, and symbol.");
         }
     })
     .catch(err => {

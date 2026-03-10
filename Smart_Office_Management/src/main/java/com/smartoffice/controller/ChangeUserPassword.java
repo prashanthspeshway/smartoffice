@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.smartoffice.utils.DBConnectionUtil;
+import com.smartoffice.utils.PasswordUtil;
 
 @SuppressWarnings("serial")
 @WebServlet("/changePassword")
@@ -62,7 +63,8 @@ public class ChangeUserPassword extends HttpServlet {
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, newPassword);   // password
+        	String hashedPassword = PasswordUtil.hashPassword(newPassword);
+        	ps.setString(1, hashedPassword);   // password
             ps.setString(2, username);      // username
 
             int updated = ps.executeUpdate();

@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.smartoffice.utils.DBConnectionUtil;
+import com.smartoffice.utils.PasswordUtil;
 
 @SuppressWarnings("serial")
 @WebServlet("/addUser")
@@ -29,7 +30,8 @@ public class AddUser extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-        String password = req.getParameter("password");
+    	String password = req.getParameter("password");
+    	String hashedPassword = PasswordUtil.hashPassword(password);
         String role = req.getParameter("role");
         String manager = req.getParameter("manager");
 
@@ -67,12 +69,20 @@ public class AddUser extends HttpServlet {
             PreparedStatement ps = con.prepareStatement(sql);
 
             ps.setString(1, req.getParameter("username"));
-            ps.setString(2, password);
+            ps.setString(2, hashedPassword);
             ps.setString(3, role);
             ps.setString(4, req.getParameter("status"));
             ps.setString(5, req.getParameter("email"));
             ps.setString(6, req.getParameter("fullname"));
-            ps.setDate(7, Date.valueOf(req.getParameter("joinedDate")));
+            String joinedDateStr = req.getParameter("joinedDate");
+
+            Date joinedDate = null;
+
+            if (joinedDateStr != null && !joinedDateStr.isEmpty()) {
+                joinedDate = Date.valueOf(joinedDateStr);
+            }
+
+            ps.setDate(7, joinedDate);
             ps.setString(8, manager);
             ps.setString(9, req.getParameter("phonenumber"));
 
