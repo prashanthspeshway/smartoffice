@@ -71,60 +71,47 @@ public class BulkUploadEmployees extends HttpServlet {
 					
 
 					for (Row row : sheet) {
-						
-						
-
 						if (row.getRowNum() == 0)
 							continue;
 
-						String email = formatter.formatCellValue(row.getCell(4));
+						// Expected Excel columns: 0=username, 1=password, 2=status, 3=role, 4=firstname, 5=lastname, 6=email, 7=joinedDate, 8=phone
+						String username = formatter.formatCellValue(row.getCell(0));
 						String password = formatter.formatCellValue(row.getCell(1));
+						String status = formatter.formatCellValue(row.getCell(2));
+						String role = formatter.formatCellValue(row.getCell(3));
+						String firstname = formatter.formatCellValue(row.getCell(4));
+						String lastname = formatter.formatCellValue(row.getCell(5));
+						String email = formatter.formatCellValue(row.getCell(6));
 
 						if (email == null || email.trim().isEmpty() || !isValidPassword(password)) {
 							continue;
 						}
-						insertedCount++;
-						String role = formatter.formatCellValue(row.getCell(2));
-						String status = formatter.formatCellValue(row.getCell(3));
-						String fullname = formatter.formatCellValue(row.getCell(5));
 
-						Cell dateCell = row.getCell(6);
+						Cell dateCell = row.getCell(7);
 						java.sql.Date sqlDate = null;
-
 						if (dateCell != null) {
-
 							if (dateCell.getCellType() == CellType.NUMERIC) {
-
 								java.util.Date utilDate = DateUtil.getJavaDate(dateCell.getNumericCellValue());
 								sqlDate = new java.sql.Date(utilDate.getTime());
-
 							} else {
-
 								String dateStr = formatter.formatCellValue(dateCell).trim();
-
 								if (!dateStr.isEmpty()) {
-
 									try {
 										java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
 										java.util.Date utilDate = sdf.parse(dateStr);
 										sqlDate = new java.sql.Date(utilDate.getTime());
 									} catch (Exception e) {
 										try {
-											java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
-													"yyyy-MM-dd");
+											java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
 											java.util.Date utilDate = sdf.parse(dateStr);
 											sqlDate = new java.sql.Date(utilDate.getTime());
 										} catch (Exception ex) {
 											sqlDate = null;
 										}
 									}
-
 								}
-
 							}
 						}
-
-						// skip row if date invalid
 						if (sqlDate == null) {
 							continue;
 						}
@@ -134,16 +121,14 @@ public class BulkUploadEmployees extends HttpServlet {
 							phone = phone.replaceAll("[^0-9]", "").trim();
 							if (phone.length() > 10) phone = phone.substring(0, 10);
 						}
-						String firstname = "";
-						String lastname = "";
-						if (fullname != null && !fullname.trim().isEmpty()) {
-							int sp = fullname.trim().indexOf(' ');
-							firstname = sp > 0 ? fullname.substring(0, sp).trim() : fullname.trim();
-							lastname = sp > 0 ? fullname.substring(sp).trim() : "";
+						if (firstname == null) firstname = "";
+						if (lastname == null) lastname = "";
+						if (username == null || username.trim().isEmpty()) {
+							username = (firstname + " " + lastname).trim();
+							if (username.isEmpty()) username = email;
 						}
-
-						String username = (firstname + " " + lastname).trim();
-						if (username.isEmpty()) username = email;
+						if (status == null || status.trim().isEmpty()) status = "active";
+						if (role == null || role.trim().isEmpty()) role = "user";
 
 						String hashedPassword = PasswordUtil.hashPassword(password);
 						ps.setString(1, username);
@@ -157,6 +142,7 @@ public class BulkUploadEmployees extends HttpServlet {
 						ps.setString(9, phone);
 
 						ps.addBatch();
+						insertedCount++;
 					}
 
 					if (insertedCount > 0) {
@@ -180,50 +166,67 @@ public class BulkUploadEmployees extends HttpServlet {
 						continue;
 					}
 
-					String[] data = line.split(",");
-					String fullname = data.length > 5 ? data[5] : "";
-					String firstname = "";
-					String lastname = "";
-					if (fullname != null && !fullname.trim().isEmpty()) {
-						int sp = fullname.trim().indexOf(' ');
-						firstname = sp > 0 ? fullname.substring(0, sp).trim() : fullname.trim();
-						lastname = sp > 0 ? fullname.substring(sp).trim() : "";
-					}
-					String phone = data.length > 8 ? data[8] : "";
-					if (phone != null) {
-						phone = phone.replaceAll("[^0-9]", "").trim();
-						if (phone.length() > 10) phone = phone.substring(0, 10);
-					}
+					String[] data = line.split(",", -1);
+					if (data.length < 7) continue;
+
+					String username = data.length > 0 ? data[0].trim() : "";
+					String password = data.length > 1 ? data[1].trim() : "";
+					String status = data.length > 2 ? data[2].trim() : "active";
+					String role = data.length > 3 ? data[3].trim() : "user";
+					String firstname = data.length > 4 ? data[4].trim() : "";
+					String lastname = data.length > 5 ? data[5].trim() : "";
+					String email = data.length > 6 ? data[6].trim() : "";
+
+					if (email.isEmpty() || !isValidPassword(password)) continue;
+
 					java.sql.Date sqlDate = null;
-					try {
-						sqlDate = java.sql.Date.valueOf(data[6]);
-					} catch (Exception e) {
+					String dateStr = data.length > 7 ? data[7].trim() : "";
+					if (!dateStr.isEmpty()) {
 						try {
-							java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
-							java.util.Date utilDate = sdf.parse(data[6]);
-							sqlDate = new java.sql.Date(utilDate.getTime());
-						} catch (Exception ex) {
-							sqlDate = null;
+							sqlDate = java.sql.Date.valueOf(dateStr);
+						} catch (Exception e) {
+							try {
+								java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
+								java.util.Date utilDate = sdf.parse(dateStr);
+								sqlDate = new java.sql.Date(utilDate.getTime());
+							} catch (Exception ex) {
+								try {
+									java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+									java.util.Date utilDate = sdf.parse(dateStr);
+									sqlDate = new java.sql.Date(utilDate.getTime());
+								} catch (Exception ex2) {
+									sqlDate = null;
+								}
+							}
 						}
 					}
+					if (sqlDate == null) continue;
 
-					String username = (firstname + " " + lastname).trim();
-					if (username.isEmpty()) username = data.length > 4 ? data[4] : "";
+					String phone = data.length > 8 ? data[8].replaceAll("[^0-9]", "").trim() : "";
+					if (phone != null && phone.length() > 10) phone = phone.substring(0, 10);
+
+					if (username.isEmpty()) {
+						username = (firstname + " " + lastname).trim();
+						if (username.isEmpty()) username = email;
+					}
 
 					ps.setString(1, username);
-					ps.setString(2, PasswordUtil.hashPassword(data[1]));
-					ps.setString(3, data[2]);
-					ps.setString(4, data[3]);
-					ps.setString(5, data[4]);
+					ps.setString(2, PasswordUtil.hashPassword(password));
+					ps.setString(3, role);
+					ps.setString(4, status);
+					ps.setString(5, email);
 					ps.setString(6, firstname);
 					ps.setString(7, lastname);
 					ps.setDate(8, sqlDate);
 					ps.setString(9, phone);
 
 					ps.addBatch();
+					insertedCount++;
 				}
 
-				ps.executeBatch();
+				if (insertedCount > 0) {
+					ps.executeBatch();
+				}
 			}
 
 			if (insertedCount > 0) {

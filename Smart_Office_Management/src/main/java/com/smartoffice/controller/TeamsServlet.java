@@ -90,13 +90,15 @@ public class TeamsServlet extends HttpServlet {
         if ("create".equals(action)) {
             String name = req.getParameter("teamName");
             String managerUsername = req.getParameter("managerUsername");
-            if (name != null && !name.trim().isEmpty() && managerUsername != null && !managerUsername.isEmpty()) {
+            if (admin == null || admin.isEmpty()) {
+                session.setAttribute("teamsError", "Session expired. Please log in again.");
+            } else if (name != null && !name.trim().isEmpty() && managerUsername != null && !managerUsername.isEmpty()) {
                 if (TeamDAO.teamNameExists(name.trim())) {
                     session.setAttribute("teamsError", "Team name already exists.");
                 } else if (TeamDAO.createTeam(name.trim(), managerUsername, admin)) {
                     session.setAttribute("teamsSuccess", "Team created successfully.");
                 } else {
-                    session.setAttribute("teamsError", "Failed to create team.");
+                    session.setAttribute("teamsError", "Failed to create team. Run database/fix-teams-fk.sql in MySQL if you have schema issues.");
                 }
             } else {
                 session.setAttribute("teamsError", "Team name and manager are required.");

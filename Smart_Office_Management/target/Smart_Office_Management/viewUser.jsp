@@ -52,11 +52,59 @@
 /*             max-width: 1200px; */
 /*         } */
 
-        /* Heading */
-        h2 {
-            margin-bottom: 20px;
+        /* Header row with title and filters */
+        .page-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .page-header h2 {
+            margin: 0;
             color: var(--text-color);
-            text-align: center;
+        }
+
+        .filters-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filters-bar input,
+        .filters-bar select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        .filters-bar input {
+            min-width: 180px;
+        }
+
+        .filters-bar input:focus,
+        .filters-bar select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .filters-bar .search-btn {
+            padding: 8px 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .filters-bar .search-btn:hover {
+            background: #2563eb;
         }
 
         /* Table container for responsiveness */
@@ -121,64 +169,54 @@
             color: #6c757d;
         }
 
-        /* Action icons */
-        .actions {
-            white-space: nowrap;
+        /* Google-style pagination */
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
         }
 
-        .icon-btn {
+        .pagination a,
+        .pagination span {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 10px;
             border-radius: 6px;
             text-decoration: none;
-            font-size: 14px;
-            margin-right: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .icon-btn.edit {
-            background: var(--info-bg);
-            color: var(--info-text);
-        }
-
-        .icon-btn.edit:hover {
-            background: #bfdbfe;
-        }
-
-        .icon-btn.delete {
-            background: var(--error-bg);
-            color: var(--error-text);
-        }
-
-        .icon-btn.delete:hover {
-            background: #fecaca;
-        }
-
-        /* Pagination */
-        .pagination {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .pagination a {
-            display: inline-block;
-            padding: 8px 12px;
-            margin: 0 4px;
-            border-radius: 6px;
-            text-decoration: none;
-            background: var(--border-color);
+            background: #fff;
             color: var(--text-color);
-            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
             font-size: 14px;
+            transition: all 0.2s ease;
         }
 
-        .pagination a:hover,
+        .pagination a:hover:not(.disabled) {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
         .pagination a.active {
             background: var(--primary-color);
             color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination span.ellipsis {
+            border: none;
+            background: transparent;
+            cursor: default;
+        }
+
+        .pagination a.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
         /* Toast */
@@ -267,6 +305,42 @@
                 opacity: 0;
                 transform: translateX(100%);
             }
+        }
+
+        /* Action icons */
+        .actions {
+            white-space: nowrap;
+        }
+
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            margin-right: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn.edit {
+            background: var(--info-bg);
+            color: var(--info-text);
+        }
+
+        .icon-btn.edit:hover {
+            background: #bfdbfe;
+        }
+
+        .icon-btn.delete {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        .icon-btn.delete:hover {
+            background: #fecaca;
         }
 
         /* Delete Confirmation Modal */
@@ -361,10 +435,19 @@
                 font-size: 12px;
             }
 
-            .pagination a {
-                padding: 6px 10px;
+            .pagination a,
+            .pagination span {
+                min-width: 32px;
+                height: 32px;
                 font-size: 13px;
-                margin: 0 2px;
+            }
+
+            .filters-bar {
+                width: 100%;
+            }
+
+            .filters-bar input {
+                min-width: 140px;
             }
 
             .toast {
@@ -375,19 +458,6 @@
                 font-size: 14px;
             }
 
-            .modal-content {
-                padding: 20px;
-                max-width: none;
-                width: 100%;
-            }
-
-            .modal-buttons {
-                flex-direction: column;
-            }
-
-            .modal-buttons button {
-                width: 100%;
-            }
         }
 
         @media (max-width: 480px) {
@@ -407,7 +477,31 @@
 <body>
 
 <div class="page">
-    <h2>User List</h2>
+    <div class="page-header">
+        <h2>User List</h2>
+        <div class="filters-bar">
+            <form method="get" action="viewUser" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+                <input type="text" name="search" placeholder="Search name, email, role..." value="<%= request.getAttribute("search") != null ? request.getAttribute("search") : "" %>">
+                <select name="role" onchange="this.form.submit()">
+                    <option value="">All Roles</option>
+                    <option value="user" <%= "user".equals(request.getAttribute("roleFilter")) ? "selected" : "" %>>User</option>
+                    <option value="manager" <%= "manager".equals(request.getAttribute("roleFilter")) ? "selected" : "" %>>Manager</option>
+                    <option value="employee" <%= "employee".equals(request.getAttribute("roleFilter")) ? "selected" : "" %>>Employee</option>
+                </select>
+                <select name="sort" onchange="this.form.submit()">
+                    <option value="fullname" <%= "fullname".equals(request.getAttribute("sortBy")) ? "selected" : "" %>>Sort by Name</option>
+                    <option value="role" <%= "role".equals(request.getAttribute("sortBy")) ? "selected" : "" %>>Sort by Role</option>
+                    <option value="email" <%= "email".equals(request.getAttribute("sortBy")) ? "selected" : "" %>>Sort by Email</option>
+                    <option value="date" <%= "date".equals(request.getAttribute("sortBy")) ? "selected" : "" %>>Sort by Date</option>
+                </select>
+                <select name="order" onchange="this.form.submit()">
+                    <option value="asc" <%= "asc".equals(request.getAttribute("sortOrder")) ? "selected" : "" %>>Ascending</option>
+                    <option value="desc" <%= "desc".equals(request.getAttribute("sortOrder")) ? "selected" : "" %>>Descending</option>
+                </select>
+                <button type="submit" class="search-btn"><i class="fa-solid fa-search"></i> Search</button>
+            </form>
+        </div>
+    </div>
 
     <div class="table-container">
         <table>
@@ -435,16 +529,36 @@
         <%
             int currentPage = request.getAttribute("currentPage") != null ? (int) request.getAttribute("currentPage") : 1;
             int totalPages = request.getAttribute("totalPages") != null ? (int) request.getAttribute("totalPages") : 1;
-
-            for (int i = 1; i <= totalPages; i++) {
+            String search = request.getAttribute("search") != null ? (String) request.getAttribute("search") : "";
+            String roleFilter = request.getAttribute("roleFilter") != null ? (String) request.getAttribute("roleFilter") : "";
+            String sortBy = request.getAttribute("sortBy") != null ? (String) request.getAttribute("sortBy") : "fullname";
+            String sortOrder = request.getAttribute("sortOrder") != null ? (String) request.getAttribute("sortOrder") : "asc";
+            String baseParams = "search=" + java.net.URLEncoder.encode(search, "UTF-8") + "&role=" + java.net.URLEncoder.encode(roleFilter, "UTF-8") + "&sort=" + sortBy + "&order=" + sortOrder;
         %>
-        <a href="viewUser?page=<%= i %>"
-           class="<%= i == currentPage ? "active" : "" %>">
-            <%= i %>
-        </a>
+        <a href="viewUser?<%= baseParams %>&page=<%= Math.max(1, currentPage - 1) %>" class="<%= currentPage <= 1 ? "disabled" : "" %>">Previous</a>
+        <%
+            int totalPagesClamped = Math.max(1, totalPages);
+            int startPage = Math.max(1, currentPage - 2);
+            int endPage = Math.min(totalPagesClamped, currentPage + 2);
+            if (startPage > 1) {
+        %>
+        <a href="viewUser?<%= baseParams %>&page=1">1</a>
+        <% if (startPage > 2) { %><span class="ellipsis">...</span><% } %>
+        <%
+            }
+            for (int i = startPage; i <= endPage; i++) {
+        %>
+        <a href="viewUser?<%= baseParams %>&page=<%= i %>" class="<%= i == currentPage ? "active" : "" %>"><%= i %></a>
+        <%
+            }
+            if (endPage < totalPagesClamped) {
+        %>
+        <% if (endPage < totalPagesClamped - 1) { %><span class="ellipsis">...</span><% } %>
+        <a href="viewUser?<%= baseParams %>&page=<%= totalPagesClamped %>"><%= totalPagesClamped %></a>
         <%
             }
         %>
+        <a href="viewUser?<%= baseParams %>&page=<%= currentPage < totalPagesClamped ? currentPage + 1 : totalPagesClamped %>" class="<%= currentPage >= totalPagesClamped ? "disabled" : "" %>">Next</a>
     </div>
 </div>
 

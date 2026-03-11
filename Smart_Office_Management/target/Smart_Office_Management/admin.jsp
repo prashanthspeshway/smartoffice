@@ -68,22 +68,13 @@ body {
 	font-size: 14px;
 }
 
-/* Buttons */
+/* Notification button */
 .settings-btn {
 	width: 38px;
 	height: 38px;
 	border-radius: 50%;
 	border: none;
 	background: linear-gradient(135deg, #667eea, #764ba2);
-	color: white;
-	cursor: pointer;
-}
-
-.logout-btn {
-	padding: 8px 14px;
-	border-radius: 8px;
-	border: none;
-	background: #e53e3e;
 	color: white;
 	cursor: pointer;
 }
@@ -101,6 +92,43 @@ body {
 	background: rgba(255, 255, 255, 0.2);
 	border-right: 1px solid rgba(255, 255, 255, 0.3);
 	padding: 18px 12px;
+	display: flex;
+	flex-direction: column;
+}
+
+.sidebar-nav {
+	flex: 1;
+}
+
+.sidebar-bottom {
+	margin-top: auto;
+	padding-top: 12px;
+	border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.sidebar-bottom .sidebar-btn {
+	margin-bottom: 8px;
+}
+
+.sidebar-bottom .logout-link {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	padding: 12px 14px;
+	border: none;
+	background: transparent;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	color: #e53e3e;
+	text-decoration: none;
+	transition: 0.25s;
+}
+
+.sidebar-bottom .logout-link:hover {
+	background: rgba(229, 62, 62, 0.15);
 }
 
 /* NORMAL BUTTON (NO BG) */
@@ -320,94 +348,6 @@ to {
 		width: 95%;
 		height: 90%;
 	}
-} /* ================= SETTINGS DRAWER ================= */
-/* ===== Settings Drawer ===== */
-.settings-drawer {
-	position: fixed;
-	top: 0;
-	right: -340px;
-	width: 340px;
-	height: 100%;
-	background: linear-gradient(135deg, rgba(255, 255, 255, 0.85),
-		rgba(240, 245, 255, 0.75));
-	backdrop-filter: blur(16px);
-	box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
-	transition: right 0.4s ease, opacity 0.3s ease;
-	z-index: 1000;
-	border-left: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-/* Open State */
-.settings-drawer.open {
-	right: 0;
-}
-
-/* Header */
-.settings-header {
-	padding: 20px;
-	font-size: 18px;
-	height: 100px;
-	font-weight: 600;
-	color: #2d3748;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-/* Close Button */
-.settings-close {
-	cursor: pointer;
-	font-size: 20px;
-	color: #718096;
-	transition: color 0.3s;
-}
-
-.settings-close:hover {
-	color: #e53e3e;
-}
-
-/* Items Container */
-.settings-list {
-	padding: 10px 0;
-}
-
-/* Individual Item */
-.settings-item {
-	padding: 14px 22px;
-	margin: 6px 12px;
-	border-radius: 10px;
-	cursor: pointer;
-	font-size: 15px;
-	font-weight: 500;
-	color: #2d3748;
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
-}
-
-/* Hover Effect */
-.settings-item:hover {
-	background: rgba(99, 102, 241, 0.12);
-	transform: translateX(4px);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* Icon Styling (Font Awesome) */
-.settings-item i {
-	font-size: 18px;
-	color: #6366f1;
-}
-
-/* Active Item */
-.settings-item.active {
-	background: linear-gradient(135deg, #6366f1, #818cf8);
-	color: #fff;
-}
-
-.settings-item.active i {
-	color: #fff;
 }
 
 /* ================= TOAST ================= */
@@ -488,94 +428,53 @@ to {
 
 <body>
 
-	<div id="overlay" onclick="closeAll()"></div>
-
-	<!-- SETTINGS -->
-	<div id="settingsPanel" class="settings-drawer">
-		<div class="modal-header">
-			<h4>Settings</h4>
-			<span onclick="closeSettings()" style="cursor: pointer;">✕</span>
-		</div>
-		<div class="settings-item" onclick="openProfile()">My Profile</div>
-		<div class="settings-item" onclick="openChangePassword()">Change
-			Password</div>
-	</div>
-
-	<!-- PASSWORD MODAL -->
-	<div id="passwordModal" class="modal">
-		<div class="modal-content" style="text-align: center;">
-			<div class="modal-header">
-				<h4>Change Password</h4>
-				<span onclick="closeChangePassword()" style="cursor: pointer;">✕</span>
-			</div>
-			<div class="modal-body">
-				<input type="password" id="newPassword" placeholder="New Password"><br>
-				<br> <input type="password" id="confirmPassword"
-					placeholder="Confirm Password"><br> <br>
-
-				<button onclick="submitPassword()">Update</button>
-			</div>
-		</div>
-	</div>
-
-	<!-- PROFILE MODAL -->
-	<div id="profileModal" class="modal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h4>My Profile</h4>
-				<span class="modal-close" onclick="closeProfile()"
-					style="cursor: pointer;">✕</span>
-			</div>
-			<iframe id="profileFrame"></iframe>
-		</div>
-	</div>
-
 	<!-- TOP BAR -->
 	<div class="top-bar">
 		<h2>Smart Office • Admin Dashboard</h2>
 		<div class="user-area">
-		
-			<button class="settings-btn"
-				onclick="loadPage(this,'sendNotification.jsp')">
+			<button class="settings-btn" onclick="loadPage(this,'sendNotification.jsp')">
 				<i class="fa-solid fa-bell"></i>
 			</button>
 			<span class="welcome">Welcome, <strong>${not empty sessionScope.fullName ? sessionScope.fullName : sessionScope.username}</strong></span>
-			<button class="settings-btn" onclick="openSettings()">
-				<i class="fa fa-gear"></i>
-			</button>
-			<a href="<%=request.getContextPath()%>/logout">
-				<button class="logout-btn">Logout <i class="fa-solid fa-right-to-bracket"></i></button>
-			</a>
 		</div>
 	</div>
 
 	<!-- MAIN -->
 	<div class="main-container">
 		<div class="sidebar">
-			<button class="sidebar-btn active"
-				onclick="loadPage(this,'adminOverview')">
-				<i class="fa-solid fa-chart-line"></i> <span>Admin Overview</span>
-			</button>
+			<div class="sidebar-nav">
+				<button class="sidebar-btn active" onclick="loadPage(this,'adminOverview')">
+					<i class="fa-solid fa-chart-line"></i> <span>Admin Overview</span>
+				</button>
 
-			<button class="sidebar-btn" onclick="loadPage(this,'addUser')">
-				<i class="fa-solid fa-user-plus"></i> <span>Add Employee</span>
-			</button>
+				<button class="sidebar-btn" onclick="loadPage(this,'addUser')">
+					<i class="fa-solid fa-user-plus"></i> <span>Add Employee</span>
+				</button>
 
-			<button class="sidebar-btn" onclick="loadPage(this,'viewUser')">
-				<i class="fa-solid fa-users"></i> <span>View Employees</span>
-			</button>
+				<button class="sidebar-btn" onclick="loadPage(this,'viewUser')">
+					<i class="fa-solid fa-users"></i> <span>View Employees</span>
+				</button>
 
-			<button class="sidebar-btn" onclick="loadPage(this,'teams')">
-				<i class="fa-solid fa-people-group"></i> <span>Teams</span>
-			</button>
+				<button class="sidebar-btn" onclick="loadPage(this,'teams')">
+					<i class="fa-solid fa-people-group"></i> <span>Teams</span>
+				</button>
 
-			<button class="sidebar-btn" onclick="loadPage(this,'calendar.jsp')">
-				<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
-			</button>
-			<button class="sidebar-btn" onclick="exportUsers()">
-				<i class="fa-solid fa-file-export"></i> <span>Export
-					Employees</span>
-			</button>
+				<button class="sidebar-btn" onclick="loadPage(this,'calendar.jsp')">
+					<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
+				</button>
+				<button class="sidebar-btn" onclick="exportUsers()">
+					<i class="fa-solid fa-file-export"></i> <span>Export Employees</span>
+				</button>
+			</div>
+
+			<div class="sidebar-bottom">
+				<button class="sidebar-btn" onclick="loadPage(this,'adminSettingsPage.jsp')">
+					<i class="fa-solid fa-gear"></i> <span>Settings</span>
+				</button>
+				<a href="<%=request.getContextPath()%>/logout" class="logout-link">
+					<i class="fa-solid fa-right-to-bracket"></i> <span>Logout</span>
+				</a>
+			</div>
 		</div>
 
 		<div class="content-area" id="contentArea">
@@ -598,59 +497,6 @@ function loadPage(btn,page){
     btn.classList.add("active");
 }
 
-/* EXISTING FUNCTIONS */
-function openSettings(){document.getElementById("settingsPanel").classList.add("open");}
-function closeSettings(){document.getElementById("settingsPanel").classList.remove("open");}
-function openProfile(){
-    document.getElementById("profileFrame").src="selfProfile";
-    document.getElementById("profileModal").style.display="flex";
-}
-function closeProfile(){document.getElementById("profileModal").style.display="none";}
-function openChangePassword(){document.getElementById("passwordModal").style.display="flex";}
-function closeChangePassword(){document.getElementById("passwordModal").style.display="none";}
-function closeAll(){closeSettings();closeProfile();closeChangePassword();}
-function submitPassword() {
-    const newPassword = document.getElementById("newPassword").value.trim();
-    const confirmPassword = document.getElementById("confirmPassword").value.trim();
-
-    if (!newPassword || !confirmPassword) {
-        showToast("Please fill all fields");
-        return;
-    }
-
-    fetch("<%=request.getContextPath()%>/changePassword", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams({
-            newPassword: newPassword,
-            confirmPassword: confirmPassword
-        })
-    })
-    .then(res => res.text())
-    .then(data => {
-        if (data === "Success") {
-        	showToast("Password updated successfully", "success");
-            closeChangePassword();
-            document.getElementById("newPassword").value = "";
-            document.getElementById("confirmPassword").value = "";
-        } 
-        else if (data === "PasswordMismatch") {
-        	showToast("Passwords do not match", "error");
-        } 
-        else if (data === "MissingFields") {
-        	showToast("Please fill all fields", "warning");
-        } 
-        else {
-            showToast("Password must be at least 8 characters with uppercase, lowercase, number, and symbol.");
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        showToast("Server error");
-    });
-}
 function exportUsers(){document.getElementById("contentFrame").src="exportUsers";}
 
 

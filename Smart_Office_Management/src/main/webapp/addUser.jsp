@@ -177,6 +177,7 @@ body {
           <input type="file" name="excelFile" accept=".xlsx,.csv" required style="flex:1;min-width:200px;">
           <button type="submit" class="btn">Add Bulk</button>
         </form>
+        <p style="margin-top:10px;font-size:13px;color:#64748b;">Expected columns (row 1 = header): username, password, status, role, firstname, lastname, email, joinedDate (dd-mm-yyyy), phone. Password must have 8+ chars, uppercase, lowercase, number, symbol.</p>
       </div>
     </div>
   </div>

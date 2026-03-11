@@ -80,6 +80,17 @@ public class SessionAuthFilter implements Filter {
         }
     }
 
+    /** Redirects the top window (fixes iframe: login form no longer appears inside dashboard). */
+    private void redirectTopWindow(HttpServletRequest request, HttpServletResponse response, String url) throws IOException {
+        String fullUrl = request.getContextPath() + url;
+        response.setContentType("text/html;charset=UTF-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+        String html = "<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"0;url=" + fullUrl + "\">"
+            + "<script>window.top.location.href='" + fullUrl.replace("'", "\\'") + "';</script></head>"
+            + "<body>Session expired. <a href=\"" + fullUrl + "\">Click here to login</a>.</body></html>";
+        response.getWriter().write(html);
+    }
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
@@ -101,14 +112,14 @@ public class SessionAuthFilter implements Filter {
 
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
-            response.sendRedirect(request.getContextPath() + "/index.html?error=sessionExpired");
+            redirectTopWindow(request, response, "/index.html?error=sessionExpired");
             return;
         }
 
         // Validate session token - sessions without token are legacy/invalid
         if (session.getAttribute("sessionToken") == null) {
             session.invalidate();
-            response.sendRedirect(request.getContextPath() + "/index.html?error=sessionExpired");
+            redirectTopWindow(request, response, "/index.html?error=sessionExpired");
             return;
         }
 
@@ -117,15 +128,15 @@ public class SessionAuthFilter implements Filter {
         String base = request.getContextPath();
 
         if (isAdminPath(path) && !"admin".equalsIgnoreCase(role)) {
-            response.sendRedirect(base + getRedirectForRole(role) + "?error=accessDenied");
+            redirectTopWindow(request, response, getRedirectForRole(role) + "?error=accessDenied");
             return;
         }
         if (isManagerPath(path) && !"manager".equalsIgnoreCase(role)) {
-            response.sendRedirect(base + getRedirectForRole(role) + "?error=accessDenied");
+            redirectTopWindow(request, response, getRedirectForRole(role) + "?error=accessDenied");
             return;
         }
         if (isUserPath(path) && !"user".equalsIgnoreCase(role) && !"employee".equalsIgnoreCase(role)) {
-            response.sendRedirect(base + getRedirectForRole(role) + "?error=accessDenied");
+            redirectTopWindow(request, response, getRedirectForRole(role) + "?error=accessDenied");
             return;
         }
 
