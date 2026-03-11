@@ -17,6 +17,16 @@ import com.smartoffice.utils.DBConnectionUtil;
 @WebServlet("/viewUser")
 public class ViewUser extends HttpServlet {
 
+	private static String nullToEmpty(String s) {
+		return s != null ? s : "";
+	}
+
+	private static String fullName(String first, String last) {
+		String f = first != null ? first.trim() : "";
+		String l = last != null ? last.trim() : "";
+		return (f + " " + l).trim();
+	}
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
@@ -46,15 +56,19 @@ public class ViewUser extends HttpServlet {
 				int userId = rs.getInt("id");
 				String status = rs.getString("status");
 
-				rows.append("<tr>").append("<td>").append(rs.getString("username")).append("</td>").append("<td>")
+				String fullName = fullName(rs.getString("firstname"), rs.getString("lastname"));
+				if (fullName.isEmpty()) fullName = rs.getString("email");
+
+				rows.append("<tr>").append("<td>").append(fullName).append("</td>").append("<td>")
 						.append(rs.getString("role")).append("</td>")
 
 						.append("<td>").append("<span class='badge ")
 						.append(status.equalsIgnoreCase("active") ? "active" : "inactive").append("'>").append(status)
 						.append("</span>").append("</td>")
 
-						.append("<td>").append(rs.getString("fullname")).append("</td>").append("<td>")
-						.append(rs.getString("email")).append("</td>").append("<td>").append(rs.getDate("joinedDate"))
+						.append("<td>").append(nullToEmpty(rs.getString("firstname"))).append("</td>")
+						.append("<td>").append(nullToEmpty(rs.getString("lastname"))).append("</td>").append("<td>")
+						.append(nullToEmpty(rs.getString("email"))).append("</td>").append("<td>").append(rs.getDate("joinedDate"))
 						.append("</td>")
 
 						.append("<td class='actions'>").append("<a href='editUser?id=").append(userId)

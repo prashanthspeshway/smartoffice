@@ -24,42 +24,23 @@ public class EditUser extends HttpServlet {
 
         int id = Integer.parseInt(req.getParameter("id"));
 
-        List<String> managers = new ArrayList<>();
-
         try (Connection con = DBConnectionUtil.getConnection()) {
-
-            // 🔹 Load user details
             try (PreparedStatement ps = con.prepareStatement(
-                    "SELECT * FROM users WHERE id=?")) {
-
+                    "SELECT id, email, firstname, lastname, role, status, phone, joinedDate FROM users WHERE id=?")) {
                 ps.setInt(1, id);
                 ResultSet rs = ps.executeQuery();
-
                 if (rs.next()) {
                     req.setAttribute("id", id);
-                    req.setAttribute("username", rs.getString("username"));
+                    req.setAttribute("email", rs.getString("email"));
                     req.setAttribute("role", rs.getString("role"));
                     req.setAttribute("status", rs.getString("status"));
-                    req.setAttribute("fullname", rs.getString("fullname"));
+                    req.setAttribute("firstname", rs.getString("firstname"));
+                    req.setAttribute("lastname", rs.getString("lastname"));
                     req.setAttribute("phone", rs.getString("phone"));
                     req.setAttribute("email", rs.getString("email"));
                     req.setAttribute("joinedDate", rs.getDate("joinedDate"));
-                    req.setAttribute("manager", rs.getString("manager"));
                 }
             }
-
-            // 🔹 Load managers list
-            try (PreparedStatement ps2 = con.prepareStatement(
-                    "SELECT username FROM users WHERE role='manager' AND status='active'")) {
-
-                ResultSet rs2 = ps2.executeQuery();
-                while (rs2.next()) {
-                    managers.add(rs2.getString("username"));
-                }
-            }
-
-            req.setAttribute("managers", managers);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -77,39 +58,37 @@ public class EditUser extends HttpServlet {
         int id = Integer.parseInt(req.getParameter("id"));
         String role = req.getParameter("role");
         String status = req.getParameter("status");
-        String fullname = req.getParameter("fullname");
+        String firstname = req.getParameter("firstname");
+        String lastname = req.getParameter("lastname");
         String phone = req.getParameter("number");
+        if (phone != null) {
+            phone = phone.replaceAll("[^0-9]", "").trim();
+            if (phone.length() > 10) phone = phone.substring(0, 10);
+        }
         String email = req.getParameter("email");
-        String manager = req.getParameter("manager");
         String joinedDateStr = req.getParameter("joinedDate");
-
-        // 🔒 If role is manager, clear manager field
-
-        if ("manager".equalsIgnoreCase(role)) {
-            manager = "";
-        }
-
-        if (manager == null || manager.trim().isEmpty()) {
-            manager = "";
-        }
 
         Date joinedDate = null;
         if (joinedDateStr != null && !joinedDateStr.isEmpty()) {
             joinedDate = Date.valueOf(joinedDateStr);
         }
 
+        // Username = firstname + lastname (fallback to email if empty)
+        String username = ((firstname != null ? firstname : "") + " " + (lastname != null ? lastname : "")).trim();
+        if (username.isEmpty()) username = email;
+
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                     "UPDATE users SET role=?, status=?, fullname=?, email=?, joinedDate=?, manager=?, phone=? WHERE id=?")) {
-
-            ps.setString(1, role);
-            ps.setString(2, status);
-            ps.setString(3, fullname);
-            ps.setString(4, email);
-            ps.setDate(5, joinedDate);
-            ps.setString(6, manager);
-            ps.setString(7, phone);
-            ps.setInt(8, id);
+                     "UPDATE users SET username=?, role=?, status=?, firstname=?, lastname=?, email=?, joinedDate=?, phone=? WHERE id=?")) {
+            ps.setString(1, username);
+            ps.setString(2, role);
+            ps.setString(3, status);
+            ps.setString(4, firstname);
+            ps.setString(5, lastname);
+            ps.setString(6, email);
+            ps.setDate(7, joinedDate);
+            ps.setString(8, phone);
+            ps.setInt(9, id);
 
             ps.executeUpdate();
 

@@ -5,8 +5,6 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -30,12 +28,20 @@ public class AddUser extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-    	String password = req.getParameter("password");
-    	String hashedPassword = PasswordUtil.hashPassword(password);
+        String password = req.getParameter("password");
+        String confirmPassword = req.getParameter("confirmPassword");
         String role = req.getParameter("role");
-        String manager = req.getParameter("manager");
 
-        // 🔐 Password validation
+        // Password confirmation
+        if (password == null || !password.equals(confirmPassword)) {
+            req.getSession().setAttribute("errorMsg", "Passwords do not match.");
+            res.sendRedirect("addUser");
+            return;
+        }
+
+        String hashedPassword = PasswordUtil.hashPassword(password);
+
+        // Password strength
         if (!isStrongPassword(password)) {
             req.getSession().setAttribute(
                 "errorMsg",
@@ -45,46 +51,64 @@ public class AddUser extends HttpServlet {
             return;
         }
 
-        // ✅ Business rule validation
-        if ("user".equalsIgnoreCase(role) && (manager == null || manager.isEmpty())) {
-            req.getSession().setAttribute(
-                "errorMsg",
-                "Please select a manager for the Employee."
-            );
-            res.sendRedirect("addUser");
-            return;
+        String firstname = req.getParameter("firstname");
+        String lastname = req.getParameter("lastname");
+        if (firstname != null) firstname = firstname.trim();
+        if (lastname != null) lastname = lastname.trim();
+
+        String phone = req.getParameter("phonenumber");
+        if (phone != null) {
+            phone = phone.replaceAll("[^0-9]", "").trim();
+            if (phone.isEmpty()) phone = null;
+            else if (phone.length() > 10) phone = phone.substring(0, 10);
         }
 
-        // Managers report to admin by default
-        if ("manager".equalsIgnoreCase(role)) {
-            manager = "admin";
+        Date joinedDate = null;
+        String joinedDateStr = req.getParameter("joinedDate");
+        if (joinedDateStr != null && !joinedDateStr.trim().isEmpty()) {
+            try {
+                joinedDate = Date.valueOf(joinedDateStr.trim());
+            } catch (IllegalArgumentException ignored) {
+                // Invalid date format - leave as null
+            }
         }
+
+        String email = req.getParameter("email");
+        if (email != null) email = email.trim();
 
         try (Connection con = DBConnectionUtil.getConnection()) {
+            try (PreparedStatement checkPs = con.prepareStatement("SELECT 1 FROM users WHERE email = ?")) {
+                checkPs.setString(1, email);
+                try (ResultSet rs = checkPs.executeQuery()) {
+                    if (rs.next()) {
+                        req.getSession().setAttribute("errorMsg", "Email already exists.");
+                        res.sendRedirect("addUser");
+                        return;
+                    }
+                }
+            }
+
+            String status = req.getParameter("status");
+            if (status == null || status.trim().isEmpty()) status = "active";
+
+            // Username = firstname + lastname (fallback to email if empty)
+            String username = ((firstname != null ? firstname : "") + " " + (lastname != null ? lastname : "")).trim();
+            if (username.isEmpty()) username = email;
 
             String sql = "INSERT INTO users " +
-                    "(username, password, role, status, email, fullname, joinedDate, manager, phone) " +
+                    "(username, password, role, status, email, firstname, lastname, joinedDate, phone) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             PreparedStatement ps = con.prepareStatement(sql);
-
-            ps.setString(1, req.getParameter("username"));
+            ps.setString(1, username);
             ps.setString(2, hashedPassword);
             ps.setString(3, role);
-            ps.setString(4, req.getParameter("status"));
-            ps.setString(5, req.getParameter("email"));
-            ps.setString(6, req.getParameter("fullname"));
-            String joinedDateStr = req.getParameter("joinedDate");
-
-            Date joinedDate = null;
-
-            if (joinedDateStr != null && !joinedDateStr.isEmpty()) {
-                joinedDate = Date.valueOf(joinedDateStr);
-            }
-
-            ps.setDate(7, joinedDate);
-            ps.setString(8, manager);
-            ps.setString(9, req.getParameter("phonenumber"));
+            ps.setString(4, status);
+            ps.setString(5, email);
+            ps.setString(6, firstname);
+            ps.setString(7, lastname);
+            ps.setDate(8, joinedDate);
+            ps.setString(9, phone);
 
             ps.executeUpdate();
 
@@ -93,7 +117,9 @@ public class AddUser extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            req.getSession().setAttribute("errorMsg", "Failed to add Employee!");
+            String msg = e.getMessage() != null ? e.getMessage() : "Failed to add Employee!";
+            if (msg.contains("Unknown column")) msg = "Database schema mismatch. Ensure users table has username column.";
+            req.getSession().setAttribute("errorMsg", msg);
             res.sendRedirect("addUser");
         }
     }
@@ -101,29 +127,6 @@ public class AddUser extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-
-        try (Connection con = DBConnectionUtil.getConnection()) {
-
-            String sql = "SELECT username FROM users " +
-                         "WHERE LOWER(TRIM(role)) = 'manager' " +
-                         "AND LOWER(TRIM(status)) = 'active'";
-
-            PreparedStatement ps = con.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-
-            List<String> managers = new ArrayList<>();
-
-            while (rs.next()) {
-                managers.add(rs.getString("username"));
-            }
-
-            req.setAttribute("managers", managers);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // ✅ Forward to JSP (NOT servlet)
         req.getRequestDispatcher("addUser.jsp").forward(req, res);
     }
 }

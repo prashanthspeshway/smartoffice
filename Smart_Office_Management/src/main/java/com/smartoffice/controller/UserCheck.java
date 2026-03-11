@@ -21,17 +21,18 @@ public class UserCheck extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-        String username = req.getParameter("username");
+        String email = req.getParameter("email");
+        if (email == null) email = req.getParameter("username"); // fallback for old forms
 
         boolean userExists = false;
 
         try (
             Connection con = DBConnectionUtil.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                "SELECT username FROM users WHERE username = ?"
+                "SELECT 1 FROM users WHERE email = ?"
             );
         ) {
-            ps.setString(1, username);
+            ps.setString(1, email);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -45,10 +46,10 @@ public class UserCheck extends HttpServlet {
 
         // Redirect logic
         if (userExists) {
-            res.sendRedirect("editUserDetails.jsp?username=" + username);
+            res.sendRedirect("editUserDetails.jsp?email=" + java.net.URLEncoder.encode(email, java.nio.charset.StandardCharsets.UTF_8));
         } else {
             res.sendRedirect("editUserDetails.jsp?error=UserNotFound");
-            System.out.println("User not found: " + username);
+            System.out.println("User not found: " + email);
         }
     }
 }

@@ -36,7 +36,7 @@ public class SelfProfileServlet extends HttpServlet {
 		}
 
 		// Fetch logged-in user details
-		User user = UserDao.getUserByUsername(username);
+		User user = UserDao.getUserByEmail(username);
 
 		if (user == null) {
 			request.setAttribute("error", "User details not found");

@@ -36,7 +36,7 @@ public class ExportTeamPerformanceServlet extends HttpServlet {
         );
 
         PrintWriter out = resp.getWriter();
-        out.println("Employee Username,Rating,Performance Month");
+        out.println("Employee Email,Rating,Performance Month");
 
         String sql =
             "SELECT employee_username, rating, performance_month " +

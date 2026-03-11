@@ -3,13 +3,12 @@ package com.smartoffice.model;
 public class User {
 
 	private int id;
-	private String username;
-	private String fullname;
+	private String email;
+	private String firstname;
+	private String lastname;
 	private String role;
 	private String status;
-	private String email;
 	private String phone;
-	private String manager;
 
 	// getters & setters
 	public int getId() {
@@ -20,20 +19,40 @@ public class User {
 		this.id = id;
 	}
 
+	/** Returns email (session stores it as "username" for compatibility). */
 	public String getUsername() {
-		return username;
+		return email;
 	}
 
 	public void setUsername(String username) {
-		this.username = username;
+		this.email = username;
 	}
 
 	public String getFullname() {
-		return fullname;
+		if (firstname != null || lastname != null) {
+			return ((firstname != null ? firstname : "") + " " + (lastname != null ? lastname : "")).trim();
+		}
+		return null;
 	}
 
 	public void setFullname(String fullname) {
-		this.fullname = fullname;
+		// Kept for compatibility; value is derived from firstname+lastname
+	}
+
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
 	}
 
 	public String getRole() {
@@ -66,13 +85,5 @@ public class User {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
-	}
-
-	public String getManager() {
-		return manager;
-	}
-
-	public void setManager(String manager) {
-		this.manager = manager;
 	}
 }

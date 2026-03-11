@@ -131,47 +131,42 @@ public class TaskDAO {
 
 	public static List<User> getEmployeesUnderManager(String managerUsername) {
 		List<User> list = new ArrayList<>();
-		String sql = "SELECT * FROM users WHERE manager=? ORDER BY fullname";
+		String sql = "SELECT DISTINCT u.email, u.firstname, u.lastname, u.phone, u.status " +
+		             "FROM users u JOIN team_members tm ON tm.username = u.email " +
+		             "JOIN teams t ON t.id = tm.team_id AND t.manager_username = ? " +
+		             "ORDER BY u.firstname, u.lastname";
 
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
 			ps.setString(1, managerUsername);
 			ResultSet rs = ps.executeQuery();
-
 			while (rs.next()) {
 				User u = new User();
-				u.setUsername(rs.getString("username"));
-				u.setFullname(rs.getString("fullname"));
+				u.setEmail(rs.getString("email"));
+				u.setFirstname(rs.getString("firstname"));
+				u.setLastname(rs.getString("lastname"));
 				u.setEmail(rs.getString("email"));
 				u.setPhone(rs.getString("phone"));
 				u.setStatus(rs.getString("status"));
 				list.add(u);
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return list;
 	}
 
-	// TaskDAO.java
 	public static boolean isEmployeeUnderManager(String employeeUsername, String managerUsername) {
-		String sql = "SELECT COUNT(*) FROM users WHERE username=? AND manager=?";
+		String sql = "SELECT COUNT(*) FROM team_members tm JOIN teams t ON t.id = tm.team_id " +
+		             "WHERE tm.username = ? AND t.manager_username = ?";
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
 			ps.setString(1, employeeUsername);
 			ps.setString(2, managerUsername);
-
 			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				int count = rs.getInt(1);
-				return count > 0; // true if employee exists under this manager
-			}
-
+			if (rs.next()) return rs.getInt(1) > 0;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return false; // fallback
+		return false;
 	}
 
 }

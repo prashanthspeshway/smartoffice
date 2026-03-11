@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -35,23 +36,17 @@ public class LoginServlet extends HttpServlet {
 
         try (Connection con = DBConnectionUtil.getConnection()) {
 
-            String sql = "SELECT username,email,password,role,status FROM users WHERE email=? OR username=?";
+            String sql = "SELECT email,password,role,status,firstname,lastname FROM users WHERE email=?";
             PreparedStatement ps = con.prepareStatement(sql);
-
             ps.setString(1, emailOrUsername);
-            ps.setString(2, emailOrUsername);
-
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-
                 String dbPassword = rs.getString("password");
                 String role = rs.getString("role");
                 String status = rs.getString("status");
-                String username = rs.getString("username");
                 String email = rs.getString("email");
 
-                // 🔐 BCrypt password verification
                 if (!PasswordUtil.checkPassword(password, dbPassword)) {
                     res.sendRedirect("index.html?error=invalid");
                     return;
@@ -62,13 +57,27 @@ public class LoginServlet extends HttpServlet {
                     return;
                 }
 
-                HttpSession session = req.getSession();
-                session.setAttribute("username", username);
+                String first = rs.getString("firstname");
+                String last = rs.getString("lastname");
+                String fullName = ((first != null ? first.trim() : "") + " " + (last != null ? last.trim() : "")).trim();
+                if (fullName.isEmpty()) fullName = email;
+
+                // Invalidate any existing session so only one login is active per browser
+                HttpSession existingSession = req.getSession(false);
+                if (existingSession != null) {
+                    existingSession.invalidate();
+                }
+
+                HttpSession session = req.getSession(true);
+                session.setAttribute("username", email);
                 session.setAttribute("email", email);
+                session.setAttribute("fullName", fullName);
                 session.setAttribute("role", role);
+                session.setAttribute("sessionToken", UUID.randomUUID().toString());
 
                 switch (role.toLowerCase()) {
                     case "user":
+                    case "employee":
                         res.sendRedirect("user?success=Login");
                         break;
                     case "manager":

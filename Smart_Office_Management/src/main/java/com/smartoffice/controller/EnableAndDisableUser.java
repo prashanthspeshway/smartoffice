@@ -20,19 +20,16 @@ public class EnableAndDisableUser extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-        String username = req.getParameter("username");
-        String status = req.getParameter("status"); // active / inactive
+        String email = req.getParameter("email");
+        String status = req.getParameter("status");
 
         boolean updated = false;
-
         try {
             Connection con = DBConnectionUtil.getConnection();
-
-            String sql = "UPDATE users SET status = ? WHERE username = ?";
-
+            String sql = "UPDATE users SET status = ? WHERE email = ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, status);
-            ps.setString(2, username);
+            ps.setString(2, email);
 
             int rows = ps.executeUpdate();
             updated = rows > 0;

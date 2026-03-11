@@ -34,13 +34,15 @@ public class ViewMeetingsServlet extends HttpServlet {
 			return;
 		}
 
+		// Get meetings created by this employee's team manager(s)
 		String sql = """
 				    SELECT *
 				    FROM meetings
-				    WHERE created_by = (
-				        SELECT manager
-				        FROM users
-				        WHERE username = ?
+				    WHERE created_by IN (
+				        SELECT t.manager_username
+				        FROM team_members tm
+				        JOIN teams t ON t.id = tm.team_id
+				        WHERE tm.username = ?
 				    )
 				    AND start_time >= NOW()
 				    ORDER BY start_time

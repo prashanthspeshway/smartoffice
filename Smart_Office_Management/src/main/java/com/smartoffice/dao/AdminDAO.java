@@ -19,13 +19,21 @@ public class AdminDAO {
     }
 
     public int getPresentTodayCount() throws Exception {
-        String sql = """
-            SELECT COUNT(DISTINCT username)
-            FROM attendance
-            WHERE punch_date = CURDATE()
-              AND punch_in IS NOT NULL
-        """;
+        String userCol = hasAttendanceUserColumn();
+        String sql = "SELECT COUNT(DISTINCT " + userCol + ") FROM attendance " +
+            "WHERE punch_date = CURDATE() AND punch_in IS NOT NULL";
         return getCount(sql);
+    }
+
+    /** Returns 'email' or 'username' depending on attendance table schema. */
+    private String hasAttendanceUserColumn() throws Exception {
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                 "SELECT 1 FROM information_schema.COLUMNS " +
+                 "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'attendance' AND COLUMN_NAME = 'email'");
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? "email" : "username";
+        }
     }
 
     public int getAbsentTodayCount() throws Exception {

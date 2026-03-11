@@ -17,10 +17,13 @@ import javax.servlet.http.HttpSession;
 import com.smartoffice.dao.AttendanceDAO;
 import com.smartoffice.dao.LeaveRequestDAO;
 import com.smartoffice.dao.MeetingDao;
+import com.smartoffice.dao.NotificationReadsDAO;
 import com.smartoffice.dao.TaskDAO;
+import com.smartoffice.dao.TeamDAO;
 import com.smartoffice.dao.UserDao;
 import com.smartoffice.model.Meeting;
 import com.smartoffice.model.Notification;
+import com.smartoffice.model.Team;
 import com.smartoffice.model.User;
 import com.smartoffice.utils.DBConnectionUtil;
 
@@ -73,6 +76,10 @@ public class ManagerDashboardServlet extends HttpServlet {
 			LeaveRequestDAO leaveDao = new LeaveRequestDAO();
 			request.setAttribute("leaveRequests", leaveDao.getTeamLeaveRequests(username));
 
+			// ================= TEAMS (assigned to this manager) =================
+			List<Team> myTeams = TeamDAO.getTeamsByManager(username);
+			request.setAttribute("myTeams", myTeams);
+
 			// ================= ASSIGN / VIEW TASK =================
 			if ("assignTask".equals(tab)) {
 
@@ -90,41 +97,15 @@ public class ManagerDashboardServlet extends HttpServlet {
 				}
 			}
 			// ================= SELF PROFILE =================
-			User user = UserDao.getUserByUsername(username);
+			User user = UserDao.getUserByEmail(username);
 			request.setAttribute("user", user);
+			String fn = user != null ? user.getFullname() : null;
+			if (fn != null && !fn.isEmpty()) request.getSession().setAttribute("fullName", fn);
 
 
 			/* ================= NOTIFICATIONS ================= */
-			List<Notification> notifications = new ArrayList<>();
-
-			String notificationSql = """
-					    SELECT n.*
-					    FROM notifications n
-					    WHERE NOT EXISTS (
-					        SELECT 1
-					        FROM notification_reads nr
-					        WHERE nr.notification_id = n.id
-					        AND nr.username = ?
-					    )
-					    ORDER BY n.created_at DESC
-					""";
-
-			try (Connection con = DBConnectionUtil.getConnection();
-					PreparedStatement ps = con.prepareStatement(notificationSql)) {
-
-				ps.setString(1, username); // ⭐ manager username
-				ResultSet rsNotif = ps.executeQuery();
-
-				while (rsNotif.next()) {
-					Notification n = new Notification();
-					n.setId(rsNotif.getInt("id"));
-					n.setMessage(rsNotif.getString("message"));
-					n.setCreatedBy(rsNotif.getString("created_by"));
-					n.setCreatedAt(rsNotif.getTimestamp("created_at"));
-					notifications.add(n);
-				}
-			}
-
+			NotificationReadsDAO nrDAO = new NotificationReadsDAO();
+			List<Notification> notifications = nrDAO.getUnreadNotifications(username);
 			request.setAttribute("notifications", notifications);
 
 		} catch (Exception e) {

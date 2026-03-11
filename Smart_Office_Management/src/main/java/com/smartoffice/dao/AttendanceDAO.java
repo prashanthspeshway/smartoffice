@@ -12,12 +12,56 @@ import com.smartoffice.utils.DBConnectionUtil;
 
 public class AttendanceDAO {
 
-	// Check if user has punched in today
-	public boolean hasPunchedIn(String username, Date date) throws Exception {
-		String sql = "SELECT punch_in FROM attendance WHERE username=? AND punch_date=?";
+	private boolean hasAttendanceColumn(String colName) throws Exception {
+		try (Connection con = DBConnectionUtil.getConnection();
+			 PreparedStatement ps = con.prepareStatement(
+				 "SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='attendance' AND COLUMN_NAME=?")) {
+			ps.setString(1, colName);
+			try (ResultSet rs = ps.executeQuery()) {
+				return rs.next();
+			}
+		}
+	}
+
+	private String getAttendanceUserColumn() throws Exception {
+		if (hasAttendanceColumn("user_email")) return "user_email";
+		if (hasAttendanceColumn("email")) return "email";
+		if (hasAttendanceColumn("username")) return "username";
+		return "username";
+	}
+
+	/** Resolve session value (email) to attendance identifier. When attendance uses username, look up from users. */
+	private String resolveForAttendance(String sessionValue) throws Exception {
+		String col = getAttendanceUserColumn();
+		if ("email".equals(col) || "user_email".equals(col)) return sessionValue;
+		try (Connection con = DBConnectionUtil.getConnection();
+			 PreparedStatement ps = con.prepareStatement("SELECT username FROM users WHERE email = ?")) {
+			ps.setString(1, sessionValue);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) return rs.getString("username");
+		}
+		return sessionValue;
+	}
+
+	/** Get username from users by email (for INSERT when both username and user_email exist). */
+	private String getUsernameFromEmail(String email) throws Exception {
+		try (Connection con = DBConnectionUtil.getConnection();
+			 PreparedStatement ps = con.prepareStatement("SELECT username FROM users WHERE email = ?")) {
+			ps.setString(1, email);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) return rs.getString("username");
+		}
+		return email;
+	}
+
+	// Check if user has punched in today (sessionValue = email from session)
+	public boolean hasPunchedIn(String sessionValue, Date date) throws Exception {
+		String id = resolveForAttendance(sessionValue);
+		String col = getAttendanceUserColumn();
+		String sql = "SELECT punch_in FROM attendance WHERE " + col + "=? AND punch_date=?";
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-			ps.setString(1, username);
+			ps.setString(1, id);
 			ps.setDate(2, new java.sql.Date(date.getTime()));
 
 			ResultSet rs = ps.executeQuery();
@@ -29,11 +73,13 @@ public class AttendanceDAO {
 	}
 
 	// Check if user has punched out today
-	public boolean hasPunchedOut(String username, Date date) throws Exception {
-		String sql = "SELECT punch_out FROM attendance WHERE username=? AND punch_date=?";
+	public boolean hasPunchedOut(String sessionValue, Date date) throws Exception {
+		String id = resolveForAttendance(sessionValue);
+		String col = getAttendanceUserColumn();
+		String sql = "SELECT punch_out FROM attendance WHERE " + col + "=? AND punch_date=?";
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-			ps.setString(1, username);
+			ps.setString(1, id);
 			ps.setDate(2, new java.sql.Date(date.getTime()));
 
 			ResultSet rs = ps.executeQuery();
@@ -72,90 +118,91 @@ public class AttendanceDAO {
 		return false;
 	}
 
-	// Punch In with holiday check
-	public void punchIn(String username) throws Exception {
+	// Punch In with holiday check (sessionValue = email from session)
+	public void punchIn(String sessionValue) throws Exception {
 		Date today = new Date(System.currentTimeMillis());
 
 		if (isHoliday(today)) {
 			throw new Exception("Cannot punch in on a holiday");
 		}
 
-		String sql = "INSERT INTO attendance (username, punch_in, punch_date) " + "VALUES (?, NOW(), CURDATE()) "
+		// Build INSERT with ALL user columns that exist (table may have both username and user_email during migration)
+		List<String> userCols = new ArrayList<>();
+		if (hasAttendanceColumn("username")) userCols.add("username");
+		if (hasAttendanceColumn("user_email")) userCols.add("user_email");
+		if (hasAttendanceColumn("email")) userCols.add("email");
+
+		if (userCols.isEmpty()) userCols.add("username");
+
+		String cols = String.join(", ", userCols);
+		String placeholders = String.join(", ", java.util.Collections.nCopies(userCols.size(), "?"));
+		String sql = "INSERT INTO attendance (" + cols + ", punch_in, punch_date) VALUES (" + placeholders + ", NOW(), CURDATE()) "
 				+ "ON DUPLICATE KEY UPDATE punch_in = IF(punch_in IS NULL, NOW(), punch_in)";
 
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+		String usernameVal = getUsernameFromEmail(sessionValue);
 
-			ps.setString(1, username);
+		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+			int i = 1;
+			for (String c : userCols) {
+				ps.setString(i++, "email".equals(c) || "user_email".equals(c) ? sessionValue : usernameVal);
+			}
 			ps.executeUpdate();
 		}
 	}
 
 	// Punch Out with holiday check
-	public void punchOut(String username) throws Exception {
+	public void punchOut(String sessionValue) throws Exception {
 		Date today = new Date(System.currentTimeMillis());
 
 		if (isHoliday(today)) {
 			throw new Exception("Cannot punch out on a holiday");
 		}
 
+		String id = resolveForAttendance(sessionValue);
+		String col = getAttendanceUserColumn();
 		String sql = "UPDATE attendance SET punch_out = NOW() "
-				+ "WHERE username=? AND punch_date=CURDATE() AND punch_out IS NULL";
+				+ "WHERE " + col + "=? AND punch_date=CURDATE() AND punch_out IS NULL";
 
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-			ps.setString(1, username);
+			ps.setString(1, id);
 			ps.executeUpdate();
 		}
 	}
 
-	// Get today's attendance
-	public ResultSet getTodayAttendance(String username) throws Exception {
-		String sql = "SELECT punch_in, punch_out FROM attendance WHERE username=? AND punch_date=CURDATE()";
+	// Get today's attendance (sessionValue = email from session)
+	public ResultSet getTodayAttendance(String sessionValue) throws Exception {
+		String id = resolveForAttendance(sessionValue);
+		String col = getAttendanceUserColumn();
+		String sql = "SELECT punch_in, punch_out FROM attendance WHERE " + col + "=? AND punch_date=CURDATE()";
 
 		Connection con = DBConnectionUtil.getConnection();
 		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setString(1, username);
+		ps.setString(1, id);
 
 		return ps.executeQuery();
 	}
 
 	public List<TeamAttendance> getTeamAttendanceForToday(String managerUsername) throws Exception {
-
 		List<TeamAttendance> list = new ArrayList<>();
-
-		String sql = """
-				    SELECT
-				        u.username,
-				        u.fullname,
-				        a.punch_in,
-				        a.punch_out
-				    FROM users u
-				    LEFT JOIN attendance a
-				        ON a.username = u.username
-				        AND a.punch_date = CURDATE()
-				    WHERE u.manager = ?
-				    ORDER BY u.fullname
-				""";
+		String aCol = getAttendanceUserColumn();
+		String joinOn = "username".equals(aCol) ? "a.username = u.username" : "a." + aCol + " = u.email";
+		String sql = "SELECT u.email, TRIM(CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,''))) AS fullname, a.punch_in, a.punch_out " +
+		             "FROM (SELECT DISTINCT tm.username FROM team_members tm JOIN teams t ON t.id = tm.team_id AND t.manager_username = ?) team_users " +
+		             "JOIN users u ON u.email = team_users.username " +
+		             "LEFT JOIN attendance a ON " + joinOn + " AND a.punch_date = CURDATE() " +
+		             "ORDER BY fullname";
 
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
 			ps.setString(1, managerUsername);
 			ResultSet rs = ps.executeQuery();
-
 			while (rs.next()) {
 				TeamAttendance ta = new TeamAttendance();
-				ta.setUsername(rs.getString("username"));
+				ta.setUsername(rs.getString("email"));
 				ta.setFullName(rs.getString("fullname"));
 				ta.setPunchIn(rs.getTimestamp("punch_in"));
 				ta.setPunchOut(rs.getTimestamp("punch_out"));
-
-				if (ta.getPunchIn() == null)
-					ta.setStatus("Absent");
-				else if (ta.getPunchOut() == null)
-					ta.setStatus("Punched In");
-				else
-					ta.setStatus("Present");
-
+				ta.setStatus(ta.getPunchIn() == null ? "Absent" : (ta.getPunchOut() == null ? "Punched In" : "Present"));
 				list.add(ta);
 			}
 		}
@@ -163,42 +210,28 @@ public class AttendanceDAO {
 	}
 
 	public List<TeamAttendance> getTeamAttendanceForMonth(String managerUsername) throws Exception {
-
 		List<TeamAttendance> list = new ArrayList<>();
-
-		String sql = """
-				    SELECT
-				        u.username,
-				        u.fullname,
-				        a.punch_date,
-				        a.punch_in,
-				        a.punch_out
-				    FROM users u
-				    LEFT JOIN attendance a
-				        ON a.username = u.username
-				        AND MONTH(a.punch_date) = MONTH(CURDATE())
-				        AND YEAR(a.punch_date) = YEAR(CURDATE())
-				    WHERE u.manager = ?
-				    ORDER BY u.fullname, a.punch_date
-				""";
+		String aCol = getAttendanceUserColumn();
+		String joinOn = "username".equals(aCol) ? "a.username = u.username" : "a." + aCol + " = u.email";
+		String sql = "SELECT u.email, TRIM(CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,''))) AS fullname, a.punch_date, a.punch_in, a.punch_out " +
+		             "FROM (SELECT DISTINCT tm.username FROM team_members tm JOIN teams t ON t.id = tm.team_id AND t.manager_username = ?) team_users " +
+		             "JOIN users u ON u.email = team_users.username " +
+		             "LEFT JOIN attendance a ON " + joinOn + " AND MONTH(a.punch_date) = MONTH(CURDATE()) AND YEAR(a.punch_date) = YEAR(CURDATE()) " +
+		             "ORDER BY fullname, a.punch_date";
 
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
 			ps.setString(1, managerUsername);
 			ResultSet rs = ps.executeQuery();
-
 			while (rs.next()) {
 				TeamAttendance ta = new TeamAttendance();
-				ta.setUsername(rs.getString("username"));
+				ta.setUsername(rs.getString("email"));
 				ta.setFullName(rs.getString("fullname"));
-				ta.setAttendanceDate(rs.getDate("punch_date")); // ⭐ IMPORTANT
+				ta.setAttendanceDate(rs.getDate("punch_date"));
 				ta.setPunchIn(rs.getTimestamp("punch_in"));
 				ta.setPunchOut(rs.getTimestamp("punch_out"));
-
 				list.add(ta);
 			}
 		}
-
 		return list;
 	}
 

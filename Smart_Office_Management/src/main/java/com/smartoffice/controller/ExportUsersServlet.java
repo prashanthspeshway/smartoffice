@@ -27,17 +27,18 @@ public class ExportUsersServlet extends HttpServlet {
         );
 
         PrintWriter out = resp.getWriter();
-        out.println("ID,Username,Role,Status,Email");
+        out.println("ID,Email,Role,Status,Firstname,Lastname");
 
         List<User> users = UserDao.getAllUsers();
 
         for (User u : users) {
             out.println(
                 u.getId() + "," +
-                u.getUsername() + "," +
+                u.getEmail() + "," +
                 u.getRole() + "," +
                 u.getStatus() + "," +
-                u.getEmail()
+                (u.getFirstname() != null ? u.getFirstname() : "") + "," +
+                (u.getLastname() != null ? u.getLastname() : "")
             );
         }
 

@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
 
 import com.smartoffice.dao.AttendanceDAO;
 import com.smartoffice.dao.LeaveRequestDAO;
+import com.smartoffice.dao.NotificationReadsDAO;
 import com.smartoffice.dao.TaskDAO;
 import com.smartoffice.dao.UserDao;
 import com.smartoffice.model.LeaveRequest;
@@ -41,8 +42,10 @@ public class UserDashboardServlet extends HttpServlet {
 
 		try {
              //USER PROFILe
-			User user = UserDao.getUserByUsername(username);
+			User user = UserDao.getUserByEmail(username);
             request.setAttribute("user", user);
+            String fn = user != null ? user.getFullname() : null;
+            if (fn != null && !fn.isEmpty()) request.getSession().setAttribute("fullName", fn);
 			/* ================= ATTENDANCE ================= */
 			AttendanceDAO attendanceDAO = new AttendanceDAO();
 			ResultSet rs = attendanceDAO.getTodayAttendance(username);
@@ -64,15 +67,9 @@ public class UserDashboardServlet extends HttpServlet {
 			/* ================= MEETINGS ================= */
 			List<Meeting> meetings = new ArrayList<>();
 
-			String meetingSql = """
-					    SELECT *
-					    FROM meetings
-					    WHERE created_by = (
-					        SELECT manager FROM users WHERE username = ?
-					    )
-					    AND start_time >= NOW()
-					    ORDER BY start_time
-					""";
+			String meetingSql = "SELECT * FROM meetings WHERE created_by IN " +
+				"(SELECT t.manager_username FROM team_members tm JOIN teams t ON t.id = tm.team_id WHERE tm.username = ?) " +
+				"AND start_time >= NOW() ORDER BY start_time";
 
 			try (Connection con = DBConnectionUtil.getConnection();
 					PreparedStatement ps = con.prepareStatement(meetingSql)) {
@@ -96,36 +93,8 @@ public class UserDashboardServlet extends HttpServlet {
 			request.setAttribute("meetings", meetings);
 
 			/* ================= NOTIFICATIONS ================= */
-			List<Notification> notifications = new ArrayList<>();
-
-			String notificationSql = """
-					    SELECT n.*
-					    FROM notifications n
-					    WHERE NOT EXISTS (
-					        SELECT 1
-					        FROM notification_reads nr
-					        WHERE nr.notification_id = n.id
-					        AND nr.username = ?
-					    )
-					    ORDER BY n.created_at DESC
-					""";
-
-			try (Connection con = DBConnectionUtil.getConnection();
-					PreparedStatement ps = con.prepareStatement(notificationSql)) {
-
-				ps.setString(1, username); // ⭐ IMPORTANT
-				ResultSet rsNotif = ps.executeQuery();
-
-				while (rsNotif.next()) {
-					Notification n = new Notification();
-					n.setId(rsNotif.getInt("id"));
-					n.setMessage(rsNotif.getString("message"));
-					n.setCreatedBy(rsNotif.getString("created_by"));
-					n.setCreatedAt(rsNotif.getTimestamp("created_at"));
-					notifications.add(n);
-				}
-			}
-
+			NotificationReadsDAO nrDAO = new NotificationReadsDAO();
+			List<Notification> notifications = nrDAO.getUnreadNotifications(username);
 			request.setAttribute("notifications", notifications);
 
 			/* ================= FORWARD ================= */

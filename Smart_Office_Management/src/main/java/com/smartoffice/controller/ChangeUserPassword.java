@@ -58,7 +58,7 @@ public class ChangeUserPassword extends HttpServlet {
             return;
         }
 
-        String sql = "UPDATE users SET password = ? WHERE username = ?";
+        String sql = "UPDATE users SET password = ? WHERE email = ?";
 
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

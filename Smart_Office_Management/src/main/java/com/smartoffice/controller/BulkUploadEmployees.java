@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -33,9 +34,7 @@ import com.smartoffice.utils.PasswordUtil;
 public class BulkUploadEmployees extends HttpServlet {
 
 	private boolean isValidPassword(String password) {
-
 		String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$";
-
 		return password != null && password.matches(regex);
 	}
 
@@ -53,7 +52,7 @@ public class BulkUploadEmployees extends HttpServlet {
 			con = DBConnectionUtil.getConnection();
 
 			String sql = "INSERT INTO users "
-					+ "(username,password,role,status,email,fullname,joinedDate,manager,phone) "
+					+ "(username,password,role,status,email,firstname,lastname,joinedDate,phone) "
 					+ "VALUES (?,?,?,?,?,?,?,?,?)";
 
 			ps = con.prepareStatement(sql);
@@ -78,17 +77,15 @@ public class BulkUploadEmployees extends HttpServlet {
 						if (row.getRowNum() == 0)
 							continue;
 
-						String username = formatter.formatCellValue(row.getCell(0));
+						String email = formatter.formatCellValue(row.getCell(4));
 						String password = formatter.formatCellValue(row.getCell(1));
 
-						// password validation
-						if (!isValidPassword(password)) {
+						if (email == null || email.trim().isEmpty() || !isValidPassword(password)) {
 							continue;
 						}
 						insertedCount++;
 						String role = formatter.formatCellValue(row.getCell(2));
 						String status = formatter.formatCellValue(row.getCell(3));
-						String email = formatter.formatCellValue(row.getCell(4));
 						String fullname = formatter.formatCellValue(row.getCell(5));
 
 						Cell dateCell = row.getCell(6);
@@ -132,18 +129,31 @@ public class BulkUploadEmployees extends HttpServlet {
 							continue;
 						}
 
-						String manager = formatter.formatCellValue(row.getCell(7));
 						String phone = formatter.formatCellValue(row.getCell(8));
+						if (phone != null) {
+							phone = phone.replaceAll("[^0-9]", "").trim();
+							if (phone.length() > 10) phone = phone.substring(0, 10);
+						}
+						String firstname = "";
+						String lastname = "";
+						if (fullname != null && !fullname.trim().isEmpty()) {
+							int sp = fullname.trim().indexOf(' ');
+							firstname = sp > 0 ? fullname.substring(0, sp).trim() : fullname.trim();
+							lastname = sp > 0 ? fullname.substring(sp).trim() : "";
+						}
 
-						ps.setString(1, username);
+						String username = (firstname + " " + lastname).trim();
+						if (username.isEmpty()) username = email;
+
 						String hashedPassword = PasswordUtil.hashPassword(password);
+						ps.setString(1, username);
 						ps.setString(2, hashedPassword);
 						ps.setString(3, role);
 						ps.setString(4, status);
 						ps.setString(5, email);
-						ps.setString(6, fullname);
-						ps.setDate(7, sqlDate);
-						ps.setString(8, manager);
+						ps.setString(6, firstname);
+						ps.setString(7, lastname);
+						ps.setDate(8, sqlDate);
 						ps.setString(9, phone);
 
 						ps.addBatch();
@@ -171,19 +181,23 @@ public class BulkUploadEmployees extends HttpServlet {
 					}
 
 					String[] data = line.split(",");
-
-					ps.setString(1, data[0]);
-					ps.setString(2, data[1]);
-					ps.setString(3, data[2]);
-					ps.setString(4, data[3]);
-					ps.setString(5, data[4]);
-					ps.setString(6, data[5]);
+					String fullname = data.length > 5 ? data[5] : "";
+					String firstname = "";
+					String lastname = "";
+					if (fullname != null && !fullname.trim().isEmpty()) {
+						int sp = fullname.trim().indexOf(' ');
+						firstname = sp > 0 ? fullname.substring(0, sp).trim() : fullname.trim();
+						lastname = sp > 0 ? fullname.substring(sp).trim() : "";
+					}
+					String phone = data.length > 8 ? data[8] : "";
+					if (phone != null) {
+						phone = phone.replaceAll("[^0-9]", "").trim();
+						if (phone.length() > 10) phone = phone.substring(0, 10);
+					}
 					java.sql.Date sqlDate = null;
-
 					try {
-						sqlDate = java.sql.Date.valueOf(data[6]); // yyyy-MM-dd
+						sqlDate = java.sql.Date.valueOf(data[6]);
 					} catch (Exception e) {
-
 						try {
 							java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
 							java.util.Date utilDate = sdf.parse(data[6]);
@@ -191,12 +205,20 @@ public class BulkUploadEmployees extends HttpServlet {
 						} catch (Exception ex) {
 							sqlDate = null;
 						}
-
 					}
 
-					ps.setDate(7, sqlDate);
-					ps.setString(8, data[7]);
-					ps.setString(9, data[8]);
+					String username = (firstname + " " + lastname).trim();
+					if (username.isEmpty()) username = data.length > 4 ? data[4] : "";
+
+					ps.setString(1, username);
+					ps.setString(2, PasswordUtil.hashPassword(data[1]));
+					ps.setString(3, data[2]);
+					ps.setString(4, data[3]);
+					ps.setString(5, data[4]);
+					ps.setString(6, firstname);
+					ps.setString(7, lastname);
+					ps.setDate(8, sqlDate);
+					ps.setString(9, phone);
 
 					ps.addBatch();
 				}

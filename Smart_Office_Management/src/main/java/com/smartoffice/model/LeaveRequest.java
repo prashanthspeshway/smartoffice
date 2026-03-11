@@ -22,6 +22,13 @@ public class LeaveRequest {
 	public void setUsername(String username) {
 		this.username = username;
 	}
+	/** Email (stored in username field for compatibility). */
+	public String getEmail() {
+		return username;
+	}
+	public void setEmail(String email) {
+		this.username = email;
+	}
 	public String getLeaveType() {
 		return leaveType;
 	}
