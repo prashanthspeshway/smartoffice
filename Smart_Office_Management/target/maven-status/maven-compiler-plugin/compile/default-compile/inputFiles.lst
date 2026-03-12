@@ -1,3 +1,4 @@
+C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\TaskAttachmentServlet.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\model\TeamAttendance.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\dao\AdminDAO.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\dao\TaskDAO.java
@@ -24,6 +25,7 @@ C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\ja
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\ViewMeetingsServlet.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\UpdateTaskStatusServlet.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\GetHolidaysServlet.java
+C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\model\BreakLog.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\utils\DBConnectionUtil.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\AssignTaskServlet.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\ExportTeamPerformanceServlet.java
@@ -32,6 +34,7 @@ C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\ja
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\AddUser.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\LogoutServlet.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\PerformanceServlet.java
+C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\dao\BreakDAO.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\model\Team.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\ApplyLeaveServlet.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\dao\DesignationDAO.java
@@ -60,5 +63,6 @@ C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\ja
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\LoginServlet.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\UserCheck.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\AdminLeaveServlet.java
+C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\BreakServlet.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\controller\MarkNotificationRead.java
 C:\Users\Home\Desktop\smartoffice_management\Smart_Office_Management\src\main\java\com\smartoffice\model\User.java

@@ -12,7 +12,7 @@
 <%
 String activeTab = request.getParameter("tab");
 if (activeTab == null) {
-	activeTab = "selfAttendance";
+	activeTab = "attendance";
 }
 %>
 
@@ -627,22 +627,22 @@ to {
 
 /* ===== Fieldset Styling ===== */
 .team-fieldset {
-	border: 2px solid #c3cfe2;
-	border-radius: 14px;
-	padding: 20px 24px 30px;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 20px 24px 24px;
 	height: 450px;
 	overflow-y: auto;
-	background: #c3cfe2;
-	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .team-fieldset legend {
-	padding: 8px;
-	font-size: 18px;
+	padding: 8px 16px;
+	font-size: 15px;
 	font-weight: 600;
-	background: #e2ebf0;
-	border-radius: 15px;
-	color: #2d3748;
+	background: #eef2ff;
+	border-radius: 8px;
+	color: #1e293b;
 }
 
 /* ===== Scroll Area ===== */
@@ -692,15 +692,17 @@ to {
 
 /* ===== Employee Card ===== */
 .employee-card {
-	background: #C3CFE2;
+	background: linear-gradient(135deg, rgba(102,126,234,0.03), rgba(148,163,184,0.03));
 	border-radius: 12px;
-	padding: 8px;
-	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
-	transition: 0.3s ease;
+	padding: 14px 16px;
+	box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+	border: 1px solid rgba(148,163,184,0.35);
+	transition: 0.2s ease;
 }
 
 .employee-card:hover {
 	transform: translateY(-3px);
+	box-shadow: 0 8px 18px rgba(15,23,42,0.12);
 }
 
 /* ===== Header ===== */
@@ -1081,20 +1083,20 @@ to {
 /* ===== Status Badge ===== */
 /* ===== Meeting Fieldset ===== */
 .meeting-fieldset {
-	border: 2px solid #c3cfe2;
-	border-radius: 14px;
-	padding: 20px 24px 26px;
-	background: #c3cfe2;
-	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 24px;
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .meeting-fieldset legend {
-	padding: 8px;
-	background: #e2ebf0;
-	border-radius: 14px;
-	font-size: 18px;
+	padding: 8px 16px;
+	background: #eef2ff;
+	border-radius: 8px;
+	font-size: 15px;
 	font-weight: 600;
-	color: #2d3748;
+	color: #1e293b;
 }
 
 /* ===== Header ===== */
@@ -1483,20 +1485,22 @@ to {
 
 /* Left: form */
 .meeting-left {
-	background: #c3cfe2;
+	background: #ffffff;
 	height: 100%;
 	padding: 18px;
-	border-radius: 14px;
+	border-radius: 12px;
 	overflow-y: hidden;
 	margin-top: -18px;
+	border: 1px solid #e2e8f0;
 }
 
 /* Right: meetings list */
 .meeting-right {
-	background: #c3cfe2;
+	background: #ffffff;
 	padding: 18px;
-	border-radius: 14px;
-	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+	border: 1px solid #e2e8f0;
 	max-height: 430px; /* 👈 controls visible height */
 	overflow-y: auto; /* 👈 vertical scroll */
 }
@@ -1722,6 +1726,102 @@ to {
 
 }
 
+/* ================= BREAK TIME (MANAGER) ================= */
+.break-fieldset {
+	border-radius: 16px;
+	padding: 22px 20px 26px;
+	border: none;
+	background: #ffffff;
+	box-shadow: 0 8px 32px rgba(14, 165, 233, 0.15);
+	height: auto;
+	margin-top: 18px;
+}
+
+.break-fieldset legend {
+	padding: 8px 18px;
+	font-size: 15px;
+	font-weight: 700;
+	color: #fff;
+	border-radius: 20px;
+	background: linear-gradient(135deg, #0ea5e9, #6c63ff);
+	border: none;
+	box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+}
+
+.break-total-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 14px;
+	background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(99,102,241,0.08));
+	border-radius: 10px;
+	border: 1px solid rgba(14,165,233,0.15);
+	margin-bottom: 12px;
+}
+
+.break-total-row .tr-label {
+	font-size: 12px;
+	color: #6b7280;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.break-total-row .tr-val {
+	font-size: 15px;
+	font-weight: 800;
+	color: #0ea5e9;
+	letter-spacing: 1px;
+}
+
+.break-actions {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 14px;
+}
+
+.break-actions button {
+	flex: 1;
+	padding: 11px 10px;
+	border-radius: 25px;
+	border: none;
+	font-weight: 700;
+	font-size: 13px;
+	cursor: pointer;
+	transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+}
+
+.break-actions button:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+	transform: none !important;
+	box-shadow: none !important;
+}
+
+.break-log {
+	max-height: 110px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	margin-top: 8px;
+	gap: 6px;
+}
+
+.break-log::-webkit-scrollbar { width: 3px; }
+.break-log::-webkit-scrollbar-thumb { background: rgba(14,165,233,0.3); border-radius: 3px; }
+
+.time-card {
+	background: #f8f9ff;
+	padding: 10px 12px;
+	border-radius: 8px;
+	font-size: 12px;
+	border: 1px solid rgba(148,163,184,0.4);
+}
+
 /* ================= FULL DARK MODE ================= */
 body.dark-theme {
 	background: #0f172a !important;
@@ -1899,9 +1999,9 @@ body.dark-theme .settings-item i {
 		<div class="sidebar">
 
 			<button
-				class="sidebar-btn <%=activeTab.equals("selfAttendance") ? "active" : ""%>"
-				onclick="setActive(this); showSection('selfAttendance')">
-				<i class="fa-solid fa-user-check"></i> <span>My Attendance</span>
+				class="sidebar-btn <%=activeTab.equals("attendance") ? "active" : ""%>"
+				onclick="setActive(this); showSection('attendance')">
+				<i class="fa-solid fa-user-check"></i> <span>Attendance</span>
 			</button>
 
 			<button
@@ -1923,13 +2023,6 @@ body.dark-theme .settings-item i {
 			</button>
 
 			<button
-				class="sidebar-btn <%=activeTab.equals("attendance") ? "active" : ""%>"
-				onclick="setActive(this); showSection('attendance')">
-				<i class="fa-solid fa-clipboard-user"></i> <span>Team
-					Attendance</span>
-			</button>
-
-			<button
 				class="sidebar-btn <%=activeTab.equals("leave") ? "active" : ""%>"
 				onclick="setActive(this); location.href='<%=request.getContextPath()%>/manager?tab=leave'">
 				<i class="fa-solid fa-calendar-xmark"></i> <span>Leave
@@ -1944,12 +2037,6 @@ body.dark-theme .settings-item i {
 			</button>
 
 			<button
-				class="sidebar-btn <%=activeTab.equals("teams") ? "active" : ""%>"
-				onclick="setActive(this); showSection('teams')">
-				<i class="fa-solid fa-people-group"></i> <span>Teams</span>
-			</button>
-
-			<button
 				class="sidebar-btn <%=activeTab.equals("calendar") ? "active" : ""%>"
 				onclick="setActive(this); openCalendar()">
 				<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
@@ -1961,48 +2048,6 @@ body.dark-theme .settings-item i {
 			<div class="box" id="blank" style="display: none;">
 				<h3>Welcome 👋</h3>
 				<p>Select an option from the left menu to continue.</p>
-			</div>
-
-			<!-- ===== My Attendance ===== -->
-			<div class="box" id="selfAttendance" style="display: none;">
-
-				<fieldset class="attendance-fieldset">
-					<legend>My Attendance</legend>
-
-					<div class="attendance-row">
-						<span class="label">Status</span> <span class="value"><%=status%></span>
-					</div>
-
-					<div class="attendance-row">
-						<span class="label">Punch In</span> <span class="value"><%=punchIn != null ? punchIn : "--"%></span>
-					</div>
-
-					<div class="attendance-row">
-						<span class="label">Punch Out</span> <span class="value"><%=punchOut != null ? punchOut : "--"%></span>
-					</div>
-
-					<% if (isWeekend) { %>
-					<div class="attendance-buttons" style="opacity:0.7;">
-						<p style="color:#64748b;font-size:13px;margin:0;">Attendance is closed on weekends.</p>
-					</div>
-					<% } else { %>
-					<div class="attendance-buttons">
-						<form action="attendance" method="post">
-							<input type="hidden" name="action" value="punchin">
-							<button class="primary-btn"
-								<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
-						</form>
-
-						<form action="attendance" method="post">
-							<input type="hidden" name="action" value="punchout">
-							<button class="reject-btn"
-								<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
-								Punch Out</button>
-						</form>
-					</div>
-					<% } %>
-
-				</fieldset>
 			</div>
 
 			<!-- ===== Self Profile ===== -->
@@ -2186,10 +2231,115 @@ body.dark-theme .settings-item i {
 				</fieldset>
 			</div>
 
-			<!-- ===== Team Attendance ===== -->
+			<!-- ===== Attendance (Self + Team) ===== -->
 			<div class="box" id="attendance" style="display: none;">
 
+				<!-- My Attendance -->
 				<fieldset class="attendance-fieldset">
+					<legend>My Attendance</legend>
+
+					<div class="attendance-row">
+						<span class="label">Status</span> <span class="value"><%=status%></span>
+					</div>
+
+					<div class="attendance-row">
+						<span class="label">Punch In</span> <span class="value"><%=punchIn != null ? punchIn : "--"%></span>
+					</div>
+
+					<div class="attendance-row">
+						<span class="label">Punch Out</span> <span class="value"><%=punchOut != null ? punchOut : "--"%></span>
+					</div>
+
+					<% if (isWeekend) { %>
+					<div class="attendance-buttons" style="opacity:0.7;">
+						<p style="color:#64748b;font-size:13px;margin:0;">Attendance is closed on weekends.</p>
+					</div>
+					<% } else { %>
+					<div class="attendance-buttons">
+						<form action="attendance" method="post">
+							<input type="hidden" name="action" value="punchin">
+							<button class="primary-btn"
+								<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
+						</form>
+
+						<form action="attendance" method="post">
+							<input type="hidden" name="action" value="punchout">
+							<button class="reject-btn"
+								<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
+								Punch Out</button>
+						</form>
+					</div>
+					<% } %>
+
+				</fieldset>
+
+				<!-- Break Time (manager) -->
+				<fieldset class="break-fieldset">
+					<legend>
+						<i class="fa-solid fa-mug-hot"></i> Break Time
+					</legend>
+
+					<div class="break-total-row">
+						<span class="tr-label">Total Break Today</span>
+						<span class="tr-val">
+							<%
+							int mgrBreakSecs = 0;
+							if (request.getAttribute("breakTotalSeconds") != null) {
+								mgrBreakSecs = (Integer) request.getAttribute("breakTotalSeconds");
+							}
+							int mbh = mgrBreakSecs / 3600;
+							int mbm = (mgrBreakSecs % 3600) / 60;
+							int mbs = mgrBreakSecs % 60;
+							%>
+							<%= String.format("%02d:%02d:%02d", mbh, mbm, mbs) %>
+						</span>
+					</div>
+
+					<div class="break-actions">
+						<form action="break" method="post" style="display:inline;">
+							<input type="hidden" name="action" value="start">
+							<input type="hidden" name="redirect" value="manager">
+							<button class="primary-btn"
+								<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
+								Start Break
+							</button>
+						</form>
+
+						<form action="break" method="post"
+							style="display:inline; margin-left:8px;">
+							<input type="hidden" name="action" value="end">
+							<input type="hidden" name="redirect" value="manager">
+							<button class="reject-btn">
+								End Break
+							</button>
+						</form>
+					</div>
+
+					<div class="break-log" style="margin-top:10px;">
+						<%
+						java.util.List<com.smartoffice.model.BreakLog> mgrBreaks =
+							(java.util.List<com.smartoffice.model.BreakLog>) request.getAttribute("breakLogs");
+						if (mgrBreaks != null && !mgrBreaks.isEmpty()) {
+							for (com.smartoffice.model.BreakLog b : mgrBreaks) {
+						%>
+						<div class="time-card">
+							From <b><%= b.getStartTime() %></b>
+							to <b><%= b.getEndTime() != null ? b.getEndTime() : "--" %></b>
+						</div>
+						<%
+							}
+						} else {
+						%>
+						<p class="no-task-text">No breaks recorded today.</p>
+						<%
+						}
+						%>
+					</div>
+
+				</fieldset>
+
+				<!-- Team Attendance -->
+				<fieldset class="attendance-fieldset" style="margin-top:18px;">
 					<legend>Team Attendance (Today)</legend>
 
 					<!-- Header Actions -->
@@ -2266,8 +2416,16 @@ body.dark-theme .settings-item i {
 					<legend>Leave</legend>
 
 					<div style="display: flex; gap: 12px; margin-bottom: 20px;">
-						<button type="button" class="nav-btn" style="flex: 1; background: linear-gradient(135deg,#667eea,#764ba2); color: white; border-radius:20px; padding: 10px;" onclick="showManagerApplyLeave()">Apply Leave</button>
-						<button type="button" class="nav-btn" style="flex: 1; background: #6b7280; color: white; border-radius:20px; padding: 10px;" onclick="showManagerMyLeaves()">My Leave Requests</button>
+						<button id="managerApplyTab" type="button" class="nav-btn"
+							style="flex: 1; background: linear-gradient(135deg,#667eea,#764ba2); color: white; border-radius:20px; padding: 10px; border:none;"
+							onclick="showManagerApplyLeave()">
+							Apply Leave
+						</button>
+						<button id="managerMyLeavesTab" type="button" class="nav-btn"
+							style="flex: 1; background: #6b7280; color: white; border-radius:20px; padding: 10px; border:none;"
+							onclick="showManagerMyLeaves()">
+							My Leave Requests
+						</button>
 					</div>
 
 					<div id="managerApplyLeaveSection">
@@ -2347,8 +2505,10 @@ body.dark-theme .settings-item i {
 					Theme</button>
 			</div>
 
-			<!-- ===== Teams (assigned by admin) ===== -->
-			<div class="box" id="teams" style="display: none;">
+			<!-- ===== My Teams & My Team Members (combined) ===== -->
+			<div class="box" id="teamSection" style="display: none;">
+
+				<!-- My Teams (as assigned by admin) -->
 				<fieldset class="team-fieldset">
 					<legend><i class="fa-solid fa-people-group"></i> My Teams</legend>
 					<div class="team-scroll">
@@ -2388,13 +2548,10 @@ body.dark-theme .settings-item i {
 						</div>
 					</div>
 				</fieldset>
-			</div>
 
-			<!-- ===== My Team ===== -->
-			<div class="box" id="teamSection" style="display: none;">
-
-				<fieldset class="team-fieldset">
-					<legend>My Team</legend>
+				<!-- Individual team members under this manager -->
+				<fieldset class="team-fieldset" style="margin-top:16px;">
+					<legend>My Team Members</legend>
 
 					<!-- Scroll Container -->
 					<div class="team-scroll">
@@ -2438,125 +2595,204 @@ body.dark-theme .settings-item i {
 			</div>
 
 			<!-- ===== Assign Tasks ===== -->
-			<div class="box" id="assignTask" style="display: none;">
+			<div class="box" id="assignTask" style="display: none; padding: 20px;">
 
-				<!-- ===== Assign Task Fieldset ===== -->
-				<fieldset class="task-fieldset">
-					<legend>Assign Task</legend>
+				<div style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px;">
 
-					<%
-					String errorMessage = (String) request.getAttribute("errorMessage");
-					if (errorMessage != null) {
-					%>
-					<div class="task-error"><%=errorMessage%></div>
-					<%
-					}
-					%>
+					<!-- ===== Assign Task Fieldset ===== -->
+					<fieldset class="task-fieldset" style="background: #f8fafc;">
+						<legend>
+							<i class="fa-solid fa-paper-plane"></i>
+							New Task
+						</legend>
 
-					<form action="<%=request.getContextPath()%>/assignTask"
-						method="post">
-						<select class="form-control" name="employeeUsername" required>
-							<option value="">Select Employee</option>
-
-							<%
-							String assignEmployee = (String) request.getAttribute("assignEmployee");
-
-							if (team != null && !team.isEmpty()) {
-								for (User u : team) {
-							%>
-							<option value="<%=u.getEmail()%>"
-								<%=u.getEmail().equals(assignEmployee) ? "selected" : ""%>>
-								<%=u.getFullname()%> (<%=u.getEmail()%>)
-							</option>
-							<%
-							}
-							} else {
-							%>
-							<option disabled>No employees available</option>
-							<%
-							}
-							%>
-						</select>
-
-						<textarea class="form-control" name="taskDesc" rows="4"
-							placeholder="Task Description" required></textarea>
-
-						<button class="primary-btn">Assign Task</button>
-					</form>
-				</fieldset>
-
-				<!-- ===== View Tasks Fieldset ===== -->
-				<fieldset class="task-fieldset">
-					<legend>View Assigned Tasks</legend>
-
-					<form action="<%=request.getContextPath()%>/viewAssignedTasks"
-						method="post">
-						<select class="form-control" name="employeeUsername" required>
-							<option value="">Select Employee</option>
-
-							<%
-							String viewEmployee = (String) request.getAttribute("viewEmployee");
-
-							if (team != null && !team.isEmpty()) {
-								for (User u : team) {
-							%>
-							<option value="<%=u.getEmail()%>"
-								<%=u.getEmail().equals(viewEmployee) ? "selected" : ""%>>
-								<%=u.getFullname()%> (<%=u.getEmail()%>)
-							</option>
-							<%
-							}
-							} else {
-							%>
-							<option disabled>No employees available</option>
-							<%
-							}
-							%>
-						</select>
-
-						<button class="secondary-btn">View Tasks</button>
-					</form>
-
-					<%
-					viewTasks = (List<Task>) request.getAttribute("viewTasks");
-					if (viewTasks != null) {
-					%>
-
-					<h4 class="tasks-title">
-						Tasks for
-						<%=viewEmployee%></h4>
-
-					<div class="task-list">
 						<%
-						if (viewTasks.isEmpty()) {
+						String errorMessage = (String) request.getAttribute("errorMessage");
+						if (errorMessage != null) {
 						%>
-						<p class="no-data">No tasks found.</p>
+						<div class="task-error"><%=errorMessage%></div>
 						<%
-						} else {
-						for (Task t : viewTasks) {
+						}
 						%>
 
-						<div
-							class="task-card <%=t.getStatus().equals("COMPLETED") ? "completed" : ""%>">
-							<div class="task-desc"><%=t.getDescription()%></div>
-							<span
-								class="task-status
+						<form action="<%=request.getContextPath()%>/assignTask"
+							method="post" enctype="multipart/form-data"
+							style="display:flex; flex-direction:column; gap:12px;">
+
+							<label style="font-size:13px; font-weight:600; color:#475569;">Assign to</label>
+							<select class="form-control" name="employeeUsername" required>
+								<option value="">Select Employee</option>
+
+								<%
+								String assignEmployee = (String) request.getAttribute("assignEmployee");
+
+								if (team != null && !team.isEmpty()) {
+									for (User u : team) {
+								%>
+								<option value="<%=u.getEmail()%>"
+									<%=u.getEmail().equals(assignEmployee) ? "selected" : ""%>>
+									<%=u.getFullname()%> (<%=u.getEmail()%>)
+								</option>
+								<%
+								}
+								} else {
+								%>
+								<option disabled>No employees available</option>
+								<%
+								}
+								%>
+							</select>
+
+							<label style="font-size:13px; font-weight:600; color:#475569;">Task title</label>
+							<input class="form-control" type="text" name="title"
+								placeholder="E.g. Submit weekly report" required>
+
+							<label style="font-size:13px; font-weight:600; color:#475569;">Description</label>
+							<textarea class="form-control" name="taskDesc" rows="4"
+								placeholder="Add clear instructions and details" required></textarea>
+
+							<div style="display:flex; gap:12px; flex-wrap:wrap;">
+								<div style="flex:1; min-width:160px;">
+									<label style="font-size:13px; font-weight:600; color:#475569;">Deadline</label>
+									<input class="form-control" type="date" name="deadline">
+								</div>
+
+								<div style="flex:1; min-width:160px;">
+									<label style="font-size:13px; font-weight:600; color:#475569;">Priority</label>
+									<select class="form-control" name="priority">
+										<option value="HIGH">High</option>
+										<option value="MEDIUM" selected>Medium</option>
+										<option value="LOW">Low</option>
+									</select>
+								</div>
+							</div>
+
+							<div>
+								<label style="font-size:13px; font-weight:600; color:#475569;">Attachment (optional)</label>
+								<input class="form-control" type="file" name="attachment"
+									accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg">
+								<small style="font-size:11px; color:#6b7280;">
+									Attach any reference document or file your employee needs.
+								</small>
+							</div>
+
+							<div style="margin-top:4px;">
+								<button class="primary-btn" type="submit"
+									style="min-width:150px; border-radius:999px;">
+									Assign Task
+								</button>
+							</div>
+						</form>
+					</fieldset>
+
+					<!-- ===== View Tasks Fieldset ===== -->
+					<fieldset class="task-fieldset" style="background:#eef2ff;">
+						<legend>
+							<i class="fa-solid fa-list-check"></i>
+							View Assigned Tasks
+						</legend>
+
+						<form action="<%=request.getContextPath()%>/viewAssignedTasks"
+							method="post" style="display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
+
+							<label style="font-size:13px; font-weight:600; color:#475569;">Employee</label>
+							<select class="form-control" name="employeeUsername" required>
+								<option value="">Select Employee</option>
+
+								<%
+								String viewEmployee = (String) request.getAttribute("viewEmployee");
+
+								if (team != null && !team.isEmpty()) {
+									for (User u : team) {
+								%>
+								<option value="<%=u.getEmail()%>"
+									<%=u.getEmail().equals(viewEmployee) ? "selected" : ""%>>
+									<%=u.getFullname()%> (<%=u.getEmail()%>)
+								</option>
+								<%
+								}
+								} else {
+								%>
+								<option disabled>No employees available</option>
+								<%
+								}
+								%>
+							</select>
+
+							<button class="secondary-btn" type="submit"
+								style="align-self:flex-start; border-radius:999px;">
+								View Tasks
+							</button>
+						</form>
+
+						<%
+						viewTasks = (List<Task>) request.getAttribute("viewTasks");
+							if (viewTasks != null) {
+						%>
+
+						<h4 class="tasks-title" style="margin-top:10px;">
+							Tasks for
+							<span style="color:#4f46e5;"><%=viewEmployee%></span>
+						</h4>
+
+						<div class="task-list">
+							<%
+							if (viewTasks.isEmpty()) {
+							%>
+							<p class="no-data">No tasks found for this employee.</p>
+							<%
+							} else {
+							for (Task t : viewTasks) {
+							%>
+
+							<div
+								class="task-card <%=t.getStatus().equals("COMPLETED") ? "completed" : ""%>">
+								<div class="task-desc">
+									<strong><%=t.getTitle() != null ? t.getTitle() : "Task"%></strong><br>
+									<%=t.getDescription()%><br>
+									<small style="font-size:11px; color:#6b7280;">
+										<%
+										java.sql.Date dl = t.getDeadline();
+										String pr = t.getPriority();
+										%>
+										Deadline:
+										<%= dl != null ? dl.toString() : "--" %>
+										&nbsp; | Priority:
+										<%= pr != null ? pr : "MEDIUM" %>
+									</small>
+									<%
+									String attName = t.getAttachmentName();
+									if (attName != null && !attName.isEmpty()) {
+									%>
+									<br>
+									<a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
+									   target="_blank" style="font-size:12px; color:#2563eb; text-decoration:underline;">
+										Download: <%=attName%>
+									</a>
+									<%
+									}
+									%>
+								</div>
+								<span
+									class="task-status
                     <%=t.getStatus().equals("COMPLETED") ? "completed" : "assigned"%>">
-								<%=t.getStatus()%>
-							</span>
+									<%=t.getStatus()%>
+								</span>
+							</div>
+
+							<%
+							}
+							}
+							%>
 						</div>
 
 						<%
 						}
-						}
 						%>
-					</div>
 
-					<%
-					}
-					%>
+					</fieldset>
 
-				</fieldset>
+				</div>
 			</div>
 
 		</div>
@@ -2625,7 +2861,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const error = params.get("error");
 
     /* -------- Restore Tab -------- */
-    showSection(tab || "selfAttendance");
+    showSection(tab || "attendance");
 
     /* -------- SUCCESS MESSAGES -------- */
     if (success === "Login")
@@ -2659,6 +2895,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     else if (error === "EmptyTask")
         showToast("Task description cannot be empty", "error");
+
+    else if (error === "InvalidDeadline")
+        showToast("Invalid deadline date", "error");
+
+    else if (error === "EmptyTitle")
+        showToast("Task title cannot be empty", "error");
 
     else if (error === "AlreadyRated")
         showToast("Performance already submitted for this employee this month", "error");
@@ -2744,13 +2986,33 @@ function showSection(id) {
         document.getElementById(id).style.display = 'block';
 }
 
+function setManagerLeaveTabs(active) {
+    const applyTab = document.getElementById("managerApplyTab");
+    const myTab = document.getElementById("managerMyLeavesTab");
+    if (!applyTab || !myTab) return;
+
+    if (active === "apply") {
+        applyTab.style.background = "linear-gradient(135deg,#667eea,#764ba2)";
+        applyTab.style.color = "#ffffff";
+        myTab.style.background = "#6b7280";
+        myTab.style.color = "#ffffff";
+    } else if (active === "my") {
+        myTab.style.background = "linear-gradient(135deg,#667eea,#764ba2)";
+        myTab.style.color = "#ffffff";
+        applyTab.style.background = "#6b7280";
+        applyTab.style.color = "#ffffff";
+    }
+}
+
 function showManagerApplyLeave() {
     document.getElementById("managerApplyLeaveSection").style.display = "block";
     document.getElementById("managerMyLeaveSection").style.display = "none";
+    setManagerLeaveTabs("apply");
 }
 function showManagerMyLeaves() {
     document.getElementById("managerApplyLeaveSection").style.display = "none";
     document.getElementById("managerMyLeaveSection").style.display = "block";
+    setManagerLeaveTabs("my");
 }
 
 function toggleTheme() {

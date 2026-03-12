@@ -1,6 +1,7 @@
 package com.smartoffice.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -12,19 +13,108 @@ import com.smartoffice.utils.DBConnectionUtil;
 
 public class TaskDAO {
 
-	public static void assignTask(String emp, String manager, String desc) {
-		String sql = "INSERT INTO tasks (description, assigned_to, assigned_by, status) "
-				+ "VALUES (?, ?, ?, 'ASSIGNED')";
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
-			ps.setString(1, desc);
-			ps.setString(2, emp);
-			ps.setString(3, manager);
-
-			ps.executeUpdate();
-
+	private static String resolveDbUsername(Connection con, String emailOrUsername) {
+		if (emailOrUsername == null || emailOrUsername.trim().isEmpty()) {
+			return emailOrUsername;
+		}
+		String trimmed = emailOrUsername.trim();
+		// Try to resolve username from users table using email
+		String sql = "SELECT username FROM users WHERE email = ? LIMIT 1";
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setString(1, trimmed);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					String dbUsername = rs.getString("username");
+					if (dbUsername != null && !dbUsername.trim().isEmpty()) {
+						return dbUsername.trim();
+					}
+				}
+			}
 		} catch (Exception e) {
-			e.printStackTrace(); // use logger in production
+			// If anything goes wrong, just fall back to original value
+			e.printStackTrace();
+		}
+		return trimmed;
+	}
+
+	public static void assignTask(String emp, String manager, String title, String desc,
+	                             Date deadline, String priority,
+	                             String attachmentName, byte[] attachmentBytes) {
+
+		// 1) Try full schema: title + attachment + deadline + priority
+		try (Connection con = DBConnectionUtil.getConnection()) {
+			String assignedToDb = resolveDbUsername(con, emp);
+			String assignedByDb = resolveDbUsername(con, manager);
+
+			String sqlFull = "INSERT INTO tasks (title, description, attachment_name, attachment, assigned_to, assigned_by, status, deadline, priority) "
+					+ "VALUES (?, ?, ?, ?, ?, ?, 'ASSIGNED', ?, ?)";
+
+			try (PreparedStatement ps = con.prepareStatement(sqlFull)) {
+				ps.setString(1, title);
+				ps.setString(2, desc);
+				ps.setString(3, attachmentName);
+				if (attachmentBytes != null) {
+					ps.setBytes(4, attachmentBytes);
+				} else {
+					ps.setNull(4, java.sql.Types.BLOB);
+				}
+				ps.setString(5, assignedToDb);
+				ps.setString(6, assignedByDb);
+				if (deadline != null) {
+					ps.setDate(7, deadline);
+				} else {
+					ps.setNull(7, java.sql.Types.DATE);
+				}
+				ps.setString(8, priority);
+				ps.executeUpdate();
+				return; // success
+			}
+		} catch (Exception ignoreFull) {
+			// fall through to next strategy
+		}
+
+		// 2) Try older schema with attachment but without deadline/priority
+		try (Connection con = DBConnectionUtil.getConnection()) {
+			String assignedToDb = resolveDbUsername(con, emp);
+			String assignedByDb = resolveDbUsername(con, manager);
+
+			String sqlNoDeadline = "INSERT INTO tasks (title, description, attachment_name, attachment, assigned_to, assigned_by, status) "
+					+ "VALUES (?, ?, ?, ?, ?, ?, 'ASSIGNED')";
+
+			try (PreparedStatement ps = con.prepareStatement(sqlNoDeadline)) {
+				ps.setString(1, title);
+				ps.setString(2, desc);
+				ps.setString(3, attachmentName);
+				if (attachmentBytes != null) {
+					ps.setBytes(4, attachmentBytes);
+				} else {
+					ps.setNull(4, java.sql.Types.BLOB);
+				}
+				ps.setString(5, assignedToDb);
+				ps.setString(6, assignedByDb);
+				ps.executeUpdate();
+				return; // success
+			}
+		} catch (Exception ignoreMid) {
+			// fall through to final strategy
+		}
+
+		// 3) Final fallback: very old schema (no title/attachment/deadline/priority)
+		try (Connection con = DBConnectionUtil.getConnection()) {
+			String assignedToDb = resolveDbUsername(con, emp);
+			String assignedByDb = resolveDbUsername(con, manager);
+
+			String sqlLegacy = "INSERT INTO tasks (description, assigned_to, assigned_by, status) "
+					+ "VALUES (?, ?, ?, 'ASSIGNED')";
+
+			try (PreparedStatement ps = con.prepareStatement(sqlLegacy)) {
+				ps.setString(1, desc);
+				ps.setString(2, assignedToDb);
+				ps.setString(3, assignedByDb);
+				ps.executeUpdate();
+			}
+		} catch (Exception finalEx) {
+			finalEx.printStackTrace();
 		}
 	}
 
@@ -35,18 +125,22 @@ public class TaskDAO {
 
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-			ps.setString(1, username);
+			String assignedToDb = resolveDbUsername(con, username);
+			ps.setString(1, assignedToDb);
 			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
 				Task task = new Task();
 				task.setId(rs.getInt("id"));
-				task.setTitle(rs.getString("title")); // ✅ if exists
+				task.setTitle(rs.getString("title"));
 				task.setDescription(rs.getString("description"));
+				task.setAttachmentName(rs.getString("attachment_name"));
 				task.setAssignedTo(rs.getString("assigned_to"));
 				task.setAssignedBy(rs.getString("assigned_by"));
 				task.setStatus(rs.getString("status"));
-				task.setAssignedDate(rs.getTimestamp("assigned_date")); // ✅ FIXED
+				task.setAssignedDate(rs.getTimestamp("assigned_date"));
+				try { task.setDeadline(rs.getDate("deadline")); } catch (Exception ignore) {}
+				try { task.setPriority(rs.getString("priority")); } catch (Exception ignore) {}
 
 				list.add(task);
 			}
@@ -101,8 +195,8 @@ public class TaskDAO {
 
 	public static List<Task> getAllTasks() throws Exception {
 		List<Task> list = new ArrayList<>();
-		String sql = "SELECT id, title, description, assigned_to, assigned_by, status, assigned_date "
-				+ "FROM tasks ORDER BY id DESC";
+		// Use * so it works even if deadline/priority columns are missing.
+		String sql = "SELECT * FROM tasks ORDER BY id DESC";
 		try (Connection con = DBConnectionUtil.getConnection();
 		     PreparedStatement ps = con.prepareStatement(sql);
 		     ResultSet rs = ps.executeQuery()) {
@@ -111,10 +205,13 @@ public class TaskDAO {
 				t.setId(rs.getInt("id"));
 				t.setTitle(rs.getString("title"));
 				t.setDescription(rs.getString("description"));
+				t.setAttachmentName(rs.getString("attachment_name"));
 				t.setAssignedTo(rs.getString("assigned_to"));
 				t.setAssignedBy(rs.getString("assigned_by"));
 				t.setStatus(rs.getString("status"));
 				t.setAssignedDate(rs.getTimestamp("assigned_date"));
+				try { t.setDeadline(rs.getDate("deadline")); } catch (Exception ignore) {}
+				try { t.setPriority(rs.getString("priority")); } catch (Exception ignore) {}
 				list.add(t);
 			}
 		}
@@ -130,17 +227,24 @@ public class TaskDAO {
 
 		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-			ps.setString(1, manager);
-			ps.setString(2, employee);
+			String managerDb = resolveDbUsername(con, manager);
+			String employeeDb = resolveDbUsername(con, employee);
+
+			ps.setString(1, managerDb);
+			ps.setString(2, employeeDb);
 
 			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
 				Task t = new Task();
 				t.setId(rs.getInt("id"));
+				t.setTitle(rs.getString("title"));
 				t.setDescription(rs.getString("description"));
+				t.setAttachmentName(rs.getString("attachment_name"));
 				t.setStatus(rs.getString("status"));
 				t.setAssignedDate(rs.getTimestamp("assigned_date"));
+				try { t.setDeadline(rs.getDate("deadline")); } catch (Exception ignore) {}
+				try { t.setPriority(rs.getString("priority")); } catch (Exception ignore) {}
 				list.add(t);
 			}
 

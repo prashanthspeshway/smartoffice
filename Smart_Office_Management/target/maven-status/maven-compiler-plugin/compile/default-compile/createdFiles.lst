@@ -3,6 +3,7 @@ com\smartoffice\controller\ManageDesignationsServlet.class
 com\smartoffice\controller\TeamsServlet.class
 com\smartoffice\controller\EnableAndDisableUser.class
 com\smartoffice\controller\GetHolidaysServlet.class
+com\smartoffice\model\BreakLog.class
 com\smartoffice\controller\AdminLeaveServlet.class
 com\smartoffice\controller\ExportTeamAttendanceServlet.class
 com\smartoffice\controller\LogoutServlet.class
@@ -29,6 +30,7 @@ com\smartoffice\dao\AdminDAO.class
 com\smartoffice\controller\DeleteUser.class
 com\smartoffice\controller\UserCheck.class
 com\smartoffice\model\Meeting.class
+com\smartoffice\controller\TaskAttachmentServlet.class
 com\smartoffice\controller\UpdateTaskStatusServlet.class
 com\smartoffice\controller\AllMeetingsServlet.class
 com\smartoffice\controller\ManagerDashboardServlet.class
@@ -51,6 +53,7 @@ com\smartoffice\controller\ViewAssignedTasksServlet.class
 com\smartoffice\model\LeaveRequest.class
 com\smartoffice\controller\AddNotificationServlet.class
 com\smartoffice\controller\SelfProfileServlet.class
+com\smartoffice\controller\BreakServlet.class
 com\smartoffice\controller\TodayMeetingsServlet.class
 com\smartoffice\controller\BulkUploadEmployees.class
 com\smartoffice\dao\DesignationDAO.class
@@ -59,6 +62,7 @@ com\smartoffice\controller\AddUser.class
 com\smartoffice\dao\MeetingDao.class
 com\smartoffice\service\LoginService.class
 com\smartoffice\dao\AttendanceDAO.class
+com\smartoffice\dao\BreakDAO.class
 com\smartoffice\controller\ExportUsersServlet.class
 com\smartoffice\controller\EmployeeDashboardServlet.class
 com\smartoffice\controller\GetHolidayByDateServlet.class

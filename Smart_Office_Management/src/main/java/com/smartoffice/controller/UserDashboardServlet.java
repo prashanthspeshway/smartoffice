@@ -15,9 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.smartoffice.dao.AttendanceDAO;
+import com.smartoffice.dao.BreakDAO;
 import com.smartoffice.dao.LeaveRequestDAO;
 import com.smartoffice.dao.NotificationReadsDAO;
 import com.smartoffice.dao.TaskDAO;
+import com.smartoffice.dao.TeamDAO;
 import com.smartoffice.dao.UserDao;
 import com.smartoffice.model.LeaveRequest;
 import com.smartoffice.model.Meeting;
@@ -55,6 +57,10 @@ public class UserDashboardServlet extends HttpServlet {
 				request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
 			}
 
+			/* ================= BREAK TIME ================= */
+			request.setAttribute("breakTotalSeconds", BreakDAO.getTodayTotalSeconds(username));
+			request.setAttribute("breakLogs", BreakDAO.getTodayBreaks(username));
+
 			/* ================= TASKS ================= */
 			TaskDAO.deleteOldCompletedTasks();
 			request.setAttribute("tasks", TaskDAO.getTasksForEmployee(username));
@@ -91,6 +97,9 @@ public class UserDashboardServlet extends HttpServlet {
 			}
 
 			request.setAttribute("meetings", meetings);
+
+			/* ================= MY TEAMS (as member) ================= */
+			request.setAttribute("myTeams", TeamDAO.getTeamsForMember(username));
 
 			/* ================= NOTIFICATIONS ================= */
 			NotificationReadsDAO nrDAO = new NotificationReadsDAO();

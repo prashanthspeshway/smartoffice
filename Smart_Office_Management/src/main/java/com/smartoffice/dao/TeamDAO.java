@@ -49,6 +49,31 @@ public class TeamDAO {
         return list;
     }
 
+    // Teams where a given user is a member (used for employee "My Team")
+    public static List<Team> getTeamsForMember(String username) {
+        List<Team> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT t.id, t.name, t.manager_username, t.created_by, t.created_at, " +
+                     "TRIM(CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,''))) AS manager_fullname " +
+                     "FROM teams t " +
+                     "JOIN team_members tm ON tm.team_id = t.id " +
+                     "LEFT JOIN users u ON t.manager_username = u.email " +
+                     "WHERE tm.username = ? ORDER BY t.name";
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Team team = mapTeam(rs);
+                    team.setMembers(getTeamMembers(con, team.getId()));
+                    list.add(team);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public static Team getTeamById(int teamId) {
         Team team = null;
         String sql = "SELECT t.id, t.name, t.manager_username, t.created_by, t.created_at, TRIM(CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,''))) AS manager_fullname " +

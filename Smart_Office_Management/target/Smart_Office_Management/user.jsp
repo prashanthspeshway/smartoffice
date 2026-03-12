@@ -1183,6 +1183,11 @@ border-color:#667eea;
 			</button>
 
 			<button class="nav-btn"
+				onclick="setActive(this); showMyTeam(); setTab('myteam');">
+				<i class="fa-solid fa-users"></i> <span>My Team</span>
+			</button>
+
+			<button class="nav-btn"
 				onclick="setActive(this); showLeave(); setTab('leave');">
 				<i class="fa-solid fa-calendar-xmark"></i> <span>Apply Leave</span>
 			</button>
@@ -1245,36 +1250,69 @@ border-color:#667eea;
 					<% } %>
 				</fieldset>
 
-				<!-- ====== BREAK TIME TRACKER ====== -->
+				<!-- ====== BREAK TIME (DB-backed) ====== -->
 				<fieldset class="break-fieldset">
 					<legend>
 						<i class="fa-solid fa-mug-hot"></i> Break Time
 					</legend>
 
-					<div class="break-status-badge" id="breakStatusBadge">
-						<span class="bdot"></span> On Break
-					</div>
-
-					<div class="break-timer-display" id="breakTimer">00:00:00</div>
-
 					<div class="break-total-row">
 						<span class="tr-label">Total Break Today</span>
-						<span class="tr-val" id="totalBreakTime">00:00:00</span>
+						<span class="tr-val">
+							<%
+							int breakSecs = 0;
+							if (request.getAttribute("breakTotalSeconds") != null) {
+								breakSecs = (Integer) request.getAttribute("breakTotalSeconds");
+							}
+							int bh = breakSecs / 3600;
+							int bm = (breakSecs % 3600) / 60;
+							int bs = breakSecs % 60;
+							%>
+							<%= String.format("%02d:%02d:%02d", bh, bm, bs) %>
+						</span>
 					</div>
-					
-					<div class="break-log" id="breakLog"></div>
 
 					<div class="break-actions">
-						<button id="startBreakBtn" onclick="startBreak()"
-							<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
-							<i class="fa-solid fa-play"></i> Start Break
-						</button>
-						<button id="endBreakBtn" onclick="endBreak()" disabled>
-							<i class="fa-solid fa-stop"></i> End Break
-						</button>
+						<form action="break" method="post" style="display:inline;">
+							<input type="hidden" name="action" value="start">
+							<input type="hidden" name="redirect" value="user">
+							<button class="punch-in-btn"
+								<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
+								Start Break
+							</button>
+						</form>
+
+						<form action="break" method="post"
+							style="display:inline; margin-left:8px;">
+							<input type="hidden" name="action" value="end">
+							<input type="hidden" name="redirect" value="user">
+							<button class="punch-out-btn">
+								End Break
+							</button>
+						</form>
 					</div>
 
-					
+					<div class="break-log" style="margin-top:10px;">
+						<%
+						java.util.List<com.smartoffice.model.BreakLog> empBreaks =
+							(java.util.List<com.smartoffice.model.BreakLog>) request.getAttribute("breakLogs");
+						if (empBreaks != null && !empBreaks.isEmpty()) {
+							for (com.smartoffice.model.BreakLog b : empBreaks) {
+						%>
+						<div class="time-card">
+							From <b><%= b.getStartTime() %></b>
+							to <b><%= b.getEndTime() != null ? b.getEndTime() : "--" %></b>
+						</div>
+						<%
+							}
+						} else {
+						%>
+						<p class="no-task-text">No breaks recorded today.</p>
+						<%
+						}
+						%>
+					</div>
+
 				</fieldset>
 
 			</div>
@@ -1302,8 +1340,30 @@ border-color:#667eea;
 						<div class="task-left">
 							<i class="fa-solid fa-file-lines"></i>
 							<div>
-								<b><%=t.getDescription()%></b><br> <small>Assigned
-									by: <%=t.getAssignedBy()%></small>
+								<b><%=t.getTitle() != null ? t.getTitle() : t.getDescription()%></b><br>
+								<small><%=t.getDescription()%></small><br>
+								<small>
+									<%
+									java.sql.Date dl = t.getDeadline();
+									String pr = t.getPriority();
+									%>
+									Deadline:
+									<%= dl != null ? dl.toString() : "--" %>
+									&nbsp; | Priority:
+									<%= pr != null ? pr : "MEDIUM" %>
+								</small><br>
+								<%
+								String attName = t.getAttachmentName();
+								if (attName != null && !attName.isEmpty()) {
+								%>
+								<small>
+									<a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
+									   target="_blank">Download: <%=attName%></a>
+								</small><br>
+								<%
+								}
+								%>
+								<small>Assigned by: <%=t.getAssignedBy()%></small>
 							</div>
 						</div>
 
@@ -1351,6 +1411,62 @@ border-color:#667eea;
 
 				</fieldset>
 
+			</div>
+
+			<!-- My Team -->
+			<div class="box" id="myTeamSection" style="display: none;">
+				<fieldset class="attendance-fieldset">
+					<legend>
+						<i class="fa-solid fa-users"></i> My Team
+					</legend>
+
+					<div class="team-scroll">
+						<div class="employee-grid">
+							<%
+							List<com.smartoffice.model.Team> myTeamsEmp = (List<com.smartoffice.model.Team>) request.getAttribute("myTeams");
+							if (myTeamsEmp != null && !myTeamsEmp.isEmpty()) {
+								for (com.smartoffice.model.Team t : myTeamsEmp) {
+							%>
+							<div class="task-card">
+								<div class="task-left">
+									<i class="fa-solid fa-people-group"></i>
+									<div>
+										<b><%= t.getName() %></b><br>
+										<small>Manager:
+											<%= t.getManagerFullname() != null ? t.getManagerFullname() : t.getManagerUsername() %></small><br>
+										<small>Members: <%= t.getMembers().size() %></small>
+										<%
+										if (!t.getMembers().isEmpty()) {
+										%>
+										<br>
+										<small>
+											<%
+											for (com.smartoffice.model.User m : t.getMembers()) {
+											%>
+											<span style="display:inline-block; background:#e2e8f0; padding:2px 8px; border-radius:999px; margin:1px; font-size:11px;">
+												<%= m.getFullname() != null ? m.getFullname() : m.getEmail() %>
+											</span>
+											<%
+											}
+											%>
+										</small>
+										<%
+										}
+										%>
+									</div>
+								</div>
+							</div>
+							<%
+								}
+							} else {
+							%>
+							<p class="no-task-text">You are not part of any team yet.</p>
+							<%
+							}
+							%>
+						</div>
+					</div>
+				</fieldset>
 			</div>
 
 			<!-- Meetings -->
@@ -1557,6 +1673,8 @@ border-color:#667eea;
     document.getElementById("leaveSection").style.display = "none";
     document.getElementById("calendarSection").style.display = "none";
     document.getElementById("meetingSection").style.display = "none";
+    var myTeam = document.getElementById("myTeamSection");
+    if (myTeam) myTeam.style.display = "none";
 }
 
 function showAttendance() {
@@ -1567,6 +1685,12 @@ function showAttendance() {
 function showTasks() {
     hideAllSections();
     document.getElementById("taskSection").style.display = "block";
+}
+
+function showMyTeam() {
+    hideAllSections();
+    var myTeam = document.getElementById("myTeamSection");
+    if (myTeam) myTeam.style.display = "block";
 }
 
 function showMeetings() {

@@ -44,10 +44,10 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 				<tr class="bg-slate-50 border-b border-slate-200 text-sm text-slate-600">
 					<th class="px-4 py-3 text-left">#</th>
 					<th class="px-4 py-3 text-left">Title</th>
-					<th class="px-4 py-3 text-left">Description</th>
-					<th class="px-4 py-3 text-left">Priority</th>
 					<th class="px-4 py-3 text-left">Status</th>
 					<th class="px-4 py-3 text-left">Assigned Date</th>
+					<th class="px-4 py-3 text-left">Deadline</th>
+					<th class="px-4 py-3 text-left">Attachment</th>
 					<th class="px-4 py-3 text-left">Assigned To</th>
 					<th class="px-4 py-3 text-left">Assigned By</th>
 				</tr>
@@ -57,7 +57,7 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 				if (tasks.isEmpty()) {
 				%>
 				<tr>
-					<td colspan="8" class="px-4 py-8 text-center text-slate-500 text-sm italic">
+					<td colspan="7" class="px-4 py-8 text-center text-slate-500 text-sm italic">
 						No tasks found.
 					</td>
 				</tr>
@@ -66,18 +66,13 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 					int idx = 1;
 					for (Task t : tasks) {
 						String title = t.getTitle() != null ? t.getTitle() : "";
-						String desc = t.getDescription() != null ? t.getDescription() : "";
 						String status = t.getStatus() != null ? t.getStatus() : "";
 						String assignedTo = t.getAssignedTo() != null ? t.getAssignedTo() : "";
 						String assignedBy = t.getAssignedBy() != null ? t.getAssignedBy() : "";
 						java.sql.Timestamp ts = t.getAssignedDate();
 						String dateStr = ts != null ? ts.toLocalDateTime().toLocalDate().toString() : "";
-
-						String priClass = "bp-medium";
-						String priText = "Medium";
-						if ("COMPLETED".equalsIgnoreCase(status)) { priClass = "bp-low"; priText = "Low"; }
-						else if ("ASSIGNED".equalsIgnoreCase(status)) { priClass = "bp-medium"; priText = "Medium"; }
-						else if ("IN_PROGRESS".equalsIgnoreCase(status)) { priClass = "bp-high"; priText = "High"; }
+						java.sql.Date dl = t.getDeadline();
+						String deadlineStr = dl != null ? dl.toString() : dateStr;
 
 						String stClass = "bs-pending";
 						String stText = status;
@@ -88,18 +83,30 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 				<tr class="border-b border-slate-200 hover:bg-slate-50 text-sm">
 					<td class="px-4 py-3 text-slate-500"><%= idx++ %></td>
 					<td class="px-4 py-3 text-slate-800"><%= title %></td>
-					<td class="px-4 py-3 text-slate-600"><%= desc %></td>
-					<td class="px-4 py-3">
-						<span class="badge-priority <%= priClass %>">
-							<%= priText %>
-						</span>
-					</td>
 					<td class="px-4 py-3">
 						<span class="badge-status <%= stClass %>">
 							<%= stText %>
 						</span>
 					</td>
 					<td class="px-4 py-3 text-slate-600"><%= dateStr %></td>
+					<td class="px-4 py-3 text-slate-600"><%= deadlineStr %></td>
+					<td class="px-4 py-3 text-slate-600">
+						<%
+						String attName = t.getAttachmentName();
+						if (attName != null && !attName.isEmpty()) {
+						%>
+						<a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
+						   class="text-indigo-600 hover:underline" target="_blank">
+							<%= attName %>
+						</a>
+						<%
+						} else {
+						%>
+						<span class="text-slate-400 text-xs italic">No file</span>
+						<%
+						}
+						%>
+					</td>
 					<td class="px-4 py-3 text-slate-600"><%= assignedTo %></td>
 					<td class="px-4 py-3 text-slate-600"><%= assignedBy %></td>
 				</tr>

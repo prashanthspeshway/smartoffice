@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.smartoffice.dao.AttendanceDAO;
+import com.smartoffice.dao.BreakDAO;
 import com.smartoffice.dao.LeaveRequestDAO;
 import com.smartoffice.dao.MeetingDao;
 import com.smartoffice.dao.NotificationReadsDAO;
@@ -46,7 +47,7 @@ public class ManagerDashboardServlet extends HttpServlet {
 		// ================= TAB HANDLING =================
 		String tab = request.getParameter("tab");
 		if (tab == null || tab.isEmpty()) {
-			tab = "selfAttendance";
+			tab = "attendance";
 		}
 		request.setAttribute("tab", tab);
 
@@ -61,6 +62,10 @@ public class ManagerDashboardServlet extends HttpServlet {
 				request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
 				request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
 			}
+
+			// ================= BREAK TIME =================
+			request.setAttribute("breakTotalSeconds", BreakDAO.getTodayTotalSeconds(username));
+			request.setAttribute("breakLogs", BreakDAO.getTodayBreaks(username));
 
 			// ================= TODAY MEETINGS =================
 			List<Meeting> todayMeetings = MeetingDao.getTodayMeetings(username);
