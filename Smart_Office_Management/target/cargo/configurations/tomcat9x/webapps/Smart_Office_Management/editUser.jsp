@@ -1,222 +1,112 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <%@ page import="java.util.List"%>
+<%
+List<String> designations = (List<String>) request.getAttribute("designations");
+if (designations == null) designations = java.util.Collections.emptyList();
+String currentDesignation = (String) request.getAttribute("designation");
+%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Edit User</title>
-
-<!-- Font Awesome -->
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Employee • Smart Office HRMS</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ===== Reset ===== */
-* {
-	box-sizing: border-box;
-}
-
-body {
-	background: #c3cfe2;
-	font-family: Arial, sans-serif;
-	display: flex;
-	justify-content: center;
-	padding: 40px;
-}
-
-.card {
-	width: 100%;
-}
-
-.form-fieldset {
-	border: none;
-	border-radius: 12px;
-	padding: 25px;
-	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-	background: #c3cfe2;
-}
-
-.form-fieldset legend {
-	padding: 8px 14px;
-	font-size: 16px;
-	font-weight: 600;
-	color: #333;
-	background: #e2ebf0;
-	border-radius: 14px;
-	display: flex;
-	align-items: center;
-	gap: 8px;
-}
-
-.form-group {
-	display: flex;
-	flex-direction: column;
-	margin-bottom: 15px;
-}
-
-.form-group label {
-	font-size: 14px;
-	margin-bottom: 6px;
-	color: #444;
-}
-
-.form-group input, .form-group select {
-	padding: 9px;
-	border-radius: 6px;
-	background: #e2ebf0;
-	border: 1px solid #ccc;
-	font-size: 14px;
-}
-
-.form-group input:focus, .form-group select:focus {
-	outline: none;
-	border-color: #6a7be7;
-	box-shadow: 0 0 0 2px rgba(106, 123, 231, 0.2);
-}
-
-.btn {
-	width: 100%;
-	padding: 12px;
-	border: none;
-	border-radius: 8px;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	color: white;
-	font-size: 16px;
-	font-weight: 500;
-	cursor: pointer;
-	transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.btn:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-}
-
-.password-wrapper {
-	position: relative;
-	display: flex;
-	align-items: center;
-}
-
-.password-wrapper input {
-	width: 100%;
-	padding-right: 40px; /* space for icon */
-}
-
-.toggle-password {
-	position: absolute;
-	right: 12px;
-	cursor: pointer;
-	color: #555;
-	font-size: 14px;
-	transition: 0.2s;
-}
-
-.toggle-password:hover {
-	color: #667eea;
-}
+body { font-family: 'Inter', system-ui, sans-serif; }
 </style>
 </head>
+<body class="bg-slate-100 min-h-screen p-6">
 
-<body>
-
-	<div class="card">
-		<fieldset class="form-fieldset">
-			<legend>
-				<i class="fa-solid fa-user-pen"></i> Edit Employee
-			</legend>
-
-			<form action="editUser" method="post">
-
-				<!-- Hidden ID -->
-				<input type="hidden" name="id" value="${id}">
-
-				<div class="form-group">
-					<label>Email</label> <input type="email" name="email"
-						value="${email}" required readonly>
-				</div>
-
-				<!-- Role -->
-				<div class="form-group">
-					<label>Role</label> <select name="role" id="roleSelect" required>
-						<option value="admin"
-							${role eq 'admin' ? 'selected="selected"' : ''}>Admin</option>
-						<option value="manager"
-							${role eq 'manager' ? 'selected="selected"' : ''}>Manager</option>
-						<option value="user"
-							${role eq 'user' ? 'selected="selected"' : ''}>Employee</option>
-					</select>
-				</div>
-
-				<!-- Status -->
-				<div class="form-group">
-					<label>Status</label> <select name="status" required>
-						<option value="active"
-							${status eq 'active' ? 'selected="selected"' : ''}>Active</option>
-						<option value="inactive"
-							${status eq 'inactive' ? 'selected="selected"' : ''}>Inactive</option>
-					</select>
-				</div>
-
-				<div class="form-group">
-					<label>First Name</label> <input type="text" name="firstname"
-						value="${firstname}" required>
-				</div>
-				<div class="form-group">
-					<label>Last Name</label> <input type="text" name="lastname"
-						value="${lastname}" required>
-				</div>
-
-				<div class="form-group">
-					<label>Phone Number</label> <input type="text" name="number"
-						value="${phone}" maxlength="10" pattern="[0-9]*" placeholder="Up to 10 digits">
-				</div>
-
-				<div class="form-group">
-					<label>Email</label> <input type="email" name="email"
-						value="${email}" required>
-				</div>
-
-				<div class="form-group">
-					<label>Joined Date</label> <input type="date" name="joinedDate"
-						value="${joinedDate}">
-				</div>
-
-				<button type="submit" class="btn">
-					<i class="fa-solid fa-floppy-disk"></i> Update Employee
-				</button>
-
-			</form>
-		</fieldset>
+<div class="max-w-2xl mx-auto">
+	<!-- Pill-style title -->
+	<div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-100 text-indigo-700 font-semibold text-lg mb-6">
+		<i class="fa-solid fa-user-pen"></i> Edit Employee
 	</div>
 
-	<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			// Manager field removed
-		});
+	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+		<form action="editUser" method="post">
+			<input type="hidden" name="id" value="${id}">
 
-		const passwordField = document.getElementById("passwordField");
-		const togglePassword = document.getElementById("togglePassword");
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<div>
+					<label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+					<input type="email" name="email" value="${email}" required readonly class="w-full px-4 py-2.5 border border-slate-300 rounded-lg bg-slate-50 text-slate-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-slate-700 mb-1.5">Role</label>
+					<select name="role" id="roleSelect" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+						<option value="manager" ${role eq 'manager' ? 'selected' : ''}>Manager</option>
+						<option value="employee" ${(role eq 'user' or role eq 'employee') ? 'selected' : ''}>Employee</option>
+					</select>
+				</div>
+				<div id="designationWrap" class="hidden">
+					<label class="block text-sm font-medium text-slate-700 mb-1.5">Designation</label>
+					<select name="designation" id="designationSelect" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+						<option value="">Select Designation</option>
+						<%
+							for (String d : designations) {
+								String esc = d != null ? d.replace("\"", "&quot;").replace("'", "&#39;") : "";
+								boolean sel = currentDesignation != null && currentDesignation.equalsIgnoreCase(d);
+						%>
+							<option value="<%= esc %>" <%= sel ? "selected" : "" %>><%= d %></option>
+						<% } %>
+					</select>
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-slate-700 mb-1.5">Status</label>
+					<select name="status" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+						<option value="active" ${status eq 'active' ? 'selected' : ''}>Active</option>
+						<option value="inactive" ${status eq 'inactive' ? 'selected' : ''}>Inactive</option>
+					</select>
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-slate-700 mb-1.5">First Name</label>
+					<input type="text" name="firstname" value="${firstname}" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-slate-700 mb-1.5">Last Name</label>
+					<input type="text" name="lastname" value="${lastname}" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-slate-700 mb-1.5">Phone Number</label>
+					<input type="text" name="number" value="${phone}" maxlength="10" pattern="[0-9]*" placeholder="Up to 10 digits" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-slate-700 mb-1.5">Joined Date</label>
+					<input type="date" name="joinedDate" value="${joinedDate}" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+				</div>
+			</div>
 
-		togglePassword
-				.addEventListener(
-						"click",
-						function() {
-							const type = passwordField.getAttribute("type") === "password" ? "text"
-									: "password";
-							passwordField.setAttribute("type", type);
+			<div class="mt-6 flex gap-3">
+				<button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium transition-colors">
+					<i class="fa-solid fa-floppy-disk"></i> Update Employee
+				</button>
+				<a href="viewUser" class="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg font-medium transition-colors">
+					Cancel
+				</a>
+			</div>
+		</form>
+	</div>
+</div>
 
-							// Change icon
-							this.classList.toggle("fa-eye");
-							this.classList.toggle("fa-eye-slash");
-						});
-		
-		document.addEventListener('contextmenu', e => e.preventDefault());
-		document.onkeydown = e =>
-		  e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))
-		    ? false
-		    : true;
-		
-	</script>
-
+<script>
+function syncDesignationVisibility() {
+	var roleSel = document.getElementById('roleSelect');
+	var wrap = document.getElementById('designationWrap');
+	if (!roleSel || !wrap) return;
+	if ((roleSel.value || '').toLowerCase() === 'employee') wrap.classList.remove('hidden');
+	else wrap.classList.add('hidden');
+}
+document.addEventListener('DOMContentLoaded', function() {
+	var roleSel = document.getElementById('roleSelect');
+	if (roleSel) roleSel.addEventListener('change', syncDesignationVisibility);
+	syncDesignationVisibility();
+});
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.onkeydown = e => (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))) ? false : true;
+</script>
 </body>
 </html>

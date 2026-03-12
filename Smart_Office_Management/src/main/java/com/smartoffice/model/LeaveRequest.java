@@ -65,8 +65,16 @@ public class LeaveRequest {
 	public void setAppliedAt(Timestamp appliedAt) {
 		this.appliedAt = appliedAt;
 	}
-	private String reason;
+    private String reason;
     private String status;
     private Timestamp appliedAt;
+    private String displayName;
+
+    public String getDisplayName() {
+        return displayName != null ? displayName : username;
+    }
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 
 }

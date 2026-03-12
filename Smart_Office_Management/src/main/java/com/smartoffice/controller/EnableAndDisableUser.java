@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.smartoffice.utils.DBConnectionUtil;
+import com.smartoffice.utils.UserFieldUtil;
 
 @SuppressWarnings("serial")
 @WebServlet("/enableanddisable")
@@ -21,7 +22,7 @@ public class EnableAndDisableUser extends HttpServlet {
             throws ServletException, IOException {
 
         String email = req.getParameter("email");
-        String status = req.getParameter("status");
+        String status = UserFieldUtil.normalizeStatus(req.getParameter("status"));
 
         boolean updated = false;
         try {

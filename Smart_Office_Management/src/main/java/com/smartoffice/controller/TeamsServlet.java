@@ -56,7 +56,7 @@ public class TeamsServlet extends HttpServlet {
             String r = u.getRole() != null ? u.getRole().toLowerCase() : "";
             if ((r.startsWith("man") || "manager".equals(r)) && "active".equalsIgnoreCase(u.getStatus()))
                 managers.add(u);
-            else if ("user".equalsIgnoreCase(u.getRole()) && "active".equalsIgnoreCase(u.getStatus()))
+            else if (("user".equalsIgnoreCase(u.getRole()) || "employee".equalsIgnoreCase(u.getRole())) && "active".equalsIgnoreCase(u.getStatus()))
                 employees.add(u);
         }
 

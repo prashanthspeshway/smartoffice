@@ -134,7 +134,7 @@ select:focus {
         <div class="form-group">
             <label>Default User Role</label>
             <select name="defaultRole">
-                <option value="user">User</option>
+                <option value="employee">Employee</option>
                 <option value="manager">Manager</option>
             </select>
         </div>

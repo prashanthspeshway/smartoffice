@@ -36,466 +36,123 @@ String safeError = (errorMsg != null) ? errorMsg.replace("&", "&amp;").replace("
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teams • Smart Office</title>
+<title>Teams • Smart Office HRMS</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
 <style>
-:root {
-  --bg: #f1f5f9;
-  --card: #ffffff;
-  --card-border: #e2e8f0;
-  --text: #0f172a;
-  --text-muted: #64748b;
-  --accent: #0ea5e9;
-  --accent-hover: #0284c7;
-  --success: #10b981;
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-lg: 0 10px 40px -10px rgba(0,0,0,0.12);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  line-height: 1.5;
-}
-
-.page {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 32px 24px;
-}
-
-/* Header */
-.page-header {
-  margin-bottom: 32px;
-}
-.page-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-.page-title i { color: var(--accent); }
-.page-subtitle { font-size: 14px; color: var(--text-muted); }
-
-/* Stats row */
-.stats-row {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
-.stat-card {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  padding: 16px 20px;
-  min-width: 140px;
-  box-shadow: var(--shadow);
-}
-.stat-card .value { font-size: 24px; font-weight: 700; color: var(--text); }
-.stat-card .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
-
-/* Grid layout */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
-
-/* Cards */
-.card {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  padding: 24px;
-  box-shadow: var(--shadow);
-}
-.card-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.card-title i { color: var(--accent); font-size: 18px; }
-
-/* Forms */
-.form-group { margin-bottom: 16px; }
-.form-group:last-of-type { margin-bottom: 0; }
-.form-group label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-family: inherit;
-  background: var(--card);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
-}
-.form-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
-.form-row .form-group { flex: 1; min-width: 160px; margin-bottom: 0; }
-
-/* Buttons */
-.btn {
-  padding: 12px 20px;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s;
-}
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent), #0284c7);
-  color: white;
-}
-.btn-primary:hover { opacity: 0.95; transform: translateY(-1px); }
-.btn-danger {
-  background: var(--danger);
-  color: white;
-  padding: 8px 14px;
-  font-size: 13px;
-}
-.btn-danger:hover { background: var(--danger-hover); }
-.btn-ghost {
-  background: transparent;
-  color: var(--text-muted);
-  padding: 6px 10px;
-}
-.btn-ghost:hover { background: #f1f5f9; color: var(--text); }
-
-/* Add members section - stacked to prevent overlap */
-.add-members-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.add-members-row {
-  display: flex;
-  gap: 16px;
-  align-items: flex-end;
-  flex-wrap: wrap;
-}
-.add-members-row .team-select-wrap { flex: 0 0 200px; min-width: 160px; }
-.add-members-row .add-btn-wrap { flex-shrink: 0; }
-
-.employee-panel {
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-sm);
-  background: #fafafa;
-  overflow: hidden;
-  min-height: 0;
-}
-.employee-panel-label {
-  padding: 12px 14px 0;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-}
-.employee-panel-label .muted { color: var(--text-muted); font-weight: 400; }
-.employee-search {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--card-border);
-  position: relative;
-}
-.employee-search input {
-  width: 100%;
-  padding: 10px 12px 10px 36px;
-  border: none;
-  background: var(--card);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-}
-.employee-search .fa-search {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  font-size: 13px;
-}
-.employee-list {
-  height: 200px;
-  min-height: 120px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 8px;
-  box-sizing: border-box;
-}
-.employee-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  margin-bottom: 4px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.employee-item:hover:not(.assigned) { background: #e2e8f0; }
-.employee-item.assigned {
-  opacity: 0.5;
-  color: var(--text-muted);
-  cursor: not-allowed;
-}
-.employee-item input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: var(--accent);
-}
-.employee-item.assigned input { cursor: not-allowed; }
-.employee-item .name { font-size: 14px; font-weight: 500; }
-.employee-item .badge { font-size: 11px; color: var(--text-muted); margin-left: 4px; }
-.no-results { padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px; }
-
-/* Team select in add form */
-.team-select-wrap select {
-  height: 44px;
-  padding: 10px 14px;
-}
-
-/* Teams grid */
-.teams-section { margin-top: 32px; }
-.teams-section .card { padding: 28px; }
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-.section-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.section-title i { color: var(--accent); }
-
-.teams-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 20px;
-}
-.team-card {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: var(--shadow);
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-.team-card:hover {
-  box-shadow: var(--shadow-lg);
-  border-color: #cbd5e1;
-}
-.team-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-.team-name {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.team-name i { color: var(--accent); font-size: 16px; }
-.team-manager-select {
-  padding: 6px 10px;
-  font-size: 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--card-border);
-  background: var(--card);
-  min-width: 100px;
-}
-.team-meta {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-}
-.team-members-wrap {
-  margin-bottom: 16px;
-}
-.team-members-label { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; }
-.member-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.member-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #f1f5f9;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  color: var(--text);
-}
-.member-pill .remove {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  font-size: 12px;
-}
-.member-pill .remove:hover { color: var(--danger); }
-.team-actions { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--card-border); }
-.empty-state {
-  text-align: center;
-  padding: 48px 24px;
-  color: var(--text-muted);
-}
-.empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
-.empty-state p { font-size: 15px; margin-bottom: 8px; }
-
 /* Toast */
 .toast {
   position: fixed;
   top: 24px;
   right: 24px;
   padding: 14px 20px;
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   z-index: 9999;
   display: none;
   font-size: 14px;
   font-weight: 500;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.2);
   animation: slideIn 0.3s ease;
 }
 @keyframes slideIn {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
-.toast.success { background: var(--success); color: white; }
-.toast.error { background: var(--danger); color: white; }
+.toast.success { background: #10b981; color: white; }
+.toast.error { background: #ef4444; color: white; }
 </style>
 </head>
-<body>
+<body class="bg-slate-100 min-h-screen">
 
 <div id="toast" class="toast" data-success="<%= safeSuccess %>" data-error="<%= safeError %>"></div>
 
-<div class="page">
-  <header class="page-header">
-    <h1 class="page-title"><i class="fa-solid fa-people-group"></i> Team Management</h1>
-    <p class="page-subtitle">Create teams, assign managers, and add employees</p>
+<div class="max-w-6xl mx-auto p-6">
+  <header class="mb-8">
+    <h1 class="text-2xl font-semibold text-slate-800 flex items-center gap-2 mb-2"><i class="fa-solid fa-people-group text-indigo-500"></i> Team Management</h1>
+    <p class="text-slate-500 text-sm">Create teams, assign managers, and add employees</p>
   </header>
 
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="value"><%= teams.size() %></div>
-      <div class="label">Teams</div>
+  <!-- Stats cards -->
+  <div class="flex gap-4 mb-8 flex-wrap">
+    <div class="bg-white rounded-xl border border-slate-200 px-6 py-4 shadow-sm min-w-[140px]">
+      <div class="text-2xl font-bold text-slate-800"><%= teams.size() %></div>
+      <div class="text-xs text-slate-500 uppercase tracking-wider font-medium mt-1">Teams</div>
     </div>
-    <div class="stat-card">
-      <div class="value"><%= totalMembers %></div>
-      <div class="label">Total Members</div>
+    <div class="bg-white rounded-xl border border-slate-200 px-6 py-4 shadow-sm min-w-[140px]">
+      <div class="text-2xl font-bold text-slate-800"><%= totalMembers %></div>
+      <div class="text-xs text-slate-500 uppercase tracking-wider font-medium mt-1">Total Members</div>
     </div>
-    <div class="stat-card">
-      <div class="value"><%= availableCount %></div>
-      <div class="label">Available</div>
+    <div class="bg-white rounded-xl border border-slate-200 px-6 py-4 shadow-sm min-w-[140px]">
+      <div class="text-2xl font-bold text-slate-800"><%= availableCount %></div>
+      <div class="text-xs text-slate-500 uppercase tracking-wider font-medium mt-1">Available</div>
     </div>
   </div>
 
-  <div class="grid-2">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Create Team -->
-    <div class="card">
-      <h2 class="card-title"><i class="fa-solid fa-plus-circle"></i> Create Team</h2>
+    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-5"><i class="fa-solid fa-plus text-indigo-500"></i> Create Team</h2>
       <form action="<%= request.getContextPath() %>/teams" method="post">
         <input type="hidden" name="action" value="create">
-        <div class="form-group">
-          <label>Team Name</label>
-          <input type="text" name="teamName" required placeholder="e.g. Development Team">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-700 mb-2">Team Name</label>
+          <input type="text" name="teamName" required placeholder="e.g. Development Team" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-slate-700 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
         </div>
-        <div class="form-group">
-          <label>Assign Manager</label>
-          <select name="managerUsername" required>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-700 mb-2">Assign Manager</label>
+          <select name="managerUsername" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
             <option value="">Select Manager</option>
             <% for (User m : managers) { %>
             <option value="<%= m.getEmail() %>"><%= m.getFullname() != null ? m.getFullname() : m.getEmail() %></option>
             <% } %>
           </select>
         </div>
-        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create Team</button>
+        <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium text-sm transition-colors"><i class="fa-solid fa-plus"></i> Create Team</button>
       </form>
     </div>
 
     <!-- Add Members -->
-    <div class="card">
-      <h2 class="card-title"><i class="fa-solid fa-user-plus"></i> Add Employees</h2>
+    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-5"><i class="fa-solid fa-user-plus text-indigo-500"></i> Add Employees</h2>
       <form id="addMemberForm" action="<%= request.getContextPath() %>/teams" method="post">
         <input type="hidden" name="action" value="addMember">
-        <div class="add-members-layout">
-          <div class="add-members-row">
-            <div class="form-group team-select-wrap">
-              <label>Team</label>
-              <select name="teamId" id="teamSelect" required>
+        <div class="space-y-4">
+          <div class="flex gap-3 items-end flex-wrap">
+            <div class="flex-1 min-w-[180px]">
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">Team</label>
+              <select name="teamId" id="teamSelect" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="">Select Team</option>
                 <% for (Team t : teams) { %>
                 <option value="<%= t.getId() %>"><%= t.getName() %></option>
                 <% } %>
               </select>
             </div>
-            <div class="add-btn-wrap">
-              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-arrow-right"></i> Add</button>
-            </div>
+            <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium text-sm transition-colors shrink-0"><i class="fa-solid fa-arrow-right"></i> Add</button>
           </div>
-          <div class="employee-panel">
-            <div class="employee-panel-label">Employees <span class="muted">(assigned are faded)</span></div>
-            <div class="employee-search">
-              <i class="fa-solid fa-search"></i>
-              <input type="text" id="employeeSearch" placeholder="Search name or username..." autocomplete="off">
+          <div class="border border-slate-200 rounded-lg overflow-hidden bg-slate-50">
+            <div class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border-b border-slate-200">Employees <span class="font-normal text-slate-500">(assigned are faded)</span></div>
+            <div class="p-3 border-b border-slate-200 bg-white">
+              <div class="relative">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="employeeSearch" placeholder="Search name or username..." autocomplete="off" class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+              </div>
             </div>
-            <div class="employee-list" id="employeeCheckboxList">
+            <div class="employee-list max-h-[220px] overflow-y-auto p-3" id="employeeCheckboxList">
               <% for (User e : employees) {
                 boolean assigned = assignedUsernames.contains(e.getEmail());
                 String displayName = e.getFullname() != null ? e.getFullname() : e.getEmail();
                 String searchText = (displayName + " " + e.getEmail()).toLowerCase();
               %>
-              <label class="employee-item <%= assigned ? "assigned" : "" %>" data-search="<%= searchText.replace("\"", "&quot;") %>">
-                <input type="checkbox" name="username" value="<%= e.getEmail() %>" <%= assigned ? "disabled" : "" %>>
-                <span class="name"><%= displayName %><% if (assigned) { %><span class="badge">(assigned)</span><% } %></span>
+              <label class="employee-item flex items-center gap-3 py-2.5 px-3 rounded-lg cursor-pointer transition-colors <%= assigned ? "opacity-50 text-slate-500 cursor-not-allowed" : "hover:bg-slate-100" %>" data-search="<%= searchText.replace("\"", "&quot;") %>">
+                <input type="checkbox" name="username" value="<%= e.getEmail() %>" class="w-4 h-4 rounded border-slate-300 text-indigo-500 focus:ring-indigo-500" <%= assigned ? "disabled" : "" %>>
+                <span class="text-sm font-medium text-slate-700"><%= displayName %><% if (assigned) { %><span class="text-slate-400 font-normal ml-1">(assigned)</span><% } %></span>
               </label>
               <% } %>
-              <p class="no-results" id="employeeNoResults" style="display:none;">No matches</p>
+              <p class="no-results py-4 text-center text-slate-500 text-sm" id="employeeNoResults" style="display:none;">No matches</p>
               <% if (employees.isEmpty()) { %>
-              <p class="no-results" id="employeeEmpty">No employees</p>
+              <p class="no-results py-4 text-center text-slate-500 text-sm" id="employeeEmpty">No employees</p>
               <% } %>
             </div>
           </div>
@@ -505,17 +162,17 @@ body {
   </div>
 
   <!-- All Teams -->
-  <section class="teams-section">
-    <div class="card">
-      <div class="section-header">
-        <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> All Teams</h2>
+  <section class="mt-8">
+    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-layer-group text-indigo-500"></i> All Teams</h2>
       </div>
 
       <% if (teams.isEmpty()) { %>
-      <div class="empty-state">
-        <i class="fa-solid fa-people-group"></i>
-        <p>No teams yet</p>
-        <p style="font-size: 13px;">Create your first team above</p>
+      <div class="text-center py-16 text-slate-500">
+        <i class="fa-solid fa-people-group text-5xl mb-4 block opacity-40"></i>
+        <p class="font-medium text-slate-600">No teams yet</p>
+        <p class="text-sm mt-1">Create your first team above</p>
       </div>
       <% } else { %>
       <div class="teams-grid">
@@ -533,33 +190,33 @@ body {
               </select>
             </form>
           </div>
-          <div class="team-meta">
+          <div class="text-sm text-slate-500 mb-4">
             <%= t.getMembers().size() %> member<%= t.getMembers().size() != 1 ? "s" : "" %>
           </div>
-          <div class="team-members-wrap">
-            <div class="team-members-label">Members</div>
-            <div class="member-pills">
+          <div class="mb-4">
+            <div class="text-xs font-medium text-slate-500 mb-2">Members</div>
+            <div class="flex flex-wrap gap-2">
               <% for (User mem : t.getMembers()) { %>
-              <span class="member-pill">
+              <span class="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-full text-sm text-slate-700">
                 <%= mem.getFullname() != null ? mem.getFullname() : mem.getEmail() %>
-                <form action="<%= request.getContextPath() %>/teams" method="post" style="display:inline;">
+                <form action="<%= request.getContextPath() %>/teams" method="post" class="inline">
                   <input type="hidden" name="action" value="removeMember">
                   <input type="hidden" name="teamId" value="<%= t.getId() %>">
                   <input type="hidden" name="username" value="<%= mem.getEmail() %>">
-                  <button type="submit" class="remove" title="Remove"><i class="fa-solid fa-xmark"></i></button>
+                  <button type="submit" class="text-slate-400 hover:text-red-500 transition-colors" title="Remove"><i class="fa-solid fa-xmark text-xs"></i></button>
                 </form>
               </span>
               <% } %>
               <% if (t.getMembers().isEmpty()) { %>
-              <span style="font-size: 13px; color: var(--text-muted);">No members yet</span>
+              <span class="text-sm text-slate-500">No members yet</span>
               <% } %>
             </div>
           </div>
-          <div class="team-actions">
-            <form action="<%= request.getContextPath() %>/teams" method="post" style="display:inline;">
+          <div class="pt-4 border-t border-slate-200">
+            <form action="<%= request.getContextPath() %>/teams" method="post" class="inline">
               <input type="hidden" name="action" value="delete">
               <input type="hidden" name="teamId" value="<%= t.getId() %>">
-              <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this team?');"><i class="fa-solid fa-trash"></i> Delete</button>
+              <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors" onclick="return confirm('Delete this team?');"><i class="fa-solid fa-trash"></i> Delete</button>
             </form>
           </div>
         </div>

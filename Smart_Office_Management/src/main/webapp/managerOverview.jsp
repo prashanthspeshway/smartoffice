@@ -21,7 +21,7 @@
     // Team data
     List<User> teamList       = (List<User>) request.getAttribute("teamList");
     List<TeamAttendance> teamAttendance = (List<TeamAttendance>) request.getAttribute("teamAttendance");
-    List<LeaveRequest>   leaveRequests  = (List<LeaveRequest>)  request.getAttribute("leaveRequests");
+    List<LeaveRequest>   leaveRequests  = (List<LeaveRequest>)  request.getAttribute("myLeaves");
     List<Task>           viewTasks      = (List<Task>)           request.getAttribute("viewTasks");
     List<Meeting>        todayMeetings  = (List<Meeting>)        request.getAttribute("todayMeetings");
     List<Notification>   notifications  = (List<Notification>)   request.getAttribute("notifications");
@@ -981,7 +981,7 @@ body {
                     <div class="stat-icon si-amber" style="width:32px;height:32px;border-radius:9px;font-size:13px;">
                         <i class="fa-solid fa-calendar-xmark"></i>
                     </div>
-                    Leave Requests
+                    My Leaves
                     <% if (pendingLeave > 0) { %>
                     <span class="notif-count"><%= pendingLeave %></span>
                     <% } %>
@@ -1001,34 +1001,21 @@ body {
                 %>
                 <div class="leave-item">
                     <div class="mini-avatar" style="font-size:11px;">
-                        <%= lr.getEmail() != null && lr.getEmail().length() > 0 ? lr.getEmail().substring(0,1).toUpperCase() : "?" %>
+                        <%= lr.getLeaveType() != null && lr.getLeaveType().length() > 0 ? lr.getLeaveType().substring(0,1).toUpperCase() : "?" %>
                     </div>
                     <div class="leave-meta">
-                        <div class="leave-name"><%= lr.getEmail() %></div>
+                        <div class="leave-name"><%= lr.getLeaveType() %></div>
                         <div class="leave-detail">
-                            <%= lr.getLeaveType() %> &bull; <%= lr.getFromDate() %> → <%= lr.getToDate() %>
+                            <%= lr.getFromDate() %> → <%= lr.getToDate() %>
                         </div>
                     </div>
-                    <% if ("PENDING".equalsIgnoreCase(lr.getStatus())) { %>
-                    <div class="leave-btns">
-                        <form action="leave-approval" method="post" style="display:inline;">
-                            <input type="hidden" name="leaveId" value="<%= lr.getId() %>">
-                            <button class="btn-xs btn-approve" name="action" value="approve">✓</button>
-                        </form>
-                        <form action="leave-approval" method="post" style="display:inline;">
-                            <input type="hidden" name="leaveId" value="<%= lr.getId() %>">
-                            <button class="btn-xs btn-reject" name="action" value="reject">✕</button>
-                        </form>
-                    </div>
-                    <% } else { %>
                     <span class="chip <%= chipCls %>"><%= lr.getStatus() %></span>
-                    <% } %>
                 </div>
                 <%
                     }
                 } else {
                 %>
-                <div class="empty-state"><i class="fa-solid fa-check-circle"></i>No leave requests pending</div>
+                <div class="empty-state"><i class="fa-solid fa-check-circle"></i>No leave requests</div>
                 <%
                 }
                 %>

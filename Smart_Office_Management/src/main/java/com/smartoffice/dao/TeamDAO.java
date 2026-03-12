@@ -179,7 +179,7 @@ public class TeamDAO {
                 while (rs.next()) {
                     User u = new User();
                     u.setId(rs.getInt("id"));
-                    u.setUsername(rs.getString("username"));
+                    u.setUsername(rs.getString("email"));
                     u.setFirstname(rs.getString("firstname"));
                     u.setLastname(rs.getString("lastname"));
                     u.setEmail(rs.getString("email"));

@@ -100,7 +100,7 @@ public class AttendanceDAO {
 		int dayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK);
 
 		if (dayOfWeek == java.util.Calendar.SATURDAY || dayOfWeek == java.util.Calendar.SUNDAY) {
-			return true; // 🚫 Weekend = Holiday
+			return true; // Block punch in/out on weekends
 		}
 
 		// 2️⃣ Check admin-declared holidays from DB

@@ -24,6 +24,10 @@
     java.sql.Timestamp punchIn  = (java.sql.Timestamp) request.getAttribute("punchIn");
     java.sql.Timestamp punchOut = (java.sql.Timestamp) request.getAttribute("punchOut");
 
+    java.util.Calendar cal = java.util.Calendar.getInstance();
+    int dow = cal.get(java.util.Calendar.DAY_OF_WEEK);
+    boolean isWeekend = (dow == java.util.Calendar.SATURDAY || dow == java.util.Calendar.SUNDAY);
+
     String attendStatus = "Not Punched In";
     if (punchIn != null && punchOut == null) attendStatus = "Punched In";
     if (punchOut != null)                    attendStatus = "Punched Out";
@@ -1238,6 +1242,11 @@ body {
                 </div>
             </div>
 
+            <% if (isWeekend) { %>
+            <div class="punch-btn-row" style="opacity:0.7;">
+                <p style="color:#64748b;font-size:13px;margin:0;">Attendance is closed on weekends.</p>
+            </div>
+            <% } else { %>
             <div class="punch-btn-row">
                 <form action="attendance" method="post" style="flex:1;display:flex;">
                     <input type="hidden" name="action" value="punchin">
@@ -1253,6 +1262,7 @@ body {
                     </button>
                 </form>
             </div>
+            <% } %>
         </div>
 
         <%-- Attendance Breakdown Pie --%>

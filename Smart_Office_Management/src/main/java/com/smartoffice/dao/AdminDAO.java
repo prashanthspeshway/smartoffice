@@ -11,11 +11,11 @@ import com.smartoffice.utils.DBConnectionUtil;
 public class AdminDAO {
 
     public int getManagerCount() throws Exception {
-        return getCount("SELECT COUNT(*) FROM users WHERE role = 'MANAGER'");
+        return getCount("SELECT COUNT(*) FROM users WHERE LOWER(TRIM(role)) = 'manager'");
     }
 
     public int getEmployeeCount() throws Exception {
-        return getCount("SELECT COUNT(*) FROM users WHERE role = 'user'");
+        return getCount("SELECT COUNT(*) FROM users WHERE LOWER(TRIM(role)) IN ('user', 'employee')");
     }
 
     public int getPresentTodayCount() throws Exception {
@@ -37,7 +37,7 @@ public class AdminDAO {
     }
 
     public int getAbsentTodayCount() throws Exception {
-        int total = getCount("SELECT COUNT(*) FROM users WHERE role IN ('MANAGER','user')");
+        int total = getCount("SELECT COUNT(*) FROM users WHERE LOWER(TRIM(role)) IN ('manager', 'user', 'employee')");
         int present = getPresentTodayCount();
         return total - present;
     }

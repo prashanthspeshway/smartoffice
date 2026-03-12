@@ -12,8 +12,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.smartoffice.dao.DesignationDAO;
 import com.smartoffice.utils.DBConnectionUtil;
 import com.smartoffice.utils.PasswordUtil;
+import com.smartoffice.utils.UserFieldUtil;
 
 @SuppressWarnings("serial")
 @WebServlet("/addUser")
@@ -31,6 +33,7 @@ public class AddUser extends HttpServlet {
         String password = req.getParameter("password");
         String confirmPassword = req.getParameter("confirmPassword");
         String role = req.getParameter("role");
+        String designation = req.getParameter("designation");
 
         // Password confirmation
         if (password == null || !password.equals(confirmPassword)) {
@@ -88,27 +91,29 @@ public class AddUser extends HttpServlet {
                 }
             }
 
-            String status = req.getParameter("status");
-            if (status == null || status.trim().isEmpty()) status = "active";
+            String status = UserFieldUtil.normalizeStatus(req.getParameter("status"));
+            String roleNormalized = UserFieldUtil.normalizeRole(role);
+            String designationVal = (roleNormalized != null && roleNormalized.equalsIgnoreCase("employee")) ? (designation != null && !designation.trim().isEmpty() ? designation.trim() : null) : null;
 
             // Username = firstname + lastname (fallback to email if empty)
             String username = ((firstname != null ? firstname : "") + " " + (lastname != null ? lastname : "")).trim();
             if (username.isEmpty()) username = email;
 
             String sql = "INSERT INTO users " +
-                    "(username, password, role, status, email, firstname, lastname, joinedDate, phone) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "(username, password, role, status, email, firstname, lastname, designation, joinedDate, phone) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, username);
             ps.setString(2, hashedPassword);
-            ps.setString(3, role);
+            ps.setString(3, roleNormalized);
             ps.setString(4, status);
             ps.setString(5, email);
             ps.setString(6, firstname);
             ps.setString(7, lastname);
-            ps.setDate(8, joinedDate);
-            ps.setString(9, phone);
+            ps.setString(8, designationVal);
+            ps.setDate(9, joinedDate);
+            ps.setString(10, phone);
 
             ps.executeUpdate();
 
@@ -127,6 +132,9 @@ public class AddUser extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
+        try {
+            req.setAttribute("designations", new DesignationDAO().getActiveDesignations());
+        } catch (Exception ignored) {}
         req.getRequestDispatcher("addUser.jsp").forward(req, res);
     }
 }

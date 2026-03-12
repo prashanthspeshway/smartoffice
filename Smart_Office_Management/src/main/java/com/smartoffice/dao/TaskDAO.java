@@ -99,6 +99,28 @@ public class TaskDAO {
 		}
 	}
 
+	public static List<Task> getAllTasks() throws Exception {
+		List<Task> list = new ArrayList<>();
+		String sql = "SELECT id, title, description, assigned_to, assigned_by, status, assigned_date "
+				+ "FROM tasks ORDER BY id DESC";
+		try (Connection con = DBConnectionUtil.getConnection();
+		     PreparedStatement ps = con.prepareStatement(sql);
+		     ResultSet rs = ps.executeQuery()) {
+			while (rs.next()) {
+				Task t = new Task();
+				t.setId(rs.getInt("id"));
+				t.setTitle(rs.getString("title"));
+				t.setDescription(rs.getString("description"));
+				t.setAssignedTo(rs.getString("assigned_to"));
+				t.setAssignedBy(rs.getString("assigned_by"));
+				t.setStatus(rs.getString("status"));
+				t.setAssignedDate(rs.getTimestamp("assigned_date"));
+				list.add(t);
+			}
+		}
+		return list;
+	}
+
 	// MANAGER – view tasks assigned to a specific employee
 	public static List<Task> getTasksAssignedByManager(String manager, String employee) {
 

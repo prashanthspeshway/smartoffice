@@ -20,6 +20,9 @@ public class GetHolidaysServlet extends HttpServlet {
             throws ServletException, IOException {
 
         response.setContentType("application/json");
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
 
         try {
             Connection con = DBConnectionUtil.getConnection();

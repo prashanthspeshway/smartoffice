@@ -1,224 +1,67 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Admin Overview</title>
-
-<style>
-body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #c3cfe2;
-    margin: 0;
-}
-
-/* ===== SAME CONTAINER STYLE AS ADD USER ===== */
-.container {
-    width: 100%;
-}
-
-/* ===== SAME FIELDSET STYLE ===== */
-fieldset {
-    max-width: 1000px;
-    margin: 30px auto;
-    height: 440px;
-    padding: 10px 15px;
-    border-radius: 14px;
-    border: none;
-    background: #c3cfe2;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-}
-
-/* ===== LEGEND SAME STYLE ===== */
-legend {
-    padding: 8px 18px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #111;
-    background:#e2ebf0;
-    border-radius: 8px;
-}
-
-/* ===== DASHBOARD GRID ===== */
-.dashboard {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 22px;
-    margin-top: 20px;
-}
-
-/* ===== CARD BASE ===== */
-.card {
-    padding: 22px 18px;
-    border-radius: 14px;
-    text-align: center;
-    color: #ffffff;
-    transition: 0.3s ease;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
-}
-
-.card:hover {
-    transform: translateY(-6px);
-}
-
-/* ===== COLORS (UNCHANGED) ===== */
-.managers  { background: linear-gradient(135deg, #2563eb, #1e40af); }
-.employees { background: linear-gradient(135deg, #22c55e, #15803d); }
-.total     { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
-.present   { background: linear-gradient(135deg, #f59e0b, #d97706); }
-.absent    { background: linear-gradient(135deg, #ef4444, #b91c1c); }
-.holidays  { background: linear-gradient(135deg, #14b8a6, #0f766e); }
-
-/* ===== HOLIDAYS FULL WIDTH ===== */
-.holidays {
-    grid-column: 1 / -1;
-}
-
-/* ===== TEXT ===== */
-.card h3 {
-    margin-bottom: 18px;
-    font-size: 15px;
-    font-weight: 600;
-}
-
-.card span {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-/* ===== LIST STYLE ===== */
-.card-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.card-list li {
-    background: rgba(255, 255, 255, 0.18);
-    margin-bottom: 10px;
-    padding: 14px 12px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.25s ease;
-}
-
-.card-list li:last-child {
-    margin-bottom: 0;
-}
-
-.card-list li:hover {
-    background: rgba(255, 255, 255, 0.28);
-    transform: scale(0.98);
-}
-
-/* ===== DARK MODE (SAME STYLE LOGIC) ===== */
-body.dark-theme {
-    background: #121212 !important;
-}
-
-body.dark-theme fieldset {
-    background: #1e1e1e !important;
-}
-
-body.dark-theme legend {
-    background: #2c2c2c !important;
-    color: white !important;
-}
-
-body.dark-theme .card {
-    background: #2c2c2c !important;
-    color: white !important;
-}
-
-body.dark-theme .card-list li {
-    background: rgba(255,255,255,0.08) !important;
-}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Overview • Smart Office HRMS</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
 </head>
+<body class="bg-slate-100 min-h-screen p-6">
 
-<body>
+<div class="max-w-6xl mx-auto">
+	<h1 class="text-2xl font-semibold text-slate-800 mb-6 flex items-center gap-2">
+		<i class="fa-solid fa-chart-line text-indigo-500"></i>
+		Admin Overview
+	</h1>
 
-<div class="container">
-    <fieldset>
-        <legend>📊 Admin Overview</legend>
+	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+		<div class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-shadow">
+			<h3 class="text-sm font-medium opacity-90 mb-2">Managers</h3>
+			<p class="text-2xl font-bold">${managers}</p>
+		</div>
+		<div class="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-shadow">
+			<h3 class="text-sm font-medium opacity-90 mb-2">Employees</h3>
+			<p class="text-2xl font-bold">${employees}</p>
+		</div>
+		<div class="bg-gradient-to-br from-violet-500 to-violet-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-shadow">
+			<h3 class="text-sm font-medium opacity-90 mb-2">Total Staff</h3>
+			<p class="text-2xl font-bold">${totalStaff}</p>
+		</div>
+		<div class="bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-shadow">
+			<h3 class="text-sm font-medium opacity-90 mb-2">Present Today</h3>
+			<p class="text-2xl font-bold">${presentToday}</p>
+		</div>
+		<div class="bg-gradient-to-br from-red-500 to-red-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-shadow">
+			<h3 class="text-sm font-medium opacity-90 mb-2">Absent Today</h3>
+			<p class="text-2xl font-bold">${absentToday}</p>
+		</div>
+	</div>
 
-        <div class="dashboard">
-
-            <div class="card managers">
-                <h3>Managers</h3>
-                <ul class="card-list">
-                    <li>${managers}</li>
-                </ul>
-            </div>
-
-            <div class="card employees">
-                <h3>Employees</h3>
-                <ul class="card-list">
-                    <li>${employees}</li>
-                </ul>
-            </div>
-
-            <div class="card total">
-                <h3>Total Staff</h3>
-                <ul class="card-list">
-                    <li>${totalStaff}</li>
-                </ul>
-            </div>
-
-            <div class="card present">
-                <h3>Present Today</h3>
-                <ul class="card-list">
-                    <li>${presentToday}</li>
-                </ul>
-            </div>
-
-            <div class="card absent">
-                <h3>Absent Today</h3>
-                <ul class="card-list">
-                    <li>${absentToday}</li>
-                </ul>
-            </div>
-
-            <div class="card holidays">
-                <h3>Upcoming Holiday</h3>
-                <ul class="card-list">
-                    <c:choose>
-                        <c:when test="${not empty holidays}">
-                            <c:forEach var="h" items="${holidays}">
-                                <li>${h}</li>
-                            </c:forEach>
-                        </c:when>
-                        <c:otherwise>
-                            <li>No upcoming holidays</li>
-                        </c:otherwise>
-                    </c:choose>
-                </ul>
-            </div>
-
-        </div>
-
-    </fieldset>
+	<div class="mt-6 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl p-6 text-white shadow-lg">
+		<h3 class="text-lg font-semibold mb-4">Upcoming Holiday</h3>
+		<ul class="space-y-2">
+			<c:choose>
+				<c:when test="${not empty holidays}">
+					<c:forEach var="h" items="${holidays}">
+						<li class="bg-white/20 rounded-lg px-4 py-3 font-medium">${h}</li>
+					</c:forEach>
+				</c:when>
+				<c:otherwise>
+					<li class="bg-white/20 rounded-lg px-4 py-3">No upcoming holidays</li>
+				</c:otherwise>
+			</c:choose>
+		</ul>
+	</div>
 </div>
 
 <script>
-window.onload = function() {
-    if (window.parent && window.parent.document.body.classList.contains("dark-theme")) {
-        document.body.classList.add("dark-theme");
-    }
-};
-
 document.addEventListener('contextmenu', e => e.preventDefault());
-document.onkeydown = e =>
-  e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))
-    ? false
-    : true;
+document.onkeydown = e => (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))) ? false : true;
 </script>
-
 </body>
 </html>

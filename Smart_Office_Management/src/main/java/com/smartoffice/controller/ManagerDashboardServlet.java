@@ -72,9 +72,9 @@ public class ManagerDashboardServlet extends HttpServlet {
 			// ================= TEAM ATTENDANCE =================
 			request.setAttribute("teamAttendance", attendanceDAO.getTeamAttendanceForToday(username));
 
-			// ================= LEAVE REQUESTS =================
+			// ================= LEAVE (manager's own leaves - apply to admin) =================
 			LeaveRequestDAO leaveDao = new LeaveRequestDAO();
-			request.setAttribute("leaveRequests", leaveDao.getTeamLeaveRequests(username));
+			request.setAttribute("myLeaves", leaveDao.getLeavesByUsername(username));
 
 			// ================= TEAMS (assigned to this manager) =================
 			List<Team> myTeams = TeamDAO.getTeamsByManager(username);

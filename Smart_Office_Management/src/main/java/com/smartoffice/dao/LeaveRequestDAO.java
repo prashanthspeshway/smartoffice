@@ -128,4 +128,37 @@ public class LeaveRequestDAO {
         return list;
     }
 
+    /** All leave requests for admin (all employees and managers). */
+    public List<LeaveRequest> getAllLeaveRequests() throws Exception {
+        List<LeaveRequest> list = new ArrayList<>();
+        String lrCol = getLeaveUserColumn();
+        String userCol = "email".equals(lrCol) ? "email" : "username";
+        String sql = "SELECT lr.*, TRIM(CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,''))) AS fullname " +
+            "FROM leave_requests lr " +
+            "LEFT JOIN users u ON u." + userCol + " = lr." + lrCol + " " +
+            "ORDER BY lr.applied_at DESC";
+
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                LeaveRequest lr = new LeaveRequest();
+                lr.setId(rs.getInt("id"));
+                lr.setUsername(rs.getString(lrCol));
+                lr.setLeaveType(rs.getString("leave_type"));
+                lr.setFromDate(rs.getDate("from_date"));
+                lr.setToDate(rs.getDate("to_date"));
+                lr.setReason(rs.getString("reason"));
+                lr.setStatus(rs.getString("status"));
+                lr.setAppliedAt(rs.getTimestamp("applied_at"));
+                String fn = rs.getString("fullname");
+                if (fn != null && !fn.trim().isEmpty()) lr.setDisplayName(fn.trim());
+                else lr.setDisplayName(rs.getString(lrCol));
+                list.add(lr);
+            }
+        }
+        return list;
+    }
+
 }

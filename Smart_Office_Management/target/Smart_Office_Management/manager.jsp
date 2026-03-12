@@ -37,6 +37,10 @@ List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");
 java.sql.Timestamp punchIn = (java.sql.Timestamp) request.getAttribute("punchIn");
 java.sql.Timestamp punchOut = (java.sql.Timestamp) request.getAttribute("punchOut");
 
+java.util.Calendar cal = java.util.Calendar.getInstance();
+int dow = cal.get(java.util.Calendar.DAY_OF_WEEK);
+boolean isWeekend = (dow == java.util.Calendar.SATURDAY || dow == java.util.Calendar.SUNDAY);
+
 String status = "Not Punched In";
 if (punchIn != null && punchOut == null)
 	status = "Punched In";
@@ -54,8 +58,8 @@ User userObj = (User) request.getAttribute("user");
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Manager Dashboard • Smart Office</title>
 
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ================= GLOBAL ================= */
 * {
@@ -69,56 +73,61 @@ body {
 	height: 100vh;
 	display: flex;
 	flex-direction: column;
-	background: linear-gradient(135deg, #c3cfe2 0%, #e2ebf0 100%);
+	background: #f1f5f9;
 	overflow: hidden;
+	font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
 /* ================= TOP BAR ================= */
 .top-bar {
-	backdrop-filter: blur(10px);
-	background: rgba(255, 255, 255, 0.25);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-	padding: 15px 30px;
+	background: #ffffff;
+	border-bottom: 1px solid #e2e8f0;
+	padding: 15px 24px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .top-bar h2 {
-	font-size: 22px;
+	font-size: 20px;
 	font-weight: 600;
-	color: #2d3748;
+	color: #1e293b;
 }
 
 .user-area {
 	display: flex;
 	align-items: center;
-	gap: 15px;
-}
-
-.welcome {
+	gap: 12px;
+	color: #64748b;
 	font-size: 14px;
 }
+.user-area b { color: #1e293b; }
 
-/* Buttons */
 .settings-btn {
-	width: 38px;
-	height: 38px;
+	width: 40px;
+	height: 40px;
 	border-radius: 50%;
 	border: none;
-	background: linear-gradient(135deg, #667eea, #764ba2);
+	background: #4f46e5;
 	color: white;
 	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
+.settings-btn:hover { background: #4338ca; }
 
 .logout-btn {
-	padding: 8px 14px;
+	padding: 8px 16px;
 	border-radius: 8px;
-	border: none;
-	background: #e53e3e;
-	color: white;
+	border: 1px solid #e2e8f0;
+	background: #fff;
+	color: #dc2626;
 	cursor: pointer;
+	font-weight: 600;
 }
+.logout-btn:hover { background: #fef2f2; }
 
 /* ================= LAYOUT ================= */
 .main-container {
@@ -128,18 +137,17 @@ body {
 
 /* ================= SIDEBAR ================= */
 .sidebar {
-	width: 250px;
-	backdrop-filter: blur(10px);
-	background: rgba(255, 255, 255, 0.2);
-	border-right: 1px solid rgba(255, 255, 255, 0.3);
-	padding: 18px 12px;
+	width: 256px;
+	background: #ffffff;
+	border-right: 1px solid #e2e8f0;
+	padding: 16px 12px;
+	box-shadow: 1px 0 0 rgba(0,0,0,0.05);
 }
 
-/* NORMAL BUTTON (NO BG) */
 .sidebar-btn {
 	width: 100%;
-	padding: 12px 14px;
-	margin-bottom: 10px;
+	padding: 12px 16px;
+	margin-bottom: 4px;
 	border: none;
 	background: transparent;
 	border-radius: 8px;
@@ -148,44 +156,35 @@ body {
 	font-weight: 500;
 	display: flex;
 	align-items: center;
-	gap: 10px;
-	color: #2d3748;
-	transition: 0.25s;
+	gap: 12px;
+	color: #64748b;
+	transition: 0.2s;
 }
 
-/* HOVER */
 .sidebar-btn:hover {
-	background: rgba(102, 126, 234);
-	color: white;
-	font-size: 15px;
+	background: #f1f5f9;
+	color: #1e293b;
 }
 
-/* ACTIVE */
 .sidebar-btn.active {
-	background: linear-gradient(135deg, #e7e6eb);
-	color: black;
-	box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
-	position: relative;
-	font-size: 15px;
-}
-
-.sidebar-btn.active::before {
-	content: "";
-	position: absolute;
-	left: 0;
-	top: 10%;
-	width: 4px;
-	height: 80%;
-	background: white;
-	border-radius: 2px;
+	background: #eef2ff;
+	color: #4f46e5;
+	font-weight: 600;
 }
 
 /* ================= CONTENT ================= */
 .content-area {
 	flex: 1;
-	padding: 25px;
-	background: #c3cfe2;
+	padding: 24px;
+	background: #f1f5f9;
 	overflow-y: hidden;
+}
+
+.box {
+	background: #ffffff;
+	border-radius: 12px;
+	border: 1px solid #e2e8f0;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 #contentFrame {
@@ -586,20 +585,20 @@ to {
 }
 
 .attendance-fieldset {
-	border: 2px solid #c3cfe2;
-	border-radius: 14px;
-	padding: 20px 24px 24px;
-	background: #c3cfe2;
-	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 24px;
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .attendance-fieldset legend {
-	padding: 10px;
-	font-size: 18px;
+	padding: 8px 16px;
+	font-size: 15px;
 	font-weight: 600;
-	background: #e2ebf0;
-	border-radius: 15px;
-	color: #2d3748;
+	background: #eef2ff;
+	border-radius: 8px;
+	color: #1e293b;
 }
 
 .attendance-row {
@@ -1018,20 +1017,20 @@ to {
 /* Leave request  */
 /* ===== Leave Fieldset ===== */
 .leave-fieldset {
-	border: 2px solid #c3cfe2;
-	border-radius: 14px;
-	padding: 20px 24px 26px;
-	background: #c3cfe2;
-	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8);
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 24px;
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .leave-fieldset legend {
-	padding: 8px;
-	font-size: 18px;
-	border-radius: 14px;
+	padding: 8px 16px;
+	font-size: 15px;
+	border-radius: 8px;
 	font-weight: 600;
-	background: #e2ebf0;
-	color: #2d3748;
+	background: #eef2ff;
+	color: #1e293b;
 }
 
 /* ===== Scroll Area ===== */
@@ -1055,6 +1054,12 @@ to {
 .leave-scroll::-webkit-scrollbar-track {
 	background: #e2ebf0;
 }
+
+/* ===== Leave Form ===== */
+.leave-form label { display: block; margin-top: 12px; font-weight: 600; color: #2d3748; }
+.leave-form input, .leave-form select, .leave-form textarea { width: 100%; padding: 10px 14px; margin-top: 4px; border: 1px solid #c3cfe2; border-radius: 8px; }
+.leave-form textarea { min-height: 80px; resize: vertical; }
+.leave-form button[type="submit"] { margin-top: 16px; }
 
 /* ===== Action Buttons ===== */
 .leave-actions {
@@ -1156,18 +1161,20 @@ to {
 }
 /* ===== Attendance Fieldset ===== */
 .attendance-fieldset {
-	border: 2px solid #c3cfe2;
-	border-radius: 14px;
-	padding: 20px 24px 26px;
-	background: #c3cfe2;
-	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8);
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 24px;
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .attendance-fieldset legend {
-	padding: 8px;
-	font-size: 18px;
+	padding: 8px 16px;
+	font-size: 15px;
 	font-weight: 600;
-	color: #2d3748;
+	background: #eef2ff;
+	border-radius: 8px;
+	color: #1e293b;
 }
 
 /* ===== Header ===== */
@@ -1906,7 +1913,7 @@ body.dark-theme .settings-item i {
 			<button
 				class="sidebar-btn <%=activeTab.equals("assignTask") ? "active" : ""%>"
 				onclick="setActive(this); showSection('assignTask')">
-				<i class="fa-solid fa-list-check"></i> <span>Assign Tasks</span>
+				<i class="fa-solid fa-list-check"></i> <span>Tasks</span>
 			</button>
 
 			<button
@@ -1974,6 +1981,11 @@ body.dark-theme .settings-item i {
 						<span class="label">Punch Out</span> <span class="value"><%=punchOut != null ? punchOut : "--"%></span>
 					</div>
 
+					<% if (isWeekend) { %>
+					<div class="attendance-buttons" style="opacity:0.7;">
+						<p style="color:#64748b;font-size:13px;margin:0;">Attendance is closed on weekends.</p>
+					</div>
+					<% } else { %>
 					<div class="attendance-buttons">
 						<form action="attendance" method="post">
 							<input type="hidden" name="action" value="punchin">
@@ -1988,6 +2000,7 @@ body.dark-theme .settings-item i {
 								Punch Out</button>
 						</form>
 					</div>
+					<% } %>
 
 				</fieldset>
 			</div>
@@ -2246,71 +2259,66 @@ body.dark-theme .settings-item i {
 				</fieldset>
 			</div>
 
-			<!-- ===== Leave Requests ===== -->
+			<!-- ===== Leave (Apply Leave + My Leave Requests) ===== -->
 			<div class="box centered-box" id="leave" style="display: none;">
 
 				<fieldset class="leave-fieldset">
-					<legend>Leave Requests</legend>
+					<legend>Leave</legend>
 
-					<div class="leave-scroll">
+					<div style="display: flex; gap: 12px; margin-bottom: 20px;">
+						<button type="button" class="nav-btn" style="flex: 1; background: linear-gradient(135deg,#667eea,#764ba2); color: white; border-radius:20px; padding: 10px;" onclick="showManagerApplyLeave()">Apply Leave</button>
+						<button type="button" class="nav-btn" style="flex: 1; background: #6b7280; color: white; border-radius:20px; padding: 10px;" onclick="showManagerMyLeaves()">My Leave Requests</button>
+					</div>
 
-						<%
-						List<LeaveRequest> leaveRequests = (List<LeaveRequest>) request.getAttribute("leaveRequests");
+					<div id="managerApplyLeaveSection">
+						<form class="leave-form" action="applyLeave" method="post" style="max-width: 400px;">
+							<label>Leave Type</label>
+							<select name="leaveType" required>
+								<option value="">Select</option>
+								<option>Casual Leave</option>
+								<option>Sick Leave</option>
+								<option>Earned Leave</option>
+							</select>
+							<label>From Date</label>
+							<input type="date" name="fromDate" required>
+							<label>To Date</label>
+							<input type="date" name="toDate" required>
+							<label>Reason</label>
+							<textarea name="reason" required></textarea>
+							<button type="submit" class="primary-btn">Submit Request</button>
+						</form>
+					</div>
 
-						if (leaveRequests != null && !leaveRequests.isEmpty()) {
-							for (LeaveRequest lr : leaveRequests) {
-						%>
-
-						<div class="employee-card">
-							<div class="emp-header">
-								<div class="emp-left">
-									<i class="fa-solid fa-calendar-xmark"></i> <span
-										class="emp-name"><%=lr.getEmail()%></span>
-								</div>
-								<span class="emp-status"><%=lr.getStatus()%></span>
-							</div>
-
-							<div class="emp-body">
-								<div>
-									<b>Type:</b>
-									<%=lr.getLeaveType()%></div>
-								<div>
-									<b>From:</b>
-									<%=lr.getFromDate()%></div>
-								<div>
-									<b>To:</b>
-									<%=lr.getToDate()%></div>
-								<div>
-									<b>Reason:</b>
-									<%=lr.getReason()%></div>
-							</div>
-
+					<div id="managerMyLeaveSection" style="display: none;">
+						<div class="leave-scroll">
 							<%
-							if ("PENDING".equals(lr.getStatus())) {
+							List<LeaveRequest> myLeaves = (List<LeaveRequest>) request.getAttribute("myLeaves");
+							if (myLeaves == null || myLeaves.isEmpty()) {
 							%>
-							<form action="leave-approval" method="post" class="leave-actions">
-								<input type="hidden" name="leaveId" value="<%=lr.getId()%>">
-
-								<button class="primary-btn" name="action" value="approve">
-									Approve</button>
-
-								<button class="reject-btn" name="action" value="reject">
-									Reject</button>
-							</form>
+							<p class="no-data">No leave requests found.</p>
 							<%
+							} else {
+								for (LeaveRequest lr : myLeaves) {
+							%>
+							<div class="employee-card">
+								<div class="emp-header">
+									<div class="emp-left">
+										<i class="fa-solid fa-plane-departure"></i>
+										<span class="emp-name"><%=lr.getLeaveType()%></span>
+									</div>
+									<span class="emp-status <%= "APPROVED".equalsIgnoreCase(lr.getStatus()) ? "done" : "REJECTED".equalsIgnoreCase(lr.getStatus()) ? "out" : "pending" %>"><%=lr.getStatus()%></span>
+								</div>
+								<div class="emp-body">
+									<div><b>From:</b> <%=lr.getFromDate()%></div>
+									<div><b>To:</b> <%=lr.getToDate()%></div>
+									<div><b>Reason:</b> <%=lr.getReason()%></div>
+								</div>
+							</div>
+							<%
+								}
 							}
 							%>
 						</div>
-
-						<%
-						}
-						} else {
-						%>
-						<p class="no-data">No leave requests.</p>
-						<%
-						}
-						%>
-
 					</div>
 				</fieldset>
 			</div>
@@ -2635,6 +2643,9 @@ document.addEventListener("DOMContentLoaded", function () {
     else if (success === "PerformanceSaved")
         showToast("Performance submitted successfully");
 
+    else if (success === "LeaveApplied")
+        showToast("Leave applied successfully");
+
     else if (success === "true")
         showToast("Task assigned successfully");
 
@@ -2731,6 +2742,15 @@ function showSection(id) {
     document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
     if (document.getElementById(id))
         document.getElementById(id).style.display = 'block';
+}
+
+function showManagerApplyLeave() {
+    document.getElementById("managerApplyLeaveSection").style.display = "block";
+    document.getElementById("managerMyLeaveSection").style.display = "none";
+}
+function showManagerMyLeaves() {
+    document.getElementById("managerApplyLeaveSection").style.display = "none";
+    document.getElementById("managerMyLeaveSection").style.display = "block";
 }
 
 function toggleTheme() {

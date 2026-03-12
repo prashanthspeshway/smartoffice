@@ -1,9 +1,11 @@
 package com.smartoffice.controller;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Base64;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -16,6 +18,13 @@ import com.smartoffice.utils.PasswordUtil;
 @SuppressWarnings("serial")
 @WebServlet("/Login")
 public class LoginServlet extends HttpServlet {
+
+    private static String generateRememberToken() {
+        SecureRandom sr = new SecureRandom();
+        byte[] bytes = new byte[32];
+        sr.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
 
     private boolean isStrongPassword(String password) {
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$";
@@ -75,9 +84,32 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("role", role);
                 session.setAttribute("sessionToken", UUID.randomUUID().toString());
 
+                // Remember me: set cookie for persistent login (survives server restarts)
+                if ("on".equalsIgnoreCase(req.getParameter("remember")) || "true".equalsIgnoreCase(req.getParameter("remember"))) {
+                    try {
+                        String token = generateRememberToken();
+                        long expiresMs = System.currentTimeMillis() + (7L * 24 * 60 * 60 * 1000); // 7 days
+                        java.sql.Timestamp expiresAt = new java.sql.Timestamp(expiresMs);
+                        try (PreparedStatement ins = con.prepareStatement("INSERT INTO remember_tokens (token, email, expires_at) VALUES (?, ?, ?)")) {
+                            ins.setString(1, token);
+                            ins.setString(2, email);
+                            ins.setTimestamp(3, expiresAt);
+                            ins.executeUpdate();
+                        }
+                        Cookie c = new Cookie("remember_token", token);
+                        c.setMaxAge(7 * 24 * 60 * 60); // 7 days
+                        c.setPath(req.getContextPath().isEmpty() ? "/" : req.getContextPath());
+                        c.setHttpOnly(true);
+                        res.addCookie(c);
+                    } catch (Exception e) {
+                        e.printStackTrace(); // remember_tokens table may not exist; continue without
+                    }
+                }
+
                 switch (role.toLowerCase()) {
                     case "user":
                     case "employee":
+                    case "security":
                         res.sendRedirect("user?success=Login");
                         break;
                     case "manager":

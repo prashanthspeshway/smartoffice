@@ -18,7 +18,11 @@ AttendanceDAO dao = new AttendanceDAO();
 Timestamp punchIn = null;
 Timestamp punchOut = null;
 String status = "Not Punched In";
- 
+
+java.util.Calendar cal = java.util.Calendar.getInstance();
+int dow = cal.get(java.util.Calendar.DAY_OF_WEEK);
+boolean isWeekend = (dow == java.util.Calendar.SATURDAY || dow == java.util.Calendar.SUNDAY);
+
 ResultSet rs = null;
  
 try {
@@ -157,6 +161,11 @@ button:disabled {
     </div>
  
     <!-- Actions -->
+    <% if (isWeekend) { %>
+    <div class="punch-actions" style="opacity:0.7;">
+        <p style="color:#64748b;font-size:13px;margin:0;">Attendance is closed on weekends.</p>
+    </div>
+    <% } else { %>
     <div class="punch-actions">
         <form action="attendance" method="post">
             <input type="hidden" name="action" value="punchin">
@@ -165,7 +174,7 @@ button:disabled {
                 Punch In
             </button>
         </form>
- 
+
         <form action="attendance" method="post">
             <input type="hidden" name="action" value="punchout">
             <button class="punch-out-btn"
@@ -174,6 +183,7 @@ button:disabled {
             </button>
         </form>
     </div>
+    <% } %>
 </div>
 
 <script>

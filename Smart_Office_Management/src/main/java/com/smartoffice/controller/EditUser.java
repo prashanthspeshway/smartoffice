@@ -9,7 +9,9 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
+import com.smartoffice.dao.DesignationDAO;
 import com.smartoffice.utils.DBConnectionUtil;
+import com.smartoffice.utils.UserFieldUtil;
 
 @SuppressWarnings("serial")
 @WebServlet("/editUser")
@@ -26,16 +28,19 @@ public class EditUser extends HttpServlet {
 
         try (Connection con = DBConnectionUtil.getConnection()) {
             try (PreparedStatement ps = con.prepareStatement(
-                    "SELECT id, email, firstname, lastname, role, status, phone, joinedDate FROM users WHERE id=?")) {
+                    "SELECT id, email, firstname, lastname, designation, role, status, phone, joinedDate FROM users WHERE id=?")) {
                 ps.setInt(1, id);
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
+                    String roleVal = rs.getString("role");
+                    String statusVal = rs.getString("status");
                     req.setAttribute("id", id);
                     req.setAttribute("email", rs.getString("email"));
-                    req.setAttribute("role", rs.getString("role"));
-                    req.setAttribute("status", rs.getString("status"));
+                    req.setAttribute("role", ("user".equalsIgnoreCase(roleVal != null ? roleVal.trim() : "") ? "employee" : roleVal));
+                    req.setAttribute("status", (statusVal != null && statusVal.trim().equalsIgnoreCase("active")) ? "active" : "inactive");
                     req.setAttribute("firstname", rs.getString("firstname"));
                     req.setAttribute("lastname", rs.getString("lastname"));
+                    req.setAttribute("designation", rs.getString("designation"));
                     req.setAttribute("phone", rs.getString("phone"));
                     req.setAttribute("email", rs.getString("email"));
                     req.setAttribute("joinedDate", rs.getDate("joinedDate"));
@@ -44,6 +49,9 @@ public class EditUser extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        try {
+            req.setAttribute("designations", new DesignationDAO().getActiveDesignations());
+        } catch (Exception ignored) {}
 
         req.getRequestDispatcher("editUser.jsp").forward(req, res);
     }
@@ -56,10 +64,11 @@ public class EditUser extends HttpServlet {
             throws IOException {
 
         int id = Integer.parseInt(req.getParameter("id"));
-        String role = req.getParameter("role");
-        String status = req.getParameter("status");
+        String role = UserFieldUtil.normalizeRole(req.getParameter("role"));
+        String status = UserFieldUtil.normalizeStatus(req.getParameter("status"));
         String firstname = req.getParameter("firstname");
         String lastname = req.getParameter("lastname");
+        String designation = req.getParameter("designation");
         String phone = req.getParameter("number");
         if (phone != null) {
             phone = phone.replaceAll("[^0-9]", "").trim();
@@ -79,16 +88,18 @@ public class EditUser extends HttpServlet {
 
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                     "UPDATE users SET username=?, role=?, status=?, firstname=?, lastname=?, email=?, joinedDate=?, phone=? WHERE id=?")) {
+                     "UPDATE users SET username=?, role=?, status=?, firstname=?, lastname=?, designation=?, email=?, joinedDate=?, phone=? WHERE id=?")) {
             ps.setString(1, username);
             ps.setString(2, role);
             ps.setString(3, status);
             ps.setString(4, firstname);
             ps.setString(5, lastname);
-            ps.setString(6, email);
-            ps.setDate(7, joinedDate);
-            ps.setString(8, phone);
-            ps.setInt(9, id);
+            String designationVal = (role != null && role.equalsIgnoreCase("employee")) ? (designation != null && !designation.trim().isEmpty() ? designation.trim() : null) : null;
+            ps.setString(6, designationVal);
+            ps.setString(7, email);
+            ps.setDate(8, joinedDate);
+            ps.setString(9, phone);
+            ps.setInt(10, id);
 
             ps.executeUpdate();
 

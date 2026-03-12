@@ -24,6 +24,10 @@ String phone = (String) session.getAttribute("phone");
 java.sql.Timestamp punchIn = (java.sql.Timestamp) request.getAttribute("punchIn");
 java.sql.Timestamp punchOut = (java.sql.Timestamp) request.getAttribute("punchOut");
 
+java.util.Calendar cal = java.util.Calendar.getInstance();
+int dow = cal.get(java.util.Calendar.DAY_OF_WEEK);
+boolean isWeekend = (dow == java.util.Calendar.SATURDAY || dow == java.util.Calendar.SUNDAY);
+
 String status = "Not Punched In";
 if (punchIn != null && punchOut == null)
 	status = "Punched In";
@@ -41,79 +45,78 @@ List<LeaveRequest> myLeaves = (List<LeaveRequest>) request.getAttribute("myLeave
 <meta charset="UTF-8">
 <title>Employee Dashboard</title>
 
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 body {
 	margin: 0;
 	height: 100vh;
 	overflow: hidden;
-	font-family: "Segoe UI", Arial, sans-serif;
-	background: #f0f2ff;
+	font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+	background: #f1f5f9;
 }
 
 /* ================= TOP BAR ================= */
 .top-bar {
-	backdrop-filter: blur(10px);
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-	padding: 15px 30px;
+	background: #ffffff;
+	border-bottom: 1px solid #e2e8f0;
+	padding: 15px 24px;
 	display: flex;
-	height: 50px;
+	height: 56px;
 	justify-content: space-between;
 	align-items: center;
-	box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .top-bar h2 {
-	font-size: 22px;
-	font-weight: 700;
-	color: #ffffff;
-	letter-spacing: 0.5px;
+	font-size: 20px;
+	font-weight: 600;
+	color: #1e293b;
 }
 
 .user-area {
 	display: flex;
 	align-items: center;
-	gap: 15px;
-	color: rgba(255,255,255,0.9);
+	gap: 12px;
+	color: #64748b;
 	font-weight: 500;
+	font-size: 14px;
 }
+.user-area b { color: #1e293b; }
 
 .icon-btn {
-	width: 38px;
-	height: 38px;
+	width: 40px;
+	height: 40px;
 	border-radius: 50%;
-	border: 2px solid rgba(255,255,255,0.4);
-	background: rgba(255,255,255,0.2);
+	border: none;
+	background: #4f46e5;
 	color: white;
 	cursor: pointer;
 	transition: all 0.2s;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .icon-btn:hover {
-	background: rgba(255,255,255,0.35);
-	transform: rotate(30deg);
+	background: #4338ca;
 }
 
-.icon-btn i {
-	font-size: 16px;
-	margin-right: 2px;
-}
+.icon-btn i { font-size: 16px; }
 
 .logout-btn {
 	padding: 8px 16px;
-	border-radius: 20px;
-	border: 2px solid rgba(255,255,255,0.4);
-	background: rgba(255,255,255,0.15);
-	color: white;
+	border-radius: 8px;
+	border: 1px solid #e2e8f0;
+	background: #fff;
+	color: #dc2626;
 	cursor: pointer;
 	font-weight: 600;
 	transition: all 0.2s;
 }
 
 .logout-btn:hover {
-	background: rgba(255,255,255,0.3);
+	background: #fef2f2;
 }
 
 /* ===== Layout ===== */
@@ -124,54 +127,39 @@ body {
 
 /* ================= SIDEBAR  ================= */
 .left-panel {
-	width: 250px;
-	background: linear-gradient(180deg, #1a2980 0%, #26d0ce 100%);
-	border-right: 1px solid rgba(255, 255, 255, 0.1);
-	padding: 18px 12px;
-	box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+	width: 256px;
+	background: #ffffff;
+	border-right: 1px solid #e2e8f0;
+	padding: 16px 12px;
+	box-shadow: 1px 0 0 rgba(0,0,0,0.05);
 }
 
-/* BUTTON */
 .nav-btn {
 	width: 100%;
-	padding: 12px 14px;
-	margin-bottom: 8px;
+	padding: 12px 16px;
+	margin-bottom: 4px;
 	border: none;
 	background: transparent;
-	border-radius: 10px;
+	border-radius: 8px;
 	cursor: pointer;
 	font-size: 14px;
 	font-weight: 500;
 	display: flex;
 	align-items: center;
-	gap: 10px;
-	color:#f0f4ff;
-	transition: 0.25s;
+	gap: 12px;
+	color: #64748b;
+	transition: 0.2s;
 }
 
-/* Hover */
 .nav-btn:hover {
-	background: rgba(102, 126, 234, 0.73);
-	color: white;
-	transform: translateX(4px);
-	box-shadow: 0 4px 12px rgba(10, 16, 34, 0.4);
-}
-
-/* Active */
-.nav-btn{
-	transition: 
-	background 0.35s ease,
-	color 0.25s ease,
-	box-shadow 0.35s ease,
-	transform 0.25s ease;
+	background: #f1f5f9;
+	color: #1e293b;
 }
 
 .nav-btn.active {
-	background: linear-gradient(180deg, #36d1dc 0%, #5b86e5 100%);
-	color: black;
-	box-shadow: 0 6px 15px rgba(102, 126, 234, 0.5);
-	font-weight: 400;
-	font-size: 15px;
+	background: #eef2ff;
+	color: #4f46e5;
+	font-weight: 600;
 }
 
 
@@ -179,36 +167,38 @@ body {
 .box {
 	overflow-y: auto;
 	overflow-x: hidden;
-	padding: 28px;
+	padding: 24px;
 	height: 100%;
+	background: #ffffff;
+	border-radius: 12px;
+	border: 1px solid #e2e8f0;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 /* ================= RIGHT PANEL ================= */
 .right-panel {
 	flex: 1;
-	background: linear-gradient(45deg,#8fd2ee, #a78bfa);
+	background: #f1f5f9;
 	overflow: hidden;
 }
 
 /* ================= ATTENDANCE FIELDSET ================= */
 .attendance-fieldset {
-	border-radius: 16px;
-	padding: 25px 20px 30px;
-	border: none;
-	background: #fbfbff;
-	box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
+	border-radius: 12px;
+	padding: 24px;
+	border: 1px solid #e2e8f0;
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* Legend (Title) */
 .attendance-fieldset legend {
-	padding: 8px 18px;
+	padding: 8px 16px;
 	font-size: 15px;
-	font-weight: 700;
-	color: #fff;
-	border-radius: 20px;
-	background: linear-gradient(135deg, #667eea, #764ba2);
+	font-weight: 600;
+	color: #1e293b;
+	border-radius: 8px;
+	background: #eef2ff;
 	border: none;
-	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 /* Time Cards */
@@ -230,21 +220,19 @@ body {
 
 .attendance-fieldset button {
 	flex: 1;
-	padding: 12px 22px;
-	border-radius: 25px;
-	background: linear-gradient(135deg, #667eea, #764ba2);
+	padding: 12px 20px;
+	border-radius: 8px;
+	background: #4f46e5;
 	color: white;
 	border: none;
-	font-weight: 700;
+	font-weight: 600;
 	font-size: 14px;
-	transition: all ease 0.2s;
+	transition: all 0.2s;
 	cursor: pointer;
-	box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .attendance-fieldset button:hover:not(:disabled) {
-	transform: translateY(-2px);
-	box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+	background: #4338ca;
 }
 
 /* Disabled State */
@@ -1191,7 +1179,7 @@ border-color:#667eea;
 
 			<button class="nav-btn"
 				onclick="setActive(this); showTasks(); setTab('tasks');">
-				<i class="fa-solid fa-list-check"></i> <span>Assigned Tasks</span>
+				<i class="fa-solid fa-list-check"></i> <span>Tasks</span>
 			</button>
 
 			<button class="nav-btn"
@@ -1235,6 +1223,11 @@ border-color:#667eea;
 						Punch Out: <b><%=punchOut != null ? punchOut : "--"%></b>
 					</div>
 
+					<% if (isWeekend) { %>
+					<div class="punch-actions" style="opacity:0.7;">
+						<p style="color:#64748b;font-size:13px;margin:0;">Attendance is closed on weekends.</p>
+					</div>
+					<% } else { %>
 					<div class="punch-actions">
 						<form action="attendance" method="post">
 							<input type="hidden" name="action" value="punchin">
@@ -1249,6 +1242,7 @@ border-color:#667eea;
 								Punch Out</button>
 						</form>
 					</div>
+					<% } %>
 				</fieldset>
 
 				<!-- ====== BREAK TIME TRACKER ====== -->

@@ -32,13 +32,19 @@ public class ApplyLeaveServlet extends HttpServlet {
 		String toDate = request.getParameter("toDate");
 		String reason = request.getParameter("reason");
 
+		String role = (String) session.getAttribute("role");
 		try {
 			LeaveRequestDAO dao = new LeaveRequestDAO();
 			dao.applyLeave(sessionValue, leaveType, Date.valueOf(fromDate), Date.valueOf(toDate), reason);
-			response.sendRedirect(request.getContextPath() + "/user?tab=leave&success=LeaveApplied");
+			if ("manager".equalsIgnoreCase(role)) {
+				response.sendRedirect(request.getContextPath() + "/manager?tab=leave&success=LeaveApplied");
+			} else {
+				response.sendRedirect(request.getContextPath() + "/user?tab=leave&success=LeaveApplied");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.sendRedirect(request.getContextPath() + "/user?tab=leave&error=LeaveFailed");
+			String redirect = "manager".equalsIgnoreCase(role) ? "/manager?tab=leave" : "/user?tab=leave";
+			response.sendRedirect(request.getContextPath() + redirect + "&error=LeaveFailed");
 		}
 	}
 }

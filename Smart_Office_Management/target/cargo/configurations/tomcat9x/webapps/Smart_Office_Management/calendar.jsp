@@ -1,492 +1,343 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+if (session.getAttribute("username") == null) {
+	response.sendRedirect(request.getContextPath() + "/index.html");
+	return;
+}
+String role = (String) session.getAttribute("role");
+boolean isAdmin = role != null && "admin".equalsIgnoreCase(role);
+%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Company Calendar</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Company Calendar • Smart Office HRMS</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-
-
-body{
-    font-family: "Segoe UI";
-    margin:0;
-    padding:0;
-    background: linear-gradient(135deg,#764ba2,#6366f1);
-}
-
-/* CALENDAR BOX */
-.calendar-box{
-    width:97%;
-    margin:auto;
-    padding:15px;
-    background:#f0ede9;
-/*     border-radius:14px; */
-    box-shadow:0 15px 35px rgba(0,0,0,0.2);
-}
-
-/* HEADER */
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:10px;
-}
-
-.header h3{
-    font-size:22px;
-    font-weight:600;
-    color:#6366f1;
-}
-
-.header button{
-    border:none;
-    background:#6366f1;
-    color:white;
-    font-size:16px;
-    padding:8px 16px;
-    border-radius:8px;
-    cursor:pointer;
-    transition:0.3s;
-}
-
-.header button:hover{
-    background:#764ba2;
-}
-
-/* TABLE */
-table{
-    width:100%;
-    height:calc(100vh - 100px);
-    border-collapse:collapse;
-    table-layout:fixed;
-}
-
-/* HEADER DAYS */
-th{
-    background:#6366f1;
-    color:white;
-    font-size:14px;
-    height:45px;
-}
-
-/* CELLS */
-td{
-    background:white;
-    border:1px solid #e5e7eb;
-    height:55px;
-    text-align:center;
-    font-weight:500;
-    border-radius:6px;
-    transition:0.25s;
-}
-
-/* HOVER EFFECT */
-td:hover{	
-    background:#764ba2;
-/*     transform:scale(1.05); */
-    cursor:pointer;
-}
-
-/* HOLIDAY */
-.holiday{
-    background:#5b8e92;
-    color:#eee;
-    font-weight:600;
-}
-.holiday:hover{
-    background:#1aa2ac;
-     transform:none;
-}
-
-
-/* TODAY */
-.today{
-    background:#dbeafe;
-    border:2px solid #6366f1;
-    font-weight:700;
-}
-
-/* HOLIDAY NAME */
-td div{
-    font-size:13px;
-    margin-top:4px;
-    color:#eee;
-    font-weight:800;
-}
-
-/* MODAL */
-#holidayModal{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.45);
-    z-index:999;
-}
-
-#holidayModal>div{
-    background:white;
-    width:320px;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 15px 35px rgba(0,0,0,0.3);
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-}
-
-#holidayModal h3{
-    color:#6366f1;
-}
-
-/* INPUT */
-#holidayNameInput{
-    width:100%;
-    padding:9px;
-    border-radius:8px;
-    border:1px solid #d1d5db;
-    margin-top:10px;
-}
-
-#holidayNameInput:focus{
-    outline:none;
-    border-color:#6366f1;
-}
-
-/* BUTTONS */
-#holidayModal button{
-    padding:7px 14px;
-    border:none;
-    border-radius:7px;
-    font-size:13px;
-    cursor:pointer;
-}
-
-#holidayModal button:first-child{
-    background:#e5e7eb;
-}
-
-#holidayModal button:last-child{
-    background:#10b981;
-    color:white;
-}
-
-#deleteBtn{
-    background:#ef4444;
-    color:white;
-}
-
-/* TOAST */
-.toast{
-    position:fixed;
-    top:20px;
-    right:25px;
-    background:#6366f1;
-    color:white;
-    padding:12px 18px;
-    border-radius:10px;
-    font-size:14px;
-    display:none;
-    box-shadow:0 10px 25px rgba(0,0,0,0.25);
-}
-
-/* SCROLLBAR */
-#calendarBox{
-    height:500px;
-    overflow-y:auto;
-}
-
-#calendarBox::-webkit-scrollbar{
-    width:8px;
-}
-
-#calendarBox::-webkit-scrollbar-thumb{
-    background:#6366f1;
-    border-radius:10px;
-}
+body { font-family: 'Inter', system-ui, sans-serif; }
+.cal-day { min-height: 80px; padding: 8px; }
+.cal-day:hover:not(.holiday-blocked):not(.other-month) { background: #f1f5f9; }
+.cal-day.holiday-blocked { background: #dbeafe; color: #1e40af; cursor: default; }
+.cal-day.holiday-blocked { background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); }
+.cal-day.today { background: #eef2ff; border: 2px solid #6366f1; font-weight: 700; }
+.cal-day.other-month { color: #cbd5e1; }
+.toast { position: fixed; top: 24px; right: 24px; padding: 14px 20px; border-radius: 8px; z-index: 9999; display: none; font-size: 14px; font-weight: 500; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+.toast.success { background: #10b981; color: white; }
+.toast.error { background: #ef4444; color: white; }
 </style>
 </head>
+<body class="bg-slate-100 min-h-screen">
 
-<body>
+<div id="toast" class="toast"></div>
 
-	<div class="calendar-box" id="calendarBox">
+<div class="max-w-7xl mx-auto p-6">
+  <header class="mb-8">
+    <h1 class="text-2xl font-semibold text-slate-800 flex items-center gap-2 mb-2"><i class="fa-solid fa-calendar-days text-indigo-500"></i> Company Calendar</h1>
+    <p class="text-slate-500 text-sm">Manage holidays, events, and attendance lockouts. Holiday days are blocked automatically.</p>
+  </header>
 
-		<div class="header">
-			<button onclick="changeMonth(-1)">◀</button>
-			<h3 id="monthYear"></h3>
-			<button onclick="changeMonth(1)">▶</button>
-		</div>
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Main Calendar -->
+    <div class="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="changeMonth(-1)" class="w-10 h-10 rounded-lg border border-slate-300 hover:bg-slate-50 flex items-center justify-center text-slate-600"><i class="fa-solid fa-chevron-left"></i></button>
+          <button type="button" onclick="goToday()" class="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium">Today</button>
+          <button type="button" onclick="changeMonth(1)" class="w-10 h-10 rounded-lg border border-slate-300 hover:bg-slate-50 flex items-center justify-center text-slate-600"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <h2 id="monthYear" class="text-lg font-semibold text-slate-800"></h2>
+        <% if (isAdmin) { %>
+        <button type="button" onclick="openAddModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium text-sm"><i class="fa-solid fa-plus"></i> Add Holiday</button>
+        <% } %>
+      </div>
+      <div class="p-4 overflow-x-auto">
+        <table class="w-full border-collapse" id="calendar">
+          <thead>
+            <tr class="text-slate-500 text-xs font-semibold uppercase tracking-wider">
+              <th class="p-2 text-center">Sun</th>
+              <th class="p-2 text-center">Mon</th>
+              <th class="p-2 text-center">Tue</th>
+              <th class="p-2 text-center">Wed</th>
+              <th class="p-2 text-center">Thu</th>
+              <th class="p-2 text-center">Fri</th>
+              <th class="p-2 text-center">Sat</th>
+            </tr>
+          </thead>
+          <tbody id="calBody"></tbody>
+        </table>
+      </div>
+    </div>
 
-		<table id="calendar">
-			<thead>
-				<tr>
-					<th>Sun</th>
-					<th>Mon</th>
-					<th>Tue</th>
-					<th>Wed</th>
-					<th>Thu</th>
-					<th>Fri</th>
-					<th>Sat</th>
-				</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
+    <!-- Upcoming Holidays -->
+    <div class="w-full lg:w-80 shrink-0">
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Upcoming Holidays</h3>
+        <div id="upcomingList" class="space-y-3"></div>
+        <a href="#" onclick="loadUpcoming(); return false;" class="block mt-4 text-sm text-indigo-500 hover:text-indigo-600 font-medium">View Full List</a>
+      </div>
+    </div>
+  </div>
+</div>
 
-	</div>
+<!-- Add Holiday Modal -->
+<div id="holidayModal" class="fixed inset-0 bg-black/40 z-[9999] items-center justify-center hidden" onclick="if(event.target===this)closeModal()">
+  <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6" onclick="event.stopPropagation()">
+    <div class="flex justify-between items-center mb-5">
+      <h3 id="modalTitle" class="text-lg font-semibold text-slate-800">Add New Holiday</h3>
+      <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <form id="holidayForm" onsubmit="saveHoliday(event)">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Date</label>
+          <input type="date" id="holidayDate" name="date" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Holiday Name</label>
+          <input type="text" id="holidayName" name="name" placeholder="e.g. Independence Day" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Type</label>
+          <select id="holidayType" name="type" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="Public">Public Holiday</option>
+            <option value="Optional">Optional</option>
+            <option value="Company">Company Holiday</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6 pt-4 border-t border-slate-200">
+        <button type="button" onclick="closeModal()" class="flex-1 px-4 py-2.5 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50">Cancel</button>
+        <button type="button" id="deleteBtn" onclick="deleteHoliday()" class="px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium hidden" style="display:none;">Delete</button>
+        <button type="submit" class="flex-1 px-4 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-	<!-- Holiday Modal -->
-	<div id="holidayModal"
-		style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4);">
-
-		<div
-			style="background: white; width: 320px; padding: 20px; border-radius: 8px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);">
-
-			<h3 id="modalDate">Add Holiday</h3>
-
-			<input type="text" id="holidayNameInput" placeholder="Holiday Name"
-				style="width: 100%; padding: 8px; margin-top: 10px;">
-
-			<div style="margin-top: 15px; text-align: right;">
-				<div style="margin-top: 15px; text-align: right;">
-					<button onclick="closeModal()">Cancel</button>
-
-					<button type="button" id="deleteBtn" onclick="deleteHoliday()"
-						style="background: #dc2626; color: white; border: none; padding: 6px 12px; display: none;">
-						Delete</button>
-
-
-					<button onclick="saveHoliday()"
-						style="background: #16a34a; color: white; border: none; padding: 6px 12px;">
-						Save</button>
-				</div>
-
-			</div>
-
-		</div>
-	</div>
-
-	<!-- Toast Notification -->
-	<div id="toast" class="toast"></div>
-
-	<script>
+<script>
 let today = new Date();
 let currentMonth = today.getMonth();
 let currentYear = today.getFullYear();
 let selectedDate = "";
+let editMode = false;
+let holidayMap = {};
 
-/* ===== LOAD CALENDAR ===== */
-function loadCalendar(){
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-    const monthYear = document.getElementById("monthYear");
-    const tbody = document.querySelector("#calendar tbody");
-    tbody.innerHTML = "";
+function pad(n) { return n.toString().padStart(2,'0'); }
+function formatDate(d) { return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); }
 
-    const months = ["January","February","March","April","May","June",
-                    "July","August","September","October","November","December"];
-
-    monthYear.innerText = months[currentMonth] + " " + currentYear;
-
-    let firstDay = new Date(currentYear,currentMonth,1).getDay();
-    let daysInMonth = new Date(currentYear,currentMonth+1,0).getDate();
-
-    fetch("getHolidays")
+function loadCalendar() {
+  document.getElementById("monthYear").textContent = months[currentMonth] + " " + currentYear;
+  fetch("getHolidays?t=" + Date.now())
     .then(r => r.json())
     .then(holidays => {
-
-        let holidayMap = {};
-        holidays.forEach(h => {
-            holidayMap[h.date] = h.name;
-        });
-
-        let row = document.createElement("tr");
-
-        for(let i=0;i<firstDay;i++){
-            row.appendChild(document.createElement("td"));
-        }
-
-        for(let d=1; d<=daysInMonth; d++){
-
-            if(row.children.length === 7){
-                tbody.appendChild(row);
-                row = document.createElement("tr");
-            }
-
-            let cell = document.createElement("td");
-            cell.innerText = d;
-
-            let dayOfWeek = new Date(currentYear, currentMonth, d).getDay();
-
-            // Weekend Red
-            if(dayOfWeek === 0 || dayOfWeek === 6){
-                cell.classList.add("holiday");
-            }
-
-            // Today
-            if(d === today.getDate() &&
-               currentMonth === today.getMonth() &&
-               currentYear === today.getFullYear()){
-                cell.classList.add("today");
-            }
-
-            // DB Holiday
-            let month = (currentMonth+1).toString().padStart(2,'0');
-            let day = d.toString().padStart(2,'0');
-            let fullDate = currentYear + "-" + month + "-" + day;
-
-            if(holidayMap[fullDate]){
-                cell.classList.add("holiday");
-
-                let div = document.createElement("div");
-                div.style.fontSize = "11px";
-                div.style.marginTop = "4px";
-                div.innerText = holidayMap[fullDate];
-                cell.appendChild(div);
-            }
-
-            row.appendChild(cell);
-        }
-
-        tbody.appendChild(row);
-    });
+      holidayMap = {};
+      holidays.forEach(h => { holidayMap[h.date] = { name: h.name }; });
+      renderCalendar();
+    })
+    .catch(() => renderCalendar());
 }
 
-/* ===== MONTH CHANGE ===== */
-function changeMonth(step){
-    currentMonth += step;
-    if(currentMonth < 0){ currentMonth = 11; currentYear--; }
-    if(currentMonth > 11){ currentMonth = 0; currentYear++; }
-    loadCalendar();
-}
+function renderCalendar() {
+  const tbody = document.getElementById("calBody");
+  tbody.innerHTML = "";
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const todayStr = formatDate(today);
 
-/* ===== CLICK DATE → OPEN MODAL ===== */
-document.addEventListener("click", function(e){
+  let row = document.createElement("tr");
+  for (let i = 0; i < firstDay; i++) {
+    const cell = document.createElement("td");
+    cell.className = "cal-day other-month border border-slate-200";
+    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    const prevDays = new Date(prevYear, prevMonth + 1, 0).getDate();
+    cell.innerHTML = prevDays - firstDay + i + 1;
+    row.appendChild(cell);
+  }
 
-    let cell = e.target.closest("#calendar td");
-    if(!cell) return;
-
-    let day = cell.childNodes[0].nodeValue.trim();
-    if(day === "" || isNaN(day)) return;
-
-    const role = "<%=session.getAttribute("role")%>";
-    if(!role || role.toLowerCase() !== "admin") return;
-
-    let month = (currentMonth + 1).toString().padStart(2,'0');
-    let d = day.toString().padStart(2,'0');
-
-    selectedDate = currentYear + "-" + month + "-" + d;
-
-    /* BLOCK PAST DATE */
-    let todayStr = new Date().toISOString().split("T")[0];
-    if(selectedDate < todayStr){
-        showToast("previous date not allowed","error");
-        return;
+  for (let d = 1; d <= daysInMonth; d++) {
+    if (row.children.length === 7) {
+      tbody.appendChild(row);
+      row = document.createElement("tr");
     }
+    const fullDate = currentYear + "-" + pad(currentMonth + 1) + "-" + pad(d);
+    const cell = document.createElement("td");
+    cell.className = "cal-day border border-slate-200 text-center text-slate-800";
+    const isHoliday = holidayMap[fullDate];
+    const isToday = fullDate === todayStr;
 
-    //  Check if holiday exists
-    fetch("getHolidayByDate?date=" + selectedDate)
+    if (isHoliday) {
+      cell.classList.add("holiday-blocked");
+      cell.innerHTML = "<div class=\"font-semibold\">" + d + "</div><div class=\"text-xs mt-1 truncate\" title=\"" + (isHoliday.name || "") + "\">" + (isHoliday.name || "Holiday") + "</div>";
+    } else {
+      cell.innerHTML = "<div class=\"font-medium\">" + d + "</div>";
+    }
+    if (isToday) cell.classList.add("today");
+    if (<%= isAdmin %>) {
+      cell.style.cursor = "pointer";
+      cell.onclick = () => openForDate(fullDate);
+    }
+    row.appendChild(cell);
+  }
+
+  const remaining = 7 - row.children.length;
+  if (remaining < 7) {
+    for (let i = 0; i < remaining; i++) {
+      const cell = document.createElement("td");
+      cell.className = "cal-day other-month border border-slate-200";
+      cell.innerHTML = i + 1;
+      row.appendChild(cell);
+    }
+  }
+  tbody.appendChild(row);
+}
+
+function changeMonth(step) {
+  currentMonth += step;
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  loadCalendar();
+}
+
+function goToday() {
+  currentMonth = today.getMonth();
+  currentYear = today.getFullYear();
+  loadCalendar();
+}
+
+function openAddModal() {
+  editMode = false;
+  selectedDate = "";
+  document.getElementById("modalTitle").textContent = "Add New Holiday";
+  document.getElementById("holidayDate").value = formatDate(new Date());
+  document.getElementById("holidayDate").disabled = false;
+  document.getElementById("holidayName").value = "";
+  document.getElementById("holidayType").value = "Public";
+  document.getElementById("deleteBtn").style.display = "none";
+  document.getElementById("holidayModal").classList.remove("hidden");
+  document.getElementById("holidayModal").classList.add("flex");
+}
+
+function openForDate(dateStr) {
+  const todayStr = formatDate(new Date());
+  if (dateStr < todayStr) {
+    showToast("Cannot add holiday for past date", "error");
+    return;
+  }
+  fetch("getHolidayByDate?date=" + dateStr)
     .then(r => r.json())
     .then(data => {
-
-        document.getElementById("holidayModal").style.display = "block";
-
-        if(data.exists){
-            editMode = true;
-            document.getElementById("modalDate").innerText =
-                "Edit Holiday for " + selectedDate;
-            document.getElementById("holidayNameInput").value = data.name;
-            document.getElementById("deleteBtn").style.display = "inline-block";
-        } else {
-            editMode = false;
-            document.getElementById("modalDate").innerText =
-                "Add Holiday for " + selectedDate;
-            document.getElementById("holidayNameInput").value = "";
-            document.getElementById("deleteBtn").style.display = "none";
-        }
+      editMode = data.exists;
+      selectedDate = dateStr;
+      document.getElementById("modalTitle").textContent = editMode ? "Edit Holiday" : "Add New Holiday";
+      document.getElementById("holidayDate").value = dateStr;
+      document.getElementById("holidayDate").disabled = editMode;
+      document.getElementById("holidayName").value = data.name || "";
+      document.getElementById("holidayType").value = "Public";
+      document.getElementById("deleteBtn").style.display = editMode ? "block" : "none";
+      document.getElementById("holidayModal").classList.remove("hidden");
+      document.getElementById("holidayModal").classList.add("flex");
     });
-});
-
-
-/* ===== CLOSE MODAL ===== */
-function closeModal(){
-    document.getElementById("holidayModal").style.display = "none";
 }
 
-/* ===== SHOW TOAST ===== */
-function showToast(message, type = "success") {
-    const toast = document.getElementById("toast");
-
-    // full reset
-    toast.style.display = "none";
-    toast.className = "toast";
-    toast.offsetHeight; // force reflow
-
-    toast.classList.add(type);
-    toast.textContent = message;
-    toast.style.display = "block";
-
-    setTimeout(() => {
-        toast.classList.add("hide");
-
-        setTimeout(() => {
-            toast.style.display = "none";
-            toast.className = "toast";
-        }, 400);
-    }, 2500);
+function closeModal() {
+  document.getElementById("holidayModal").classList.add("hidden");
+  document.getElementById("holidayModal").classList.remove("flex");
 }
 
-/* ===== SAVE HOLIDAY ===== */
-function saveHoliday(){
-
-    let holidayName = document.getElementById("holidayNameInput").value.trim();
-    if(holidayName === ""){
-        showToast("Enter holiday name", "error");
-        return;
-    }
-
-    let url = editMode ? "updateHoliday" : "addHoliday";
-
-    fetch(url,{
-        method:"POST",
-        headers:{ "Content-Type":"application/x-www-form-urlencoded" },
-        body:"date=" + encodeURIComponent(selectedDate) +
-             "&name=" + encodeURIComponent(holidayName)
-    })
+function saveHoliday(ev) {
+  ev.preventDefault();
+  const date = document.getElementById("holidayDate").value;
+  const name = document.getElementById("holidayName").value.trim();
+  if (!name) { showToast("Enter holiday name", "error"); return; }
+  const todayStr = formatDate(new Date());
+  if (date < todayStr) { showToast("Cannot add holiday for past date", "error"); return; }
+  const url = editMode ? "updateHoliday" : "addHoliday";
+  const body = editMode
+    ? "date=" + encodeURIComponent(selectedDate) + "&name=" + encodeURIComponent(name)
+    : "date=" + encodeURIComponent(date) + "&name=" + encodeURIComponent(name);
+  fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body
+  })
     .then(r => r.text())
     .then(msg => {
-        showToast(msg);
-        closeModal();
-        loadCalendar();
+      showToast(msg || "Saved");
+      closeModal();
+      loadCalendar();
+      loadUpcoming();
     })
-    .catch(() => showToast("Operation failed","error"));
-}	
-
-/* delete existing holiday */
-function deleteHoliday(){
-
-    fetch("deleteHoliday?date=" + encodeURIComponent(selectedDate), {
-        method: "GET"
-    })
-    .then(response => response.text())
-    .then(msg => {
-        showToast(msg || "Holiday deleted");
-        closeModal();
-        loadCalendar();
-    })
-    .catch(() => showToast("Delete failed","error"));
+    .catch(() => showToast("Operation failed", "error"));
 }
 
+function deleteHoliday() {
+  if (!confirm("Delete this holiday?")) return;
+  fetch("deleteHoliday?date=" + encodeURIComponent(selectedDate))
+    .then(r => r.text())
+    .then(msg => {
+      showToast(msg || "Deleted");
+      closeModal();
+      loadCalendar();
+      loadUpcoming();
+    })
+    .catch(() => showToast("Delete failed", "error"));
+}
 
+function loadUpcoming() {
+  fetch("getHolidays?t=" + Date.now())
+    .then(r => r.json())
+    .then(holidays => {
+      const todayStr = formatDate(new Date());
+      const upcoming = holidays.filter(h => h.date >= todayStr).slice(0, 8);
+      const container = document.getElementById("upcomingList");
+      if (upcoming.length === 0) {
+        container.innerHTML = "<p class=\"text-slate-500 text-sm\">No upcoming holidays</p>";
+        return;
+      }
+      container.innerHTML = upcoming.map(h => {
+        const d = new Date(h.date);
+        const mon = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][d.getMonth()];
+        const day = d.getDate();
+        return "<div class=\"flex gap-3 items-start p-3 rounded-lg bg-slate-50 border border-slate-100\"><div class=\"shrink-0 w-12 h-12 rounded-lg bg-emerald-100 text-emerald-700 flex flex-col items-center justify-center text-xs font-bold\"><span>" + mon + "</span><span>" + day + "</span></div><div><div class=\"font-medium text-slate-800\">" + (h.name || "Holiday") + "</div><div class=\"text-xs text-slate-500\">Public Holiday</div></div></div>";
+      }).join("");
+    })
+    .catch(() => { document.getElementById("upcomingList").innerHTML = "<p class=\"text-slate-500 text-sm\">Unable to load</p>"; });
+}
 
-/* ===== LOAD ON START ===== */
-window.onload = loadCalendar;
+function showToast(msg, type) {
+  const t = document.getElementById("toast");
+  t.className = "toast " + (type || "success");
+  t.textContent = msg;
+  t.style.display = "block";
+  setTimeout(() => { t.style.display = "none"; }, 2500);
+}
 
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.onkeydown = e =>
-  e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))
-    ? false
-    : true;
+window.onload = function() {
+  loadCalendar();
+  loadUpcoming();
+  setInterval(function() {
+    fetch("getHolidays?t=" + Date.now())
+      .then(r => r.json())
+      .then(holidays => {
+        const next = {};
+        holidays.forEach(h => { next[h.date] = { name: h.name }; });
+        const changed = JSON.stringify(next) !== JSON.stringify(holidayMap);
+        if (changed) {
+          holidayMap = next;
+          renderCalendar();
+          loadUpcoming();
+        }
+      });
+  }, 60000);
+};
+
+document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
 </body>
 </html>

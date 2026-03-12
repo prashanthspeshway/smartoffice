@@ -1,8 +1,12 @@
 package com.smartoffice.filter;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -11,9 +15,12 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.smartoffice.utils.DBConnectionUtil;
 
 /**
  * Ensures only one active session per browser. Validates session token and enforces role-based access.
@@ -45,8 +52,10 @@ public class SessionAuthFilter implements Filter {
         return p.contains("admin") || p.contains("adminoverview") || p.contains("adduser")
             || p.contains("viewuser") || p.contains("/teams") || p.contains("deleteuser")
             || p.contains("edituser") || p.contains("bulkupload") || p.contains("exportusers")
-            || p.contains("addholiday") || p.contains("getholidays") || p.contains("deleteholiday")
+            || p.contains("addholiday") || p.contains("deleteholiday")
             || p.contains("updateholiday") || p.contains("getholidaybydate")
+            || p.contains("leave-approval") || p.contains("adminleave") || p.contains("admintasks")
+            || p.contains("managedesignations")
             || p.contains("addnotification") || p.contains("enableanddisable")
             || p.contains("adminsettings") || p.contains("sendnotification")
             || p.contains("employeeoverview") || p.contains("usercheck");
@@ -56,7 +65,7 @@ public class SessionAuthFilter implements Filter {
         if (path == null) return false;
         String p = path.toLowerCase();
         return (p.contains("/manager") && !p.contains("manager_")) || p.contains("assigntask")
-            || p.contains("leave-approval") || p.contains("schedulemeeting")
+            || p.contains("schedulemeeting")
             || p.contains("todaymeetings") || p.contains("allmeetings")
             || p.contains("viewmeetings") || p.contains("exportteamperformance")
             || p.contains("exportteamattendance") || p.contains("viewassignedtasks")
@@ -66,7 +75,7 @@ public class SessionAuthFilter implements Filter {
     private static boolean isUserPath(String path) {
         if (path == null) return false;
         String p = path.toLowerCase();
-        return p.equals("/user") || p.startsWith("/user?") || p.contains("applyleave");
+        return p.equals("/user") || p.startsWith("/user?");
     }
 
     private static String getRedirectForRole(String role) {
@@ -75,7 +84,8 @@ public class SessionAuthFilter implements Filter {
             case "admin": return "/admin.jsp";
             case "manager": return "/manager";
             case "user":
-            case "employee": return "/user";
+            case "employee":
+            case "security": return "/user";
             default: return "/index.html";
         }
     }
@@ -112,12 +122,36 @@ public class SessionAuthFilter implements Filter {
 
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
-            redirectTopWindow(request, response, "/index.html?error=sessionExpired");
-            return;
+            // Try remember-me cookie to restore session (e.g. after server restart)
+            String email = restoreSessionFromRememberToken(request, response);
+            if (email != null) {
+                session = request.getSession(true);
+                session.setAttribute("username", email);
+                session.setAttribute("email", email);
+                session.setAttribute("sessionToken", UUID.randomUUID().toString());
+                try (Connection con = DBConnectionUtil.getConnection();
+                     PreparedStatement ps = con.prepareStatement("SELECT firstname, lastname, role FROM users WHERE email=?")) {
+                    ps.setString(1, email);
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()) {
+                        String first = rs.getString("firstname");
+                        String last = rs.getString("lastname");
+                        String fullName = ((first != null ? first.trim() : "") + " " + (last != null ? last.trim() : "")).trim();
+                        if (fullName.isEmpty()) fullName = email;
+                        session.setAttribute("fullName", fullName);
+                        session.setAttribute("role", rs.getString("role"));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                redirectTopWindow(request, response, "/index.html?error=sessionExpired");
+                return;
+            }
         }
 
         // Validate session token - sessions without token are legacy/invalid
-        if (session.getAttribute("sessionToken") == null) {
+        if (session != null && session.getAttribute("sessionToken") == null) {
             session.invalidate();
             redirectTopWindow(request, response, "/index.html?error=sessionExpired");
             return;
@@ -135,12 +169,37 @@ public class SessionAuthFilter implements Filter {
             redirectTopWindow(request, response, getRedirectForRole(role) + "?error=accessDenied");
             return;
         }
-        if (isUserPath(path) && !"user".equalsIgnoreCase(role) && !"employee".equalsIgnoreCase(role)) {
+        if (isUserPath(path) && !"user".equalsIgnoreCase(role) && !"employee".equalsIgnoreCase(role) && !"security".equalsIgnoreCase(role)) {
             redirectTopWindow(request, response, getRedirectForRole(role) + "?error=accessDenied");
             return;
         }
 
         chain.doFilter(req, res);
+    }
+
+    /** Check remember_token cookie and restore session if valid. Returns email or null. */
+    private String restoreSessionFromRememberToken(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) return null;
+        String token = null;
+        for (Cookie c : cookies) {
+            if ("remember_token".equals(c.getName())) {
+                token = c.getValue();
+                break;
+            }
+        }
+        if (token == null || token.isEmpty()) return null;
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement("SELECT email FROM remember_tokens WHERE token=? AND expires_at > NOW()")) {
+            ps.setString(1, token);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("email");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

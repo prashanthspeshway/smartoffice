@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -27,6 +28,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.smartoffice.utils.DBConnectionUtil;
 import com.smartoffice.utils.PasswordUtil;
+import com.smartoffice.utils.UserFieldUtil;
 
 @SuppressWarnings("serial")
 @WebServlet("/bulkUploadEmployees")
@@ -36,6 +38,28 @@ public class BulkUploadEmployees extends HttpServlet {
 	private boolean isValidPassword(String password) {
 		String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$";
 		return password != null && password.matches(regex);
+	}
+
+	/** Extracts a user-friendly error message from DB constraint violations. */
+	private String extractConstraintError(Throwable t) {
+		Throwable cause = t;
+		while (cause != null) {
+			String msg = cause.getMessage();
+			if (msg != null) {
+				if (msg.contains("Duplicate entry") && msg.contains("for key")) {
+					// e.g. "Duplicate entry '9890011225' for key 'users.phone_UNIQUE'"
+					String field = "value";
+					if (msg.contains("phone") || msg.contains("phone_UNIQUE")) field = "phone number";
+					else if (msg.contains("email")) field = "email";
+					return "Bulk upload rejected: " + msg + " No employees were added. Please fix the duplicate " + field + " in your file and try again.";
+				}
+				if (msg.contains("foreign key") || msg.contains("FOREIGN KEY")) {
+					return "Bulk upload failed: " + msg + " No employees were added.";
+				}
+			}
+			cause = cause.getCause();
+		}
+		return "Bulk upload failed. No employees were added. " + (t.getMessage() != null ? t.getMessage() : "Please check your file format and data.");
 	}
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -50,6 +74,7 @@ public class BulkUploadEmployees extends HttpServlet {
 			InputStream inputStream = filePart.getInputStream();
 
 			con = DBConnectionUtil.getConnection();
+			con.setAutoCommit(false);
 
 			String sql = "INSERT INTO users "
 					+ "(username,password,role,status,email,firstname,lastname,joinedDate,phone) "
@@ -127,8 +152,8 @@ public class BulkUploadEmployees extends HttpServlet {
 							username = (firstname + " " + lastname).trim();
 							if (username.isEmpty()) username = email;
 						}
-						if (status == null || status.trim().isEmpty()) status = "active";
-						if (role == null || role.trim().isEmpty()) role = "user";
+						status = UserFieldUtil.normalizeStatus(status);
+						role = UserFieldUtil.normalizeRole(role);
 
 						String hashedPassword = PasswordUtil.hashPassword(password);
 						ps.setString(1, username);
@@ -146,7 +171,8 @@ public class BulkUploadEmployees extends HttpServlet {
 					}
 
 					if (insertedCount > 0) {
-					    ps.executeBatch();
+						ps.executeBatch();
+						con.commit();
 					}
 				}
 			}
@@ -171,8 +197,8 @@ public class BulkUploadEmployees extends HttpServlet {
 
 					String username = data.length > 0 ? data[0].trim() : "";
 					String password = data.length > 1 ? data[1].trim() : "";
-					String status = data.length > 2 ? data[2].trim() : "active";
-					String role = data.length > 3 ? data[3].trim() : "user";
+					String status = UserFieldUtil.normalizeStatus(data.length > 2 ? data[2].trim() : "");
+					String role = UserFieldUtil.normalizeRole(data.length > 3 ? data[3].trim() : "");
 					String firstname = data.length > 4 ? data[4].trim() : "";
 					String lastname = data.length > 5 ? data[5].trim() : "";
 					String email = data.length > 6 ? data[6].trim() : "";
@@ -226,6 +252,7 @@ public class BulkUploadEmployees extends HttpServlet {
 
 				if (insertedCount > 0) {
 					ps.executeBatch();
+					con.commit();
 				}
 			}
 
@@ -234,21 +261,24 @@ public class BulkUploadEmployees extends HttpServlet {
 			} else {
 			    req.getSession().setAttribute("errorMsg", "No employees were uploaded. Please check password format.");
 			}
-			res.sendRedirect("addUser");
+			String redirect = req.getParameter("redirect");
+			res.sendRedirect("viewUser".equals(redirect) ? "viewUser" : "addUser");
 
 		} catch (Exception e) {
-
 			e.printStackTrace();
-			req.getSession().setAttribute("errorMsg", "Bulk upload failed!");
-			res.sendRedirect("addUser");
+			try {
+				if (con != null) con.rollback();
+			} catch (SQLException ex) { ex.printStackTrace(); }
+			String errMsg = extractConstraintError(e);
+			req.getSession().setAttribute("errorMsg", errMsg);
+			String redirect = req.getParameter("redirect");
+			res.sendRedirect("viewUser".equals(redirect) ? "viewUser" : "addUser");
 
 		} finally {
-
 			try {
-				if (ps != null)
-					ps.close();
-				if (con != null)
-					con.close();
+				if (con != null) con.setAutoCommit(true);
+				if (ps != null) ps.close();
+				if (con != null) con.close();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
