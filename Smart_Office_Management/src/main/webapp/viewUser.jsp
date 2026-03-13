@@ -27,7 +27,8 @@ if (designationOptions == null) designationOptions = java.util.Collections.empty
 <style>
 body { font-family: 'Inter', system-ui, sans-serif; }
 .search-input-wrap { position: relative; display: inline-block; }
-.search-input-wrap input { padding-right: 32px; }
+.search-input-wrap input { padding-right: 32px; padding-left: 40px; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; font-size: 14px; }
 .search-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #64748b; cursor: pointer; padding: 4px; display: none; }
 .search-clear:hover { color: #4f46e5; }
 .search-input-wrap.has-text .search-clear { display: block; }
@@ -82,14 +83,31 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 
 	<!-- Search, Filters, View Toggle -->
 	<div class="flex flex-wrap items-center gap-3 mb-4">
-		<form method="get" action="viewUser" id="viewUserForm" class="flex flex-wrap items-center gap-3 flex-1 min-w-0">
+		<form method="get" action="viewUser" id="viewUserForm" class="flex flex-wrap items-center gap-3 flex-1 min-w-0" role="search">
 			<div class="search-input-wrap flex-1 min-w-[200px]">
-				<input type="text" name="search" id="searchInput" placeholder="Search by name, email, or role..." value="<%= search != null ? search.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\"","&quot;") : "" %>" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-				<button type="button" class="search-clear" id="searchClear" title="Clear" aria-label="Clear"><i class="fa-solid fa-xmark"></i></button>
+				<i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+
+				<input
+					type="text"
+					name="search"
+					id="searchInput"
+					placeholder="Search by name, email, or role..."
+					value="<%= search != null ? search.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\"","&quot;") : "" %>"
+					class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+				>
+
+				<button type="button" class="search-clear" id="searchClear" title="Clear" aria-label="Clear">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
 			</div>
+
+			<!-- ensures Enter key always submits in all browsers -->
+			<button type="submit" class="hidden" aria-hidden="true" tabindex="-1">Search</button>
+
 			<button type="button" onclick="toggleFilters()" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium">
 				<i class="fa-solid fa-filter"></i> Filters
 			</button>
+
 			<div id="filtersPanel" class="flex flex-wrap items-center gap-3 w-full mt-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
 				<select name="role" onchange="this.form.submit()" class="px-3 py-2 border border-slate-300 rounded-lg text-sm">
 					<option value="">All Roles</option>
@@ -110,15 +128,15 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 					<option value="active" <%= "active".equals(statusFilter) ? "selected" : "" %>>Active</option>
 					<option value="inactive" <%= "inactive".equals(statusFilter) ? "selected" : "" %>>Inactive</option>
 				</select>
-				<input type="date" name="dateFrom" value="<%= dateFrom != null ? dateFrom : "" %>" class="px-3 py-2 border border-slate-300 rounded-lg text-sm">
-				<span class="text-slate-500 text-sm">to</span>
-				<input type="date" name="dateTo" value="<%= dateTo != null ? dateTo : "" %>" class="px-3 py-2 border border-slate-300 rounded-lg text-sm">
+
 				<input type="hidden" name="sort" value="<%= request.getAttribute("sortBy") != null ? request.getAttribute("sortBy") : "fullname" %>">
 				<input type="hidden" name="order" value="<%= request.getAttribute("sortOrder") != null ? request.getAttribute("sortOrder") : "asc" %>">
+
 				<button type="submit" class="px-3 py-2 bg-indigo-500 text-white rounded-lg text-sm font-medium">Apply</button>
 				<a href="viewUser" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-medium"><i class="fa-solid fa-filter-circle-xmark mr-1"></i> Clear</a>
 			</div>
 		</form>
+
 		<div class="flex items-center border border-slate-300 rounded-lg overflow-hidden bg-white">
 			<button type="button" id="viewGrid" onclick="setView('grid')" class="px-3 py-2 text-slate-500 hover:bg-slate-100">
 				<i class="fa-solid fa-grip"></i>
@@ -129,7 +147,7 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 		</div>
 	</div>
 
-	<!-- List View (Table) - Full Name, Role, Status, First Name, Last Name, Email, Joined Date, Actions -->
+	<!-- List View (Table) -->
 	<div id="listView" class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
 		<table class="w-full">
 			<thead>
@@ -225,36 +243,141 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 
 <script>
 var deleteUserId = null;
+
 function openDeleteModal(id) { deleteUserId = id; document.getElementById('deleteModal').classList.add('show'); }
 function closeDeleteModal() { deleteUserId = null; document.getElementById('deleteModal').classList.remove('show'); }
 function confirmDelete() { if (deleteUserId) window.location.href = 'deleteUser?id=' + deleteUserId; }
-function loadAddEmployee() { try { window.parent.document.getElementById('contentFrame').src = 'addUser'; } catch(e) { window.location.href = 'addUser'; } }
+
+function loadAddEmployee() {
+	try { window.parent.document.getElementById('contentFrame').src = 'addUser'; }
+	catch(e) { window.location.href = 'addUser'; }
+}
+
 function openImportModal() { document.getElementById('importModal').classList.add('show'); }
 function closeImportModal() { document.getElementById('importModal').classList.remove('show'); }
-function toggleFilters() { document.getElementById('filtersPanel').classList.toggle('show'); }
-function setView(v) {
-	var list = document.getElementById('listView'); var grid = document.getElementById('gridView');
-	var btnList = document.getElementById('viewList'); var btnGrid = document.getElementById('viewGrid');
-	if (v === 'list') { list.classList.remove('hidden'); grid.classList.add('hidden'); btnList.classList.add('bg-slate-100','text-slate-700'); btnGrid.classList.remove('bg-slate-100','text-slate-700'); btnGrid.classList.add('text-slate-500'); }
-	else { list.classList.add('hidden'); grid.classList.remove('hidden'); btnGrid.classList.add('bg-slate-100','text-slate-700'); btnList.classList.remove('bg-slate-100','text-slate-700'); btnList.classList.add('text-slate-500'); }
+
+function toggleFilters() {
+	var panel = document.getElementById('filtersPanel');
+	if (panel) panel.classList.toggle('show');
 }
+
+function setView(v) {
+	var list = document.getElementById('listView');
+	var grid = document.getElementById('gridView');
+	var btnList = document.getElementById('viewList');
+	var btnGrid = document.getElementById('viewGrid');
+
+	if (!list || !grid || !btnList || !btnGrid) return;
+
+	if (v === 'grid') {
+		list.classList.add('hidden');
+		grid.classList.remove('hidden');
+
+		btnGrid.classList.add('bg-slate-100','text-slate-700');
+		btnGrid.classList.remove('text-slate-500');
+
+		btnList.classList.remove('bg-slate-100','text-slate-700');
+		btnList.classList.add('text-slate-500');
+	} else {
+		list.classList.remove('hidden');
+		grid.classList.add('hidden');
+
+		btnList.classList.add('bg-slate-100','text-slate-700');
+		btnList.classList.remove('text-slate-500');
+
+		btnGrid.classList.remove('bg-slate-100','text-slate-700');
+		btnGrid.classList.add('text-slate-500');
+	}
+
+	try { localStorage.setItem('employees_view_mode', v); } catch(e) {}
+}
+
 function showToast(message, type) {
-	var t = document.getElementById('toast'); t.className = 'toast ' + (type || 'success'); t.textContent = message; t.style.display = 'block';
+	var t = document.getElementById('toast');
+	if (!t) return;
+	t.className = 'toast ' + (type || 'success');
+	t.textContent = message;
+	t.style.display = 'block';
 	setTimeout(function(){ t.style.display = 'none'; }, 2500);
 }
+
 document.addEventListener('DOMContentLoaded', function() {
+	// Toast messages
 	var params = new URLSearchParams(window.location.search);
 	if (params.get('msg') === 'deleted') showToast('Employee deleted successfully', 'success');
 	else if (params.get('msg') === 'error') showToast('Failed to delete employee', 'error');
 	else if (params.get('msg') === 'updated') showToast('Employee updated successfully', 'success');
 	<% if (successMsg != null && !successMsg.isEmpty()) { %>showToast('<%= successMsg.replace("'","\\'").replace("\n"," ") %>', 'success');<% } %>
 	<% if (errorMsg != null && !errorMsg.isEmpty()) { %>showToast('<%= errorMsg.replace("'","\\'").replace("\n"," ") %>', 'error');<% } %>
-	var wrap = document.querySelector('.search-input-wrap'), input = document.getElementById('searchInput'), clearBtn = document.getElementById('searchClear');
-	if (wrap && input && clearBtn) {
-		function toggleClear() { wrap.classList.toggle('has-text', input.value.trim().length > 0); }
+
+	// Persist view mode
+	try {
+		var savedView = localStorage.getItem('employees_view_mode');
+		if (savedView === 'grid' || savedView === 'list') setView(savedView);
+	} catch(e) {}
+
+	// Auto-open filters if any filter is active (optional UX)
+	(function autoOpenFiltersIfActive(){
+		var panel = document.getElementById('filtersPanel');
+		if (!panel) return;
+		var hasAny = !!(params.get('role') || params.get('status') || params.get('designation') || params.get('dateFrom') || params.get('dateTo'));
+		if (hasAny) panel.classList.add('show');
+	})();
+
+	// Search behaviors: Enter submit + debounced submit while typing (fast + clean)
+	var form = document.getElementById('viewUserForm');
+	var wrap = document.querySelector('.search-input-wrap');
+	var input = document.getElementById('searchInput');
+	var clearBtn = document.getElementById('searchClear');
+
+	if (form && wrap && input && clearBtn) {
+		var debounceTimer = null;
+		var DEBOUNCE_MS = 450;
+
+		function toggleClear() {
+			wrap.classList.toggle('has-text', input.value.trim().length > 0);
+		}
+
+		function submitDebounced() {
+			clearTimeout(debounceTimer);
+			debounceTimer = setTimeout(function(){
+				form.submit();
+			}, DEBOUNCE_MS);
+		}
+
 		toggleClear();
-		input.addEventListener('input', toggleClear);
-		clearBtn.addEventListener('click', function() { input.value = ''; wrap.classList.remove('has-text'); document.getElementById('viewUserForm').submit(); });
+
+		input.addEventListener('input', function() {
+			toggleClear();
+
+			var v = input.value.trim();
+
+			// Submit automatically only when empty (clear) or 2+ chars (avoid too many requests)
+			if (v.length === 0 || v.length >= 2) {
+				submitDebounced();
+			} else {
+				clearTimeout(debounceTimer);
+			}
+		});
+
+		input.addEventListener('keydown', function(e) {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				clearTimeout(debounceTimer);
+				form.submit();
+			}
+		});
+
+		clearBtn.addEventListener('click', function() {
+			clearTimeout(debounceTimer);
+			input.value = '';
+			toggleClear();
+			form.submit();
+		});
+
+		form.addEventListener('submit', function() {
+			input.value = input.value.trim();
+		});
 	}
 });
 </script>

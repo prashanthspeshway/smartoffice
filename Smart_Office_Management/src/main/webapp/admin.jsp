@@ -11,7 +11,7 @@ if (username == null) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard • Smart Office HRMS</title>
+<title>AdminDashboard • Smart Office HRMS</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 
 	<!-- Top Bar -->
 	<header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
-		<h1 class="text-xl font-semibold text-slate-800">Smart Office • Admin Dashboard</h1>
+		<h1 class="text-xl font-semibold text-slate-800">Smart Office • AdminDashboard</h1>
 		<div class="flex items-center gap-4">
 			<button onclick="loadPage(this,'sendNotification.jsp')" class="w-10 h-10 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white flex items-center justify-center transition-colors">
 				<i class="fa-solid fa-bell"></i>
