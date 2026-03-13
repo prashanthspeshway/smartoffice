@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.smartoffice.model.AdminAttendanceRow;
+import com.smartoffice.model.AttendanceLogEntry;
 import com.smartoffice.model.TeamAttendance;
 import com.smartoffice.utils.DBConnectionUtil;
 
@@ -230,6 +232,84 @@ public class AttendanceDAO {
 				ta.setPunchIn(rs.getTimestamp("punch_in"));
 				ta.setPunchOut(rs.getTimestamp("punch_out"));
 				list.add(ta);
+			}
+		}
+		return list;
+	}
+
+	/** All non-admin users with today's attendance for admin dashboard. Does not set break duration or live status. */
+	public List<AdminAttendanceRow> getAllAttendanceForToday() throws Exception {
+		List<AdminAttendanceRow> list = new ArrayList<>();
+		String aCol = getAttendanceUserColumn();
+		String userCol = "username".equals(aCol) ? "username" : "email";
+		String sql = "SELECT u.email, TRIM(CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,''))) AS fullname, " +
+			"COALESCE(u.designation,'') AS designation, a.punch_in, a.punch_out " +
+			"FROM users u " +
+			"LEFT JOIN attendance a ON a.punch_date = CURDATE() AND a." + aCol + " = u." + userCol + " " +
+			"WHERE LOWER(TRIM(COALESCE(u.role,''))) != 'admin' " +
+			"ORDER BY fullname";
+		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				AdminAttendanceRow row = new AdminAttendanceRow();
+				row.setEmail(rs.getString("email"));
+				row.setFullName(rs.getString("fullname"));
+				try {
+					row.setDesignation(rs.getString("designation"));
+				} catch (Exception e) { /* designation column may not exist */ }
+				row.setPunchIn(rs.getTimestamp("punch_in"));
+				row.setPunchOut(rs.getTimestamp("punch_out"));
+				row.setBreakDurationFormatted("--");
+				row.setLiveStatus(row.getPunchIn() == null ? "ABSENT" : (row.getPunchOut() == null ? "PUNCHED IN" : "PUNCHED OUT"));
+				list.add(row);
+			}
+		} catch (Exception e) {
+			if (e.getMessage() != null && e.getMessage().contains("designation")) {
+				list.clear();
+				String sqlNoDesig = "SELECT u.email, TRIM(CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,''))) AS fullname, " +
+					"a.punch_in, a.punch_out " +
+					"FROM users u " +
+					"LEFT JOIN attendance a ON a.punch_date = CURDATE() AND a." + aCol + " = u." + userCol + " " +
+					"WHERE LOWER(TRIM(COALESCE(u.role,''))) != 'admin' " +
+					"ORDER BY fullname";
+				try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sqlNoDesig)) {
+					ResultSet rs = ps.executeQuery();
+					while (rs.next()) {
+						AdminAttendanceRow row = new AdminAttendanceRow();
+						row.setEmail(rs.getString("email"));
+						row.setFullName(rs.getString("fullname"));
+						row.setDesignation("");
+						row.setPunchIn(rs.getTimestamp("punch_in"));
+						row.setPunchOut(rs.getTimestamp("punch_out"));
+						row.setBreakDurationFormatted("--");
+						row.setLiveStatus(row.getPunchIn() == null ? "ABSENT" : (row.getPunchOut() == null ? "PUNCHED IN" : "PUNCHED OUT"));
+						list.add(row);
+					}
+				}
+			} else {
+				throw e;
+			}
+		}
+		return list;
+	}
+
+	/** Recent attendance rows for activity log (sessionValue = email). */
+	public List<AttendanceLogEntry> getRecentAttendance(String sessionValue, int limit) throws Exception {
+		String id = resolveForAttendance(sessionValue);
+		String col = getAttendanceUserColumn();
+		String sql = "SELECT punch_date, punch_in, punch_out FROM attendance WHERE " + col + "=? ORDER BY punch_date DESC LIMIT ?";
+		List<AttendanceLogEntry> list = new ArrayList<>();
+		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setString(1, id);
+			ps.setInt(2, limit <= 0 ? 14 : limit);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				AttendanceLogEntry e = new AttendanceLogEntry();
+				e.setAttendanceDate(rs.getDate("punch_date"));
+				e.setPunchIn(rs.getTimestamp("punch_in"));
+				e.setPunchOut(rs.getTimestamp("punch_out"));
+				e.setStatus(e.getPunchIn() != null && e.getPunchOut() != null ? "Present" : (e.getPunchIn() != null ? "Punched In" : "Absent"));
+				list.add(e);
 			}
 		}
 		return list;

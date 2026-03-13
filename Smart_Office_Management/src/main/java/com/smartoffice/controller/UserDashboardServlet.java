@@ -21,6 +21,7 @@ import com.smartoffice.dao.NotificationReadsDAO;
 import com.smartoffice.dao.TaskDAO;
 import com.smartoffice.dao.TeamDAO;
 import com.smartoffice.dao.UserDao;
+import com.smartoffice.model.AttendanceLogEntry;
 import com.smartoffice.model.LeaveRequest;
 import com.smartoffice.model.Meeting;
 import com.smartoffice.model.Notification;
@@ -60,6 +61,14 @@ public class UserDashboardServlet extends HttpServlet {
 			/* ================= BREAK TIME ================= */
 			request.setAttribute("breakTotalSeconds", BreakDAO.getTodayTotalSeconds(username));
 			request.setAttribute("breakLogs", BreakDAO.getTodayBreaks(username));
+			request.setAttribute("onBreak", BreakDAO.isCurrentlyOnBreak(username));
+
+			/* ================= RECENT ACTIVITY LOG ================= */
+			List<AttendanceLogEntry> activityLog = attendanceDAO.getRecentAttendance(username, 30);
+			for (AttendanceLogEntry e : activityLog) {
+				e.setBreakSeconds(BreakDAO.getTotalSecondsForDate(username, e.getAttendanceDate()));
+			}
+			request.setAttribute("attendanceLog", activityLog);
 
 			/* ================= TASKS ================= */
 			TaskDAO.deleteOldCompletedTasks();

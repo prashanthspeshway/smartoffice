@@ -1,4 +1,5 @@
 com\smartoffice\dao\TaskDAO.class
+com\smartoffice\model\AttendanceLogEntry.class
 com\smartoffice\controller\ManageDesignationsServlet.class
 com\smartoffice\controller\TeamsServlet.class
 com\smartoffice\controller\EnableAndDisableUser.class
@@ -37,6 +38,7 @@ com\smartoffice\controller\ManagerDashboardServlet.class
 com\smartoffice\controller\LoginServlet.class
 com\smartoffice\model\Team.class
 com\smartoffice\utils\DBConnectionUtil.class
+com\smartoffice\controller\AdminAttendanceServlet.class
 com\smartoffice\model\Notification.class
 com\smartoffice\controller\DeleteHolidayServlet.class
 com\smartoffice\model\User.class
@@ -53,6 +55,7 @@ com\smartoffice\controller\ViewAssignedTasksServlet.class
 com\smartoffice\model\LeaveRequest.class
 com\smartoffice\controller\AddNotificationServlet.class
 com\smartoffice\controller\SelfProfileServlet.class
+com\smartoffice\model\AdminAttendanceRow.class
 com\smartoffice\controller\BreakServlet.class
 com\smartoffice\controller\TodayMeetingsServlet.class
 com\smartoffice\controller\BulkUploadEmployees.class

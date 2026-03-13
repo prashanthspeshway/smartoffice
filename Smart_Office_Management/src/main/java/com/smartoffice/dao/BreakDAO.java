@@ -1,6 +1,7 @@
 package com.smartoffice.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -154,6 +155,57 @@ public class BreakDAO {
 						"FROM break_logs WHERE username = ? AND break_date = CURDATE()";
 				try (PreparedStatement ps = con.prepareStatement(sql)) {
 					ps.setString(1, username);
+					try (ResultSet rs = ps.executeQuery()) {
+						return rs.next() ? rs.getInt(1) : 0;
+					}
+				}
+			}
+		}
+	}
+
+	/** True if user has an open break today (started but not ended). */
+	public static boolean isCurrentlyOnBreak(String emailOrUsername) throws Exception {
+		try (Connection con = DBConnectionUtil.getConnection()) {
+			String sql = "SELECT 1 FROM break_logs WHERE email = ? AND break_date = CURDATE() AND end_time IS NULL LIMIT 1";
+			try (PreparedStatement ps = con.prepareStatement(sql)) {
+				ps.setString(1, emailOrUsername);
+				try (ResultSet rs = ps.executeQuery()) {
+					return rs.next();
+				}
+			}
+		} catch (SQLSyntaxErrorException ex) {
+			try (Connection con = DBConnectionUtil.getConnection()) {
+				String username = resolveDbUsername(con, emailOrUsername);
+				String sql = "SELECT 1 FROM break_logs WHERE username = ? AND break_date = CURDATE() AND end_time IS NULL LIMIT 1";
+				try (PreparedStatement ps = con.prepareStatement(sql)) {
+					ps.setString(1, username);
+					try (ResultSet rs = ps.executeQuery()) {
+						return rs.next();
+					}
+				}
+			}
+		}
+	}
+
+	/** Total break seconds for a given date (for activity log). */
+	public static int getTotalSecondsForDate(String emailOrUsername, Date date) throws Exception {
+		if (date == null) return 0;
+		try (Connection con = DBConnectionUtil.getConnection()) {
+			String sql = "SELECT COALESCE(SUM(duration_seconds),0) FROM break_logs WHERE email = ? AND break_date = ?";
+			try (PreparedStatement ps = con.prepareStatement(sql)) {
+				ps.setString(1, emailOrUsername);
+				ps.setDate(2, date);
+				try (ResultSet rs = ps.executeQuery()) {
+					return rs.next() ? rs.getInt(1) : 0;
+				}
+			}
+		} catch (SQLSyntaxErrorException ex) {
+			try (Connection con = DBConnectionUtil.getConnection()) {
+				String username = resolveDbUsername(con, emailOrUsername);
+				String sql = "SELECT COALESCE(SUM(duration_seconds),0) FROM break_logs WHERE username = ? AND break_date = ?";
+				try (PreparedStatement ps = con.prepareStatement(sql)) {
+					ps.setString(1, username);
+					ps.setDate(2, date);
 					try (ResultSet rs = ps.executeQuery()) {
 						return rs.next() ? rs.getInt(1) : 0;
 					}

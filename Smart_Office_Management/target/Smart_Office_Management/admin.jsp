@@ -45,6 +45,10 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 					<i class="fa-solid fa-users w-5"></i>
 					<span>Employees</span>
 				</button>
+				<button onclick="loadPage(this,'adminAttendance')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
+					<i class="fa-solid fa-user-check w-5"></i>
+					<span>Attendance</span>
+				</button>
 				<button onclick="loadPage(this,'adminTasks')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
 					<i class="fa-solid fa-list-check w-5"></i>
 					<span>Tasks</span>
@@ -76,7 +80,7 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 
 		<!-- Content Area -->
 		<main class="flex-1 overflow-auto bg-slate-100">
-			<iframe id="contentFrame" src="viewUser" class="w-full h-full border-0"></iframe>
+			<iframe id="contentFrame" src="adminOverview" class="w-full h-full border-0"></iframe>
 		</main>
 	</div>
 
@@ -91,9 +95,9 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 	}
 	document.addEventListener('DOMContentLoaded', function() {
 		var btns = document.querySelectorAll('.sidebar-btn');
-		var employeesBtn = Array.from(btns).find(function(b) { return b.textContent.indexOf('Employees') >= 0; });
-		if (employeesBtn) employeesBtn.classList.add('bg-indigo-50', 'text-indigo-700');
-		else if (btns[1]) btns[1].classList.add('bg-indigo-50', 'text-indigo-700');
+		var overviewBtn = Array.from(btns).find(function(b) { return b.textContent.indexOf('Admin Overview') >= 0; });
+		if (overviewBtn) overviewBtn.classList.add('bg-indigo-50', 'text-indigo-700');
+		else if (btns[0]) btns[0].classList.add('bg-indigo-50', 'text-indigo-700');
 		const params = new URLSearchParams(window.location.search);
 		if (params.get('success') === 'Login') {
 			showToast('Logged in successfully', 'info');

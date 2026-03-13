@@ -6,6 +6,9 @@
 <%@ page import="com.smartoffice.model.LeaveRequest"%>
 <%@ page import="com.smartoffice.model.Notification"%>
 <%@ page import="com.smartoffice.model.User"%>
+<%@ page import="com.smartoffice.model.AttendanceLogEntry"%>
+<%@ page import="java.text.SimpleDateFormat"%>
+<%@ page import="java.util.Calendar"%>
 <%
 User userObj = (User) request.getAttribute("user");
 %>
@@ -33,6 +36,8 @@ if (punchIn != null && punchOut == null)
 	status = "Punched In";
 if (punchOut != null)
 	status = "Punched Out";
+
+boolean onBreak = Boolean.TRUE.equals(request.getAttribute("onBreak"));
 %>
 
 <%
@@ -1094,6 +1099,247 @@ border-color:#667eea;
 
 .be-label { color: #4a5568; font-weight: 600; }
 .be-dur   { color: #0ea5e9; font-weight: 800; }
+
+/* ================= NEXUS-STYLE ATTENDANCE ================= */
+.attendance-subtitle {
+	color: #64748b;
+	font-size: 14px;
+	margin: -8px 0 20px 0;
+	font-weight: 500;
+}
+
+.attendance-section-title {
+	font-size: 13px;
+	font-weight: 700;
+	color: #64748b;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 12px;
+}
+
+/* Side-by-side row for Status + Break Time */
+.attendance-cards-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+	margin-bottom: 24px;
+	align-items: stretch;
+}
+
+@media (max-width: 768px) {
+	.attendance-cards-row {
+		grid-template-columns: 1fr;
+	}
+}
+
+.status-card, .break-card, .activity-log-card {
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 20px 24px;
+	margin-bottom: 20px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.attendance-cards-row .status-card,
+.attendance-cards-row .break-card {
+	margin-bottom: 0;
+	min-height: 280px;
+	display: flex;
+	flex-direction: column;
+	transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.attendance-cards-row .status-card:hover,
+.attendance-cards-row .break-card:hover {
+	box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.attendance-cards-row .break-card .break-log {
+	flex: 1;
+	min-height: 60px;
+}
+
+.status-card .punch-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 0;
+	border-bottom: 1px solid #f1f5f9;
+}
+
+.status-card .punch-row:last-of-type { border-bottom: none; }
+
+.status-card .punch-label { color: #64748b; font-weight: 600; font-size: 14px; }
+.status-card .punch-value { color: #1e293b; font-weight: 600; font-size: 14px; }
+
+.punch-actions-nexus {
+	display: flex;
+	gap: 12px;
+	margin-top: 20px;
+	flex-wrap: wrap;
+}
+
+.punch-in-btn-nexus {
+	padding: 12px 24px;
+	border-radius: 8px;
+	border: none;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	background: #64748b;
+	color: #fff;
+	transition: background 0.2s;
+}
+
+.punch-in-btn-nexus:not(:disabled) {
+	background: #4f46e5;
+}
+
+.punch-in-btn-nexus:hover:not(:disabled) {
+	background: #4338ca;
+}
+
+.punch-in-btn-nexus:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.punch-out-btn-nexus {
+	padding: 12px 24px;
+	border-radius: 8px;
+	border: none;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	background: #dc2626;
+	color: #fff;
+	transition: background 0.2s;
+}
+
+.punch-out-btn-nexus:hover:not(:disabled) {
+	background: #b91c1c;
+}
+
+.punch-out-btn-nexus:disabled {
+	background: #94a3b8;
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.break-time-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-top: 14px;
+	padding: 8px 14px;
+	border-radius: 8px;
+	background: #e0f2fe;
+	color: #0369a1;
+	font-size: 13px;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+	border: none;
+	transition: background 0.2s;
+}
+
+.break-time-link:hover { background: #bae6fd; }
+
+.break-card .tr-label { text-transform: uppercase; }
+
+.break-action-btn {
+	padding: 11px 20px;
+	border-radius: 8px;
+	border: none;
+	font-weight: 600;
+	font-size: 14px;
+	cursor: pointer;
+	transition: opacity 0.2s, background 0.2s;
+}
+
+.break-action-btn:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+	pointer-events: auto;
+}
+
+.start-break-btn {
+	background: #7c3aed !important;
+	color: #fff !important;
+}
+
+.start-break-btn:hover:not(:disabled) { background: #6d28d9 !important; }
+
+.end-break-btn-nexus {
+	background: #64748b !important;
+	color: #fff !important;
+}
+
+.end-break-btn-nexus:hover:not(:disabled) { background: #475569 !important; }
+
+.activity-log-card h3 {
+	font-size: 16px;
+	font-weight: 700;
+	color: #1e293b;
+	margin: 0 0 16px 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.activity-log-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+}
+
+.activity-log-table th {
+	text-align: left;
+	padding: 12px 10px;
+	font-weight: 700;
+	color: #64748b;
+	text-transform: uppercase;
+	font-size: 11px;
+	letter-spacing: 0.5px;
+	border-bottom: 2px solid #e2e8f0;
+}
+
+.activity-log-table td {
+	padding: 12px 10px;
+	border-bottom: 1px solid #f1f5f9;
+	color: #334155;
+}
+
+.activity-log-table tr:hover td { background: #f8fafc; }
+
+.status-badge-present {
+	color: #15803d;
+	font-weight: 700;
+}
+
+.status-badge-absent {
+	color: #64748b;
+	font-weight: 600;
+}
+
+.log-nav {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	background: none;
+	border: none;
+	color: #64748b;
+	cursor: pointer;
+	padding: 6px 10px;
+	border-radius: 6px;
+	font-size: 14px;
+	transition: color 0.2s, background 0.2s;
+}
+
+.log-nav:hover { color: #4f46e5; background: #f1f5f9; }
+
+.log-nav:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 </head>
 
@@ -1210,112 +1456,184 @@ border-color:#667eea;
 
 		<div class="right-panel">
 
-			<!-- Attendance -->
+			<!-- Attendance (Nexus-style) -->
 			<div class="box" id="attendanceSection">
+				<h2 style="font-size:20px;font-weight:700;color:#1e293b;margin:0 0 4px 0;">
+					<i class="fa-solid fa-clock" style="margin-right:8px;"></i>Attendance
+				</h2>
+				<p class="attendance-subtitle">Track your work sessions and breaks.</p>
 
-				<fieldset class="attendance-fieldset">
-					<legend>
-						<i class="fa-solid fa-clock"></i> Attendance
-					</legend>
-
-					<div class="time-card">
-						<span class="label">Status</span> <span class="value"><%=status%></span>
-					</div>
-					<div class="time-card">
-						Punch In: <b><%=punchIn != null ? punchIn : "--"%></b>
-					</div>
-					<div class="time-card">
-						Punch Out: <b><%=punchOut != null ? punchOut : "--"%></b>
-					</div>
-
-					<% if (isWeekend) { %>
-					<div class="punch-actions" style="opacity:0.7;">
-						<p style="color:#64748b;font-size:13px;margin:0;">Attendance is closed on weekends.</p>
-					</div>
-					<% } else { %>
-					<div class="punch-actions">
-						<form action="attendance" method="post">
-							<input type="hidden" name="action" value="punchin">
-							<button class="punch-in-btn"
-								<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
-						</form>
-
-						<form action="attendance" method="post">
-							<input type="hidden" name="action" value="punchout">
-							<button class="punch-out-btn"
-								<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
-								Punch Out</button>
-						</form>
-					</div>
-					<% } %>
-				</fieldset>
-
-				<!-- ====== BREAK TIME (DB-backed) ====== -->
-				<fieldset class="break-fieldset">
-					<legend>
-						<i class="fa-solid fa-mug-hot"></i> Break Time
-					</legend>
-
-					<div class="break-total-row">
-						<span class="tr-label">Total Break Today</span>
-						<span class="tr-val">
-							<%
-							int breakSecs = 0;
-							if (request.getAttribute("breakTotalSeconds") != null) {
-								breakSecs = (Integer) request.getAttribute("breakTotalSeconds");
-							}
-							int bh = breakSecs / 3600;
-							int bm = (breakSecs % 3600) / 60;
-							int bs = breakSecs % 60;
-							%>
-							<%= String.format("%02d:%02d:%02d", bh, bm, bs) %>
-						</span>
-					</div>
-
-					<div class="break-actions">
-						<form action="break" method="post" style="display:inline;">
-							<input type="hidden" name="action" value="start">
-							<input type="hidden" name="redirect" value="user">
-							<button class="punch-in-btn"
-								<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
-								Start Break
-							</button>
-						</form>
-
-						<form action="break" method="post"
-							style="display:inline; margin-left:8px;">
-							<input type="hidden" name="action" value="end">
-							<input type="hidden" name="redirect" value="user">
-							<button class="punch-out-btn">
-								End Break
-							</button>
-						</form>
-					</div>
-
-					<div class="break-log" style="margin-top:10px;">
-						<%
-						java.util.List<com.smartoffice.model.BreakLog> empBreaks =
-							(java.util.List<com.smartoffice.model.BreakLog>) request.getAttribute("breakLogs");
-						if (empBreaks != null && !empBreaks.isEmpty()) {
-							for (com.smartoffice.model.BreakLog b : empBreaks) {
-						%>
-						<div class="time-card">
-							From <b><%= b.getStartTime() %></b>
-							to <b><%= b.getEndTime() != null ? b.getEndTime() : "--" %></b>
+				<div class="attendance-cards-row">
+					<!-- Status card -->
+					<div class="status-card">
+						<div class="attendance-section-title">Status</div>
+						<div class="punch-row">
+							<span class="punch-label">Punch In</span>
+							<span class="punch-value"><%= punchIn != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(punchIn) : "--" %></span>
 						</div>
-						<%
-							}
-						} else {
-						%>
-						<p class="no-task-text">No breaks recorded today.</p>
-						<%
-						}
-						%>
+						<div class="punch-row">
+							<span class="punch-label">Punch Out</span>
+							<span class="punch-value"><%= punchOut != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(punchOut) : "--" %></span>
+						</div>
+						<% if (isWeekend) { %>
+						<p style="color:#64748b;font-size:13px;margin:12px 0 0 0;">Attendance is closed on weekends.</p>
+						<% } else { %>
+						<div class="punch-actions-nexus">
+							<form action="attendance" method="post" style="display:inline;">
+								<input type="hidden" name="action" value="punchin">
+								<button type="submit" class="punch-in-btn-nexus" <%= punchIn != null ? "disabled" : "" %>>Punch In</button>
+							</form>
+							<form action="attendance" method="post" style="display:inline;">
+								<input type="hidden" name="action" value="punchout">
+								<button type="submit" class="punch-out-btn-nexus" <%= (punchIn == null || punchOut != null) ? "disabled" : "" %>>Punch Out</button>
+							</form>
+						</div>
+						<% } %>
 					</div>
 
-				</fieldset>
+					<!-- Break card -->
+					<div class="break-card" id="breakSection">
+						<div class="attendance-section-title">TOTAL BREAK TODAY</div>
+						<div class="break-total-row">
+							<span class="tr-label">Total Break Today</span>
+							<span class="tr-val">
+								<%
+								int breakSecs = 0;
+								if (request.getAttribute("breakTotalSeconds") != null) {
+									breakSecs = (Integer) request.getAttribute("breakTotalSeconds");
+								}
+								int bh = breakSecs / 3600;
+								int bm = (breakSecs % 3600) / 60;
+								int bs = breakSecs % 60;
+								%>
+								<%= String.format("%02d:%02d:%02d", bh, bm, bs) %>
+							</span>
+						</div>
+						<div class="break-actions">
+							<form action="break" method="post" style="display:inline;">
+								<input type="hidden" name="action" value="start">
+								<input type="hidden" name="redirect" value="user">
+								<button type="submit" class="start-break-btn break-action-btn" <%= (punchIn == null || punchOut != null || onBreak) ? "disabled" : "" %>>
+									Start Break
+								</button>
+							</form>
+							<form action="break" method="post" style="display:inline;margin-left:8px;">
+								<input type="hidden" name="action" value="end">
+								<input type="hidden" name="redirect" value="user">
+								<button type="submit" class="end-break-btn-nexus break-action-btn" <%= !onBreak ? "disabled" : "" %>>
+									End Break
+								</button>
+							</form>
+						</div>
+						<div class="break-log" style="margin-top:10px;">
+							<%
+							java.util.List<com.smartoffice.model.BreakLog> empBreaks =
+								(java.util.List<com.smartoffice.model.BreakLog>) request.getAttribute("breakLogs");
+							SimpleDateFormat timeOnlyFmt = new SimpleDateFormat("HH:mm:ss");
+							if (empBreaks != null && !empBreaks.isEmpty()) {
+								for (com.smartoffice.model.BreakLog b : empBreaks) {
+									String startStr = b.getStartTime() != null ? timeOnlyFmt.format(b.getStartTime()) : "--";
+									String endStr = b.getEndTime() != null ? timeOnlyFmt.format(b.getEndTime()) : "--";
+							%>
+							<div class="time-card">
+								From <b><%= startStr %></b> to <b><%= endStr %></b>
+							</div>
+							<%
+								}
+							} else {
+							%>
+							<p class="no-task-text">No breaks recorded today.</p>
+							<%
+							}
+							%>
+						</div>
+					</div>
+				</div>
 
+				<!-- Recent Activity Log -->
+				<div class="activity-log-card">
+					<h3>
+						Recent Activity Log
+						<span class="log-nav-wrap">
+							<button type="button" class="log-nav" id="logPrev" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>
+							<button type="button" class="log-nav" id="logNext" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
+						</span>
+					</h3>
+					<table class="activity-log-table">
+						<thead>
+							<tr>
+								<th>Date</th>
+								<th>Punch In / Out</th>
+								<th>Break</th>
+								<th>Total</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody id="activityLogBody">
+							<%
+							List<AttendanceLogEntry> activityLog = (List<AttendanceLogEntry>) request.getAttribute("attendanceLog");
+							SimpleDateFormat dateFmt = new SimpleDateFormat("MMM d, yyyy");
+							SimpleDateFormat timeFmt = new SimpleDateFormat("hh:mm a");
+							if (activityLog != null && !activityLog.isEmpty()) {
+								for (AttendanceLogEntry e : activityLog) {
+									java.sql.Timestamp pi = e.getPunchIn();
+									java.sql.Timestamp po = e.getPunchOut();
+									int br = e.getBreakSeconds();
+									long totalSec = 0;
+									if (pi != null && po != null) {
+										totalSec = Math.max(0, (po.getTime() - pi.getTime()) / 1000 - br);
+									}
+									int th = (int)(totalSec / 3600);
+									int tm = (int)((totalSec % 3600) / 60);
+									String totalStr = th + "h " + tm + "m";
+									int brH = br / 3600;
+									int brM = (br % 3600) / 60;
+									String breakStr = brH + "h " + String.format("%02d", brM) + "m";
+									String inOutStr = pi != null ? timeFmt.format(pi) : "--";
+									if (po != null) inOutStr += " (" + timeFmt.format(po) + ")";
+							%>
+							<tr data-log-row>
+								<td><%= e.getAttendanceDate() != null ? dateFmt.format(e.getAttendanceDate()) : "--" %></td>
+								<td><%= inOutStr %></td>
+								<td><%= breakStr %></td>
+								<td><%= totalStr %></td>
+								<td><span class="<%= "Present".equals(e.getStatus()) ? "status-badge-present" : "status-badge-absent" %>"><%= e.getStatus() != null ? e.getStatus() : "--" %></span></td>
+							</tr>
+							<%
+								}
+							} else {
+							%>
+							<tr><td colspan="5" style="text-align:center;padding:24px;color:#64748b;">No attendance records yet.</td></tr>
+							<%
+							}
+							%>
+						</tbody>
+					</table>
+				</div>
 			</div>
+			<script>
+			(function() {
+				var rows = document.querySelectorAll('#activityLogBody tr[data-log-row]');
+				var perPage = 5;
+				var totalPages = Math.max(1, Math.ceil(rows.length / perPage));
+				var cur = 0;
+				function showPage() {
+					for (var i = 0; i < rows.length; i++) {
+						rows[i].style.display = (i >= cur * perPage && i < (cur + 1) * perPage) ? '' : 'none';
+					}
+					document.getElementById('logPrev').disabled = cur <= 0;
+					document.getElementById('logNext').disabled = cur >= totalPages - 1;
+				}
+				if (rows.length > 0) {
+					showPage();
+					document.getElementById('logPrev').onclick = function() { if (cur > 0) { cur--; showPage(); } };
+					document.getElementById('logNext').onclick = function() { if (cur < totalPages - 1) { cur++; showPage(); } };
+				} else {
+					document.getElementById('logPrev').disabled = true;
+					document.getElementById('logNext').disabled = true;
+				}
+			})();
+			</script>
 
 			<!-- Tasks -->
 			<div class="box" id="taskSection" style="display: none;">

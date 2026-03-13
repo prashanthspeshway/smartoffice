@@ -8,6 +8,7 @@
 <%@ page import="com.smartoffice.model.LeaveRequest"%>
 <%@ page import="com.smartoffice.model.Notification"%>
 <%@ page import="com.smartoffice.model.Team"%>
+<%@ page import="java.text.SimpleDateFormat"%>
 
 <%
 String activeTab = request.getParameter("tab");
@@ -46,6 +47,8 @@ if (punchIn != null && punchOut == null)
 	status = "Punched In";
 if (punchOut != null)
 	status = "Punched Out";
+
+boolean onBreak = Boolean.TRUE.equals(request.getAttribute("onBreak"));
 %>
 <%
 User userObj = (User) request.getAttribute("user");
@@ -61,12 +64,11 @@ User userObj = (User) request.getAttribute("user");
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ================= GLOBAL ================= */
+/* ================= GLOBAL (Figma / Admin / Employee aligned) ================= */
 * {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
@@ -75,24 +77,29 @@ body {
 	flex-direction: column;
 	background: #f1f5f9;
 	overflow: hidden;
-	font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+	font-family: 'Inter', system-ui, -apple-system, sans-serif;
+	font-size: 14px;
+	color: #1e293b;
 }
 
 /* ================= TOP BAR ================= */
 .top-bar {
 	background: #ffffff;
 	border-bottom: 1px solid #e2e8f0;
-	padding: 15px 24px;
+	padding: 0 24px;
+	height: 56px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	flex-shrink: 0;
 }
 
 .top-bar h2 {
 	font-size: 20px;
 	font-weight: 600;
 	color: #1e293b;
+	letter-spacing: -0.02em;
 }
 
 .user-area {
@@ -101,12 +108,16 @@ body {
 	gap: 12px;
 	color: #64748b;
 	font-size: 14px;
+	font-weight: 500;
 }
-.user-area b { color: #1e293b; }
+.user-area .welcome { color: #64748b; }
+.user-area strong { color: #1e293b; }
 
+.icon-btn,
 .settings-btn {
 	width: 40px;
 	height: 40px;
+	min-width: 40px;
 	border-radius: 50%;
 	border: none;
 	background: #4f46e5;
@@ -115,8 +126,11 @@ body {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	transition: background 0.2s;
 }
+.icon-btn:hover,
 .settings-btn:hover { background: #4338ca; }
+.icon-btn i, .settings-btn i { font-size: 16px; }
 
 .logout-btn {
 	padding: 8px 16px;
@@ -126,6 +140,11 @@ body {
 	color: #dc2626;
 	cursor: pointer;
 	font-weight: 600;
+	font-size: 14px;
+	transition: background 0.2s, color 0.2s;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 }
 .logout-btn:hover { background: #fef2f2; }
 
@@ -133,15 +152,18 @@ body {
 .main-container {
 	flex: 1;
 	display: flex;
+	min-height: 0;
 }
 
 /* ================= SIDEBAR ================= */
 .sidebar {
 	width: 256px;
+	min-width: 256px;
 	background: #ffffff;
 	border-right: 1px solid #e2e8f0;
 	padding: 16px 12px;
-	box-shadow: 1px 0 0 rgba(0,0,0,0.05);
+	box-shadow: 1px 0 0 rgba(0,0,0,0.04);
+	flex-shrink: 0;
 }
 
 .sidebar-btn {
@@ -158,7 +180,14 @@ body {
 	align-items: center;
 	gap: 12px;
 	color: #64748b;
-	transition: 0.2s;
+	transition: background 0.2s, color 0.2s;
+	text-align: left;
+}
+
+.sidebar-btn i {
+	width: 20px;
+	text-align: center;
+	font-size: 16px;
 }
 
 .sidebar-btn:hover {
@@ -177,7 +206,8 @@ body {
 	flex: 1;
 	padding: 24px;
 	background: #f1f5f9;
-	overflow-y: hidden;
+	overflow-y: auto;
+	min-height: 0;
 }
 
 .box {
@@ -185,6 +215,9 @@ body {
 	border-radius: 12px;
 	border: 1px solid #e2e8f0;
 	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	padding: 24px;
+	overflow-y: auto;
+	max-height: 100%;
 }
 
 #contentFrame {
@@ -491,13 +524,11 @@ to {
 	right: -340px;
 	width: 340px;
 	height: 100%;
-	background: linear-gradient(135deg, rgba(255, 255, 255, 0.85),
-		rgba(240, 245, 255, 0.75));
-	backdrop-filter: blur(16px);
-	box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
-	transition: right 0.4s ease, opacity 0.3s ease;
+	background: #ffffff;
+	box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+	transition: right 0.4s ease;
 	z-index: 1000;
-	border-left: 1px solid rgba(255, 255, 255, 0.4);
+	border-left: 1px solid #e2e8f0;
 }
 
 /* Open State */
@@ -505,17 +536,14 @@ to {
 	right: 0;
 }
 
-/* Header */
-.settings-header {
-	padding: 20px;
+/* Header (when used in settings drawer) */
+#settingsPanel .modal-header {
+	background: #4f46e5;
+	color: #fff;
+	padding: 16px 20px;
 	font-size: 18px;
-	height: 100px;
 	font-weight: 600;
-	color: #2d3748;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+	border-bottom: none;
 }
 
 /* Close Button */
@@ -573,23 +601,14 @@ to {
 	color: #fff;
 }
 
-/* Manager-specific styles (appended to override/adapt) */
-.icon-btn {
-	width: 38px;
-	height: 38px;
-	border-radius: 50%;
-	border: none;
-	background: linear-gradient(135deg, #667eea, #764ba2);
-	color: white;
-	cursor: pointer;
-}
-
+/* ================= ATTENDANCE CARD (Figma / Employee aligned) ================= */
 .attendance-fieldset {
 	border: 1px solid #e2e8f0;
 	border-radius: 12px;
 	padding: 24px;
 	background: #ffffff;
 	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	margin-bottom: 0;
 }
 
 .attendance-fieldset legend {
@@ -599,13 +618,15 @@ to {
 	background: #eef2ff;
 	border-radius: 8px;
 	color: #1e293b;
+	border: none;
 }
 
 .attendance-row {
 	display: flex;
 	justify-content: space-between;
-	padding: 10px 0;
-	border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+	align-items: center;
+	padding: 12px 0;
+	border-bottom: 1px dashed rgba(102, 126, 234, 0.2);
 }
 
 .attendance-row:last-child {
@@ -614,13 +635,14 @@ to {
 
 .attendance-row .label {
 	font-weight: 600;
-	color: #4a5568;
+	color: #475569;
+	font-size: 14px;
 }
 
 .attendance-row .value {
-	color: #2d3748;
-	font-style: bold;
-	font-weight: 900;
+	color: #1e293b;
+	font-weight: 600;
+	font-size: 14px;
 }
 
 /* field set for my team */
@@ -751,94 +773,84 @@ to {
 	color: #4a5568;
 }
 
-/* Buttons */
+/* ================= BUTTONS (Figma / Employee aligned) ================= */
 .attendance-buttons {
 	margin-top: 20px;
 	display: flex;
-	gap: 15px;
+	gap: 12px;
+	flex-wrap: wrap;
 }
 
 .primary-btn {
-	padding: 10px 20px;
-	background-color: #5a67d8;
-	color: #fff;
-	border: none;
+	padding: 12px 20px;
 	border-radius: 8px;
-	cursor: pointer;
-	font-weight: 600;
-}
-
-.primary-btn:disabled {
-	background-color: #a0aec0;
-	cursor: not-allowed;
-}
-
-.reject-btn {
-	padding: 10px 20px;
-	background-color: #e53e3e;
-	color: #fff;
 	border: none;
-	border-radius: 8px;
-	cursor: pointer;
+	font-size: 14px;
 	font-weight: 600;
-}
-
-.reject-btn:disabled {
-	background-color: #feb2b2;
-	cursor: not-allowed;
-}
-
-.primary-btn, .reject-btn {
-	padding: 10px 22px;
-	border-radius: 22px;
 	cursor: pointer;
-	font-weight: 500;
-	transition: all 0.2s ease;
-	border: none;
-	margin: 5px;
-}
-
-.primary-btn {
-	background: linear-gradient(135deg, #6366f1, #818cf8);
+	background: #4f46e5;
 	color: #fff;
+	transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .primary-btn:hover:not(:disabled) {
-	transform: translateY(-2px);
-	box-shadow: 0 8px 18px rgba(99, 102, 241, 0.35);
+	background: #4338ca;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+}
+
+.primary-btn:disabled {
+	background: #94a3b8;
+	color: #fff;
+	cursor: not-allowed;
+	opacity: 0.8;
+	transform: none;
+	box-shadow: none;
 }
 
 .reject-btn {
-	background: #e53e3e;
+	padding: 12px 20px;
+	border-radius: 8px;
+	border: none;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	background: #dc2626;
 	color: #fff;
+	transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .reject-btn:hover:not(:disabled) {
-	transform: translateY(-2px);
-	box-shadow: 0 8px 18px rgba(229, 62, 62, 0.35);
+	background: #b91c1c;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
 }
 
-.primary-btn:disabled, .reject-btn:disabled {
-	background: #e5e7eb;
-	color: #9ca3af;
+.reject-btn:disabled {
+	background: #cbd5e1;
+	color: #64748b;
 	cursor: not-allowed;
-	box-shadow: none;
+	opacity: 0.8;
 	transform: none;
+	box-shadow: none;
 }
 
 .secondary-btn {
-	background: linear-gradient(135deg, #6366f1, #818cf8);
+	background: #4f46e5;
 	color: #fff;
-	padding: 8px 18px;
+	padding: 10px 18px;
 	border: none;
-	border-radius: 18px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
 	cursor: pointer;
-	transition: transform 0.2s, box-shadow 0.2s;
+	transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .secondary-btn:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 8px 18px rgba(99, 102, 241, 0.35);
+	background: #4338ca;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
 }
 
 .employee-grid {
@@ -850,18 +862,18 @@ to {
 }
 
 .employee-card {
-	border-left: 5px solid #2563eb;
 	padding: 14px 16px;
 	margin-bottom: 12px;
-	background: linear-gradient(135deg, #f8fafc, #eef2ff);
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
 	border-radius: 12px;
-	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .employee-card:hover {
-	transform: translateY(-5px);
-	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.20);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .emp-header {
@@ -904,11 +916,20 @@ to {
 
 .form-control {
 	width: 100%;
-	padding: 12px;
-	border-radius: 10px;
-	border: 1px solid #d1d5db;
-	margin-bottom: 15px;
-	background: rgba(255, 255, 255, 0.8);
+	padding: 12px 14px;
+	border-radius: 8px;
+	border: 1px solid #e2e8f0;
+	margin-bottom: 12px;
+	background: #fff;
+	font-size: 14px;
+	color: #1e293b;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+	outline: none;
+	border-color: #4f46e5;
+	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }
 
 .attendance-buttons {
@@ -940,22 +961,22 @@ to {
 }
 /* ===== Task Fieldset ===== */
 .task-fieldset {
-	border: 2px solid #c3cfe2;
-	border-radius: 14px;
-	padding: 20px 24px 26px;
-	margin-bottom: 25px;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 20px 24px 24px;
+	margin-bottom: 20px;
 	overflow-y: auto;
-	background: #c3cfe2;
-	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .task-fieldset legend {
-	padding: 6px;
-	font-size: 18px;
+	padding: 8px 16px;
+	font-size: 15px;
 	font-weight: 600;
-	border-radius: 14px;
-	background: #e2ebf0;
-	color: #2d3748;
+	border-radius: 8px;
+	background: #eef2ff;
+	color: #1e293b;
 }
 
 /* ===== Error ===== */
@@ -988,12 +1009,31 @@ to {
 	opacity: 0.75;
 }
 
+.task-status {
+	padding: 6px 12px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: 600;
+	flex-shrink: 0;
+}
+
+.task-status.completed {
+	background: #dcfce7;
+	color: #166534;
+}
+
+.task-status.assigned,
+.task-status.pending {
+	background: #fef3c7;
+	color: #b45309;
+}
+
 #assignTask {
-	height: 550px; /* scroll area height */
-	overflow-y: auto; /* enable vertical scroll */
+	max-height: 100%;
+	overflow-y: auto;
 	overflow-x: hidden;
-	padding: 15px;
-	background: c3cfe2;
+	padding: 20px;
+	background: transparent;
 	border-radius: 12px;
 }
 
@@ -1033,6 +1073,34 @@ to {
 	font-weight: 600;
 	background: #eef2ff;
 	color: #1e293b;
+}
+
+.leave-tab-row {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.leave-tab-btn {
+	flex: 1;
+	padding: 12px 16px;
+	border-radius: 8px;
+	border: none;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	background: #94a3b8;
+	color: #fff;
+	transition: background 0.2s;
+}
+
+.leave-tab-btn.leave-tab-active {
+	background: #4f46e5;
+	color: #fff;
+}
+
+.leave-tab-btn:hover:not(.leave-tab-active) {
+	background: #64748b;
 }
 
 /* ===== Scroll Area ===== */
@@ -1193,20 +1261,23 @@ to {
 }
 
 .export-btn {
-	padding: 8px 14px;
-	background: #c3cfe2;
+	padding: 10px 18px;
+	background: #4f46e5;
 	border: none;
 	border-radius: 8px;
 	font-weight: 600;
-	color: #3b5bcc;
+	font-size: 14px;
+	color: #fff;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
-	gap: 6px;
+	gap: 8px;
+	transition: background 0.2s, box-shadow 0.2s;
 }
 
 .export-btn:hover {
-	background: #dbe4ff;
+	background: #4338ca;
+	box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
 }
 
 /* ===== Scroll Area ===== */
@@ -1247,30 +1318,6 @@ to {
 	gap: 12px;
 }
 
-/* Unified export button style */
-.export-btn {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 10px 18px;
-	border-radius: 20px;
-	border: none;
-	background: linear-gradient(135deg, #6366f1, #818cf8);
-	color: #fff;
-	font-size: 14px;
-	cursor: pointer;
-	min-width: 190px;
-	justify-content: center;
-	transition: all 0.2s ease;
-}
-
-.export-btn:hover {
-	transform: translateY(-2px);
-	background: #c3cfe2;
-	color: black;
-	box-shadow: 0 8px 18px rgba(99, 102, 241, 0.35);
-}
-
 .export-btn i {
 	font-size: 14px;
 }
@@ -1288,49 +1335,22 @@ to {
 	white-space: nowrap;
 }
 
-/* Button container */
-.export-actions {
-	display: flex;
-	gap: 12px;
-}
-
-/* Buttons */
-.export-btn {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	padding: 10px 18px;
-	min-width: 190px;
-	border-radius: 20px;
-	border: none;
-	background: linear-gradient(135deg, #6366f1, #818cf8);
-	color: white;
-	font-weight: 600;
-	cursor: pointer;
-}
-
-.export-btn:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 8px 18px rgba(99, 102, 241, 0.35);
-}
-
 /* ===== Performance Fieldset ===== */
 .performance-fieldset {
-	border: 2px solid #c3cfe2;
-	border-radius: 14px;
-	padding: 22px 26px 28px;
-	background: #c3cfe2;
-	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 24px;
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .performance-fieldset legend {
-	padding: 8px;
-	background: #e2ebf0;
-	border-radius: 14px;
-	font-size: 18px;
+	padding: 8px 16px;
+	background: #eef2ff;
+	border-radius: 8px;
+	font-size: 15px;
 	font-weight: 600;
-	color: #2d3748;
+	color: #1e293b;
 }
 
 /* ===== Form Layout ===== */
@@ -1536,41 +1556,39 @@ to {
 
 /* View All button */
 .view-all-btn {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
-	gap: 6px;
-	margin-bottom: 20px;
-	margin-left: 89%;
-	padding: 8px 16px;
-	margin-top: -10px;
-	border-radius: 18px;
+	gap: 8px;
+	padding: 10px 18px;
+	border-radius: 8px;
 	border: none;
-	background: linear-gradient(135deg, #6366f1, #818cf8);
-	color: #ffffff;
-	font-size: 13px;
+	background: #4f46e5;
+	color: #fff;
+	font-size: 14px;
 	font-weight: 600;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	transition: background 0.2s, box-shadow 0.2s;
 }
 
 .view-all-btn:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 8px 18px rgba(99, 102, 241, 0.5);
+	background: #4338ca;
+	box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
 }
 
-/* Notification Panel (adapted to drawer style) */
+/* Notification Panel */
 .notification-panel {
 	position: fixed;
 	bottom: 30px;
 	right: -380px;
 	width: 350px;
 	height: 450px;
-	background: #c3cfe2;
-	box-shadow: -3px 0 10px rgba(0, 0, 0, 0.15);
-	border-radius: 14px;
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+	border-radius: 12px;
 	transition: right 0.3s ease-in-out;
 	z-index: 1000;
-	font-family: Arial, sans-serif;
+	font-family: 'Inter', system-ui, sans-serif;
 }
 
 .notification-panel.show {
@@ -1578,21 +1596,29 @@ to {
 }
 
 .notification-header {
-	background: #e2ebf0;
-	color: black;
-	padding: 15px;
-	border-radius: 14px 14px 0 0;
+	background: #4f46e5;
+	color: #fff;
+	padding: 16px 20px;
+	border-radius: 12px 12px 0 0;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	font-weight: 600;
+	font-size: 15px;
 }
 
 .notification-header button {
-	background: none;
+	background: rgba(255,255,255,0.2);
 	border: none;
-	color: black;
+	color: #fff;
 	font-size: 18px;
 	cursor: pointer;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .notification-list {
@@ -1602,11 +1628,12 @@ to {
 }
 
 .notification-item {
-	background: #f3f4f6;
-	padding: 12px;
+	background: #f8fafc;
+	padding: 12px 14px;
 	margin-bottom: 10px;
-	border-left: 4px solid #2563eb;
-	border-radius: 4px;
+	border: 1px solid #e2e8f0;
+	border-left: 4px solid #4f46e5;
+	border-radius: 8px;
 	font-size: 14px;
 }
 
@@ -1814,6 +1841,12 @@ to {
 .break-log::-webkit-scrollbar { width: 3px; }
 .break-log::-webkit-scrollbar-thumb { background: rgba(14,165,233,0.3); border-radius: 3px; }
 
+.no-task-text {
+	font-size: 14px;
+	color: #64748b;
+	margin-top: 8px;
+}
+
 .time-card {
 	background: #f8f9ff;
 	padding: 10px 12px;
@@ -1821,6 +1854,195 @@ to {
 	font-size: 12px;
 	border: 1px solid rgba(148,163,184,0.4);
 }
+
+/* ================= MANAGER ATTENDANCE (side-by-side, Nexus-style) ================= */
+.attendance-cards-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+	margin-bottom: 24px;
+	align-items: stretch;
+}
+@media (max-width: 768px) {
+	.attendance-cards-row { grid-template-columns: 1fr; }
+}
+.attendance-cards-row .status-card,
+.attendance-cards-row .break-card {
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 20px 24px;
+	margin-bottom: 0;
+	min-height: 280px;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	transition: box-shadow 0.2s ease;
+}
+.attendance-cards-row .status-card:hover,
+.attendance-cards-row .break-card:hover {
+	box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.attendance-cards-row .break-card .break-log {
+	flex: 1;
+	min-height: 60px;
+}
+.attendance-section-title {
+	font-size: 14px;
+	font-weight: 700;
+	color: #1e293b;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 12px;
+}
+.status-card .punch-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 0;
+	border-bottom: 1px solid #f1f5f9;
+}
+.status-card .punch-row:last-of-type { border-bottom: none; }
+.status-card .punch-label { color: #64748b; font-weight: 600; font-size: 14px; }
+.status-card .punch-value { color: #1e293b; font-weight: 600; font-size: 14px; }
+.punch-actions-nexus {
+	display: flex;
+	gap: 12px;
+	margin-top: 20px;
+	flex-wrap: wrap;
+}
+.punch-in-btn-nexus {
+	padding: 12px 24px;
+	border-radius: 8px;
+	border: none;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	background: #64748b;
+	color: #fff;
+	transition: background 0.2s;
+}
+.punch-in-btn-nexus:not(:disabled) { background: #4f46e5; }
+.punch-in-btn-nexus:hover:not(:disabled) { background: #4338ca; }
+.punch-in-btn-nexus:disabled { opacity: 0.7; cursor: not-allowed; }
+.punch-out-btn-nexus {
+	padding: 12px 24px;
+	border-radius: 8px;
+	border: none;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	background: #dc2626;
+	color: #fff;
+	transition: background 0.2s;
+}
+.punch-out-btn-nexus:hover:not(:disabled) { background: #b91c1c; }
+.punch-out-btn-nexus:disabled { background: #94a3b8; opacity: 0.7; cursor: not-allowed; }
+.break-action-btn {
+	padding: 11px 20px;
+	border-radius: 8px;
+	border: none;
+	font-weight: 600;
+	font-size: 14px;
+	cursor: pointer;
+	transition: opacity 0.2s, background 0.2s;
+}
+.break-action-btn:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+	pointer-events: auto;
+}
+.start-break-btn { background: #7c3aed !important; color: #fff !important; }
+.start-break-btn:hover:not(:disabled) { background: #6d28d9 !important; }
+.end-break-btn-nexus { background: #64748b !important; color: #fff !important; }
+.end-break-btn-nexus:hover:not(:disabled) { background: #475569 !important; }
+
+/* ================= TEAM ATTENDANCE: 3-col grid + list toggle ================= */
+.team-attendance-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+.team-attendance-view-toggle {
+	display: inline-flex;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	overflow: hidden;
+	background: #f8fafc;
+}
+.team-attendance-view-toggle button {
+	padding: 10px 18px;
+	border: none;
+	background: transparent;
+	font-size: 14px;
+	font-weight: 600;
+	color: #64748b;
+	cursor: pointer;
+	transition: background 0.2s, color 0.2s;
+}
+.team-attendance-view-toggle button:first-child { border-right: 1px solid #e2e8f0; }
+.team-attendance-view-toggle button:hover { background: #f1f5f9; color: #334155; }
+.team-attendance-view-toggle button.active {
+	background: #4f46e5;
+	color: #fff;
+}
+.employee-grid-3 {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 20px;
+	margin-top: 12px;
+}
+@media (max-width: 1100px) {
+	.employee-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+	.employee-grid-3 { grid-template-columns: 1fr; }
+}
+.employee-list-view {
+	display: none;
+	margin-top: 12px;
+}
+.employee-list-view.active { display: block; }
+.employee-grid-wrap { display: block; }
+.employee-grid-wrap.list-mode .employee-grid-3 { display: none; }
+.employee-grid-wrap.list-mode .employee-list-view { display: block; }
+.team-attendance-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+	background: #fff;
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	border: 1px solid #e2e8f0;
+}
+.team-attendance-table th {
+	text-align: left;
+	padding: 14px 16px;
+	background: #f1f5f9;
+	color: #334155;
+	font-weight: 600;
+	font-size: 13px;
+}
+.team-attendance-table td {
+	padding: 14px 16px;
+	border-top: 1px solid #e2e8f0;
+	color: #475569;
+}
+.team-attendance-table tbody tr:hover { background: #f8fafc; }
+.team-attendance-table .list-status {
+	display: inline-block;
+	padding: 4px 10px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: 600;
+}
+.team-attendance-table .list-status.present { background: #dcfce7; color: #166534; }
+.team-attendance-table .list-status.absent { background: #fee2e2; color: #991b1b; }
+.team-attendance-table .list-status.punched-in { background: #dbeafe; color: #1e40af; }
 
 /* ================= FULL DARK MODE ================= */
 body.dark-theme {
@@ -2233,147 +2455,122 @@ body.dark-theme .settings-item i {
 
 			<!-- ===== Attendance (Self + Team) ===== -->
 			<div class="box" id="attendance" style="display: none;">
+				<h2>Attendance</h2>
+				<p class="attendance-subtitle" style="color:#64748b;font-size:14px;margin:0 0 20px 0;">Track your work sessions and breaks.</p>
 
-				<!-- My Attendance -->
-				<fieldset class="attendance-fieldset">
-					<legend>My Attendance</legend>
-
-					<div class="attendance-row">
-						<span class="label">Status</span> <span class="value"><%=status%></span>
-					</div>
-
-					<div class="attendance-row">
-						<span class="label">Punch In</span> <span class="value"><%=punchIn != null ? punchIn : "--"%></span>
-					</div>
-
-					<div class="attendance-row">
-						<span class="label">Punch Out</span> <span class="value"><%=punchOut != null ? punchOut : "--"%></span>
-					</div>
-
-					<% if (isWeekend) { %>
-					<div class="attendance-buttons" style="opacity:0.7;">
-						<p style="color:#64748b;font-size:13px;margin:0;">Attendance is closed on weekends.</p>
-					</div>
-					<% } else { %>
-					<div class="attendance-buttons">
-						<form action="attendance" method="post">
-							<input type="hidden" name="action" value="punchin">
-							<button class="primary-btn"
-								<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
-						</form>
-
-						<form action="attendance" method="post">
-							<input type="hidden" name="action" value="punchout">
-							<button class="reject-btn"
-								<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
-								Punch Out</button>
-						</form>
-					</div>
-					<% } %>
-
-				</fieldset>
-
-				<!-- Break Time (manager) -->
-				<fieldset class="break-fieldset">
-					<legend>
-						<i class="fa-solid fa-mug-hot"></i> Break Time
-					</legend>
-
-					<div class="break-total-row">
-						<span class="tr-label">Total Break Today</span>
-						<span class="tr-val">
-							<%
-							int mgrBreakSecs = 0;
-							if (request.getAttribute("breakTotalSeconds") != null) {
-								mgrBreakSecs = (Integer) request.getAttribute("breakTotalSeconds");
-							}
-							int mbh = mgrBreakSecs / 3600;
-							int mbm = (mgrBreakSecs % 3600) / 60;
-							int mbs = mgrBreakSecs % 60;
-							%>
-							<%= String.format("%02d:%02d:%02d", mbh, mbm, mbs) %>
-						</span>
-					</div>
-
-					<div class="break-actions">
-						<form action="break" method="post" style="display:inline;">
-							<input type="hidden" name="action" value="start">
-							<input type="hidden" name="redirect" value="manager">
-							<button class="primary-btn"
-								<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>
-								Start Break
-							</button>
-						</form>
-
-						<form action="break" method="post"
-							style="display:inline; margin-left:8px;">
-							<input type="hidden" name="action" value="end">
-							<input type="hidden" name="redirect" value="manager">
-							<button class="reject-btn">
-								End Break
-							</button>
-						</form>
-					</div>
-
-					<div class="break-log" style="margin-top:10px;">
-						<%
-						java.util.List<com.smartoffice.model.BreakLog> mgrBreaks =
-							(java.util.List<com.smartoffice.model.BreakLog>) request.getAttribute("breakLogs");
-						if (mgrBreaks != null && !mgrBreaks.isEmpty()) {
-							for (com.smartoffice.model.BreakLog b : mgrBreaks) {
-						%>
-						<div class="time-card">
-							From <b><%= b.getStartTime() %></b>
-							to <b><%= b.getEndTime() != null ? b.getEndTime() : "--" %></b>
+				<!-- My Attendance + Break Time side-by-side -->
+				<div class="attendance-cards-row">
+					<!-- Status card -->
+					<div class="status-card">
+						<div class="attendance-section-title">Status</div>
+						<div class="punch-row">
+							<span class="punch-label">Punch In</span>
+							<span class="punch-value"><%= punchIn != null ? new SimpleDateFormat("HH:mm:ss").format(punchIn) : "--" %></span>
 						</div>
-						<%
-							}
-						} else {
-						%>
-						<p class="no-task-text">No breaks recorded today.</p>
-						<%
-						}
-						%>
+						<div class="punch-row">
+							<span class="punch-label">Punch Out</span>
+							<span class="punch-value"><%= punchOut != null ? new SimpleDateFormat("HH:mm:ss").format(punchOut) : "--" %></span>
+						</div>
+						<% if (isWeekend) { %>
+						<p style="color:#64748b;font-size:13px;margin:12px 0 0 0;">Attendance is closed on weekends.</p>
+						<% } else { %>
+						<div class="punch-actions-nexus">
+							<form action="attendance" method="post" style="display:inline;">
+								<input type="hidden" name="action" value="punchin">
+								<button type="submit" class="punch-in-btn-nexus" <%= punchIn != null ? "disabled" : "" %>>Punch In</button>
+							</form>
+							<form action="attendance" method="post" style="display:inline;">
+								<input type="hidden" name="action" value="punchout">
+								<button type="submit" class="punch-out-btn-nexus" <%= (punchIn == null || punchOut != null) ? "disabled" : "" %>>Punch Out</button>
+							</form>
+						</div>
+						<% } %>
 					</div>
 
-				</fieldset>
+					<!-- Break card -->
+					<div class="break-card">
+						<div class="attendance-section-title">TOTAL BREAK TODAY</div>
+						<div class="break-total-row">
+							<span class="tr-label">Total Break Today</span>
+							<span class="tr-val">
+								<%
+								int mgrBreakSecs = 0;
+								if (request.getAttribute("breakTotalSeconds") != null) {
+									mgrBreakSecs = (Integer) request.getAttribute("breakTotalSeconds");
+								}
+								int mbh = mgrBreakSecs / 3600;
+								int mbm = (mgrBreakSecs % 3600) / 60;
+								int mbs = mgrBreakSecs % 60;
+								%>
+								<%= String.format("%02d:%02d:%02d", mbh, mbm, mbs) %>
+							</span>
+						</div>
+						<div class="break-actions">
+							<form action="break" method="post" style="display:inline;">
+								<input type="hidden" name="action" value="start">
+								<input type="hidden" name="redirect" value="manager">
+								<button type="submit" class="start-break-btn break-action-btn" <%= (punchIn == null || punchOut != null || onBreak) ? "disabled" : "" %>>Start Break</button>
+							</form>
+							<form action="break" method="post" style="display:inline;margin-left:8px;">
+								<input type="hidden" name="action" value="end">
+								<input type="hidden" name="redirect" value="manager">
+								<button type="submit" class="end-break-btn-nexus break-action-btn" <%= !onBreak ? "disabled" : "" %>>End Break</button>
+							</form>
+						</div>
+						<div class="break-log" style="margin-top:10px;">
+							<%
+							java.util.List<com.smartoffice.model.BreakLog> mgrBreaks =
+								(java.util.List<com.smartoffice.model.BreakLog>) request.getAttribute("breakLogs");
+							SimpleDateFormat mgrTimeFmt = new SimpleDateFormat("HH:mm:ss");
+							if (mgrBreaks != null && !mgrBreaks.isEmpty()) {
+								for (com.smartoffice.model.BreakLog b : mgrBreaks) {
+									String mStart = b.getStartTime() != null ? mgrTimeFmt.format(b.getStartTime()) : "--";
+									String mEnd = b.getEndTime() != null ? mgrTimeFmt.format(b.getEndTime()) : "--";
+							%>
+							<div class="time-card">From <b><%= mStart %></b> to <b><%= mEnd %></b></div>
+							<%
+								}
+							} else {
+							%>
+							<p class="no-task-text">No breaks recorded today.</p>
+							<%
+							}
+							%>
+						</div>
+					</div>
+				</div>
 
 				<!-- Team Attendance -->
 				<fieldset class="attendance-fieldset" style="margin-top:18px;">
 					<legend>Team Attendance (Today)</legend>
 
-					<!-- Header Actions -->
-					<div class="team-attendance-header">
-
+					<div class="team-attendance-toolbar">
 						<div class="export-actions">
-							<form action="<%=request.getContextPath()%>/exportTeamAttendance"
-								method="get">
-								<button type="submit" class="export-btn">
-									<i class="fa-solid fa-file-export"></i> Export Attendance
-								</button>
+							<form action="<%=request.getContextPath()%>/exportTeamAttendance" method="get" style="display:inline;">
+								<button type="submit" class="export-btn"><i class="fa-solid fa-file-export"></i> Export Attendance</button>
 							</form>
-
-							<form
-								action="<%=request.getContextPath()%>/exportTeamPerformance"
-								method="get">
-								<button type="submit" class="export-btn">
-									<i class="fa-solid fa-file-export"></i> Export Performance
-								</button>
+							<form action="<%=request.getContextPath()%>/exportTeamPerformance" method="get" style="display:inline;margin-left:8px;">
+								<button type="submit" class="export-btn"><i class="fa-solid fa-file-export"></i> Export Performance</button>
 							</form>
+						</div>
+						<div class="team-attendance-view-toggle">
+							<button type="button" id="teamViewGrid" class="active" onclick="setTeamAttendanceView('grid')" title="Grid view"><i class="fa-solid fa-th-large" style="margin-right:6px;"></i>Grid</button>
+							<button type="button" id="teamViewList" onclick="setTeamAttendanceView('list')" title="List view"><i class="fa-solid fa-list" style="margin-right:6px;"></i>List</button>
 						</div>
 					</div>
 
-					<!-- Attendance Grid -->
-					<div class="attendance-scroll">
-						<div class="employee-grid">
-
+					<div class="employee-grid-wrap" id="teamAttendanceWrap">
+						<%
+						List<TeamAttendance> teamAttendance = (List<TeamAttendance>) request.getAttribute("teamAttendance");
+						if (teamAttendance != null && !teamAttendance.isEmpty()) {
+						%>
+						<!-- 3-column grid -->
+						<div class="employee-grid-3" id="teamGrid">
 							<%
-							List<TeamAttendance> teamAttendance = (List<TeamAttendance>) request.getAttribute("teamAttendance");
-
-							if (teamAttendance != null && !teamAttendance.isEmpty()) {
-								for (TeamAttendance ta : teamAttendance) {
+							for (TeamAttendance ta : teamAttendance) {
+								String st = ta.getStatus() != null ? ta.getStatus().toLowerCase() : "";
+								String listStatusClass = st.contains("present") || st.contains("punched") ? "present" : (st.contains("absent") ? "absent" : "punched-in");
 							%>
-
 							<div class="employee-card">
 								<div class="emp-header">
 									<div class="emp-left">
@@ -2381,31 +2578,52 @@ body.dark-theme .settings-item i {
 									</div>
 									<span class="emp-status"><%=ta.getStatus()%></span>
 								</div>
-
 								<div class="emp-body">
-									<div>
-										<b>Punch In:</b>
-										<%=ta.getPunchIn() != null ? ta.getPunchIn() : "--"%>
-									</div>
-									<div>
-										<b>Punch Out:</b>
-										<%=ta.getPunchOut() != null ? ta.getPunchOut() : "--"%>
-									</div>
+									<div><b>Punch In:</b> <%=ta.getPunchIn() != null ? ta.getPunchIn() : "--"%></div>
+									<div><b>Punch Out:</b> <%=ta.getPunchOut() != null ? ta.getPunchOut() : "--"%></div>
 								</div>
 							</div>
-
-							<%
-							}
-							} else {
-							%>
-							<p class="no-data">No attendance data available for today.</p>
 							<%
 							}
 							%>
-
 						</div>
+						<!-- List view (table) -->
+						<div class="employee-list-view" id="teamList">
+							<table class="team-attendance-table">
+								<thead>
+									<tr>
+										<th>Employee</th>
+										<th>Status</th>
+										<th>Punch In</th>
+										<th>Punch Out</th>
+									</tr>
+								</thead>
+								<tbody>
+									<%
+									for (TeamAttendance ta : teamAttendance) {
+										String st = ta.getStatus() != null ? ta.getStatus().toLowerCase() : "";
+										String listStatusClass = st.contains("present") || st.contains("punched") ? "present" : (st.contains("absent") ? "absent" : "punched-in");
+									%>
+									<tr>
+										<td><i class="fa-solid fa-user" style="margin-right:8px;color:#64748b;"></i><strong><%=ta.getFullName()%></strong></td>
+										<td><span class="list-status <%= listStatusClass %>"><%=ta.getStatus()%></span></td>
+										<td><%=ta.getPunchIn() != null ? ta.getPunchIn() : "--"%></td>
+										<td><%=ta.getPunchOut() != null ? ta.getPunchOut() : "--"%></td>
+									</tr>
+									<%
+									}
+									%>
+								</tbody>
+							</table>
+						</div>
+						<%
+						} else {
+						%>
+						<p class="no-data">No attendance data available for today.</p>
+						<%
+						}
+						%>
 					</div>
-
 				</fieldset>
 			</div>
 
@@ -2415,14 +2633,12 @@ body.dark-theme .settings-item i {
 				<fieldset class="leave-fieldset">
 					<legend>Leave</legend>
 
-					<div style="display: flex; gap: 12px; margin-bottom: 20px;">
-						<button id="managerApplyTab" type="button" class="nav-btn"
-							style="flex: 1; background: linear-gradient(135deg,#667eea,#764ba2); color: white; border-radius:20px; padding: 10px; border:none;"
+					<div class="leave-tab-row">
+						<button id="managerApplyTab" type="button" class="leave-tab-btn leave-tab-active"
 							onclick="showManagerApplyLeave()">
 							Apply Leave
 						</button>
-						<button id="managerMyLeavesTab" type="button" class="nav-btn"
-							style="flex: 1; background: #6b7280; color: white; border-radius:20px; padding: 10px; border:none;"
+						<button id="managerMyLeavesTab" type="button" class="leave-tab-btn"
 							onclick="showManagerMyLeaves()">
 							My Leave Requests
 						</button>
@@ -2852,6 +3068,23 @@ if (localStorage.getItem("theme") === "dark") {
     document.body.classList.add("dark-theme");
 }
 
+/* ================= TEAM ATTENDANCE VIEW TOGGLE ================= */
+function setTeamAttendanceView(mode) {
+    var wrap = document.getElementById("teamAttendanceWrap");
+    var btnGrid = document.getElementById("teamViewGrid");
+    var btnList = document.getElementById("teamViewList");
+    if (!wrap || !btnGrid || !btnList) return;
+    if (mode === "list") {
+        wrap.classList.add("list-mode");
+        btnList.classList.add("active");
+        btnGrid.classList.remove("active");
+    } else {
+        wrap.classList.remove("list-mode");
+        btnGrid.classList.add("active");
+        btnList.classList.remove("active");
+    }
+}
+
 /* ================= MAIN ================= */
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -2990,18 +3223,10 @@ function setManagerLeaveTabs(active) {
     const applyTab = document.getElementById("managerApplyTab");
     const myTab = document.getElementById("managerMyLeavesTab");
     if (!applyTab || !myTab) return;
-
-    if (active === "apply") {
-        applyTab.style.background = "linear-gradient(135deg,#667eea,#764ba2)";
-        applyTab.style.color = "#ffffff";
-        myTab.style.background = "#6b7280";
-        myTab.style.color = "#ffffff";
-    } else if (active === "my") {
-        myTab.style.background = "linear-gradient(135deg,#667eea,#764ba2)";
-        myTab.style.color = "#ffffff";
-        applyTab.style.background = "#6b7280";
-        applyTab.style.color = "#ffffff";
-    }
+    applyTab.classList.remove("leave-tab-active");
+    myTab.classList.remove("leave-tab-active");
+    if (active === "apply") applyTab.classList.add("leave-tab-active");
+    else myTab.classList.add("leave-tab-active");
 }
 
 function showManagerApplyLeave() {

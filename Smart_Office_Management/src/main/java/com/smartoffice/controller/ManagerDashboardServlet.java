@@ -66,6 +66,7 @@ public class ManagerDashboardServlet extends HttpServlet {
 			// ================= BREAK TIME =================
 			request.setAttribute("breakTotalSeconds", BreakDAO.getTodayTotalSeconds(username));
 			request.setAttribute("breakLogs", BreakDAO.getTodayBreaks(username));
+			request.setAttribute("onBreak", BreakDAO.isCurrentlyOnBreak(username));
 
 			// ================= TODAY MEETINGS =================
 			List<Meeting> todayMeetings = MeetingDao.getTodayMeetings(username);
