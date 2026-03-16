@@ -42,6 +42,30 @@ public class TaskDAO {
 
         return trimmed;
     }
+    
+    public List<Task> getTasksByStatus(String status) throws Exception {
+
+        List<Task> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM tasks WHERE status=?";
+
+        Connection con = DBConnectionUtil.getConnection();
+        PreparedStatement ps = con.prepareStatement(sql);
+
+        ps.setString(1, status);
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            Task t = new Task();
+            t.setId(rs.getInt("id"));
+            t.setTitle(rs.getString("title"));
+            t.setStatus(rs.getString("status"));
+            list.add(t);
+        }
+
+        return list;
+    }
 
     // ASSIGN TASK
     public static void assignTask(String emp, String manager, String title, String desc,

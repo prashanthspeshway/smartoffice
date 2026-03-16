@@ -29,7 +29,8 @@ public class ViewUser extends HttpServlet {
 	}
 
 	private static String escapeHtml(String s) {
-		if (s == null) return "";
+		if (s == null)
+			return "";
 		return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
 	}
 
@@ -48,28 +49,50 @@ public class ViewUser extends HttpServlet {
 		String sortOrder = req.getParameter("order");
 
 		if (req.getParameter("page") != null) {
-			try { page = Math.max(1, Integer.parseInt(req.getParameter("page"))); } catch (NumberFormatException e) {}
+			try {
+				page = Math.max(1, Integer.parseInt(req.getParameter("page")));
+			} catch (NumberFormatException e) {
+			}
 		}
-		if (search == null) search = "";
-		if (roleFilter == null) roleFilter = "";
-		if (statusFilter == null) statusFilter = "";
-		if (designationFilter == null) designationFilter = "";
-		if (dateFrom == null) dateFrom = "";
-		if (dateTo == null) dateTo = "";
-		if (sortBy == null || sortBy.isEmpty()) sortBy = "fullname";
-		if (sortOrder == null || sortOrder.isEmpty()) sortOrder = "asc";
+		if (search == null)
+			search = "";
+		if (roleFilter == null)
+			roleFilter = "";
+		if (statusFilter == null)
+			statusFilter = "";
+		if (designationFilter == null)
+			designationFilter = "";
+		if (dateFrom == null)
+			dateFrom = "";
+		if (dateTo == null)
+			dateTo = "";
+		if (sortBy == null || sortBy.isEmpty())
+			sortBy = "fullname";
+		if (sortOrder == null || sortOrder.isEmpty())
+			sortOrder = "asc";
 
 		// Validate sort column
 		String orderColumn = "firstname";
 		switch (sortBy.toLowerCase()) {
-			case "role": orderColumn = "role"; break;
-			case "status": orderColumn = "status"; break;
-			case "email": orderColumn = "email"; break;
-			case "date":
-			case "joineddate": orderColumn = "joinedDate"; break;
-			default: orderColumn = "firstname"; break;
+		case "role":
+			orderColumn = "role";
+			break;
+		case "status":
+			orderColumn = "status";
+			break;
+		case "email":
+			orderColumn = "email";
+			break;
+		case "date":
+		case "joineddate":
+			orderColumn = "joinedDate";
+			break;
+		default:
+			orderColumn = "firstname";
+			break;
 		}
-		if (!"desc".equalsIgnoreCase(sortOrder)) sortOrder = "asc";
+		if (!"desc".equalsIgnoreCase(sortOrder))
+			sortOrder = "asc";
 
 		int offset = (page - 1) * limit;
 
@@ -117,20 +140,31 @@ public class ViewUser extends HttpServlet {
 			if (search != null && !search.trim().isEmpty()) {
 				String term = "%" + search.trim() + "%";
 				where.append(" AND (LOWER(CONCAT(COALESCE(firstname,''), ' ', COALESCE(lastname,''))) LIKE LOWER(?) ")
-					.append(" OR LOWER(email) LIKE LOWER(?) OR LOWER(role) LIKE LOWER(?) OR LOWER(status) LIKE LOWER(?) ")
-					.append(" OR DATE_FORMAT(joinedDate, '%Y-%m-%d') LIKE ? OR DATE_FORMAT(joinedDate, '%d-%m-%Y') LIKE ?) ");
-				countWhere.append(" AND (LOWER(CONCAT(COALESCE(firstname,''), ' ', COALESCE(lastname,''))) LIKE LOWER(?) ")
-					.append(" OR LOWER(email) LIKE LOWER(?) OR LOWER(role) LIKE LOWER(?) OR LOWER(status) LIKE LOWER(?) ")
-					.append(" OR DATE_FORMAT(joinedDate, '%Y-%m-%d') LIKE ? OR DATE_FORMAT(joinedDate, '%d-%m-%Y') LIKE ?) ");
+						.append(" OR LOWER(email) LIKE LOWER(?) OR LOWER(role) LIKE LOWER(?) OR LOWER(status) LIKE LOWER(?) ")
+						.append(" OR DATE_FORMAT(joinedDate, '%Y-%m-%d') LIKE ? OR DATE_FORMAT(joinedDate, '%d-%m-%Y') LIKE ?) ");
+				countWhere.append(
+						" AND (LOWER(CONCAT(COALESCE(firstname,''), ' ', COALESCE(lastname,''))) LIKE LOWER(?) ")
+						.append(" OR LOWER(email) LIKE LOWER(?) OR LOWER(role) LIKE LOWER(?) OR LOWER(status) LIKE LOWER(?) ")
+						.append(" OR DATE_FORMAT(joinedDate, '%Y-%m-%d') LIKE ? OR DATE_FORMAT(joinedDate, '%d-%m-%Y') LIKE ?) ");
 			}
 
 			// Date range filter (only add when valid date)
 			java.sql.Date dateFromVal = null, dateToVal = null;
 			if (dateFrom != null && !dateFrom.trim().isEmpty()) {
-				try { dateFromVal = java.sql.Date.valueOf(dateFrom.trim()); where.append(" AND joinedDate >= ? "); countWhere.append(" AND joinedDate >= ? "); } catch (Exception ignored) {}
+				try {
+					dateFromVal = java.sql.Date.valueOf(dateFrom.trim());
+					where.append(" AND joinedDate >= ? ");
+					countWhere.append(" AND joinedDate >= ? ");
+				} catch (Exception ignored) {
+				}
 			}
 			if (dateTo != null && !dateTo.trim().isEmpty()) {
-				try { dateToVal = java.sql.Date.valueOf(dateTo.trim()); where.append(" AND joinedDate <= ? "); countWhere.append(" AND joinedDate <= ? "); } catch (Exception ignored) {}
+				try {
+					dateToVal = java.sql.Date.valueOf(dateTo.trim());
+					where.append(" AND joinedDate <= ? ");
+					countWhere.append(" AND joinedDate <= ? ");
+				} catch (Exception ignored) {
+				}
 			}
 
 			String countSql = "SELECT COUNT(*) FROM users " + countWhere;
@@ -154,13 +188,17 @@ public class ViewUser extends HttpServlet {
 					countPs.setString(p++, term);
 					countPs.setString(p++, term);
 				}
-				if (dateFromVal != null) countPs.setDate(p++, dateFromVal);
-				if (dateToVal != null) countPs.setDate(p++, dateToVal);
+				if (dateFromVal != null)
+					countPs.setDate(p++, dateFromVal);
+				if (dateToVal != null)
+					countPs.setDate(p++, dateToVal);
 				ResultSet countRs = countPs.executeQuery();
-				if (countRs.next()) totalUsers = countRs.getInt(1);
+				if (countRs.next())
+					totalUsers = countRs.getInt(1);
 			}
 
-			String sql = "SELECT * FROM users " + where + " ORDER BY " + orderColumn + " " + sortOrder + " LIMIT ? OFFSET ?";
+			String sql = "SELECT * FROM users " + where + " ORDER BY " + orderColumn + " " + sortOrder
+					+ " LIMIT ? OFFSET ?";
 			try (PreparedStatement ps = con.prepareStatement(sql)) {
 				int p = 1;
 				if (roleFilter != null && !roleFilter.trim().isEmpty()) {
@@ -181,8 +219,10 @@ public class ViewUser extends HttpServlet {
 					ps.setString(p++, term);
 					ps.setString(p++, term);
 				}
-				if (dateFromVal != null) ps.setDate(p++, dateFromVal);
-				if (dateToVal != null) ps.setDate(p++, dateToVal);
+				if (dateFromVal != null)
+					ps.setDate(p++, dateFromVal);
+				if (dateToVal != null)
+					ps.setDate(p++, dateToVal);
 				ps.setInt(p++, limit);
 				ps.setInt(p++, offset);
 
@@ -195,39 +235,47 @@ public class ViewUser extends HttpServlet {
 					String last = nullToEmpty(rs.getString("lastname"));
 					String email = nullToEmpty(rs.getString("email"));
 					String fullName = fullName(first, last);
-					if (fullName.isEmpty()) fullName = email;
+					if (fullName.isEmpty())
+						fullName = email;
 					String roleDisplay = rs.getString("role");
-					if (roleDisplay != null && "user".equalsIgnoreCase(roleDisplay.trim())) roleDisplay = "employee";
+					if (roleDisplay != null && "user".equalsIgnoreCase(roleDisplay.trim()))
+						roleDisplay = "employee";
 					roleDisplay = roleDisplay != null ? roleDisplay : "";
-					String statusClass = status != null && status.trim().equalsIgnoreCase("active") ? "active" : "inactive";
-					String statusText = status != null && status.trim().equalsIgnoreCase("active") ? "Active" : "Inactive";
+					String statusClass = status != null && status.trim().equalsIgnoreCase("active") ? "active"
+							: "inactive";
+					String statusText = status != null && status.trim().equalsIgnoreCase("active") ? "Active"
+							: "Inactive";
 					java.sql.Date joinedDate = rs.getDate("joinedDate");
 					String joinedStr = joinedDate != null ? joinedDate.toString() : "";
 
-					// Table row: Full Name | Role | Status | First Name | Last Name | Email | Joined Date | Actions
-					rows.append("<tr class=\"border-b border-slate-200 hover:bg-slate-50\">")
-						.append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(fullName)).append("</td>")
-						.append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(roleDisplay)).append("</td>")
-						.append("<td class=\"px-4 py-3\"><span class=\"badge ").append(statusClass).append("\">").append(escapeHtml(statusText)).append("</span></td>")
-						.append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(first)).append("</td>")
-						.append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(last)).append("</td>")
-						.append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(email)).append("</td>")
-						.append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(joinedStr)).append("</td>")
-						.append("<td class=\"px-4 py-3\"><a href=\"editUser?id=").append(userId).append("\" class=\"icon-btn edit\"><i class=\"fa-solid fa-pen\"></i></a>")
-						.append("<a href=\"#\" class=\"icon-btn delete\" onclick=\"openDeleteModal(").append(userId).append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a></td>")
-						.append("</tr>");
+					// Table row: Full Name | Role | Status | First Name | Last Name | Email |
+					// Joined Date | Actions
+					// Table row: Full Name | Role | Status | Designation | Email | Actions
+					String designation = nullToEmpty(rs.getString("designation"));
 
-					// Grid card: Full Name, Role, Status, First Name, Last Name, Email, Joined Date, Actions
+					rows.append("<tr class=\"border-b border-slate-200 hover:bg-slate-50\">")
+					        .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(fullName)).append("</td>")
+					        .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(roleDisplay)).append("</td>")
+					        .append("<td class=\"px-4 py-3\"><span class=\"badge ").append(statusClass).append("\">").append(escapeHtml(statusText)).append("</span></td>")
+					        .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(designation.isEmpty() ? "-" : escapeHtml(designation)).append("</td>")
+					        .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(email)).append("</td>")
+					        .append("<td class=\"px-4 py-3\">")
+					        .append("<a href=\"editUser?id=").append(userId).append("\" class=\"icon-btn edit\"><i class=\"fa-solid fa-pen\"></i></a>")
+					        .append("<a href=\"#\" class=\"icon-btn delete\" onclick=\"openDeleteModal(").append(userId).append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a>")
+					        .append("</td>").append("</tr>");
+
+					// Grid card: Full Name, Role, Status, First Name, Last Name, Email, Joined
+					// Date, Actions
+					// Grid card: Full Name, Role, Status, Designation, Email, Actions
 					gridRows.append("<div class=\"grid-card bg-white rounded-xl border border-slate-200 p-4\">")
-						.append("<div class=\"font-medium text-slate-800 mb-1\">").append(escapeHtml(fullName)).append("</div>")
-						.append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Role:</span> ").append(escapeHtml(roleDisplay)).append("</div>")
-						.append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Status:</span> <span class=\"badge ").append(statusClass).append("\">").append(escapeHtml(statusText)).append("</span></div>")
-						.append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">First:</span> ").append(escapeHtml(first)).append(" | <span class=\"font-medium\">Last:</span> ").append(escapeHtml(last)).append("</div>")
-						.append("<div class=\"text-sm text-slate-500 mb-2\">").append(escapeHtml(email)).append("</div>")
-						.append("<div class=\"text-xs text-slate-500 mb-3\">Joined: ").append(escapeHtml(joinedStr)).append("</div>")
-						.append("<div><a href=\"editUser?id=").append(userId).append("\" class=\"icon-btn edit inline-block\"><i class=\"fa-solid fa-pen\"></i></a>")
-						.append("<a href=\"#\" class=\"icon-btn delete inline-block\" onclick=\"openDeleteModal(").append(userId).append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a></div>")
-						.append("</div>");
+					        .append("<div class=\"font-medium text-slate-800 mb-1\">").append(escapeHtml(fullName)).append("</div>")
+					        .append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Role:</span> ").append(escapeHtml(roleDisplay)).append("</div>")
+					        .append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Status:</span> <span class=\"badge ").append(statusClass).append("\">").append(escapeHtml(statusText)).append("</span></div>")
+					        .append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Designation:</span> ").append(designation.isEmpty() ? "-" : escapeHtml(designation)).append("</div>")
+					        .append("<div class=\"text-sm text-slate-500 mb-3\">").append(escapeHtml(email)).append("</div>")
+					        .append("<div><a href=\"editUser?id=").append(userId).append("\" class=\"icon-btn edit inline-block\"><i class=\"fa-solid fa-pen\"></i></a>")
+					        .append("<a href=\"#\" class=\"icon-btn delete inline-block\" onclick=\"openDeleteModal(").append(userId).append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a></div>")
+					        .append("</div>");
 				}
 			}
 
@@ -238,7 +286,8 @@ public class ViewUser extends HttpServlet {
 		int totalPages = Math.max(1, (int) Math.ceil((double) totalUsers / limit));
 
 		req.setAttribute("rows", rows.toString());
-		req.setAttribute("gridRows", gridRows.length() > 0 ? gridRows.toString() : "<div class=\"col-span-full text-center py-12 text-slate-500 italic\">No employees found</div>");
+		req.setAttribute("gridRows", gridRows.length() > 0 ? gridRows.toString()
+				: "<div class=\"col-span-full text-center py-12 text-slate-500 italic\">No employees found</div>");
 		req.setAttribute("currentPage", page);
 		req.setAttribute("totalPages", totalPages);
 		req.setAttribute("totalUsers", totalUsers);
@@ -253,7 +302,8 @@ public class ViewUser extends HttpServlet {
 
 		try {
 			req.setAttribute("designationOptions", new DesignationDAO().getActiveDesignations());
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 
 		req.getRequestDispatcher("viewUser.jsp").forward(req, res);
 	}

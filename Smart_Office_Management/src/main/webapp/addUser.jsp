@@ -283,8 +283,27 @@ String errorSafe = h(errorMsg);
         if (desig) desig.required = isEmployee;
       }
 
-      if (roleSel) roleSel.addEventListener('change', syncDesignation);
+      var submitBtn = document.querySelector('#addEmployeeForm button[type="submit"]');
+
+      function syncSubmitLabel() {
+        if (!roleSel || !submitBtn) return;
+        var role = (roleSel.value || '').toLowerCase();
+        if (role === 'manager') {
+          submitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Manager';
+        } else if (role === 'employee') {
+          submitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Employee';
+        } else {
+          submitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Employee';
+        }
+      }
+
+      if (roleSel) roleSel.addEventListener('change', function() {
+        syncDesignation();
+        syncSubmitLabel();
+      });
+
       syncDesignation();
+      syncSubmitLabel();
 
       var toast = document.getElementById('toast');
       if (toast) {

@@ -6,32 +6,67 @@ import java.util.List;
 
 public class Team {
 
-    private int id;
-    private String name;
-    private String managerUsername;
-    private String managerFullname;
-    private String createdBy;
-    private Timestamp createdAt;
-    private List<User> members = new ArrayList<>();
+	private int id;
+	private String name;
+	private String managerUsername;
+	private String managerFullname;
+	private String createdBy;
+	private Timestamp createdAt;
+	private List<User> members = new ArrayList<>();
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+	public int getId() {
+		return id;
+	}
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public String getManagerUsername() { return managerUsername; }
-    public void setManagerUsername(String managerUsername) { this.managerUsername = managerUsername; }
+	public String getName() {
+		return name;
+	}
 
-    public String getManagerFullname() { return managerFullname; }
-    public void setManagerFullname(String managerFullname) { this.managerFullname = managerFullname; }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getCreatedBy() { return createdBy; }
-    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+	public String getManagerUsername() {
+		return managerUsername;
+	}
 
-    public Timestamp getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+	public void setManagerUsername(String managerUsername) {
+		this.managerUsername = managerUsername;
+	}
 
-    public List<User> getMembers() { return members; }
-    public void setMembers(List<User> members) { this.members = members != null ? members : new ArrayList<>(); }
+	public String getManagerFullname() {
+		return managerFullname;
+	}
+
+	public void setManagerFullname(String managerFullname) {
+		this.managerFullname = managerFullname;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Timestamp getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Timestamp createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public List<User> getMembers() {
+		return members;
+	}
+
+	public void setMembers(List<User> members) {
+		this.members = members != null ? members : new ArrayList<>();
+	}
 }

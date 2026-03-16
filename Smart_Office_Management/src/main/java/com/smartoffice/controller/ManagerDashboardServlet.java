@@ -1,8 +1,6 @@
 package com.smartoffice.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +24,6 @@ import com.smartoffice.model.Meeting;
 import com.smartoffice.model.Notification;
 import com.smartoffice.model.Team;
 import com.smartoffice.model.User;
-import com.smartoffice.utils.DBConnectionUtil;
 
 @SuppressWarnings("serial")
 @WebServlet("/manager")
@@ -74,6 +71,19 @@ public class ManagerDashboardServlet extends HttpServlet {
 
 			List<User> teamList = UserDao.getUsersByManager(username);
 			request.setAttribute("teamList", teamList);
+			
+			// ================= PARTICIPANTS FOR SCHEDULE MEETING =================
+
+			List<User> employees = UserDao.getUsersByRole("employee");
+			List<User> managers = UserDao.getUsersByRole("manager");
+			List<User> users = UserDao.getAllUsers();
+			List<Team> teams = TeamDAO.getAllTeams();
+
+			request.setAttribute("employees", employees);
+			request.setAttribute("managers", managers);
+			request.setAttribute("users", users);
+			request.setAttribute("teams", teams);
+
 
 			// ================= TEAM ATTENDANCE =================
 			request.setAttribute("teamAttendance", attendanceDAO.getTeamAttendanceForToday(username));

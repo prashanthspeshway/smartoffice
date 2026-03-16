@@ -3,16 +3,19 @@ package com.smartoffice.controller;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
-import com.smartoffice.dao.MeetingDao;
-import com.smartoffice.model.Meeting;
+import com.smartoffice.dao.TeamDAO;
+import com.smartoffice.model.User;
 import com.smartoffice.utils.DBConnectionUtil;
 
 @SuppressWarnings("serial")
@@ -28,40 +31,55 @@ public class ScheduleMeetingServlet extends HttpServlet {
 			return;
 		}
 
-		String manager = (String) session.getAttribute("username");
-
-		MeetingDao meetingDao = new MeetingDao();
-
-		List<Meeting> todayMeetings = meetingDao.getTodayMeetingsForManager(manager);
-
-		request.setAttribute("todayMeetings", todayMeetings);
-
 		String title = request.getParameter("title");
 		String description = request.getParameter("description");
 		String startTimeStr = request.getParameter("startTime");
 		String endTimeStr = request.getParameter("endTime");
 		String meetingLink = request.getParameter("meetingLink");
-		String username = (String) session.getAttribute("username");
+
+		String[] users = request.getParameterValues("participants");
+		String[] teams = request.getParameterValues("teamParticipants");
+
 		String email = (String) session.getAttribute("email");
 
-
-		String createdBy = (String) session.getAttribute("username");
+		Set<String> finalParticipants = new HashSet<>();
 
 		try {
+
+			/* ADD INDIVIDUAL USERS */
+
+			if (users != null) {
+				for (String u : users) {
+					finalParticipants.add(u);
+				}
+			}
+
+			/* ADD TEAM MEMBERS */
+
+			if (teams != null) {
+
+				for (String teamId : teams) {
+
+					List<User> members = TeamDAO.getTeamById(Integer.parseInt(teamId)).getMembers();
+
+					for (User member : members) {
+						finalParticipants.add(member.getEmail());
+					}
+				}
+			}
 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
 			LocalDateTime start = LocalDateTime.parse(startTimeStr, formatter);
 			LocalDateTime end = LocalDateTime.parse(endTimeStr, formatter);
-			
+
 			String sql = "INSERT INTO meetings(title, description, start_time, end_time, meeting_link, created_by) VALUES (?, ?, ?, ?, ?, ?)";
 
 			try (Connection con = DBConnectionUtil.getConnection();
-			     PreparedStatement ps = con.prepareStatement(sql)) {
+					PreparedStatement ps = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
 
 				ps.setString(1, title);
 				ps.setString(2, description);
-
 				ps.setTimestamp(3, Timestamp.valueOf(start));
 				ps.setTimestamp(4, Timestamp.valueOf(end));
 
@@ -74,6 +92,28 @@ public class ScheduleMeetingServlet extends HttpServlet {
 				ps.setString(6, email);
 
 				ps.executeUpdate();
+
+				ResultSet rs = ps.getGeneratedKeys();
+
+				if (rs.next()) {
+
+					int meetingId = rs.getInt(1);
+
+					/* INSERT PARTICIPANTS */
+
+					String insert = "INSERT INTO meeting_participants(meeting_id,user_email) VALUES (?,?)";
+
+					PreparedStatement ps2 = con.prepareStatement(insert);
+
+					for (String participant : finalParticipants) {
+
+					    ps2.setInt(1, meetingId);
+					    ps2.setString(2, participant);
+					    ps2.addBatch();
+					}
+
+					ps2.executeBatch();
+				}
 			}
 
 		} catch (Exception e) {

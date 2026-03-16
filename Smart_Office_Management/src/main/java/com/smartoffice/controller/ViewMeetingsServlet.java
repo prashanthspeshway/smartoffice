@@ -36,21 +36,31 @@ public class ViewMeetingsServlet extends HttpServlet {
 
 		// Get meetings created by this employee's team manager(s)
 		String sql = """
-				    SELECT *
-				    FROM meetings
-				    WHERE created_by IN (
-				        SELECT t.manager_username
-				        FROM team_members tm
-				        JOIN teams t ON t.id = tm.team_id
-				        WHERE tm.username = ?
-				    )
-				    AND start_time >= NOW()
-				    ORDER BY start_time
+				SELECT *
+				FROM meetings
+				WHERE created_by IN (
+				    SELECT t.manager_username
+				    FROM team_members tm
+				    JOIN teams t ON t.id = tm.team_id
+				    WHERE tm.username = ?
+				)
+
+				UNION
+
+				SELECT m.*
+				FROM meetings m
+				JOIN meeting_participants mp ON m.id = mp.meeting_id
+				WHERE mp.user_email = ?
+
+				ORDER BY start_time
 				""";
 
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+		try (Connection con = DBConnectionUtil.getConnection();
+				
+			PreparedStatement ps = con.prepareStatement(sql)) {
 
 			ps.setString(1, username);
+			ps.setString(2, username);
 
 			ResultSet rs = ps.executeQuery();
 
