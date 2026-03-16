@@ -13,286 +13,342 @@ import com.smartoffice.utils.DBConnectionUtil;
 
 public class TaskDAO {
 
-	private static String resolveDbUsername(Connection con, String emailOrUsername) {
-		if (emailOrUsername == null || emailOrUsername.trim().isEmpty()) {
-			return emailOrUsername;
-		}
-		String trimmed = emailOrUsername.trim();
-		// Try to resolve username from users table using email
-		String sql = "SELECT username FROM users WHERE email = ? LIMIT 1";
-		try (PreparedStatement ps = con.prepareStatement(sql)) {
-			ps.setString(1, trimmed);
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) {
-					String dbUsername = rs.getString("username");
-					if (dbUsername != null && !dbUsername.trim().isEmpty()) {
-						return dbUsername.trim();
-					}
-				}
-			}
-		} catch (Exception e) {
-			// If anything goes wrong, just fall back to original value
-			e.printStackTrace();
-		}
-		return trimmed;
-	}
+    private static String resolveDbUsername(Connection con, String emailOrUsername) {
+        if (emailOrUsername == null || emailOrUsername.trim().isEmpty()) {
+            return emailOrUsername;
+        }
 
-	public static void assignTask(String emp, String manager, String title, String desc,
-	                             Date deadline, String priority,
-	                             String attachmentName, byte[] attachmentBytes) {
+        String trimmed = emailOrUsername.trim();
 
-		// 1) Try full schema: title + attachment + deadline + priority
-		try (Connection con = DBConnectionUtil.getConnection()) {
-			String assignedToDb = resolveDbUsername(con, emp);
-			String assignedByDb = resolveDbUsername(con, manager);
+        String sql = "SELECT username FROM users WHERE email=? LIMIT 1";
 
-			String sqlFull = "INSERT INTO tasks (title, description, attachment_name, attachment, assigned_to, assigned_by, status, deadline, priority) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, 'ASSIGNED', ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
 
-			try (PreparedStatement ps = con.prepareStatement(sqlFull)) {
-				ps.setString(1, title);
-				ps.setString(2, desc);
-				ps.setString(3, attachmentName);
-				if (attachmentBytes != null) {
-					ps.setBytes(4, attachmentBytes);
-				} else {
-					ps.setNull(4, java.sql.Types.BLOB);
-				}
-				ps.setString(5, assignedToDb);
-				ps.setString(6, assignedByDb);
-				if (deadline != null) {
-					ps.setDate(7, deadline);
-				} else {
-					ps.setNull(7, java.sql.Types.DATE);
-				}
-				ps.setString(8, priority);
-				ps.executeUpdate();
-				return; // success
-			}
-		} catch (Exception ignoreFull) {
-			// fall through to next strategy
-		}
+            ps.setString(1, trimmed);
 
-		// 2) Try older schema with attachment but without deadline/priority
-		try (Connection con = DBConnectionUtil.getConnection()) {
-			String assignedToDb = resolveDbUsername(con, emp);
-			String assignedByDb = resolveDbUsername(con, manager);
+            ResultSet rs = ps.executeQuery();
 
-			String sqlNoDeadline = "INSERT INTO tasks (title, description, attachment_name, attachment, assigned_to, assigned_by, status) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, 'ASSIGNED')";
+            if (rs.next()) {
+                String dbUsername = rs.getString("username");
 
-			try (PreparedStatement ps = con.prepareStatement(sqlNoDeadline)) {
-				ps.setString(1, title);
-				ps.setString(2, desc);
-				ps.setString(3, attachmentName);
-				if (attachmentBytes != null) {
-					ps.setBytes(4, attachmentBytes);
-				} else {
-					ps.setNull(4, java.sql.Types.BLOB);
-				}
-				ps.setString(5, assignedToDb);
-				ps.setString(6, assignedByDb);
-				ps.executeUpdate();
-				return; // success
-			}
-		} catch (Exception ignoreMid) {
-			// fall through to final strategy
-		}
+                if (dbUsername != null && !dbUsername.trim().isEmpty()) {
+                    return dbUsername.trim();
+                }
+            }
 
-		// 3) Final fallback: very old schema (no title/attachment/deadline/priority)
-		try (Connection con = DBConnectionUtil.getConnection()) {
-			String assignedToDb = resolveDbUsername(con, emp);
-			String assignedByDb = resolveDbUsername(con, manager);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-			String sqlLegacy = "INSERT INTO tasks (description, assigned_to, assigned_by, status) "
-					+ "VALUES (?, ?, ?, 'ASSIGNED')";
+        return trimmed;
+    }
 
-			try (PreparedStatement ps = con.prepareStatement(sqlLegacy)) {
-				ps.setString(1, desc);
-				ps.setString(2, assignedToDb);
-				ps.setString(3, assignedByDb);
-				ps.executeUpdate();
-			}
-		} catch (Exception finalEx) {
-			finalEx.printStackTrace();
-		}
-	}
+    // ASSIGN TASK
+    public static void assignTask(String emp, String manager, String title, String desc,
+                                  Date deadline, String priority,
+                                  String attachmentName, byte[] attachmentBytes) {
 
-	public static List<Task> getTasksForEmployee(String username) {
-		List<Task> list = new ArrayList<>();
+        try (Connection con = DBConnectionUtil.getConnection()) {
 
-		String sql = "SELECT * FROM tasks WHERE assigned_to=? ORDER BY id DESC";
+            String assignedToDb = resolveDbUsername(con, emp);
+            String assignedByDb = resolveDbUsername(con, manager);
 
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            String sql = "INSERT INTO tasks (title, description, attachment_name, attachment, assigned_to, assigned_by, status, deadline, priority) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, 'ASSIGNED', ?, ?)";
 
-			String assignedToDb = resolveDbUsername(con, username);
-			ps.setString(1, assignedToDb);
-			ResultSet rs = ps.executeQuery();
+            PreparedStatement ps = con.prepareStatement(sql);
 
-			while (rs.next()) {
-				Task task = new Task();
-				task.setId(rs.getInt("id"));
-				task.setTitle(rs.getString("title"));
-				task.setDescription(rs.getString("description"));
-				task.setAttachmentName(rs.getString("attachment_name"));
-				task.setAssignedTo(rs.getString("assigned_to"));
-				task.setAssignedBy(rs.getString("assigned_by"));
-				task.setStatus(rs.getString("status"));
-				task.setAssignedDate(rs.getTimestamp("assigned_date"));
-				try { task.setDeadline(rs.getDate("deadline")); } catch (Exception ignore) {}
-				try { task.setPriority(rs.getString("priority")); } catch (Exception ignore) {}
+            ps.setString(1, title);
+            ps.setString(2, desc);
+            ps.setString(3, attachmentName);
 
-				list.add(task);
-			}
+            if (attachmentBytes != null)
+                ps.setBytes(4, attachmentBytes);
+            else
+                ps.setNull(4, java.sql.Types.BLOB);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            ps.setString(5, assignedToDb);
+            ps.setString(6, assignedByDb);
 
-		return list;
-	}
+            if (deadline != null)
+                ps.setDate(7, deadline);
+            else
+                ps.setNull(7, java.sql.Types.DATE);
 
-	public static void updateStatus(int taskId, String status) {
-		String sql = "UPDATE tasks SET status=? WHERE id=?";
+            ps.setString(8, priority);
 
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.executeUpdate();
 
-			ps.setString(1, status);
-			ps.setInt(2, taskId);
-			ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    // EMPLOYEE UPLOAD DOCUMENT
+    public static void submitEmployeeWork(int taskId, String attachmentName, byte[] attachmentBytes, String comment) {
 
-	// USER ONLY – safe
-	public static void markCompleted(int taskId) {
+        String sql = "UPDATE tasks SET employee_attachment_name=?, employee_attachment=?, employee_comment=?, status='SUBMITTED' WHERE id=?";
 
-		String sql = "UPDATE tasks SET status='COMPLETED' WHERE id=?";
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, attachmentName);
 
-			ps.setInt(1, taskId);
-			ps.executeUpdate();
+            if (attachmentBytes != null)
+                ps.setBytes(2, attachmentBytes);
+            else
+                ps.setNull(2, java.sql.Types.BLOB);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+            ps.setString(3, comment);
+            ps.setInt(4, taskId);
 
-	public static void deleteOldCompletedTasks() {
-		String sql = "DELETE FROM tasks " + "WHERE status='COMPLETED' " + "AND assigned_date < CURDATE()";
+            ps.executeUpdate();
 
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+ // ADMIN VIEW ALL TASKS
+    public static List<Task> getAllTasks() {
 
-			ps.executeUpdate();
+        List<Task> list = new ArrayList<>();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        String sql = "SELECT * FROM tasks ORDER BY id DESC";
 
-	public static List<Task> getAllTasks() throws Exception {
-		List<Task> list = new ArrayList<>();
-		// Use * so it works even if deadline/priority columns are missing.
-		String sql = "SELECT * FROM tasks ORDER BY id DESC";
-		try (Connection con = DBConnectionUtil.getConnection();
-		     PreparedStatement ps = con.prepareStatement(sql);
-		     ResultSet rs = ps.executeQuery()) {
-			while (rs.next()) {
-				Task t = new Task();
-				t.setId(rs.getInt("id"));
-				t.setTitle(rs.getString("title"));
-				t.setDescription(rs.getString("description"));
-				t.setAttachmentName(rs.getString("attachment_name"));
-				t.setAssignedTo(rs.getString("assigned_to"));
-				t.setAssignedBy(rs.getString("assigned_by"));
-				t.setStatus(rs.getString("status"));
-				t.setAssignedDate(rs.getTimestamp("assigned_date"));
-				try { t.setDeadline(rs.getDate("deadline")); } catch (Exception ignore) {}
-				try { t.setPriority(rs.getString("priority")); } catch (Exception ignore) {}
-				list.add(t);
-			}
-		}
-		return list;
-	}
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-	// MANAGER – view tasks assigned to a specific employee
-	public static List<Task> getTasksAssignedByManager(String manager, String employee) {
+            ResultSet rs = ps.executeQuery();
 
-		List<Task> list = new ArrayList<>();
+            while (rs.next()) {
 
-		String sql = "SELECT * FROM tasks WHERE assigned_by=? AND assigned_to=? ORDER BY id DESC";
+                Task task = new Task();
 
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+                task.setId(rs.getInt("id"));
+                task.setTitle(rs.getString("title"));
+                task.setDescription(rs.getString("description"));
+                task.setAssignedTo(rs.getString("assigned_to"));
+                task.setAssignedBy(rs.getString("assigned_by"));
+                task.setStatus(rs.getString("status"));
+                task.setAssignedDate(rs.getTimestamp("assigned_date"));
 
-			String managerDb = resolveDbUsername(con, manager);
-			String employeeDb = resolveDbUsername(con, employee);
+                try { task.setDeadline(rs.getDate("deadline")); } catch (Exception ignore) {}
+                try { task.setPriority(rs.getString("priority")); } catch (Exception ignore) {}
 
-			ps.setString(1, managerDb);
-			ps.setString(2, employeeDb);
+                list.add(task);
+            }
 
-			ResultSet rs = ps.executeQuery();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-			while (rs.next()) {
-				Task t = new Task();
-				t.setId(rs.getInt("id"));
-				t.setTitle(rs.getString("title"));
-				t.setDescription(rs.getString("description"));
-				t.setAttachmentName(rs.getString("attachment_name"));
-				t.setStatus(rs.getString("status"));
-				t.setAssignedDate(rs.getTimestamp("assigned_date"));
-				try { t.setDeadline(rs.getDate("deadline")); } catch (Exception ignore) {}
-				try { t.setPriority(rs.getString("priority")); } catch (Exception ignore) {}
-				list.add(t);
-			}
+        return list;
+    }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    // USER VIEW TASKS
+    public static List<Task> getTasksForEmployee(String username) {
 
-		return list;
-	}
+        List<Task> list = new ArrayList<>();
 
-	public static List<User> getEmployeesUnderManager(String managerUsername) {
-		List<User> list = new ArrayList<>();
-		String sql = "SELECT DISTINCT u.email, u.firstname, u.lastname, u.phone, u.status " +
-		             "FROM users u JOIN team_members tm ON tm.username = u.email " +
-		             "JOIN teams t ON t.id = tm.team_id AND t.manager_username = ? " +
-		             "ORDER BY u.firstname, u.lastname";
+        String sql = "SELECT * FROM tasks WHERE assigned_to=? ORDER BY id DESC";
 
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-			ps.setString(1, managerUsername);
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				User u = new User();
-				u.setEmail(rs.getString("email"));
-				u.setFirstname(rs.getString("firstname"));
-				u.setLastname(rs.getString("lastname"));
-				u.setEmail(rs.getString("email"));
-				u.setPhone(rs.getString("phone"));
-				u.setStatus(rs.getString("status"));
-				list.add(u);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
-	}
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-	public static boolean isEmployeeUnderManager(String employeeUsername, String managerUsername) {
-		String sql = "SELECT COUNT(*) FROM team_members tm JOIN teams t ON t.id = tm.team_id " +
-		             "WHERE tm.username = ? AND t.manager_username = ?";
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-			ps.setString(1, employeeUsername);
-			ps.setString(2, managerUsername);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) return rs.getInt(1) > 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+            String assignedToDb = resolveDbUsername(con, username);
+
+            ps.setString(1, assignedToDb);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Task task = new Task();
+
+                task.setId(rs.getInt("id"));
+                task.setTitle(rs.getString("title"));
+                task.setDescription(rs.getString("description"));
+                task.setAttachmentName(rs.getString("attachment_name"));
+                task.setAssignedTo(rs.getString("assigned_to"));
+                task.setAssignedBy(rs.getString("assigned_by"));
+                task.setStatus(rs.getString("status"));
+                task.setAssignedDate(rs.getTimestamp("assigned_date"));
+
+                try { task.setDeadline(rs.getDate("deadline")); } catch (Exception ignore) {}
+                try { task.setPriority(rs.getString("priority")); } catch (Exception ignore) {}
+
+                try { task.setEmployeeAttachmentName(rs.getString("employee_attachment_name")); } catch (Exception ignore) {}
+                try { task.setEmployeeComment(rs.getString("employee_comment")); } catch (Exception ignore) {}
+
+                list.add(task);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // MANAGER VIEW TASKS
+    public static List<Task> getTasksAssignedByManager(String manager, String employee) {
+
+        List<Task> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM tasks WHERE assigned_by=? AND assigned_to=? ORDER BY id DESC";
+
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            String managerDb = resolveDbUsername(con, manager);
+            String employeeDb = resolveDbUsername(con, employee);
+
+            ps.setString(1, managerDb);
+            ps.setString(2, employeeDb);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Task t = new Task();
+
+                t.setId(rs.getInt("id"));
+                t.setTitle(rs.getString("title"));
+                t.setDescription(rs.getString("description"));
+                t.setAttachmentName(rs.getString("attachment_name"));
+
+                t.setEmployeeAttachmentName(rs.getString("employee_attachment_name"));
+                t.setEmployeeComment(rs.getString("employee_comment"));
+
+                t.setStatus(rs.getString("status"));
+                t.setAssignedDate(rs.getTimestamp("assigned_date"));
+
+                try { t.setDeadline(rs.getDate("deadline")); } catch (Exception ignore) {}
+                try { t.setPriority(rs.getString("priority")); } catch (Exception ignore) {}
+
+                list.add(t);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+ // UPDATE TASK STATUS
+    public static void updateStatus(int taskId, String status) {
+
+        String sql = "UPDATE tasks SET status=? WHERE id=?";
+
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, status);
+            ps.setInt(2, taskId);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // MARK COMPLETED
+    public static void markCompleted(int taskId) {
+
+        String sql = "UPDATE tasks SET status='COMPLETED' WHERE id=?";
+
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, taskId);
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // DELETE OLD TASKS
+    public static void deleteOldCompletedTasks() {
+
+        String sql = "DELETE FROM tasks WHERE status='COMPLETED' AND assigned_date < CURDATE()";
+
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+ // CHECK IF EMPLOYEE BELONGS TO MANAGER
+    public static boolean isEmployeeUnderManager(String employee, String manager) {
+
+        boolean exists = false;
+
+        String sql = "SELECT 1 FROM teams t " +
+                     "JOIN team_members tm ON tm.team_id = t.id " +
+                     "WHERE t.manager_username=? AND tm.username=? LIMIT 1";
+
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, manager);
+            ps.setString(2, employee);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                exists = true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return exists;
+    }
+
+    // GET EMPLOYEES UNDER MANAGER
+    public static List<User> getEmployeesUnderManager(String managerUsername) {
+
+        List<User> list = new ArrayList<>();
+
+        String sql = "SELECT DISTINCT u.email,u.firstname,u.lastname,u.phone,u.status "
+                + "FROM users u "
+                + "JOIN team_members tm ON tm.username = u.email "
+                + "JOIN teams t ON t.id = tm.team_id AND t.manager_username=?";
+
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, managerUsername);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                User u = new User();
+
+                u.setEmail(rs.getString("email"));
+                u.setFirstname(rs.getString("firstname"));
+                u.setLastname(rs.getString("lastname"));
+                u.setPhone(rs.getString("phone"));
+                u.setStatus(rs.getString("status"));
+
+                list.add(u);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 
 }

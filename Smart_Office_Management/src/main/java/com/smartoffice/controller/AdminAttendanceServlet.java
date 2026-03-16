@@ -29,10 +29,20 @@ public class AdminAttendanceServlet extends HttpServlet {
 			response.sendRedirect(request.getContextPath() + "/index.html");
 			return;
 		}
+		
+		String search = request.getParameter("search");
+		String department = request.getParameter("department");
+
+		if (search == null) search = "";
+		if (department == null) department = "";
+
+		search = search.toLowerCase().trim();
+		department = department.trim();
 
 		try {
 			AttendanceDAO attendanceDAO = new AttendanceDAO();
 			List<AdminAttendanceRow> rows = attendanceDAO.getAllAttendanceForToday();
+			List<AdminAttendanceRow> filteredRows = new java.util.ArrayList<>();
 
 			int totalPresent = 0;
 			int onBreakCount = 0;
@@ -47,36 +57,55 @@ public class AdminAttendanceServlet extends HttpServlet {
 			long lateThresholdMs = lateCal.getTimeInMillis();
 
 			for (AdminAttendanceRow row : rows) {
+
+				String name = row.getFullName() != null ? row.getFullName().toLowerCase() : "";
+				String designation = row.getDesignation() != null ? row.getDesignation() : "";
+
+				// SEARCH FILTER
+				if (!search.isEmpty() && !name.contains(search)) {
+					continue;
+				}
+
+				// DESIGNATION FILTER
+				if (!department.isEmpty() && !department.equalsIgnoreCase(designation)) {
+					continue;
+				}
+
 				String email = row.getEmail();
+
 				// Break duration
 				int secs = 0;
 				try {
 					secs = BreakDAO.getTodayTotalSeconds(email);
-				} catch (Exception e) { /* ignore */ }
+				} catch (Exception e) { }
+
 				row.setBreakDurationFormatted(formatBreakDuration(secs));
 
-				// Live status: ON BREAK overrides
+				// Live status
 				try {
 					if (BreakDAO.isCurrentlyOnBreak(email)) {
 						row.setLiveStatus("ON BREAK");
 						onBreakCount++;
 					}
-				} catch (Exception e) { /* ignore */ }
+				} catch (Exception e) { }
 
-				// Counts
+				// Attendance counts
 				if (row.getPunchIn() == null) {
 					absentCount++;
 				} else {
 					totalPresent++;
+
 					if ("ON BREAK".equals(row.getLiveStatus())) {
 						// already counted
 					} else if (row.getPunchIn().getTime() > lateThresholdMs) {
 						lateArrivals++;
 					}
 				}
+
+				filteredRows.add(row);
 			}
 
-			request.setAttribute("attendanceList", rows);
+			request.setAttribute("attendanceList", filteredRows);
 			request.setAttribute("totalPresent", totalPresent);
 			request.setAttribute("onBreakCount", onBreakCount);
 			request.setAttribute("lateArrivals", lateArrivals);

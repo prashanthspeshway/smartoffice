@@ -15,6 +15,10 @@ public class Task {
 	private Timestamp assignedDate;
 	private Date deadline;
 	private String priority;
+	private String employeeAttachmentName;
+	private byte[] employeeAttachment;
+	private String employeeComment;
+	private Timestamp submittedAt;
  
 	public int getId() {
 		return id;
@@ -94,6 +98,31 @@ public class Task {
 
 	public void setPriority(String priority) {
 		this.priority = priority;
+	}
+	
+	public String getEmployeeAttachmentName() {
+	    return employeeAttachmentName;
+	}
+
+	public void setEmployeeAttachmentName(String employeeAttachmentName) {
+	    this.employeeAttachmentName = employeeAttachmentName;
+	}
+	
+
+	public String getEmployeeComment() {
+	    return employeeComment;
+	}
+
+	public void setEmployeeComment(String employeeComment) {
+	    this.employeeComment = employeeComment;
+	}
+
+	public Timestamp getSubmittedAt() {
+	    return submittedAt;
+	}
+
+	public void setSubmittedAt(Timestamp submittedAt) {
+	    this.submittedAt = submittedAt;
 	}
  
 	public void setCreatedAt(Timestamp timestamp) {

@@ -27,7 +27,6 @@ if (username == null) {
 String email = (String) session.getAttribute("email");
 String role = (String) session.getAttribute("role");
 String phone = (String) session.getAttribute("phone");
-
 %>
 
 <%
@@ -61,8 +60,11 @@ User userObj = (User) request.getAttribute("user");
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Manager Dashboard • Smart Office</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link
+	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+	rel="stylesheet">
 <style>
 /* ================= GLOBAL (Figma / Admin / Employee aligned) ================= */
 * {
@@ -91,7 +93,7 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 	flex-shrink: 0;
 }
 
@@ -110,11 +112,16 @@ body {
 	font-size: 14px;
 	font-weight: 500;
 }
-.user-area .welcome { color: #64748b; }
-.user-area strong { color: #1e293b; }
 
-.icon-btn,
-.settings-btn {
+.user-area .welcome {
+	color: #64748b;
+}
+
+.user-area strong {
+	color: #1e293b;
+}
+
+.icon-btn, .settings-btn {
 	width: 40px;
 	height: 40px;
 	min-width: 40px;
@@ -128,9 +135,14 @@ body {
 	justify-content: center;
 	transition: background 0.2s;
 }
-.icon-btn:hover,
-.settings-btn:hover { background: #4338ca; }
-.icon-btn i, .settings-btn i { font-size: 16px; }
+
+.icon-btn:hover, .settings-btn:hover {
+	background: #4338ca;
+}
+
+.icon-btn i, .settings-btn i {
+	font-size: 16px;
+}
 
 .logout-btn {
 	padding: 8px 16px;
@@ -146,7 +158,10 @@ body {
 	align-items: center;
 	gap: 6px;
 }
-.logout-btn:hover { background: #fef2f2; }
+
+.logout-btn:hover {
+	background: #fef2f2;
+}
 
 /* ================= LAYOUT ================= */
 .main-container {
@@ -162,7 +177,7 @@ body {
 	background: #ffffff;
 	border-right: 1px solid #e2e8f0;
 	padding: 16px 12px;
-	box-shadow: 1px 0 0 rgba(0,0,0,0.04);
+	box-shadow: 1px 0 0 rgba(0, 0, 0, 0.04);
 	flex-shrink: 0;
 }
 
@@ -214,7 +229,7 @@ body {
 	background: #ffffff;
 	border-radius: 12px;
 	border: 1px solid #e2e8f0;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 	padding: 24px;
 	overflow-y: auto;
 	max-height: 100%;
@@ -428,7 +443,8 @@ body {
 }
 
 /* ===== Animation ===== */
-@keyframes modalFade {from { opacity:0;
+@
+keyframes modalFade {from { opacity:0;
 	transform: scale(0.96);
 }
 
@@ -499,7 +515,8 @@ to {
 }
 
 /* ===== Animation ===== */
-@keyframes modalFade {from { opacity:0;
+@
+keyframes modalFade {from { opacity:0;
 	transform: scale(0.95);
 }
 
@@ -525,7 +542,7 @@ to {
 	width: 340px;
 	height: 100%;
 	background: #ffffff;
-	box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+	box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
 	transition: right 0.4s ease;
 	z-index: 1000;
 	border-left: 1px solid #e2e8f0;
@@ -607,7 +624,7 @@ to {
 	border-radius: 12px;
 	padding: 24px;
 	background: #ffffff;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 	margin-bottom: 0;
 }
 
@@ -655,7 +672,7 @@ to {
 	height: 450px;
 	overflow-y: auto;
 	background: #ffffff;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .team-fieldset legend {
@@ -714,17 +731,18 @@ to {
 
 /* ===== Employee Card ===== */
 .employee-card {
-	background: linear-gradient(135deg, rgba(102,126,234,0.03), rgba(148,163,184,0.03));
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.03),
+		rgba(148, 163, 184, 0.03));
 	border-radius: 12px;
 	padding: 14px 16px;
-	box-shadow: 0 4px 12px rgba(15,23,42,0.08);
-	border: 1px solid rgba(148,163,184,0.35);
+	box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+	border: 1px solid rgba(148, 163, 184, 0.35);
 	transition: 0.2s ease;
 }
 
 .employee-card:hover {
 	transform: translateY(-3px);
-	box-shadow: 0 8px 18px rgba(15,23,42,0.12);
+	box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
 }
 
 /* ===== Header ===== */
@@ -867,13 +885,13 @@ to {
 	background: #ffffff;
 	border: 1px solid #e2e8f0;
 	border-radius: 12px;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .employee-card:hover {
 	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .emp-header {
@@ -967,7 +985,7 @@ to {
 	margin-bottom: 20px;
 	overflow-y: auto;
 	background: #ffffff;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .task-fieldset legend {
@@ -1022,8 +1040,7 @@ to {
 	color: #166534;
 }
 
-.task-status.assigned,
-.task-status.pending {
+.task-status.assigned, .task-status.pending {
 	background: #fef3c7;
 	color: #b45309;
 }
@@ -1063,7 +1080,7 @@ to {
 	border-radius: 12px;
 	padding: 24px;
 	background: #ffffff;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .leave-fieldset legend {
@@ -1126,10 +1143,29 @@ to {
 }
 
 /* ===== Leave Form ===== */
-.leave-form label { display: block; margin-top: 12px; font-weight: 600; color: #2d3748; }
-.leave-form input, .leave-form select, .leave-form textarea { width: 100%; padding: 10px 14px; margin-top: 4px; border: 1px solid #c3cfe2; border-radius: 8px; }
-.leave-form textarea { min-height: 80px; resize: vertical; }
-.leave-form button[type="submit"] { margin-top: 16px; }
+.leave-form label {
+	display: block;
+	margin-top: 12px;
+	font-weight: 600;
+	color: #2d3748;
+}
+
+.leave-form input, .leave-form select, .leave-form textarea {
+	width: 100%;
+	padding: 10px 14px;
+	margin-top: 4px;
+	border: 1px solid #c3cfe2;
+	border-radius: 8px;
+}
+
+.leave-form textarea {
+	min-height: 80px;
+	resize: vertical;
+}
+
+.leave-form button[type="submit"] {
+	margin-top: 16px;
+}
 
 /* ===== Action Buttons ===== */
 .leave-actions {
@@ -1155,7 +1191,7 @@ to {
 	border-radius: 12px;
 	padding: 24px;
 	background: #ffffff;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .meeting-fieldset legend {
@@ -1235,7 +1271,7 @@ to {
 	border-radius: 12px;
 	padding: 24px;
 	background: #ffffff;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .attendance-fieldset legend {
@@ -1341,7 +1377,7 @@ to {
 	border-radius: 12px;
 	padding: 24px;
 	background: #ffffff;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .performance-fieldset legend {
@@ -1449,7 +1485,8 @@ to {
 	content: "✖";
 }
 
-@keyframes toastIn {from { opacity:0;
+@
+keyframes toastIn {from { opacity:0;
 	transform: translateX(120px);
 }
 
@@ -1459,7 +1496,8 @@ to {
 }
 
 }
-@keyframes toastOut {from { opacity:1;
+@
+keyframes toastOut {from { opacity:1;
 	transform: translateX(0);
 }
 
@@ -1519,7 +1557,7 @@ to {
 	background: #ffffff;
 	padding: 18px;
 	border-radius: 12px;
-	box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+	box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
 	border: 1px solid #e2e8f0;
 	max-height: 430px; /* 👈 controls visible height */
 	overflow-y: auto; /* 👈 vertical scroll */
@@ -1584,7 +1622,7 @@ to {
 	height: 450px;
 	background: #ffffff;
 	border: 1px solid #e2e8f0;
-	box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
 	border-radius: 12px;
 	transition: right 0.3s ease-in-out;
 	z-index: 1000;
@@ -1608,7 +1646,7 @@ to {
 }
 
 .notification-header button {
-	background: rgba(255,255,255,0.2);
+	background: rgba(255, 255, 255, 0.2);
 	border: none;
 	color: #fff;
 	font-size: 18px;
@@ -1742,7 +1780,8 @@ to {
 }
 
 /* Animation */
-@keyframes fadeIn {from { opacity:0;
+@
+keyframes fadeIn {from { opacity:0;
 	transform: scale(0.95);
 }
 
@@ -1780,9 +1819,10 @@ to {
 	justify-content: space-between;
 	align-items: center;
 	padding: 10px 14px;
-	background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(99,102,241,0.08));
+	background: linear-gradient(135deg, rgba(14, 165, 233, 0.08),
+		rgba(99, 102, 241, 0.08));
 	border-radius: 10px;
-	border: 1px solid rgba(14,165,233,0.15);
+	border: 1px solid rgba(14, 165, 233, 0.15);
 	margin-bottom: 12px;
 }
 
@@ -1838,8 +1878,14 @@ to {
 	gap: 6px;
 }
 
-.break-log::-webkit-scrollbar { width: 3px; }
-.break-log::-webkit-scrollbar-thumb { background: rgba(14,165,233,0.3); border-radius: 3px; }
+.break-log::-webkit-scrollbar {
+	width: 3px;
+}
+
+.break-log::-webkit-scrollbar-thumb {
+	background: rgba(14, 165, 233, 0.3);
+	border-radius: 3px;
+}
 
 .no-task-text {
 	font-size: 14px;
@@ -1852,7 +1898,7 @@ to {
 	padding: 10px 12px;
 	border-radius: 8px;
 	font-size: 12px;
-	border: 1px solid rgba(148,163,184,0.4);
+	border: 1px solid rgba(148, 163, 184, 0.4);
 }
 
 /* ================= MANAGER ATTENDANCE (side-by-side, Nexus-style) ================= */
@@ -1863,11 +1909,14 @@ to {
 	margin-bottom: 24px;
 	align-items: stretch;
 }
-@media (max-width: 768px) {
-	.attendance-cards-row { grid-template-columns: 1fr; }
+
+@media ( max-width : 768px) {
+	.attendance-cards-row {
+		grid-template-columns: 1fr;
+	}
 }
-.attendance-cards-row .status-card,
-.attendance-cards-row .break-card {
+
+.attendance-cards-row .status-card, .attendance-cards-row .break-card {
 	background: #ffffff;
 	border: 1px solid #e2e8f0;
 	border-radius: 12px;
@@ -1876,17 +1925,20 @@ to {
 	min-height: 280px;
 	display: flex;
 	flex-direction: column;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 	transition: box-shadow 0.2s ease;
 }
-.attendance-cards-row .status-card:hover,
-.attendance-cards-row .break-card:hover {
-	box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+.attendance-cards-row .status-card:hover, .attendance-cards-row .break-card:hover
+	{
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
 .attendance-cards-row .break-card .break-log {
 	flex: 1;
 	min-height: 60px;
 }
+
 .attendance-section-title {
 	font-size: 14px;
 	font-weight: 700;
@@ -1895,6 +1947,7 @@ to {
 	letter-spacing: 0.5px;
 	margin-bottom: 12px;
 }
+
 .status-card .punch-row {
 	display: flex;
 	justify-content: space-between;
@@ -1902,15 +1955,30 @@ to {
 	padding: 10px 0;
 	border-bottom: 1px solid #f1f5f9;
 }
-.status-card .punch-row:last-of-type { border-bottom: none; }
-.status-card .punch-label { color: #64748b; font-weight: 600; font-size: 14px; }
-.status-card .punch-value { color: #1e293b; font-weight: 600; font-size: 14px; }
+
+.status-card .punch-row:last-of-type {
+	border-bottom: none;
+}
+
+.status-card .punch-label {
+	color: #64748b;
+	font-weight: 600;
+	font-size: 14px;
+}
+
+.status-card .punch-value {
+	color: #1e293b;
+	font-weight: 600;
+	font-size: 14px;
+}
+
 .punch-actions-nexus {
 	display: flex;
 	gap: 12px;
 	margin-top: 20px;
 	flex-wrap: wrap;
 }
+
 .punch-in-btn-nexus {
 	padding: 12px 24px;
 	border-radius: 8px;
@@ -1922,9 +1990,20 @@ to {
 	color: #fff;
 	transition: background 0.2s;
 }
-.punch-in-btn-nexus:not(:disabled) { background: #4f46e5; }
-.punch-in-btn-nexus:hover:not(:disabled) { background: #4338ca; }
-.punch-in-btn-nexus:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.punch-in-btn-nexus:not(:disabled) {
+	background: #4f46e5;
+}
+
+.punch-in-btn-nexus:hover:not(:disabled) {
+	background: #4338ca;
+}
+
+.punch-in-btn-nexus:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
 .punch-out-btn-nexus {
 	padding: 12px 24px;
 	border-radius: 8px;
@@ -1936,8 +2015,17 @@ to {
 	color: #fff;
 	transition: background 0.2s;
 }
-.punch-out-btn-nexus:hover:not(:disabled) { background: #b91c1c; }
-.punch-out-btn-nexus:disabled { background: #94a3b8; opacity: 0.7; cursor: not-allowed; }
+
+.punch-out-btn-nexus:hover:not(:disabled) {
+	background: #b91c1c;
+}
+
+.punch-out-btn-nexus:disabled {
+	background: #94a3b8;
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
 .break-action-btn {
 	padding: 11px 20px;
 	border-radius: 8px;
@@ -1947,15 +2035,30 @@ to {
 	cursor: pointer;
 	transition: opacity 0.2s, background 0.2s;
 }
+
 .break-action-btn:disabled {
 	opacity: 0.45;
 	cursor: not-allowed;
 	pointer-events: auto;
 }
-.start-break-btn { background: #7c3aed !important; color: #fff !important; }
-.start-break-btn:hover:not(:disabled) { background: #6d28d9 !important; }
-.end-break-btn-nexus { background: #64748b !important; color: #fff !important; }
-.end-break-btn-nexus:hover:not(:disabled) { background: #475569 !important; }
+
+.start-break-btn {
+	background: #7c3aed !important;
+	color: #fff !important;
+}
+
+.start-break-btn:hover:not(:disabled) {
+	background: #6d28d9 !important;
+}
+
+.end-break-btn-nexus {
+	background: #64748b !important;
+	color: #fff !important;
+}
+
+.end-break-btn-nexus:hover:not(:disabled) {
+	background: #475569 !important;
+}
 
 /* ================= TEAM ATTENDANCE: 3-col grid + list toggle ================= */
 .team-attendance-toolbar {
@@ -1966,6 +2069,7 @@ to {
 	gap: 12px;
 	margin-bottom: 16px;
 }
+
 .team-attendance-view-toggle {
 	display: inline-flex;
 	border: 1px solid #e2e8f0;
@@ -1973,6 +2077,7 @@ to {
 	overflow: hidden;
 	background: #f8fafc;
 }
+
 .team-attendance-view-toggle button {
 	padding: 10px 18px;
 	border: none;
@@ -1983,32 +2088,61 @@ to {
 	cursor: pointer;
 	transition: background 0.2s, color 0.2s;
 }
-.team-attendance-view-toggle button:first-child { border-right: 1px solid #e2e8f0; }
-.team-attendance-view-toggle button:hover { background: #f1f5f9; color: #334155; }
+
+.team-attendance-view-toggle button:first-child {
+	border-right: 1px solid #e2e8f0;
+}
+
+.team-attendance-view-toggle button:hover {
+	background: #f1f5f9;
+	color: #334155;
+}
+
 .team-attendance-view-toggle button.active {
 	background: #4f46e5;
 	color: #fff;
 }
+
 .employee-grid-3 {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 20px;
 	margin-top: 12px;
 }
-@media (max-width: 1100px) {
-	.employee-grid-3 { grid-template-columns: repeat(2, 1fr); }
+
+@media ( max-width : 1100px) {
+	.employee-grid-3 {
+		grid-template-columns: repeat(2, 1fr);
+	}
 }
-@media (max-width: 600px) {
-	.employee-grid-3 { grid-template-columns: 1fr; }
+
+@media ( max-width : 600px) {
+	.employee-grid-3 {
+		grid-template-columns: 1fr;
+	}
 }
+
 .employee-list-view {
 	display: none;
 	margin-top: 12px;
 }
-.employee-list-view.active { display: block; }
-.employee-grid-wrap { display: block; }
-.employee-grid-wrap.list-mode .employee-grid-3 { display: none; }
-.employee-grid-wrap.list-mode .employee-list-view { display: block; }
+
+.employee-list-view.active {
+	display: block;
+}
+
+.employee-grid-wrap {
+	display: block;
+}
+
+.employee-grid-wrap.list-mode .employee-grid-3 {
+	display: none;
+}
+
+.employee-grid-wrap.list-mode .employee-list-view {
+	display: block;
+}
+
 .team-attendance-table {
 	width: 100%;
 	border-collapse: collapse;
@@ -2016,9 +2150,10 @@ to {
 	background: #fff;
 	border-radius: 12px;
 	overflow: hidden;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 	border: 1px solid #e2e8f0;
 }
+
 .team-attendance-table th {
 	text-align: left;
 	padding: 14px 16px;
@@ -2027,12 +2162,17 @@ to {
 	font-weight: 600;
 	font-size: 13px;
 }
+
 .team-attendance-table td {
 	padding: 14px 16px;
 	border-top: 1px solid #e2e8f0;
 	color: #475569;
 }
-.team-attendance-table tbody tr:hover { background: #f8fafc; }
+
+.team-attendance-table tbody tr:hover {
+	background: #f8fafc;
+}
+
 .team-attendance-table .list-status {
 	display: inline-block;
 	padding: 4px 10px;
@@ -2040,9 +2180,21 @@ to {
 	font-size: 12px;
 	font-weight: 600;
 }
-.team-attendance-table .list-status.present { background: #dcfce7; color: #166534; }
-.team-attendance-table .list-status.absent { background: #fee2e2; color: #991b1b; }
-.team-attendance-table .list-status.punched-in { background: #dbeafe; color: #1e40af; }
+
+.team-attendance-table .list-status.present {
+	background: #dcfce7;
+	color: #166534;
+}
+
+.team-attendance-table .list-status.absent {
+	background: #fee2e2;
+	color: #991b1b;
+}
+
+.team-attendance-table .list-status.punched-in {
+	background: #dbeafe;
+	color: #1e40af;
+}
 
 /* ================= FULL DARK MODE ================= */
 body.dark-theme {
@@ -2284,7 +2436,9 @@ body.dark-theme .settings-item i {
 					<div class="password-body">
 
 						<div class="time-card">
-							Full Name: <b><%=userObj != null && userObj.getFullname() != null && !userObj.getFullname().isEmpty() ? userObj.getFullname() : "--"%></b>
+							Full Name: <b><%=userObj != null && userObj.getFullname() != null && !userObj.getFullname().isEmpty()
+		? userObj.getFullname()
+		: "--"%></b>
 						</div>
 
 						<div class="time-card">
@@ -2419,10 +2573,10 @@ body.dark-theme .settings-item i {
 									<div class="emp-body">
 										<div>
 											<b>Start:</b>
-											<%=m.getStartTime()%></div>
+											<%=new java.text.SimpleDateFormat("hh:mm a").format(m.getStartTime())%></div>
 										<div>
 											<b>End:</b>
-											<%=m.getEndTime()%></div>
+											<%=new java.text.SimpleDateFormat("hh:mm a").format(m.getEndTime())%></div>
 
 										<%
 										if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
@@ -2456,7 +2610,9 @@ body.dark-theme .settings-item i {
 			<!-- ===== Attendance (Self + Team) ===== -->
 			<div class="box" id="attendance" style="display: none;">
 				<h2>Attendance</h2>
-				<p class="attendance-subtitle" style="color:#64748b;font-size:14px;margin:0 0 20px 0;">Track your work sessions and breaks.</p>
+				<p class="attendance-subtitle"
+					style="color: #64748b; font-size: 14px; margin: 0 0 20px 0;">Track
+					your work sessions and breaks.</p>
 
 				<!-- My Attendance + Break Time side-by-side -->
 				<div class="attendance-cards-row">
@@ -2464,72 +2620,87 @@ body.dark-theme .settings-item i {
 					<div class="status-card">
 						<div class="attendance-section-title">Status</div>
 						<div class="punch-row">
-							<span class="punch-label">Punch In</span>
-							<span class="punch-value"><%= punchIn != null ? new SimpleDateFormat("HH:mm:ss").format(punchIn) : "--" %></span>
+							<span class="punch-label">Punch In</span> <span
+								class="punch-value"><%=punchIn != null ? new SimpleDateFormat("HH:mm:ss").format(punchIn) : "--"%></span>
 						</div>
 						<div class="punch-row">
-							<span class="punch-label">Punch Out</span>
-							<span class="punch-value"><%= punchOut != null ? new SimpleDateFormat("HH:mm:ss").format(punchOut) : "--" %></span>
+							<span class="punch-label">Punch Out</span> <span
+								class="punch-value"><%=punchOut != null ? new SimpleDateFormat("HH:mm:ss").format(punchOut) : "--"%></span>
 						</div>
-						<% if (isWeekend) { %>
-						<p style="color:#64748b;font-size:13px;margin:12px 0 0 0;">Attendance is closed on weekends.</p>
-						<% } else { %>
+						<%
+						if (isWeekend) {
+						%>
+						<p style="color: #64748b; font-size: 13px; margin: 12px 0 0 0;">Attendance
+							is closed on weekends.</p>
+						<%
+						} else {
+						%>
 						<div class="punch-actions-nexus">
-							<form action="attendance" method="post" style="display:inline;">
+							<form action="attendance" method="post" style="display: inline;">
 								<input type="hidden" name="action" value="punchin">
-								<button type="submit" class="punch-in-btn-nexus" <%= punchIn != null ? "disabled" : "" %>>Punch In</button>
+								<button type="submit" class="punch-in-btn-nexus"
+									<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
 							</form>
-							<form action="attendance" method="post" style="display:inline;">
+							<form action="attendance" method="post" style="display: inline;">
 								<input type="hidden" name="action" value="punchout">
-								<button type="submit" class="punch-out-btn-nexus" <%= (punchIn == null || punchOut != null) ? "disabled" : "" %>>Punch Out</button>
+								<button type="submit" class="punch-out-btn-nexus"
+									<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>Punch
+									Out</button>
 							</form>
 						</div>
-						<% } %>
+						<%
+						}
+						%>
 					</div>
 
 					<!-- Break card -->
 					<div class="break-card">
 						<div class="attendance-section-title">TOTAL BREAK TODAY</div>
 						<div class="break-total-row">
-							<span class="tr-label">Total Break Today</span>
-							<span class="tr-val">
-								<%
-								int mgrBreakSecs = 0;
-								if (request.getAttribute("breakTotalSeconds") != null) {
-									mgrBreakSecs = (Integer) request.getAttribute("breakTotalSeconds");
-								}
-								int mbh = mgrBreakSecs / 3600;
-								int mbm = (mgrBreakSecs % 3600) / 60;
-								int mbs = mgrBreakSecs % 60;
-								%>
-								<%= String.format("%02d:%02d:%02d", mbh, mbm, mbs) %>
+							<span class="tr-label">Total Break Today</span> <span
+								class="tr-val"> <%
+ int mgrBreakSecs = 0;
+ if (request.getAttribute("breakTotalSeconds") != null) {
+ 	mgrBreakSecs = (Integer) request.getAttribute("breakTotalSeconds");
+ }
+ int mbh = mgrBreakSecs / 3600;
+ int mbm = (mgrBreakSecs % 3600) / 60;
+ int mbs = mgrBreakSecs % 60;
+ %> <%=String.format("%02d:%02d:%02d", mbh, mbm, mbs)%>
 							</span>
 						</div>
 						<div class="break-actions">
-							<form action="break" method="post" style="display:inline;">
-								<input type="hidden" name="action" value="start">
-								<input type="hidden" name="redirect" value="manager">
-								<button type="submit" class="start-break-btn break-action-btn" <%= (punchIn == null || punchOut != null || onBreak) ? "disabled" : "" %>>Start Break</button>
+							<form action="break" method="post" style="display: inline;">
+								<input type="hidden" name="action" value="start"> <input
+									type="hidden" name="redirect" value="manager">
+								<button type="submit" class="start-break-btn break-action-btn"
+									<%=(punchIn == null || punchOut != null || onBreak) ? "disabled" : ""%>>Start
+									Break</button>
 							</form>
-							<form action="break" method="post" style="display:inline;margin-left:8px;">
-								<input type="hidden" name="action" value="end">
-								<input type="hidden" name="redirect" value="manager">
-								<button type="submit" class="end-break-btn-nexus break-action-btn" <%= !onBreak ? "disabled" : "" %>>End Break</button>
+							<form action="break" method="post"
+								style="display: inline; margin-left: 8px;">
+								<input type="hidden" name="action" value="end"> <input
+									type="hidden" name="redirect" value="manager">
+								<button type="submit"
+									class="end-break-btn-nexus break-action-btn"
+									<%=!onBreak ? "disabled" : ""%>>End Break</button>
 							</form>
 						</div>
-						<div class="break-log" style="margin-top:10px;">
+						<div class="break-log" style="margin-top: 10px;">
 							<%
-							java.util.List<com.smartoffice.model.BreakLog> mgrBreaks =
-								(java.util.List<com.smartoffice.model.BreakLog>) request.getAttribute("breakLogs");
+							java.util.List<com.smartoffice.model.BreakLog> mgrBreaks = (java.util.List<com.smartoffice.model.BreakLog>) request
+									.getAttribute("breakLogs");
 							SimpleDateFormat mgrTimeFmt = new SimpleDateFormat("HH:mm:ss");
 							if (mgrBreaks != null && !mgrBreaks.isEmpty()) {
 								for (com.smartoffice.model.BreakLog b : mgrBreaks) {
 									String mStart = b.getStartTime() != null ? mgrTimeFmt.format(b.getStartTime()) : "--";
 									String mEnd = b.getEndTime() != null ? mgrTimeFmt.format(b.getEndTime()) : "--";
 							%>
-							<div class="time-card">From <b><%= mStart %></b> to <b><%= mEnd %></b></div>
+							<div class="time-card">
+								From <b><%=mStart%></b> to <b><%=mEnd%></b>
+							</div>
 							<%
-								}
+							}
 							} else {
 							%>
 							<p class="no-task-text">No breaks recorded today.</p>
@@ -2541,21 +2712,34 @@ body.dark-theme .settings-item i {
 				</div>
 
 				<!-- Team Attendance -->
-				<fieldset class="attendance-fieldset" style="margin-top:18px;">
+				<fieldset class="attendance-fieldset" style="margin-top: 18px;">
 					<legend>Team Attendance (Today)</legend>
 
 					<div class="team-attendance-toolbar">
 						<div class="export-actions">
-							<form action="<%=request.getContextPath()%>/exportTeamAttendance" method="get" style="display:inline;">
-								<button type="submit" class="export-btn"><i class="fa-solid fa-file-export"></i> Export Attendance</button>
+							<form action="<%=request.getContextPath()%>/exportTeamAttendance"
+								method="get" style="display: inline;">
+								<button type="submit" class="export-btn">
+									<i class="fa-solid fa-file-export"></i> Export Attendance
+								</button>
 							</form>
-							<form action="<%=request.getContextPath()%>/exportTeamPerformance" method="get" style="display:inline;margin-left:8px;">
-								<button type="submit" class="export-btn"><i class="fa-solid fa-file-export"></i> Export Performance</button>
+							<form
+								action="<%=request.getContextPath()%>/exportTeamPerformance"
+								method="get" style="display: inline; margin-left: 8px;">
+								<button type="submit" class="export-btn">
+									<i class="fa-solid fa-file-export"></i> Export Performance
+								</button>
 							</form>
 						</div>
 						<div class="team-attendance-view-toggle">
-							<button type="button" id="teamViewGrid" class="active" onclick="setTeamAttendanceView('grid')" title="Grid view"><i class="fa-solid fa-th-large" style="margin-right:6px;"></i>Grid</button>
-							<button type="button" id="teamViewList" onclick="setTeamAttendanceView('list')" title="List view"><i class="fa-solid fa-list" style="margin-right:6px;"></i>List</button>
+							<button type="button" id="teamViewGrid" class="active"
+								onclick="setTeamAttendanceView('grid')" title="Grid view">
+								<i class="fa-solid fa-th-large" style="margin-right: 6px;"></i>Grid
+							</button>
+							<button type="button" id="teamViewList"
+								onclick="setTeamAttendanceView('list')" title="List view">
+								<i class="fa-solid fa-list" style="margin-right: 6px;"></i>List
+							</button>
 						</div>
 					</div>
 
@@ -2569,7 +2753,9 @@ body.dark-theme .settings-item i {
 							<%
 							for (TeamAttendance ta : teamAttendance) {
 								String st = ta.getStatus() != null ? ta.getStatus().toLowerCase() : "";
-								String listStatusClass = st.contains("present") || st.contains("punched") ? "present" : (st.contains("absent") ? "absent" : "punched-in");
+								String listStatusClass = st.contains("present") || st.contains("punched")
+								? "present"
+								: (st.contains("absent") ? "absent" : "punched-in");
 							%>
 							<div class="employee-card">
 								<div class="emp-header">
@@ -2579,8 +2765,12 @@ body.dark-theme .settings-item i {
 									<span class="emp-status"><%=ta.getStatus()%></span>
 								</div>
 								<div class="emp-body">
-									<div><b>Punch In:</b> <%=ta.getPunchIn() != null ? ta.getPunchIn() : "--"%></div>
-									<div><b>Punch Out:</b> <%=ta.getPunchOut() != null ? ta.getPunchOut() : "--"%></div>
+									<div>
+										<b>Punch In:</b>
+										<%=ta.getPunchIn() != null ? ta.getPunchIn() : "--"%></div>
+									<div>
+										<b>Punch Out:</b>
+										<%=ta.getPunchOut() != null ? ta.getPunchOut() : "--"%></div>
 								</div>
 							</div>
 							<%
@@ -2602,11 +2792,14 @@ body.dark-theme .settings-item i {
 									<%
 									for (TeamAttendance ta : teamAttendance) {
 										String st = ta.getStatus() != null ? ta.getStatus().toLowerCase() : "";
-										String listStatusClass = st.contains("present") || st.contains("punched") ? "present" : (st.contains("absent") ? "absent" : "punched-in");
+										String listStatusClass = st.contains("present") || st.contains("punched")
+										? "present"
+										: (st.contains("absent") ? "absent" : "punched-in");
 									%>
 									<tr>
-										<td><i class="fa-solid fa-user" style="margin-right:8px;color:#64748b;"></i><strong><%=ta.getFullName()%></strong></td>
-										<td><span class="list-status <%= listStatusClass %>"><%=ta.getStatus()%></span></td>
+										<td><i class="fa-solid fa-user"
+											style="margin-right: 8px; color: #64748b;"></i><strong><%=ta.getFullName()%></strong></td>
+										<td><span class="list-status <%=listStatusClass%>"><%=ta.getStatus()%></span></td>
 										<td><%=ta.getPunchIn() != null ? ta.getPunchIn() : "--"%></td>
 										<td><%=ta.getPunchOut() != null ? ta.getPunchOut() : "--"%></td>
 									</tr>
@@ -2634,30 +2827,25 @@ body.dark-theme .settings-item i {
 					<legend>Leave</legend>
 
 					<div class="leave-tab-row">
-						<button id="managerApplyTab" type="button" class="leave-tab-btn leave-tab-active"
-							onclick="showManagerApplyLeave()">
-							Apply Leave
-						</button>
-						<button id="managerMyLeavesTab" type="button" class="leave-tab-btn"
-							onclick="showManagerMyLeaves()">
-							My Leave Requests
-						</button>
+						<button id="managerApplyTab" type="button"
+							class="leave-tab-btn leave-tab-active"
+							onclick="showManagerApplyLeave()">Apply Leave</button>
+						<button id="managerMyLeavesTab" type="button"
+							class="leave-tab-btn" onclick="showManagerMyLeaves()">
+							My Leave Requests</button>
 					</div>
 
 					<div id="managerApplyLeaveSection">
-						<form class="leave-form" action="applyLeave" method="post" style="max-width: 400px;">
-							<label>Leave Type</label>
-							<select name="leaveType" required>
+						<form class="leave-form" action="applyLeave" method="post"
+							style="max-width: 400px;">
+							<label>Leave Type</label> <select name="leaveType" required>
 								<option value="">Select</option>
 								<option>Casual Leave</option>
 								<option>Sick Leave</option>
 								<option>Earned Leave</option>
-							</select>
-							<label>From Date</label>
-							<input type="date" name="fromDate" required>
-							<label>To Date</label>
-							<input type="date" name="toDate" required>
-							<label>Reason</label>
+							</select> <label>From Date</label> <input type="date" name="fromDate"
+								required> <label>To Date</label> <input type="date"
+								name="toDate" required> <label>Reason</label>
 							<textarea name="reason" required></textarea>
 							<button type="submit" class="primary-btn">Submit Request</button>
 						</form>
@@ -2672,24 +2860,33 @@ body.dark-theme .settings-item i {
 							<p class="no-data">No leave requests found.</p>
 							<%
 							} else {
-								for (LeaveRequest lr : myLeaves) {
+							for (LeaveRequest lr : myLeaves) {
 							%>
 							<div class="employee-card">
 								<div class="emp-header">
 									<div class="emp-left">
-										<i class="fa-solid fa-plane-departure"></i>
-										<span class="emp-name"><%=lr.getLeaveType()%></span>
+										<i class="fa-solid fa-plane-departure"></i> <span
+											class="emp-name"><%=lr.getLeaveType()%></span>
 									</div>
-									<span class="emp-status <%= "APPROVED".equalsIgnoreCase(lr.getStatus()) ? "done" : "REJECTED".equalsIgnoreCase(lr.getStatus()) ? "out" : "pending" %>"><%=lr.getStatus()%></span>
+									<span
+										class="emp-status <%="APPROVED".equalsIgnoreCase(lr.getStatus())
+		? "done"
+		: "REJECTED".equalsIgnoreCase(lr.getStatus()) ? "out" : "pending"%>"><%=lr.getStatus()%></span>
 								</div>
 								<div class="emp-body">
-									<div><b>From:</b> <%=lr.getFromDate()%></div>
-									<div><b>To:</b> <%=lr.getToDate()%></div>
-									<div><b>Reason:</b> <%=lr.getReason()%></div>
+									<div>
+										<b>From:</b>
+										<%=lr.getFromDate()%></div>
+									<div>
+										<b>To:</b>
+										<%=lr.getToDate()%></div>
+									<div>
+										<b>Reason:</b>
+										<%=lr.getReason()%></div>
 								</div>
 							</div>
 							<%
-								}
+							}
 							}
 							%>
 						</div>
@@ -2726,7 +2923,9 @@ body.dark-theme .settings-item i {
 
 				<!-- My Teams (as assigned by admin) -->
 				<fieldset class="team-fieldset">
-					<legend><i class="fa-solid fa-people-group"></i> My Teams</legend>
+					<legend>
+						<i class="fa-solid fa-people-group"></i> My Teams
+					</legend>
 					<div class="team-scroll">
 						<div class="employee-grid">
 							<%
@@ -2737,27 +2936,41 @@ body.dark-theme .settings-item i {
 							<div class="employee-card" style="min-width: 280px;">
 								<div class="emp-header">
 									<div class="emp-left">
-										<i class="fa-solid fa-people-group"></i>
-										<span class="emp-name"><%= t.getName() %></span>
+										<i class="fa-solid fa-people-group"></i> <span
+											class="emp-name"><%=t.getName()%></span>
 									</div>
 								</div>
 								<div class="emp-body">
-									<div><b>Manager:</b> <%= t.getManagerFullname() != null ? t.getManagerFullname() : t.getManagerUsername() %></div>
-									<div><b>Members:</b> <%= t.getMembers().size() %></div>
-									<% if (!t.getMembers().isEmpty()) { %>
+									<div>
+										<b>Manager:</b>
+										<%=t.getManagerFullname() != null ? t.getManagerFullname() : t.getManagerUsername()%></div>
+									<div>
+										<b>Members:</b>
+										<%=t.getMembers().size()%></div>
+									<%
+									if (!t.getMembers().isEmpty()) {
+									%>
 									<div style="margin-top: 8px;">
-										<% for (User m : t.getMembers()) { %>
-										<span style="display: inline-block; background: #e2e8f0; padding: 4px 8px; border-radius: 6px; margin: 2px; font-size: 12px;"><%= m.getFullname() != null ? m.getFullname() : m.getEmail() %></span>
-										<% } %>
+										<%
+										for (User m : t.getMembers()) {
+										%>
+										<span
+											style="display: inline-block; background: #e2e8f0; padding: 4px 8px; border-radius: 6px; margin: 2px; font-size: 12px;"><%=m.getFullname() != null ? m.getFullname() : m.getEmail()%></span>
+										<%
+										}
+										%>
 									</div>
-									<% } %>
+									<%
+									}
+									%>
 								</div>
 							</div>
 							<%
-								}
+							}
 							} else {
 							%>
-							<p class="no-data">No teams assigned to you yet. Ask admin to create a team and assign you as manager.</p>
+							<p class="no-data">No teams assigned to you yet. Ask admin to
+								create a team and assign you as manager.</p>
 							<%
 							}
 							%>
@@ -2766,7 +2979,7 @@ body.dark-theme .settings-item i {
 				</fieldset>
 
 				<!-- Individual team members under this manager -->
-				<fieldset class="team-fieldset" style="margin-top:16px;">
+				<fieldset class="team-fieldset" style="margin-top: 16px;">
 					<legend>My Team Members</legend>
 
 					<!-- Scroll Container -->
@@ -2811,15 +3024,16 @@ body.dark-theme .settings-item i {
 			</div>
 
 			<!-- ===== Assign Tasks ===== -->
-			<div class="box" id="assignTask" style="display: none; padding: 20px;">
+			<div class="box" id="assignTask"
+				style="display: none; padding: 20px;">
 
-				<div style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px;">
+				<div
+					style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px;">
 
 					<!-- ===== Assign Task Fieldset ===== -->
 					<fieldset class="task-fieldset" style="background: #f8fafc;">
 						<legend>
-							<i class="fa-solid fa-paper-plane"></i>
-							New Task
+							<i class="fa-solid fa-paper-plane"></i> New Task
 						</legend>
 
 						<%
@@ -2833,10 +3047,10 @@ body.dark-theme .settings-item i {
 
 						<form action="<%=request.getContextPath()%>/assignTask"
 							method="post" enctype="multipart/form-data"
-							style="display:flex; flex-direction:column; gap:12px;">
+							style="display: flex; flex-direction: column; gap: 12px;">
 
-							<label style="font-size:13px; font-weight:600; color:#475569;">Assign to</label>
-							<select class="form-control" name="employeeUsername" required>
+							<label style="font-size: 13px; font-weight: 600; color: #475569;">Assign
+								to</label> <select class="form-control" name="employeeUsername" required>
 								<option value="">Select Employee</option>
 
 								<%
@@ -2857,24 +3071,24 @@ body.dark-theme .settings-item i {
 								<%
 								}
 								%>
-							</select>
-
-							<label style="font-size:13px; font-weight:600; color:#475569;">Task title</label>
-							<input class="form-control" type="text" name="title"
-								placeholder="E.g. Submit weekly report" required>
-
-							<label style="font-size:13px; font-weight:600; color:#475569;">Description</label>
+							</select> <label
+								style="font-size: 13px; font-weight: 600; color: #475569;">Task
+								title</label> <input class="form-control" type="text" name="title"
+								placeholder="E.g. Submit weekly report" required> <label
+								style="font-size: 13px; font-weight: 600; color: #475569;">Description</label>
 							<textarea class="form-control" name="taskDesc" rows="4"
 								placeholder="Add clear instructions and details" required></textarea>
 
-							<div style="display:flex; gap:12px; flex-wrap:wrap;">
-								<div style="flex:1; min-width:160px;">
-									<label style="font-size:13px; font-weight:600; color:#475569;">Deadline</label>
+							<div style="display: flex; gap: 12px; flex-wrap: wrap;">
+								<div style="flex: 1; min-width: 160px;">
+									<label
+										style="font-size: 13px; font-weight: 600; color: #475569;">Deadline</label>
 									<input class="form-control" type="date" name="deadline">
 								</div>
 
-								<div style="flex:1; min-width:160px;">
-									<label style="font-size:13px; font-weight:600; color:#475569;">Priority</label>
+								<div style="flex: 1; min-width: 160px;">
+									<label
+										style="font-size: 13px; font-weight: 600; color: #475569;">Priority</label>
 									<select class="form-control" name="priority">
 										<option value="HIGH">High</option>
 										<option value="MEDIUM" selected>Medium</option>
@@ -2884,34 +3098,34 @@ body.dark-theme .settings-item i {
 							</div>
 
 							<div>
-								<label style="font-size:13px; font-weight:600; color:#475569;">Attachment (optional)</label>
-								<input class="form-control" type="file" name="attachment"
+								<label
+									style="font-size: 13px; font-weight: 600; color: #475569;">Attachment
+									(optional)</label> <input class="form-control" type="file"
+									name="attachment"
 									accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg">
-								<small style="font-size:11px; color:#6b7280;">
-									Attach any reference document or file your employee needs.
-								</small>
+								<small style="font-size: 11px; color: #6b7280;"> Attach
+									any reference document or file your employee needs. </small>
 							</div>
 
-							<div style="margin-top:4px;">
+							<div style="margin-top: 4px;">
 								<button class="primary-btn" type="submit"
-									style="min-width:150px; border-radius:999px;">
-									Assign Task
-								</button>
+									style="min-width: 150px; border-radius: 999px;">
+									Assign Task</button>
 							</div>
 						</form>
 					</fieldset>
 
 					<!-- ===== View Tasks Fieldset ===== -->
-					<fieldset class="task-fieldset" style="background:#eef2ff;">
+					<fieldset class="task-fieldset" style="background: #eef2ff;">
 						<legend>
-							<i class="fa-solid fa-list-check"></i>
-							View Assigned Tasks
+							<i class="fa-solid fa-list-check"></i> View Assigned Tasks
 						</legend>
 
 						<form action="<%=request.getContextPath()%>/viewAssignedTasks"
-							method="post" style="display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
+							method="post"
+							style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
 
-							<label style="font-size:13px; font-weight:600; color:#475569;">Employee</label>
+							<label style="font-size: 13px; font-weight: 600; color: #475569;">Employee</label>
 							<select class="form-control" name="employeeUsername" required>
 								<option value="">Select Employee</option>
 
@@ -2936,19 +3150,17 @@ body.dark-theme .settings-item i {
 							</select>
 
 							<button class="secondary-btn" type="submit"
-								style="align-self:flex-start; border-radius:999px;">
-								View Tasks
-							</button>
+								style="align-self: flex-start; border-radius: 999px;">
+								View Tasks</button>
 						</form>
 
 						<%
 						viewTasks = (List<Task>) request.getAttribute("viewTasks");
-							if (viewTasks != null) {
+						if (viewTasks != null) {
 						%>
 
-						<h4 class="tasks-title" style="margin-top:10px;">
-							Tasks for
-							<span style="color:#4f46e5;"><%=viewEmployee%></span>
+						<h4 class="tasks-title" style="margin-top: 10px;">
+							Tasks for <span style="color: #4f46e5;"><%=viewEmployee%></span>
 						</h4>
 
 						<div class="task-list">
@@ -2965,24 +3177,21 @@ body.dark-theme .settings-item i {
 								class="task-card <%=t.getStatus().equals("COMPLETED") ? "completed" : ""%>">
 								<div class="task-desc">
 									<strong><%=t.getTitle() != null ? t.getTitle() : "Task"%></strong><br>
-									<%=t.getDescription()%><br>
-									<small style="font-size:11px; color:#6b7280;">
-										<%
-										java.sql.Date dl = t.getDeadline();
-										String pr = t.getPriority();
-										%>
-										Deadline:
-										<%= dl != null ? dl.toString() : "--" %>
-										&nbsp; | Priority:
-										<%= pr != null ? pr : "MEDIUM" %>
+									<%=t.getDescription()%><br> <small
+										style="font-size: 11px; color: #6b7280;"> <%
+ java.sql.Date dl = t.getDeadline();
+ String pr = t.getPriority();
+ %> Deadline: <%=dl != null ? dl.toString() : "--"%> &nbsp; |
+										Priority: <%=pr != null ? pr : "MEDIUM"%>
 									</small>
 									<%
 									String attName = t.getAttachmentName();
 									if (attName != null && !attName.isEmpty()) {
 									%>
-									<br>
-									<a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
-									   target="_blank" style="font-size:12px; color:#2563eb; text-decoration:underline;">
+									<br> <a
+										href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
+										target="_blank"
+										style="font-size: 12px; color: #2563eb; text-decoration: underline;">
 										Download: <%=attName%>
 									</a>
 									<%
@@ -2994,6 +3203,22 @@ body.dark-theme .settings-item i {
                     <%=t.getStatus().equals("COMPLETED") ? "completed" : "assigned"%>">
 									<%=t.getStatus()%>
 								</span>
+								<%
+								String empFile = t.getEmployeeAttachmentName();
+
+								if (empFile != null && !empFile.isEmpty()) {
+								%>
+
+								<br> <a
+									href="<%=request.getContextPath()%>/employeeTaskAttachment?id=<%=t.getId()%>"
+									target="_blank"
+									style="font-size: 12px; color: #16a34a; text-decoration: underline;">
+									Employee Submission: <%=empFile%>
+								</a>
+
+								<%
+								}
+								%>
 							</div>
 
 							<%
@@ -3048,7 +3273,9 @@ body.dark-theme .settings-item i {
 				<div style="margin-top: 8px; text-align: right;">
 					<button
 						style="background: linear-gradient(135deg, #6366f1, #818cf8); color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;"
-						data-id="<%= n.getId() %>" onclick="markAsRead(parseInt(this.dataset.id, 10));">Mark as read</button>
+						data-id="<%=n.getId()%>"
+						onclick="markAsRead(parseInt(this.dataset.id, 10));">Mark
+						as read</button>
 				</div>
 			</div>
 			<%

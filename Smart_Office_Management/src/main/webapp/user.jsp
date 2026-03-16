@@ -50,8 +50,11 @@ List<LeaveRequest> myLeaves = (List<LeaveRequest>) request.getAttribute("myLeave
 <meta charset="UTF-8">
 <title>Employee Dashboard</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link
+	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+	rel="stylesheet">
 <style>
 body {
 	margin: 0;
@@ -70,7 +73,7 @@ body {
 	height: 56px;
 	justify-content: space-between;
 	align-items: center;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .top-bar h2 {
@@ -87,7 +90,10 @@ body {
 	font-weight: 500;
 	font-size: 14px;
 }
-.user-area b { color: #1e293b; }
+
+.user-area b {
+	color: #1e293b;
+}
 
 .icon-btn {
 	width: 40px;
@@ -107,7 +113,9 @@ body {
 	background: #4338ca;
 }
 
-.icon-btn i { font-size: 16px; }
+.icon-btn i {
+	font-size: 16px;
+}
 
 .logout-btn {
 	padding: 8px 16px;
@@ -136,7 +144,7 @@ body {
 	background: #ffffff;
 	border-right: 1px solid #e2e8f0;
 	padding: 16px 12px;
-	box-shadow: 1px 0 0 rgba(0,0,0,0.05);
+	box-shadow: 1px 0 0 rgba(0, 0, 0, 0.05);
 }
 
 .nav-btn {
@@ -167,7 +175,6 @@ body {
 	font-weight: 600;
 }
 
-
 /* ===== Card ===== */
 .box {
 	overflow-y: auto;
@@ -177,7 +184,7 @@ body {
 	background: #ffffff;
 	border-radius: 12px;
 	border: 1px solid #e2e8f0;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* ================= RIGHT PANEL ================= */
@@ -193,7 +200,7 @@ body {
 	padding: 24px;
 	border: 1px solid #e2e8f0;
 	background: #ffffff;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .attendance-fieldset legend {
@@ -256,7 +263,8 @@ body {
 	padding: 15px 18px;
 	margin-top: 15px;
 	border-radius: 12px;
-	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05),
+		rgba(118, 75, 162, 0.05));
 	border: 1px solid rgba(102, 126, 234, 0.15);
 	transition: 0.3s;
 }
@@ -326,18 +334,18 @@ body {
 	color: #6b7280;
 }
 
-.task-dropdown{
-padding:6px 10px;
-border-radius:16px;
-border:1px solid #ccc;
-font-size:13px;
-cursor:pointer;
-background:#f8f9ff;
-transition:all 0.2s ease;
+.task-dropdown {
+	padding: 6px 10px;
+	border-radius: 16px;
+	border: 1px solid #ccc;
+	font-size: 13px;
+	cursor: pointer;
+	background: #f8f9ff;
+	transition: all 0.2s ease;
 }
 
-.task-dropdown:hover{
-border-color:#667eea;
+.task-dropdown:hover {
+	border-color: #667eea;
 }
 /* ================= MY TASK ================= */
 #taskSection {
@@ -347,10 +355,23 @@ border-color:#667eea;
 	padding: 10px;
 }
 
-#taskSection::-webkit-scrollbar { width: 4px; }
-#taskSection::-webkit-scrollbar-track { background: #f0f2ff; border-radius: 10px; }
-#taskSection::-webkit-scrollbar-thumb { background: #667eea; border-radius: 8px; }
-#taskSection::-webkit-scrollbar-thumb:hover { background: #764ba2; }
+#taskSection::-webkit-scrollbar {
+	width: 4px;
+}
+
+#taskSection::-webkit-scrollbar-track {
+	background: #f0f2ff;
+	border-radius: 10px;
+}
+
+#taskSection::-webkit-scrollbar-thumb {
+	background: #667eea;
+	border-radius: 8px;
+}
+
+#taskSection::-webkit-scrollbar-thumb:hover {
+	background: #764ba2;
+}
 
 /* ================= LEAVE FORM ================= */
 .leave-form {
@@ -369,7 +390,8 @@ border-color:#667eea;
 	outline: none;
 }
 
-.leave-form input:focus, .leave-form select:focus, .leave-form textarea:focus {
+.leave-form input:focus, .leave-form select:focus, .leave-form textarea:focus
+	{
 	border-color: #667eea;
 	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -391,10 +413,23 @@ border-color:#667eea;
 	padding: 10px;
 }
 
-#myLeaveSection::-webkit-scrollbar { width: 4px; }
-#myLeaveSection::-webkit-scrollbar-track { background: #f0f2ff; border-radius: 10px; }
-#myLeaveSection::-webkit-scrollbar-thumb { background: #667eea; border-radius: 8px; }
-#myLeaveSection::-webkit-scrollbar-thumb:hover { background: #764ba2; }
+#myLeaveSection::-webkit-scrollbar {
+	width: 4px;
+}
+
+#myLeaveSection::-webkit-scrollbar-track {
+	background: #f0f2ff;
+	border-radius: 10px;
+}
+
+#myLeaveSection::-webkit-scrollbar-thumb {
+	background: #667eea;
+	border-radius: 8px;
+}
+
+#myLeaveSection::-webkit-scrollbar-thumb:hover {
+	background: #764ba2;
+}
 
 .apply-leave-btn {
 	margin-top: 10px;
@@ -443,7 +478,8 @@ border-color:#667eea;
 	padding: 18px 20px;
 	margin-top: 18px;
 	border-radius: 14px;
-	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05),
+		rgba(118, 75, 162, 0.05));
 	border: 1px solid rgba(102, 126, 234, 0.15);
 	overflow: auto;
 	transition: all 0.3s ease;
@@ -499,8 +535,14 @@ border-color:#667eea;
 	color: #6b7280;
 }
 
-#meetingSection .attendance-fieldset::-webkit-scrollbar { width: 4px; }
-#meetingSection .attendance-fieldset::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+#meetingSection .attendance-fieldset::-webkit-scrollbar {
+	width: 4px;
+}
+
+#meetingSection .attendance-fieldset::-webkit-scrollbar-thumb {
+	background: #667eea;
+	border-radius: 4px;
+}
 
 /* ===== Settings Popup ===== */
 .popup {
@@ -646,25 +688,55 @@ border-color:#667eea;
 	line-height: 26px;
 }
 
-.toast.success { border-left-color: #10b981; }
-.toast.success::before { content: "✔"; background: linear-gradient(135deg, #10b981, #059669); }
-
-.toast.error { border-left-color: #ef4444; }
-.toast.error::before { content: "✖"; background: linear-gradient(135deg, #ef4444, #dc2626); }
-
-.toast.info { border-left-color: #667eea; }
-.toast.info::before { content: "ℹ"; background: linear-gradient(135deg, #667eea, #764ba2); }
-
-@keyframes toastIn {
-	from { opacity: 0; transform: translateX(120px); }
-	to { opacity: 1; transform: translateX(0); }
+.toast.success {
+	border-left-color: #10b981;
 }
 
-@keyframes toastOut {
-	from { opacity: 1; transform: translateX(0); }
-	to { opacity: 0; transform: translateX(120px); }
+.toast.success::before {
+	content: "✔";
+	background: linear-gradient(135deg, #10b981, #059669);
 }
 
+.toast.error {
+	border-left-color: #ef4444;
+}
+
+.toast.error::before {
+	content: "✖";
+	background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.toast.info {
+	border-left-color: #667eea;
+}
+
+.toast.info::before {
+	content: "ℹ";
+	background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+@
+keyframes toastIn {from { opacity:0;
+	transform: translateX(120px);
+}
+
+to {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+}
+@
+keyframes toastOut {from { opacity:1;
+	transform: translateX(0);
+}
+
+to {
+	opacity: 0;
+	transform: translateX(120px);
+}
+
+}
 .task-status.out {
 	background: linear-gradient(135deg, #fecaca, #fca5a5);
 	color: #7f1d1d;
@@ -703,8 +775,8 @@ border-color:#667eea;
 }
 
 .notification-header button {
-	background: rgba(255,255,255,0.2);
-	border: 1px solid rgba(255,255,255,0.3);
+	background: rgba(255, 255, 255, 0.2);
+	border: 1px solid rgba(255, 255, 255, 0.3);
 	border-radius: 50%;
 	color: white;
 	font-size: 16px;
@@ -720,7 +792,8 @@ border-color:#667eea;
 }
 
 .notification-item {
-	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05),
+		rgba(118, 75, 162, 0.05));
 	padding: 12px;
 	margin-bottom: 10px;
 	border-left: 4px solid #667eea;
@@ -729,8 +802,14 @@ border-color:#667eea;
 	border: 1px solid rgba(102, 126, 234, 0.15);
 }
 
-.notification-list::-webkit-scrollbar { width: 6px; }
-.notification-list::-webkit-scrollbar-thumb { background: rgba(102, 126, 234, 0.4); border-radius: 4px; }
+.notification-list::-webkit-scrollbar {
+	width: 6px;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+	background: rgba(102, 126, 234, 0.4);
+	border-radius: 4px;
+}
 
 /* ================= SETTINGS PANEL ================= */
 .settings-panel {
@@ -739,7 +818,8 @@ border-color:#667eea;
 	right: -340px;
 	width: 340px;
 	height: 100%;
-	background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 242, 255, 0.95));
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.95),
+		rgba(240, 242, 255, 0.95));
 	backdrop-filter: blur(16px);
 	box-shadow: -8px 0 30px rgba(102, 126, 234, 0.2);
 	transition: right 0.4s ease, opacity 0.3s ease;
@@ -770,8 +850,8 @@ border-color:#667eea;
 .close-btn {
 	cursor: pointer;
 	font-size: 18px;
-	background: rgba(255,255,255,0.2);
-	border: 1px solid rgba(255,255,255,0.3);
+	background: rgba(255, 255, 255, 0.2);
+	border: 1px solid rgba(255, 255, 255, 0.3);
 	border-radius: 50%;
 	width: 30px;
 	height: 30px;
@@ -797,7 +877,8 @@ border-color:#667eea;
 }
 
 .settings-item:hover {
-	background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.1),
+		rgba(118, 75, 162, 0.1));
 	transform: translateX(4px);
 	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 	border-color: rgba(102, 126, 234, 0.2);
@@ -822,7 +903,7 @@ border-color:#667eea;
 .password-modal {
 	position: fixed;
 	inset: 0;
-	background: rgba(0,0,0,0.45);
+	background: rgba(0, 0, 0, 0.45);
 	backdrop-filter: blur(6px);
 	display: flex;
 	align-items: center;
@@ -909,9 +990,16 @@ border-color:#667eea;
 	box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
 }
 
-@keyframes fadeIn {
-	from { opacity: 0; transform: scale(0.95); }
-	to { opacity: 1; transform: scale(1); }
+@
+keyframes fadeIn {from { opacity:0;
+	transform: scale(0.95);
+}
+
+to {
+	opacity: 1;
+	transform: scale(1);
+}
+
 }
 
 /* ================= DARK THEME ================= */
@@ -963,12 +1051,13 @@ border-color:#667eea;
 	color: #0ea5e9;
 	text-align: center;
 	padding: 18px;
-	background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(99,102,241,0.08));
+	background: linear-gradient(135deg, rgba(14, 165, 233, 0.08),
+		rgba(99, 102, 241, 0.08));
 	border-radius: 12px;
 	letter-spacing: 4px;
 	margin: 16px 0 14px;
-	border: 1px solid rgba(14,165,233,0.2);
-	text-shadow: 0 0 20px rgba(14,165,233,0.3);
+	border: 1px solid rgba(14, 165, 233, 0.2);
+	text-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
 }
 
 .break-actions {
@@ -1002,23 +1091,23 @@ border-color:#667eea;
 #startBreakBtn {
 	background: linear-gradient(135deg, #0ea5e9, #0284c7);
 	color: white;
-	box-shadow: 0 4px 14px rgba(14,165,233,0.4);
+	box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
 }
 
 #startBreakBtn:hover:not(:disabled) {
 	transform: translateY(-2px);
-	box-shadow: 0 8px 22px rgba(14,165,233,0.5);
+	box-shadow: 0 8px 22px rgba(14, 165, 233, 0.5);
 }
 
 #endBreakBtn {
 	background: linear-gradient(135deg, #f59e0b, #d97706);
 	color: white;
-	box-shadow: 0 4px 14px rgba(245,158,11,0.4);
+	box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
 }
 
 #endBreakBtn:hover:not(:disabled) {
 	transform: translateY(-2px);
-	box-shadow: 0 8px 22px rgba(245,158,11,0.5);
+	box-shadow: 0 8px 22px rgba(245, 158, 11, 0.5);
 }
 
 .break-total-row {
@@ -1026,9 +1115,10 @@ border-color:#667eea;
 	justify-content: space-between;
 	align-items: center;
 	padding: 10px 14px;
-	background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(99,102,241,0.08));
+	background: linear-gradient(135deg, rgba(14, 165, 233, 0.08),
+		rgba(99, 102, 241, 0.08));
 	border-radius: 10px;
-	border: 1px solid rgba(14,165,233,0.15);
+	border: 1px solid rgba(14, 165, 233, 0.15);
 	margin-bottom: 12px;
 }
 
@@ -1055,9 +1145,9 @@ border-color:#667eea;
 	border-radius: 20px;
 	font-size: 12px;
 	font-weight: 700;
-	background: rgba(14,165,233,0.1);
+	background: rgba(14, 165, 233, 0.1);
 	color: #0ea5e9;
-	border: 1px solid rgba(14,165,233,0.25);
+	border: 1px solid rgba(14, 165, 233, 0.25);
 	margin-bottom: 10px;
 }
 
@@ -1069,11 +1159,29 @@ border-color:#667eea;
 	animation: blink 1.5s infinite;
 }
 
-@keyframes blink {
-	0%,100% { opacity:1; }
-	50% { opacity:0.3; }
+@
+keyframes blink { 0%,100% {
+	opacity: 1;
 }
 
+50
+
+
+%
+{
+opacity
+
+
+:
+
+
+0
+.3
+;
+
+
+}
+}
 .break-log {
 	max-height: 110px;
 	overflow-y: auto;
@@ -1083,8 +1191,14 @@ border-color:#667eea;
 	gap: 6px;
 }
 
-.break-log::-webkit-scrollbar { width: 3px; }
-.break-log::-webkit-scrollbar-thumb { background: rgba(14,165,233,0.3); border-radius: 3px; }
+.break-log::-webkit-scrollbar {
+	width: 3px;
+}
+
+.break-log::-webkit-scrollbar-thumb {
+	background: rgba(14, 165, 233, 0.3);
+	border-radius: 3px;
+}
 
 .break-entry {
 	display: flex;
@@ -1094,11 +1208,18 @@ border-color:#667eea;
 	background: #f8f9ff;
 	border-radius: 8px;
 	font-size: 12px;
-	border: 1px solid rgba(14,165,233,0.15);
+	border: 1px solid rgba(14, 165, 233, 0.15);
 }
 
-.be-label { color: #4a5568; font-weight: 600; }
-.be-dur   { color: #0ea5e9; font-weight: 800; }
+.be-label {
+	color: #4a5568;
+	font-weight: 600;
+}
+
+.be-dur {
+	color: #0ea5e9;
+	font-weight: 800;
+}
 
 /* ================= NEXUS-STYLE ATTENDANCE ================= */
 .attendance-subtitle {
@@ -1126,7 +1247,7 @@ border-color:#667eea;
 	align-items: stretch;
 }
 
-@media (max-width: 768px) {
+@media ( max-width : 768px) {
 	.attendance-cards-row {
 		grid-template-columns: 1fr;
 	}
@@ -1138,11 +1259,10 @@ border-color:#667eea;
 	border-radius: 12px;
 	padding: 20px 24px;
 	margin-bottom: 20px;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.attendance-cards-row .status-card,
-.attendance-cards-row .break-card {
+.attendance-cards-row .status-card, .attendance-cards-row .break-card {
 	margin-bottom: 0;
 	min-height: 280px;
 	display: flex;
@@ -1150,9 +1270,9 @@ border-color:#667eea;
 	transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.attendance-cards-row .status-card:hover,
-.attendance-cards-row .break-card:hover {
-	box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+.attendance-cards-row .status-card:hover, .attendance-cards-row .break-card:hover
+	{
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .attendance-cards-row .break-card .break-log {
@@ -1168,10 +1288,21 @@ border-color:#667eea;
 	border-bottom: 1px solid #f1f5f9;
 }
 
-.status-card .punch-row:last-of-type { border-bottom: none; }
+.status-card .punch-row:last-of-type {
+	border-bottom: none;
+}
 
-.status-card .punch-label { color: #64748b; font-weight: 600; font-size: 14px; }
-.status-card .punch-value { color: #1e293b; font-weight: 600; font-size: 14px; }
+.status-card .punch-label {
+	color: #64748b;
+	font-weight: 600;
+	font-size: 14px;
+}
+
+.status-card .punch-value {
+	color: #1e293b;
+	font-weight: 600;
+	font-size: 14px;
+}
 
 .punch-actions-nexus {
 	display: flex;
@@ -1244,9 +1375,13 @@ border-color:#667eea;
 	transition: background 0.2s;
 }
 
-.break-time-link:hover { background: #bae6fd; }
+.break-time-link:hover {
+	background: #bae6fd;
+}
 
-.break-card .tr-label { text-transform: uppercase; }
+.break-card .tr-label {
+	text-transform: uppercase;
+}
 
 .break-action-btn {
 	padding: 11px 20px;
@@ -1269,14 +1404,18 @@ border-color:#667eea;
 	color: #fff !important;
 }
 
-.start-break-btn:hover:not(:disabled) { background: #6d28d9 !important; }
+.start-break-btn:hover:not(:disabled) {
+	background: #6d28d9 !important;
+}
 
 .end-break-btn-nexus {
 	background: #64748b !important;
 	color: #fff !important;
 }
 
-.end-break-btn-nexus:hover:not(:disabled) { background: #475569 !important; }
+.end-break-btn-nexus:hover:not(:disabled) {
+	background: #475569 !important;
+}
 
 .activity-log-card h3 {
 	font-size: 16px;
@@ -1311,7 +1450,9 @@ border-color:#667eea;
 	color: #334155;
 }
 
-.activity-log-table tr:hover td { background: #f8fafc; }
+.activity-log-table tr:hover td {
+	background: #f8fafc;
+}
 
 .status-badge-present {
 	color: #15803d;
@@ -1337,9 +1478,15 @@ border-color:#667eea;
 	transition: color 0.2s, background 0.2s;
 }
 
-.log-nav:hover { color: #4f46e5; background: #f1f5f9; }
+.log-nav:hover {
+	color: #4f46e5;
+	background: #f1f5f9;
+}
 
-.log-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+.log-nav:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
 </style>
 </head>
 
@@ -1352,8 +1499,12 @@ border-color:#667eea;
 			<span class="close-btn" onclick="closeSettings()">✖</span>
 		</div>
 
-		<div class="settings-item" onclick="openProfile()"><i class="fa-solid fa-user"></i> My Profile</div>
-		<div class="settings-item" onclick="openChangePassword()"><i class="fa-solid fa-lock"></i> Change Password</div>
+		<div class="settings-item" onclick="openProfile()">
+			<i class="fa-solid fa-user"></i> My Profile
+		</div>
+		<div class="settings-item" onclick="openChangePassword()">
+			<i class="fa-solid fa-lock"></i> Change Password
+		</div>
 	</div>
 
 	<!-- CHANGE PASSWORD MODAL -->
@@ -1366,7 +1517,8 @@ border-color:#667eea;
 
 			<div class="password-body">
 				<input type="password" id="newPassword" placeholder="New Password">
-				<input type="password" id="confirmPassword" placeholder="Confirm Password">
+				<input type="password" id="confirmPassword"
+					placeholder="Confirm Password">
 				<button onclick="submitPassword()">Update Password</button>
 			</div>
 		</div>
@@ -1382,7 +1534,9 @@ border-color:#667eea;
 
 			<div class="password-body">
 				<div class="time-card">
-					Full Name: <b><%=userObj != null && userObj.getFullname() != null && !userObj.getFullname().isEmpty() ? userObj.getFullname() : "--"%></b>
+					Full Name: <b><%=userObj != null && userObj.getFullname() != null && !userObj.getFullname().isEmpty()
+		? userObj.getFullname()
+		: "--"%></b>
 				</div>
 				<div class="time-card">
 					Email: <b><%=userObj != null ? userObj.getEmail() : "--"%></b>
@@ -1399,18 +1553,21 @@ border-color:#667eea;
 
 	<div class="top-bar">
 		<h2>Smart Office • Employee Dashboard</h2>
-		
+
 		<div class="user-area">
 			<button class="icon-btn"
 				onclick="setActive(this); openNotifications(); setTab('notificationPanel');">
 				<i class="fa-solid fa-bell"></i>
 			</button>
 			Welcome, <b><%=session.getAttribute("fullName") != null ? session.getAttribute("fullName") : username%></b>
-			<button class="icon-btn" onclick="openSettings()" style="margin-left: 10px;">
+			<button class="icon-btn" onclick="openSettings()"
+				style="margin-left: 10px;">
 				<i class="fa-solid fa-gear" style="margin-left: 2px;"></i>
 			</button>
 			<a href="<%=request.getContextPath()%>/logout">
-				<button class="logout-btn">Logout <i class="fa-solid fa-right-to-bracket"></i></button>
+				<button class="logout-btn">
+					Logout <i class="fa-solid fa-right-to-bracket"></i>
+				</button>
 			</a>
 		</div>
 	</div>
@@ -1440,7 +1597,8 @@ border-color:#667eea;
 
 			<button class="nav-btn"
 				onclick="setActive(this); showMeetings(); setTab('meetings');">
-				<i class="fa-solid fa-handshake"></i> <span>Scheduled Meetings</span>
+				<i class="fa-solid fa-handshake"></i> <span>Scheduled
+					Meetings</span>
 			</button>
 
 			<button class="nav-btn"
@@ -1448,87 +1606,98 @@ border-color:#667eea;
 				<i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
 			</button>
 
-<!-- 			<button class="nav-btn" -->
-<!-- 				onclick="setActive(this); openNotifications(); setTab('notificationPanel');"> -->
-<!-- 				<i class="fa-solid fa-bell"></i> <span>Notifications</span> -->
-<!-- 			</button> -->
-	</div>
+			<!-- 			<button class="nav-btn" -->
+			<!-- 				onclick="setActive(this); openNotifications(); setTab('notificationPanel');"> -->
+			<!-- 				<i class="fa-solid fa-bell"></i> <span>Notifications</span> -->
+			<!-- 			</button> -->
+		</div>
 
 		<div class="right-panel">
 
 			<!-- Attendance (Nexus-style) -->
 			<div class="box" id="attendanceSection">
-				<h2 style="font-size:20px;font-weight:700;color:#1e293b;margin:0 0 4px 0;">
-					<i class="fa-solid fa-clock" style="margin-right:8px;"></i>Attendance
+				<h2
+					style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0 0 4px 0;">
+					<i class="fa-solid fa-clock" style="margin-right: 8px;"></i>Attendance
 				</h2>
-				<p class="attendance-subtitle">Track your work sessions and breaks.</p>
+				<p class="attendance-subtitle">Track your work sessions and
+					breaks.</p>
 
 				<div class="attendance-cards-row">
 					<!-- Status card -->
 					<div class="status-card">
 						<div class="attendance-section-title">Status</div>
 						<div class="punch-row">
-							<span class="punch-label">Punch In</span>
-							<span class="punch-value"><%= punchIn != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(punchIn) : "--" %></span>
+							<span class="punch-label">Punch In</span> <span
+								class="punch-value"><%=punchIn != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(punchIn) : "--"%></span>
 						</div>
 						<div class="punch-row">
-							<span class="punch-label">Punch Out</span>
-							<span class="punch-value"><%= punchOut != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(punchOut) : "--" %></span>
+							<span class="punch-label">Punch Out</span> <span
+								class="punch-value"><%=punchOut != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(punchOut) : "--"%></span>
 						</div>
-						<% if (isWeekend) { %>
-						<p style="color:#64748b;font-size:13px;margin:12px 0 0 0;">Attendance is closed on weekends.</p>
-						<% } else { %>
+						<%
+						if (isWeekend) {
+						%>
+						<p style="color: #64748b; font-size: 13px; margin: 12px 0 0 0;">Attendance
+							is closed on weekends.</p>
+						<%
+						} else {
+						%>
 						<div class="punch-actions-nexus">
-							<form action="attendance" method="post" style="display:inline;">
+							<form action="attendance" method="post" style="display: inline;">
 								<input type="hidden" name="action" value="punchin">
-								<button type="submit" class="punch-in-btn-nexus" <%= punchIn != null ? "disabled" : "" %>>Punch In</button>
+								<button type="submit" class="punch-in-btn-nexus"
+									<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
 							</form>
-							<form action="attendance" method="post" style="display:inline;">
+							<form action="attendance" method="post" style="display: inline;">
 								<input type="hidden" name="action" value="punchout">
-								<button type="submit" class="punch-out-btn-nexus" <%= (punchIn == null || punchOut != null) ? "disabled" : "" %>>Punch Out</button>
+								<button type="submit" class="punch-out-btn-nexus"
+									<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>Punch
+									Out</button>
 							</form>
 						</div>
-						<% } %>
+						<%
+						}
+						%>
 					</div>
 
 					<!-- Break card -->
 					<div class="break-card" id="breakSection">
 						<div class="attendance-section-title">TOTAL BREAK TODAY</div>
 						<div class="break-total-row">
-							<span class="tr-label">Total Break Today</span>
-							<span class="tr-val">
-								<%
-								int breakSecs = 0;
-								if (request.getAttribute("breakTotalSeconds") != null) {
-									breakSecs = (Integer) request.getAttribute("breakTotalSeconds");
-								}
-								int bh = breakSecs / 3600;
-								int bm = (breakSecs % 3600) / 60;
-								int bs = breakSecs % 60;
-								%>
-								<%= String.format("%02d:%02d:%02d", bh, bm, bs) %>
+							<span class="tr-label">Total Break Today</span> <span
+								class="tr-val"> <%
+ int breakSecs = 0;
+ if (request.getAttribute("breakTotalSeconds") != null) {
+ 	breakSecs = (Integer) request.getAttribute("breakTotalSeconds");
+ }
+ int bh = breakSecs / 3600;
+ int bm = (breakSecs % 3600) / 60;
+ int bs = breakSecs % 60;
+ %> <%=String.format("%02d:%02d:%02d", bh, bm, bs)%>
 							</span>
 						</div>
 						<div class="break-actions">
-							<form action="break" method="post" style="display:inline;">
-								<input type="hidden" name="action" value="start">
-								<input type="hidden" name="redirect" value="user">
-								<button type="submit" class="start-break-btn break-action-btn" <%= (punchIn == null || punchOut != null || onBreak) ? "disabled" : "" %>>
-									Start Break
-								</button>
+							<form action="break" method="post" style="display: inline;">
+								<input type="hidden" name="action" value="start"> <input
+									type="hidden" name="redirect" value="user">
+								<button type="submit" class="start-break-btn break-action-btn"
+									<%=(punchIn == null || punchOut != null || onBreak) ? "disabled" : ""%>>
+									Start Break</button>
 							</form>
-							<form action="break" method="post" style="display:inline;margin-left:8px;">
-								<input type="hidden" name="action" value="end">
-								<input type="hidden" name="redirect" value="user">
-								<button type="submit" class="end-break-btn-nexus break-action-btn" <%= !onBreak ? "disabled" : "" %>>
-									End Break
-								</button>
+							<form action="break" method="post"
+								style="display: inline; margin-left: 8px;">
+								<input type="hidden" name="action" value="end"> <input
+									type="hidden" name="redirect" value="user">
+								<button type="submit"
+									class="end-break-btn-nexus break-action-btn"
+									<%=!onBreak ? "disabled" : ""%>>End Break</button>
 							</form>
 						</div>
-						<div class="break-log" style="margin-top:10px;">
+						<div class="break-log" style="margin-top: 10px;">
 							<%
-							java.util.List<com.smartoffice.model.BreakLog> empBreaks =
-								(java.util.List<com.smartoffice.model.BreakLog>) request.getAttribute("breakLogs");
+							java.util.List<com.smartoffice.model.BreakLog> empBreaks = (java.util.List<com.smartoffice.model.BreakLog>) request
+									.getAttribute("breakLogs");
 							SimpleDateFormat timeOnlyFmt = new SimpleDateFormat("HH:mm:ss");
 							if (empBreaks != null && !empBreaks.isEmpty()) {
 								for (com.smartoffice.model.BreakLog b : empBreaks) {
@@ -1536,10 +1705,10 @@ border-color:#667eea;
 									String endStr = b.getEndTime() != null ? timeOnlyFmt.format(b.getEndTime()) : "--";
 							%>
 							<div class="time-card">
-								From <b><%= startStr %></b> to <b><%= endStr %></b>
+								From <b><%=startStr%></b> to <b><%=endStr%></b>
 							</div>
 							<%
-								}
+							}
 							} else {
 							%>
 							<p class="no-task-text">No breaks recorded today.</p>
@@ -1553,10 +1722,15 @@ border-color:#667eea;
 				<!-- Recent Activity Log -->
 				<div class="activity-log-card">
 					<h3>
-						Recent Activity Log
-						<span class="log-nav-wrap">
-							<button type="button" class="log-nav" id="logPrev" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>
-							<button type="button" class="log-nav" id="logNext" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
+						Recent Activity Log <span class="log-nav-wrap">
+							<button type="button" class="log-nav" id="logPrev"
+								aria-label="Previous">
+								<i class="fa-solid fa-chevron-left"></i>
+							</button>
+							<button type="button" class="log-nav" id="logNext"
+								aria-label="Next">
+								<i class="fa-solid fa-chevron-right"></i>
+							</button>
 						</span>
 					</h3>
 					<table class="activity-log-table">
@@ -1581,29 +1755,35 @@ border-color:#667eea;
 									int br = e.getBreakSeconds();
 									long totalSec = 0;
 									if (pi != null && po != null) {
-										totalSec = Math.max(0, (po.getTime() - pi.getTime()) / 1000 - br);
+								totalSec = Math.max(0, (po.getTime() - pi.getTime()) / 1000 - br);
 									}
-									int th = (int)(totalSec / 3600);
-									int tm = (int)((totalSec % 3600) / 60);
+									int th = (int) (totalSec / 3600);
+									int tm = (int) ((totalSec % 3600) / 60);
 									String totalStr = th + "h " + tm + "m";
 									int brH = br / 3600;
 									int brM = (br % 3600) / 60;
 									String breakStr = brH + "h " + String.format("%02d", brM) + "m";
 									String inOutStr = pi != null ? timeFmt.format(pi) : "--";
-									if (po != null) inOutStr += " (" + timeFmt.format(po) + ")";
+									if (po != null)
+								inOutStr += " (" + timeFmt.format(po) + ")";
 							%>
 							<tr data-log-row>
-								<td><%= e.getAttendanceDate() != null ? dateFmt.format(e.getAttendanceDate()) : "--" %></td>
-								<td><%= inOutStr %></td>
-								<td><%= breakStr %></td>
-								<td><%= totalStr %></td>
-								<td><span class="<%= "Present".equals(e.getStatus()) ? "status-badge-present" : "status-badge-absent" %>"><%= e.getStatus() != null ? e.getStatus() : "--" %></span></td>
+								<td><%=e.getAttendanceDate() != null ? dateFmt.format(e.getAttendanceDate()) : "--"%></td>
+								<td><%=inOutStr%></td>
+								<td><%=breakStr%></td>
+								<td><%=totalStr%></td>
+								<td><span
+									class="<%="Present".equals(e.getStatus()) ? "status-badge-present" : "status-badge-absent"%>"><%=e.getStatus() != null ? e.getStatus() : "--"%></span></td>
 							</tr>
 							<%
-								}
+							}
 							} else {
 							%>
-							<tr><td colspan="5" style="text-align:center;padding:24px;color:#64748b;">No attendance records yet.</td></tr>
+							<tr>
+								<td colspan="5"
+									style="text-align: center; padding: 24px; color: #64748b;">No
+									attendance records yet.</td>
+							</tr>
 							<%
 							}
 							%>
@@ -1659,24 +1839,20 @@ border-color:#667eea;
 							<i class="fa-solid fa-file-lines"></i>
 							<div>
 								<b><%=t.getTitle() != null ? t.getTitle() : t.getDescription()%></b><br>
-								<small><%=t.getDescription()%></small><br>
-								<small>
+								<small><%=t.getDescription()%></small><br> <small>
 									<%
 									java.sql.Date dl = t.getDeadline();
 									String pr = t.getPriority();
-									%>
-									Deadline:
-									<%= dl != null ? dl.toString() : "--" %>
-									&nbsp; | Priority:
-									<%= pr != null ? pr : "MEDIUM" %>
+									%> Deadline: <%=dl != null ? dl.toString() : "--"%> &nbsp; |
+									Priority: <%=pr != null ? pr : "MEDIUM"%>
 								</small><br>
 								<%
 								String attName = t.getAttachmentName();
 								if (attName != null && !attName.isEmpty()) {
 								%>
-								<small>
-									<a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
-									   target="_blank">Download: <%=attName%></a>
+								<small> <a
+									href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
+									target="_blank">Download: <%=attName%></a>
 								</small><br>
 								<%
 								}
@@ -1687,37 +1863,41 @@ border-color:#667eea;
 
 						<div class="task-actions">
 
-								<form action="updateTaskStatus" method="post">
-								
+							
+							<form action="submitTaskUpdate" method="post"
+								enctype="multipart/form-data">
+
 								<input type="hidden" name="taskId" value="<%=t.getId()%>">
-								
-								<select name="status" class="task-dropdown" onchange="this.form.submit()">
-								
-								<option value="">Update Status</option>
-								
-								<option value="COMPLETED"
-								<%= "COMPLETED".equals(t.getStatus()) ? "selected" : "" %>>
-								Complete
-								</option>
-								
-								<option value="INCOMPLETE"
-								<%= "INCOMPLETE".equals(t.getStatus()) ? "selected" : "" %>>
-								Incomplete
-								</option>
-								
-								<option value="ERRORS_RAISED"
-								<%= "ERRORS_RAISED".equals(t.getStatus()) ? "selected" : "" %>>
-								Errors Raised
-								</option>
-								
-								<option value="DOCUMENT_VERIFICATION"
-								<%= "DOCUMENT_VERIFICATION".equals(t.getStatus()) ? "selected" : "" %>>
-								Document Verification
-								</option>
-								
-								</select>
-								
-								</form>
+
+								<select name="status" class="task-dropdown">
+									<option value="">Update Status</option>
+
+									<option value="COMPLETED"
+										<%="COMPLETED".equals(t.getStatus()) ? "selected" : ""%>>
+										Complete</option>
+
+									<option value="INCOMPLETE"
+										<%="INCOMPLETE".equals(t.getStatus()) ? "selected" : ""%>>
+										Incomplete</option>
+
+									<option value="ERRORS_RAISED"
+										<%="ERRORS_RAISED".equals(t.getStatus()) ? "selected" : ""%>>
+										Errors Raised</option>
+
+									<option value="DOCUMENT_VERIFICATION"
+										<%="DOCUMENT_VERIFICATION".equals(t.getStatus()) ? "selected" : ""%>>
+										Document Verification</option>
+
+								</select> <br> <br> <input type="file" name="employeeFile">
+								<br> <br>
+
+								<textarea name="comment" placeholder="Add comment"></textarea>
+
+								<br> <br>
+
+								<button type="submit" class="submit-btn">Submit Update</button>
+
+							</form>
 
 						</div>
 					</div>
@@ -1749,24 +1929,19 @@ border-color:#667eea;
 								<div class="task-left">
 									<i class="fa-solid fa-people-group"></i>
 									<div>
-										<b><%= t.getName() %></b><br>
-										<small>Manager:
-											<%= t.getManagerFullname() != null ? t.getManagerFullname() : t.getManagerUsername() %></small><br>
-										<small>Members: <%= t.getMembers().size() %></small>
+										<b><%=t.getName()%></b><br> <small>Manager: <%=t.getManagerFullname() != null ? t.getManagerFullname() : t.getManagerUsername()%></small><br>
+										<small>Members: <%=t.getMembers().size()%></small>
 										<%
 										if (!t.getMembers().isEmpty()) {
 										%>
-										<br>
-										<small>
-											<%
-											for (com.smartoffice.model.User m : t.getMembers()) {
-											%>
-											<span style="display:inline-block; background:#e2e8f0; padding:2px 8px; border-radius:999px; margin:1px; font-size:11px;">
-												<%= m.getFullname() != null ? m.getFullname() : m.getEmail() %>
-											</span>
-											<%
-											}
-											%>
+										<br> <small> <%
+ for (com.smartoffice.model.User m : t.getMembers()) {
+ %> <span
+											style="display: inline-block; background: #e2e8f0; padding: 2px 8px; border-radius: 999px; margin: 1px; font-size: 11px;">
+												<%=m.getFullname() != null ? m.getFullname() : m.getEmail()%>
+										</span> <%
+ }
+ %>
 										</small>
 										<%
 										}
@@ -1775,7 +1950,7 @@ border-color:#667eea;
 								</div>
 							</div>
 							<%
-								}
+							}
 							} else {
 							%>
 							<p class="no-task-text">You are not part of any team yet.</p>
@@ -1852,30 +2027,27 @@ border-color:#667eea;
 					<!-- Leave Tabs -->
 					<div style="display: flex; gap: 12px; margin-bottom: 20px;">
 						<button class="nav-btn"
-							style="flex: 1; background: linear-gradient(135deg,#667eea,#764ba2); color: white; border-radius:20px;"
+							style="flex: 1; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 20px;"
 							onclick="showApplyLeave()">Apply Leave</button>
 						<button class="nav-btn"
-							style="flex: 1; background: #6b7280; color: white; border-radius:20px;"
+							style="flex: 1; background: #6b7280; color: white; border-radius: 20px;"
 							onclick="showMyLeaves()">My Leave Requests</button>
 					</div>
 
 					<!-- Apply Leave -->
 					<div id="applyLeaveSection">
 						<form class="leave-form" action="applyLeave" method="post">
-							<label>Leave Type</label>
-							<select name="leaveType" required>
+							<label>Leave Type</label> <select name="leaveType" required>
 								<option value="">Select</option>
 								<option>Casual Leave</option>
 								<option>Sick Leave</option>
 								<option>Earned Leave</option>
-							</select>
-							<label>From Date</label>
-							<input type="date" name="fromDate" required>
-							<label>To Date</label>
-							<input type="date" name="toDate" required>
-							<label>Reason</label>
+							</select> <label>From Date</label> <input type="date" name="fromDate"
+								required> <label>To Date</label> <input type="date"
+								name="toDate" required> <label>Reason</label>
 							<textarea name="reason" required></textarea>
-							<button class="apply-leave-btn" style="color: white;">Apply Leave</button>
+							<button class="apply-leave-btn" style="color: white;">Apply
+								Leave</button>
 						</form>
 					</div>
 
@@ -1945,7 +2117,7 @@ border-color:#667eea;
 
 						<div style="margin-top: 8px; text-align: right;">
 							<button
-								style="background: linear-gradient(135deg,#667eea,#764ba2); color: white; border: none; padding: 4px 10px; border-radius: 12px; cursor: pointer; font-size: 12px; font-weight:600;"
+								style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 4px 10px; border-radius: 12px; cursor: pointer; font-size: 12px; font-weight: 600;"
 								onclick="markAsRead(<%=n.getId()%>)">Mark as read</button>
 						</div>
 					</div>
@@ -2373,6 +2545,5 @@ document.onkeydown = e =>
 			    });
 			}
 			</script>
-
 </body>
 </html>
