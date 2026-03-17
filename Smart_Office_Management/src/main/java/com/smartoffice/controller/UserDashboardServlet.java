@@ -82,27 +82,48 @@ public class UserDashboardServlet extends HttpServlet {
 			/* ================= MEETINGS ================= */
 			List<Meeting> meetings = new ArrayList<>();
 
-			String meetingSql = "SELECT * FROM meetings WHERE created_by IN " +
-				"(SELECT t.manager_username FROM team_members tm JOIN teams t ON t.id = tm.team_id WHERE tm.username = ?) " +
-				"AND start_time >= NOW() ORDER BY start_time";
+			// Updated query to fetch meetings where user is a participant
+			// Joins with meeting_participants and users tables to get creator info
+			String meetingSql = "SELECT DISTINCT m.id, m.title, m.description, m.start_time, m.end_time,\r\n"
+					+ "       m.meeting_link, m.created_by, m.created_at,\r\n"
+					+ "       CONCAT(u.firstname, ' ', u.lastname) AS creator_name,\r\n"
+					+ "       u.role AS creator_role\r\n"
+					+ "FROM meetings m\r\n"
+					+ "LEFT JOIN meeting_participants mp ON m.id = mp.meeting_id\r\n"
+					+ "LEFT JOIN users u ON m.created_by = u.email\r\n"
+					+ "LEFT JOIN users emp ON emp.email = ?\r\n"
+					+ "WHERE \r\n"
+					+ "(\r\n"
+					+ "    mp.user_email = ? \r\n"
+					+ "    OR m.created_by = emp.manager_email\r\n"
+					+ ")\r\n"
+					+ "AND m.end_time >= NOW()\r\n"
+					+ "ORDER BY m.start_time ASC;";
 
 			try (Connection con = DBConnectionUtil.getConnection();
-					PreparedStatement ps = con.prepareStatement(meetingSql)) {
+			        PreparedStatement ps = con.prepareStatement(meetingSql)) {
 
-				ps.setString(1, username);
-				ResultSet rsMeetings = ps.executeQuery();
+				ps.setString(1, username); // for emp.email
+				ps.setString(2, username); // for participant
+			    ResultSet rsMeetings = ps.executeQuery();
 
-				while (rsMeetings.next()) {
-					Meeting m = new Meeting();
-					m.setId(rsMeetings.getInt("id"));
-					m.setTitle(rsMeetings.getString("title"));
-					m.setDescription(rsMeetings.getString("description"));
-					m.setStartTime(rsMeetings.getTimestamp("start_time"));
-					m.setEndTime(rsMeetings.getTimestamp("end_time"));
-					m.setMeetingLink(rsMeetings.getString("meeting_link"));
-					m.setCreatedBy(rsMeetings.getString("created_by"));
-					meetings.add(m);
-				}
+			    while (rsMeetings.next()) {
+			        Meeting m = new Meeting();
+			        m.setId(rsMeetings.getInt("id"));
+			        m.setTitle(rsMeetings.getString("title"));
+			        m.setDescription(rsMeetings.getString("description"));
+			        m.setStartTime(rsMeetings.getTimestamp("start_time"));
+			        m.setEndTime(rsMeetings.getTimestamp("end_time"));
+			        m.setMeetingLink(rsMeetings.getString("meeting_link"));
+			        m.setCreatedBy(rsMeetings.getString("created_by"));
+			        m.setCreatedAt(rsMeetings.getTimestamp("created_at"));
+			        
+			        // Set creator information
+			        m.setCreatorName(rsMeetings.getString("creator_name"));
+			        m.setCreatorRole(rsMeetings.getString("creator_role"));
+			        
+			        meetings.add(m);
+			    }
 			}
 
 			request.setAttribute("meetings", meetings);

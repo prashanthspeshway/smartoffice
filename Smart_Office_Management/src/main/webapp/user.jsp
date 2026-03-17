@@ -284,9 +284,9 @@ body {
 	display: flex;
 	align-items: center;
 	gap: 10px;
-/* 	background: #fef2f2; */
+	/* 	background: #fef2f2; */
 	color: #dc2626;
-/* 	transition: all 0.2s; */
+	/* 	transition: all 0.2s; */
 	text-align: left;
 	text-decoration: none;
 	margin-top: 4px;
@@ -300,7 +300,7 @@ body {
 .sidebar-logout-btn i {
 	width: 18px;
 	text-align: center;
-/* 	flex-shrink: 0; */
+	/* 	flex-shrink: 0; */
 }
 
 /* ===== Card ===== */
@@ -483,10 +483,23 @@ body {
 	padding: 10px;
 }
 
-#taskSection::-webkit-scrollbar { width: 4px; }
-#taskSection::-webkit-scrollbar-track { background: #f0f2ff; border-radius: 10px; }
-#taskSection::-webkit-scrollbar-thumb { background: #667eea; border-radius: 8px; }
-#taskSection::-webkit-scrollbar-thumb:hover { background: #764ba2; }
+#taskSection::-webkit-scrollbar {
+	width: 4px;
+}
+
+#taskSection::-webkit-scrollbar-track {
+	background: #f0f2ff;
+	border-radius: 10px;
+}
+
+#taskSection::-webkit-scrollbar-thumb {
+	background: #667eea;
+	border-radius: 8px;
+}
+
+#taskSection::-webkit-scrollbar-thumb:hover {
+	background: #764ba2;
+}
 
 /* ================= SUBMIT TASK UPDATE BUTTON ================= */
 .submit-btn {
@@ -553,8 +566,10 @@ body {
 	align-items: start;
 }
 
-@media (max-width: 768px) {
-	.leave-apply-grid { grid-template-columns: 1fr; }
+@media ( max-width : 768px) {
+	.leave-apply-grid {
+		grid-template-columns: 1fr;
+	}
 }
 
 .leave-apply-left {
@@ -612,9 +627,8 @@ body {
 	display: block;
 }
 
-.leave-form-inner select,
-.leave-form-inner input,
-.leave-form-inner textarea {
+.leave-form-inner select, .leave-form-inner input, .leave-form-inner textarea
+	{
 	width: 100%;
 	padding: 10px 12px;
 	border-radius: 8px;
@@ -627,9 +641,8 @@ body {
 	outline: none;
 }
 
-.leave-form-inner select:focus,
-.leave-form-inner input:focus,
-.leave-form-inner textarea:focus {
+.leave-form-inner select:focus, .leave-form-inner input:focus,
+	.leave-form-inner textarea:focus {
 	border-color: #667eea;
 	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -687,9 +700,18 @@ body {
 	margin-bottom: 4px;
 }
 
-.leave-policy-casual  { border-left: 4px solid #4f46e5; }
-.leave-policy-sick    { border-left: 4px solid #10b981; }
-.leave-policy-earned  { border-left: 4px solid #f59e0b; }
+.leave-policy-casual {
+	border-left: 4px solid #4f46e5;
+}
+
+.leave-policy-sick {
+	border-left: 4px solid #10b981;
+}
+
+.leave-policy-earned {
+	border-left: 4px solid #f59e0b;
+}
+
 .leave-policy-note {
 	background: #fef2f2;
 	border: 1px solid #fecaca;
@@ -702,7 +724,11 @@ body {
 	gap: 6px;
 }
 
-.leave-policy-note i { color: #dc2626; flex-shrink: 0; margin-top: 1px; }
+.leave-policy-note i {
+	color: #dc2626;
+	flex-shrink: 0;
+	margin-top: 1px;
+}
 
 /* My leave requests scroll area */
 .leave-requests-scroll {
@@ -711,8 +737,14 @@ body {
 	padding-right: 4px;
 }
 
-.leave-requests-scroll::-webkit-scrollbar { width: 4px; }
-.leave-requests-scroll::-webkit-scrollbar-thumb { background: #c3cfe2; border-radius: 4px; }
+.leave-requests-scroll::-webkit-scrollbar {
+	width: 4px;
+}
+
+.leave-requests-scroll::-webkit-scrollbar-thumb {
+	background: #c3cfe2;
+	border-radius: 4px;
+}
 
 /* ================= OLD LEAVE FORM (kept for compatibility, hidden) ================= */
 .leave-form {
@@ -731,7 +763,8 @@ body {
 	outline: none;
 }
 
-.leave-form input:focus, .leave-form select:focus, .leave-form textarea:focus {
+.leave-form input:focus, .leave-form select:focus, .leave-form textarea:focus
+	{
 	border-color: #667eea;
 	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -741,7 +774,10 @@ body {
 	resize: none;
 }
 
-#myLeaveSection h3 { color: #667eea !important; font-weight: 700; }
+#myLeaveSection h3 {
+	color: #667eea !important;
+	font-weight: 700;
+}
 
 #myLeaveSection {
 	max-height: 300px;
@@ -750,10 +786,23 @@ body {
 	padding: 10px;
 }
 
-#myLeaveSection::-webkit-scrollbar { width: 4px; }
-#myLeaveSection::-webkit-scrollbar-track { background: #f0f2ff; border-radius: 10px; }
-#myLeaveSection::-webkit-scrollbar-thumb { background: #667eea; border-radius: 8px; }
-#myLeaveSection::-webkit-scrollbar-thumb:hover { background: #764ba2; }
+#myLeaveSection::-webkit-scrollbar {
+	width: 4px;
+}
+
+#myLeaveSection::-webkit-scrollbar-track {
+	background: #f0f2ff;
+	border-radius: 10px;
+}
+
+#myLeaveSection::-webkit-scrollbar-thumb {
+	background: #667eea;
+	border-radius: 8px;
+}
+
+#myLeaveSection::-webkit-scrollbar-thumb:hover {
+	background: #764ba2;
+}
 
 .apply-leave-btn {
 	margin-top: 10px;
@@ -802,7 +851,8 @@ body {
 	padding: 18px 20px;
 	margin-top: 18px;
 	border-radius: 14px;
-	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05),
+		rgba(118, 75, 162, 0.05));
 	border: 1px solid rgba(102, 126, 234, 0.15);
 	overflow: auto;
 	transition: all 0.3s ease;
@@ -813,10 +863,27 @@ body {
 	box-shadow: 0 10px 28px rgba(102, 126, 234, 0.2);
 }
 
-#meetingSection .task-left { display: flex; gap: 14px; align-items: flex-start; }
-#meetingSection .task-left i { font-size: 20px; color: #667eea; margin-top: 4px; }
-#meetingSection .task-left b { font-size: 15px; color: #1f2937; }
-#meetingSection .task-left small { font-size: 13px; color: #6b7280; }
+#meetingSection .task-left {
+	display: flex;
+	gap: 14px;
+	align-items: flex-start;
+}
+
+#meetingSection .task-left i {
+	font-size: 20px;
+	color: #667eea;
+	margin-top: 4px;
+}
+
+#meetingSection .task-left b {
+	font-size: 15px;
+	color: #1f2937;
+}
+
+#meetingSection .task-left small {
+	font-size: 13px;
+	color: #6b7280;
+}
 
 #meetingSection .task-btn {
 	padding: 10px 20px;
@@ -835,9 +902,20 @@ body {
 	box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
 }
 
-#meetingSection .no-task-text { margin-top: 15px; font-size: 14px; color: #6b7280; }
-#meetingSection .attendance-fieldset::-webkit-scrollbar { width: 4px; }
-#meetingSection .attendance-fieldset::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+#meetingSection .no-task-text {
+	margin-top: 15px;
+	font-size: 14px;
+	color: #6b7280;
+}
+
+#meetingSection .attendance-fieldset::-webkit-scrollbar {
+	width: 4px;
+}
+
+#meetingSection .attendance-fieldset::-webkit-scrollbar-thumb {
+	background: #667eea;
+	border-radius: 4px;
+}
 
 /* ===== Calendar ===== */
 #calendarSection {
@@ -848,8 +926,19 @@ body {
 	-ms-overflow-style: none;
 }
 
-#calendarSection::-webkit-scrollbar { width: 0; background: transparent; }
-#calendarSection h3 { position: sticky; top: 0; background: #f0f2ff; padding-bottom: 10px; z-index: 10; color: #667eea; }
+#calendarSection::-webkit-scrollbar {
+	width: 0;
+	background: transparent;
+}
+
+#calendarSection h3 {
+	position: sticky;
+	top: 0;
+	background: #f0f2ff;
+	padding-bottom: 10px;
+	z-index: 10;
+	color: #667eea;
+}
 
 /* ================= TOAST ================= */
 .toast {
@@ -870,8 +959,13 @@ body {
 	min-width: 240px;
 }
 
-.toast.show { animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1); }
-.toast.hide { animation: toastOut 0.4s ease forwards; }
+.toast.show {
+	animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toast.hide {
+	animation: toastOut 0.4s ease forwards;
+}
 
 .toast::before {
 	content: "✔";
@@ -893,15 +987,55 @@ body {
 	line-height: 26px;
 }
 
-.toast.success { border-left-color: #10b981; }
-.toast.success::before { content: "✔"; background: linear-gradient(135deg, #10b981, #059669); }
-.toast.error { border-left-color: #ef4444; }
-.toast.error::before { content: "✖"; background: linear-gradient(135deg, #ef4444, #dc2626); }
-.toast.info { border-left-color: #667eea; }
-.toast.info::before { content: "ℹ"; background: linear-gradient(135deg, #667eea, #764ba2); }
+.toast.success {
+	border-left-color: #10b981;
+}
 
-@keyframes toastIn { from { opacity: 0; transform: translateX(120px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(120px); } }
+.toast.success::before {
+	content: "✔";
+	background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.toast.error {
+	border-left-color: #ef4444;
+}
+
+.toast.error::before {
+	content: "✖";
+	background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.toast.info {
+	border-left-color: #667eea;
+}
+
+.toast.info::before {
+	content: "ℹ";
+	background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+@
+keyframes toastIn {from { opacity:0;
+	transform: translateX(120px);
+}
+
+to {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+}
+@
+keyframes toastOut {from { opacity:1;
+	transform: translateX(0);
+}
+
+to {
+	opacity: 0;
+	transform: translateX(120px);
+}
+
+}
 
 /* notification */
 .notification-panel {
@@ -919,7 +1053,9 @@ body {
 	border: 1px solid rgba(102, 126, 234, 0.2);
 }
 
-.notification-panel.show { right: 25px; }
+.notification-panel.show {
+	right: 25px;
+}
 
 .notification-header {
 	background: linear-gradient(135deg, #667eea, #764ba2);
@@ -950,7 +1086,8 @@ body {
 }
 
 .notification-item {
-	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.05),
+		rgba(118, 75, 162, 0.05));
 	padding: 12px;
 	margin-bottom: 10px;
 	border-left: 4px solid #667eea;
@@ -959,8 +1096,14 @@ body {
 	border: 1px solid rgba(102, 126, 234, 0.15);
 }
 
-.notification-list::-webkit-scrollbar { width: 6px; }
-.notification-list::-webkit-scrollbar-thumb { background: rgba(102, 126, 234, 0.4); border-radius: 4px; }
+.notification-list::-webkit-scrollbar {
+	width: 6px;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+	background: rgba(102, 126, 234, 0.4);
+	border-radius: 4px;
+}
 
 /* ================= MODAL ================= */
 .password-modal {
@@ -996,7 +1139,11 @@ body {
 	align-items: center;
 }
 
-.password-header h4 { margin: 0; font-size: 16px; font-weight: 700; }
+.password-header h4 {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 700;
+}
 
 .password-body {
 	padding: 25px;
@@ -1063,12 +1210,34 @@ body {
 	color: white;
 }
 
-@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@
+keyframes fadeIn {from { opacity:0;
+	transform: scale(0.95);
+}
+
+to {
+	opacity: 1;
+	transform: scale(1);
+}
+
+}
 
 /* ================= DARK THEME ================= */
-.dark-theme { background: #121212; color: white; }
-.dark-theme .password-box { background: #1e1e1e; color: white; }
-.dark-theme input { background: #2c2c2c; color: white; border: 1px solid #555; }
+.dark-theme {
+	background: #121212;
+	color: white;
+}
+
+.dark-theme .password-box {
+	background: #1e1e1e;
+	color: white;
+}
+
+.dark-theme input {
+	background: #2c2c2c;
+	color: white;
+	border: 1px solid #555;
+}
 
 /* ================= BREAK TIME ================= */
 .break-fieldset {
@@ -1097,16 +1266,33 @@ body {
 	justify-content: space-between;
 	align-items: center;
 	padding: 10px 14px;
-	background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(99, 102, 241, 0.08));
+	background: linear-gradient(135deg, rgba(14, 165, 233, 0.08),
+		rgba(99, 102, 241, 0.08));
 	border-radius: 10px;
 	border: 1px solid rgba(14, 165, 233, 0.15);
 	margin-bottom: 12px;
 }
 
-.break-total-row .tr-label { font-size: 12px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.break-total-row .tr-val { font-size: 15px; font-weight: 800; color: #0ea5e9; letter-spacing: 1px; }
+.break-total-row .tr-label {
+	font-size: 12px;
+	color: #6b7280;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
 
-.break-actions { display: flex; gap: 12px; margin-bottom: 14px; }
+.break-total-row .tr-val {
+	font-size: 15px;
+	font-weight: 800;
+	color: #0ea5e9;
+	letter-spacing: 1px;
+}
+
+.break-actions {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 14px;
+}
 
 .break-actions button {
 	flex: 1;
@@ -1123,7 +1309,12 @@ body {
 	gap: 7px;
 }
 
-.break-actions button:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+.break-actions button:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+	transform: none !important;
+	box-shadow: none !important;
+}
 
 .break-log {
 	max-height: 110px;
@@ -1134,11 +1325,22 @@ body {
 	gap: 6px;
 }
 
-.break-log::-webkit-scrollbar { width: 3px; }
-.break-log::-webkit-scrollbar-thumb { background: rgba(14, 165, 233, 0.3); border-radius: 3px; }
+.break-log::-webkit-scrollbar {
+	width: 3px;
+}
+
+.break-log::-webkit-scrollbar-thumb {
+	background: rgba(14, 165, 233, 0.3);
+	border-radius: 3px;
+}
 
 /* ================= NEXUS-STYLE ATTENDANCE ================= */
-.attendance-subtitle { color: #64748b; font-size: 14px; margin: -8px 0 20px 0; font-weight: 500; }
+.attendance-subtitle {
+	color: #64748b;
+	font-size: 14px;
+	margin: -8px 0 20px 0;
+	font-weight: 500;
+}
 
 .attendance-section-title {
 	font-size: 13px;
@@ -1157,7 +1359,11 @@ body {
 	align-items: stretch;
 }
 
-@media (max-width: 768px) { .attendance-cards-row { grid-template-columns: 1fr; } }
+@media ( max-width : 768px) {
+	.attendance-cards-row {
+		grid-template-columns: 1fr;
+	}
+}
 
 .status-card, .break-card, .activity-log-card {
 	background: #ffffff;
@@ -1168,8 +1374,7 @@ body {
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.attendance-cards-row .status-card,
-.attendance-cards-row .break-card {
+.attendance-cards-row .status-card, .attendance-cards-row .break-card {
 	margin-bottom: 0;
 	min-height: 280px;
 	display: flex;
@@ -1177,10 +1382,15 @@ body {
 	transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.attendance-cards-row .status-card:hover,
-.attendance-cards-row .break-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
+.attendance-cards-row .status-card:hover, .attendance-cards-row .break-card:hover
+	{
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
 
-.attendance-cards-row .break-card .break-log { flex: 1; min-height: 60px; }
+.attendance-cards-row .break-card .break-log {
+	flex: 1;
+	min-height: 60px;
+}
 
 .status-card .punch-row {
 	display: flex;
@@ -1190,11 +1400,28 @@ body {
 	border-bottom: 1px solid #f1f5f9;
 }
 
-.status-card .punch-row:last-of-type { border-bottom: none; }
-.status-card .punch-label { color: #64748b; font-weight: 600; font-size: 14px; }
-.status-card .punch-value { color: #1e293b; font-weight: 600; font-size: 14px; }
+.status-card .punch-row:last-of-type {
+	border-bottom: none;
+}
 
-.punch-actions-nexus { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+.status-card .punch-label {
+	color: #64748b;
+	font-weight: 600;
+	font-size: 14px;
+}
+
+.status-card .punch-value {
+	color: #1e293b;
+	font-weight: 600;
+	font-size: 14px;
+}
+
+.punch-actions-nexus {
+	display: flex;
+	gap: 12px;
+	margin-top: 20px;
+	flex-wrap: wrap;
+}
 
 .punch-in-btn-nexus {
 	padding: 12px 24px;
@@ -1208,9 +1435,18 @@ body {
 	transition: background 0.2s;
 }
 
-.punch-in-btn-nexus:not(:disabled) { background: #4f46e5; }
-.punch-in-btn-nexus:hover:not(:disabled) { background: #4338ca; }
-.punch-in-btn-nexus:disabled { opacity: 0.7; cursor: not-allowed; }
+.punch-in-btn-nexus:not(:disabled) {
+	background: #4f46e5;
+}
+
+.punch-in-btn-nexus:hover:not(:disabled) {
+	background: #4338ca;
+}
+
+.punch-in-btn-nexus:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
 
 .punch-out-btn-nexus {
 	padding: 12px 24px;
@@ -1224,8 +1460,15 @@ body {
 	transition: background 0.2s;
 }
 
-.punch-out-btn-nexus:hover:not(:disabled) { background: #b91c1c; }
-.punch-out-btn-nexus:disabled { background: #94a3b8; opacity: 0.7; cursor: not-allowed; }
+.punch-out-btn-nexus:hover:not(:disabled) {
+	background: #b91c1c;
+}
+
+.punch-out-btn-nexus:disabled {
+	background: #94a3b8;
+	opacity: 0.7;
+	cursor: not-allowed;
+}
 
 .break-action-btn {
 	padding: 11px 20px;
@@ -1237,13 +1480,33 @@ body {
 	transition: opacity 0.2s, background 0.2s;
 }
 
-.break-action-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: auto; }
-.start-break-btn { background: #7c3aed !important; color: #fff !important; }
-.start-break-btn:hover:not(:disabled) { background: #6d28d9 !important; }
-.end-break-btn-nexus { background: #64748b !important; color: #fff !important; }
-.end-break-btn-nexus:hover:not(:disabled) { background: #475569 !important; }
+.break-action-btn:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+	pointer-events: auto;
+}
 
-.break-card .tr-label { text-transform: uppercase; }
+.start-break-btn {
+	background: #7c3aed !important;
+	color: #fff !important;
+}
+
+.start-break-btn:hover:not(:disabled) {
+	background: #6d28d9 !important;
+}
+
+.end-break-btn-nexus {
+	background: #64748b !important;
+	color: #fff !important;
+}
+
+.end-break-btn-nexus:hover:not(:disabled) {
+	background: #475569 !important;
+}
+
+.break-card .tr-label {
+	text-transform: uppercase;
+}
 
 .time-card {
 	background: #f8f9ff;
@@ -1287,10 +1550,19 @@ body {
 	color: #334155;
 }
 
-.activity-log-table tr:hover td { background: #f8fafc; }
+.activity-log-table tr:hover td {
+	background: #f8fafc;
+}
 
-.status-badge-present { color: #15803d; font-weight: 700; }
-.status-badge-absent { color: #64748b; font-weight: 600; }
+.status-badge-present {
+	color: #15803d;
+	font-weight: 700;
+}
+
+.status-badge-absent {
+	color: #64748b;
+	font-weight: 600;
+}
 
 .log-nav {
 	display: inline-flex;
@@ -1306,8 +1578,15 @@ body {
 	transition: color 0.2s, background 0.2s;
 }
 
-.log-nav:hover { color: #4f46e5; background: #f1f5f9; }
-.log-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+.log-nav:hover {
+	color: #4f46e5;
+	background: #f1f5f9;
+}
+
+.log-nav:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
 
 /* ================= TASK UPDATE FORM INSIDE CARD ================= */
 .task-update-form {
@@ -1317,9 +1596,8 @@ body {
 	min-width: 220px;
 }
 
-.task-update-form select,
-.task-update-form textarea,
-.task-update-form input[type="file"] {
+.task-update-form select, .task-update-form textarea, .task-update-form input[type="file"]
+	{
 	padding: 7px 10px;
 	border-radius: 8px;
 	border: 1.5px solid #e0e4ff;
@@ -1331,8 +1609,7 @@ body {
 	box-sizing: border-box;
 }
 
-.task-update-form select:focus,
-.task-update-form textarea:focus {
+.task-update-form select:focus, .task-update-form textarea:focus {
 	border-color: #667eea;
 	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -1395,7 +1672,9 @@ body {
 	border-radius: 0;
 }
 
-.settings-inner-tab-btn:hover { color: #4f46e5; }
+.settings-inner-tab-btn:hover {
+	color: #4f46e5;
+}
 
 .settings-inner-tab-btn.active {
 	color: #4f46e5;
@@ -1420,10 +1699,28 @@ body {
 	font-size: 14px;
 }
 
-.profile-info-row:last-child { border-bottom: none; }
-.profile-info-label { color: #64748b; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-.profile-info-label i { color: #6366f1; width: 16px; text-align: center; }
-.profile-info-value { color: #1e293b; font-weight: 600; }
+.profile-info-row:last-child {
+	border-bottom: none;
+}
+
+.profile-info-label {
+	color: #64748b;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.profile-info-label i {
+	color: #6366f1;
+	width: 16px;
+	text-align: center;
+}
+
+.profile-info-value {
+	color: #1e293b;
+	font-weight: 600;
+}
 
 /* Change password card */
 .change-password-card {
@@ -1444,7 +1741,9 @@ body {
 	gap: 8px;
 }
 
-.change-password-card h4 i { color: #6366f1; }
+.change-password-card h4 i {
+	color: #6366f1;
+}
 
 .cp-field {
 	margin-bottom: 14px;
@@ -1499,6 +1798,53 @@ body {
 	transform: translateY(-2px);
 	box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
 }
+
+/* Creator Badge Styles */
+.creator-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.creator-badge i {
+    font-size: 10px;
+    margin-right: 4px;
+}
+
+.creator-badge-admin {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #991b1b;
+    border: 1px solid rgba(153, 27, 27, 0.2);
+}
+
+.creator-badge-manager {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
+    border: 1px solid rgba(30, 64, 175, 0.2);
+}
+
+.creator-badge-other {
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    color: #4338ca;
+    border: 1px solid rgba(67, 56, 202, 0.2);
+}
+
+/* Enhanced meeting card styling */
+#meetingSection .task-card {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.03), rgba(118, 75, 162, 0.03));
+    border-left: 4px solid #667eea;
+}
+
+#meetingSection .task-card:hover {
+    border-left-color: #764ba2;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+}
 </style>
 </head>
 
@@ -1513,7 +1859,8 @@ body {
 			</div>
 			<div class="password-body">
 				<input type="password" id="newPassword" placeholder="New Password">
-				<input type="password" id="confirmPassword" placeholder="Confirm Password">
+				<input type="password" id="confirmPassword"
+					placeholder="Confirm Password">
 				<button onclick="submitPassword()">Update Password</button>
 			</div>
 		</div>
@@ -1585,7 +1932,8 @@ body {
 
 				<button class="nav-btn"
 					onclick="setActive(this); showMeetings(); setTab('meetings');">
-					<i class="fa-solid fa-handshake"></i> <span>Scheduled Meetings</span>
+					<i class="fa-solid fa-handshake"></i> <span>Scheduled
+						Meetings</span>
 				</button>
 
 				<button class="nav-btn"
@@ -1598,15 +1946,16 @@ body {
 			<div class="sidebar-bottom">
 
 				<!-- Settings single button -->
-				<button class="nav-btn" id="settingsNavBtn" onclick="setActiveSettings(this); openSettingsSection('profile');">
+				<button class="nav-btn" id="settingsNavBtn"
+					onclick="setActiveSettings(this); openSettingsSection('profile');">
 					<i class="fa-solid fa-gear"></i> <span>Settings</span>
 				</button>
 
 				<!-- Logout -->
-				<a href="<%=request.getContextPath()%>/logout" style="text-decoration: none;">
+				<a href="<%=request.getContextPath()%>/logout"
+					style="text-decoration: none;">
 					<button class="sidebar-logout-btn">
-						<i class="fa-solid fa-right-to-bracket"></i>
-						<span>Logout</span>
+						<i class="fa-solid fa-right-to-bracket"></i> <span>Logout</span>
 					</button>
 				</a>
 
@@ -1617,38 +1966,44 @@ body {
 
 			<!-- Attendance (Nexus-style) -->
 			<div class="box" id="attendanceSection">
-				<h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0 0 4px 0;">
+				<h2
+					style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0 0 4px 0;">
 					<i class="fa-solid fa-clock" style="margin-right: 8px;"></i>Attendance
 				</h2>
-				<p class="attendance-subtitle">Track your work sessions and breaks.</p>
+				<p class="attendance-subtitle">Track your work sessions and
+					breaks.</p>
 
 				<div class="attendance-cards-row">
 					<!-- Status card -->
 					<div class="status-card">
 						<div class="attendance-section-title">Status</div>
 						<div class="punch-row">
-							<span class="punch-label">Punch In</span>
-							<span class="punch-value"><%=punchIn != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(punchIn) : "--"%></span>
+							<span class="punch-label">Punch In</span> <span
+								class="punch-value"><%=punchIn != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(punchIn) : "--"%></span>
 						</div>
 						<div class="punch-row">
-							<span class="punch-label">Punch Out</span>
-							<span class="punch-value"><%=punchOut != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(punchOut) : "--"%></span>
+							<span class="punch-label">Punch Out</span> <span
+								class="punch-value"><%=punchOut != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(punchOut) : "--"%></span>
 						</div>
 						<%
 						if (isWeekend) {
 						%>
-						<p style="color: #64748b; font-size: 13px; margin: 12px 0 0 0;">Attendance is closed on weekends.</p>
+						<p style="color: #64748b; font-size: 13px; margin: 12px 0 0 0;">Attendance
+							is closed on weekends.</p>
 						<%
 						} else {
 						%>
 						<div class="punch-actions-nexus">
 							<form action="attendance" method="post" style="display: inline;">
 								<input type="hidden" name="action" value="punchin">
-								<button type="submit" class="punch-in-btn-nexus" <%=punchIn != null ? "disabled" : ""%>>Punch In</button>
+								<button type="submit" class="punch-in-btn-nexus"
+									<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
 							</form>
 							<form action="attendance" method="post" style="display: inline;">
 								<input type="hidden" name="action" value="punchout">
-								<button type="submit" class="punch-out-btn-nexus" <%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>Punch Out</button>
+								<button type="submit" class="punch-out-btn-nexus"
+									<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>Punch
+									Out</button>
 							</form>
 						</div>
 						<%
@@ -1660,44 +2015,48 @@ body {
 					<div class="break-card" id="breakSection">
 						<div class="attendance-section-title">TOTAL BREAK TODAY</div>
 						<div class="break-total-row">
-							<span class="tr-label">Total Break Today</span>
-							<span class="tr-val">
-								<%
-								int breakSecs = 0;
-								if (request.getAttribute("breakTotalSeconds") != null) {
-									breakSecs = (Integer) request.getAttribute("breakTotalSeconds");
-								}
-								int bh = breakSecs / 3600;
-								int bm = (breakSecs % 3600) / 60;
-								int bs = breakSecs % 60;
-								%>
-								<%=String.format("%02d:%02d:%02d", bh, bm, bs)%>
+							<span class="tr-label">Total Break Today</span> <span
+								class="tr-val"> <%
+ int breakSecs = 0;
+ if (request.getAttribute("breakTotalSeconds") != null) {
+ 	breakSecs = (Integer) request.getAttribute("breakTotalSeconds");
+ }
+ int bh = breakSecs / 3600;
+ int bm = (breakSecs % 3600) / 60;
+ int bs = breakSecs % 60;
+ %> <%=String.format("%02d:%02d:%02d", bh, bm, bs)%>
 							</span>
 						</div>
 						<div class="break-actions">
 							<form action="break" method="post" style="display: inline;">
-								<input type="hidden" name="action" value="start">
-								<input type="hidden" name="redirect" value="user">
+								<input type="hidden" name="action" value="start"> <input
+									type="hidden" name="redirect" value="user">
 								<button type="submit" class="start-break-btn break-action-btn"
-									<%=(punchIn == null || punchOut != null || onBreak) ? "disabled" : ""%>>Start Break</button>
+									<%=(punchIn == null || punchOut != null || onBreak) ? "disabled" : ""%>>Start
+									Break</button>
 							</form>
-							<form action="break" method="post" style="display: inline; margin-left: 8px;">
-								<input type="hidden" name="action" value="end">
-								<input type="hidden" name="redirect" value="user">
-								<button type="submit" class="end-break-btn-nexus break-action-btn"
+							<form action="break" method="post"
+								style="display: inline; margin-left: 8px;">
+								<input type="hidden" name="action" value="end"> <input
+									type="hidden" name="redirect" value="user">
+								<button type="submit"
+									class="end-break-btn-nexus break-action-btn"
 									<%=!onBreak ? "disabled" : ""%>>End Break</button>
 							</form>
 						</div>
 						<div class="break-log" style="margin-top: 10px;">
 							<%
-							java.util.List<com.smartoffice.model.BreakLog> empBreaks = (java.util.List<com.smartoffice.model.BreakLog>) request.getAttribute("breakLogs");
+							java.util.List<com.smartoffice.model.BreakLog> empBreaks = (java.util.List<com.smartoffice.model.BreakLog>) request
+									.getAttribute("breakLogs");
 							SimpleDateFormat timeOnlyFmt = new SimpleDateFormat("HH:mm:ss");
 							if (empBreaks != null && !empBreaks.isEmpty()) {
 								for (com.smartoffice.model.BreakLog b : empBreaks) {
 									String startStr = b.getStartTime() != null ? timeOnlyFmt.format(b.getStartTime()) : "--";
 									String endStr = b.getEndTime() != null ? timeOnlyFmt.format(b.getEndTime()) : "--";
 							%>
-							<div class="time-card">From <b><%=startStr%></b> to <b><%=endStr%></b></div>
+							<div class="time-card">
+								From <b><%=startStr%></b> to <b><%=endStr%></b>
+							</div>
 							<%
 							}
 							} else {
@@ -1713,12 +2072,13 @@ body {
 				<!-- Recent Activity Log -->
 				<div class="activity-log-card">
 					<h3>
-						Recent Activity Log
-						<span class="log-nav-wrap">
-							<button type="button" class="log-nav" id="logPrev" aria-label="Previous">
+						Recent Activity Log <span class="log-nav-wrap">
+							<button type="button" class="log-nav" id="logPrev"
+								aria-label="Previous">
 								<i class="fa-solid fa-chevron-left"></i>
 							</button>
-							<button type="button" class="log-nav" id="logNext" aria-label="Next">
+							<button type="button" class="log-nav" id="logNext"
+								aria-label="Next">
 								<i class="fa-solid fa-chevron-right"></i>
 							</button>
 						</span>
@@ -1745,7 +2105,7 @@ body {
 									int br = e.getBreakSeconds();
 									long totalSec = 0;
 									if (pi != null && po != null) {
-										totalSec = Math.max(0, (po.getTime() - pi.getTime()) / 1000 - br);
+								totalSec = Math.max(0, (po.getTime() - pi.getTime()) / 1000 - br);
 									}
 									int th = (int) (totalSec / 3600);
 									int tm = (int) ((totalSec % 3600) / 60);
@@ -1755,21 +2115,24 @@ body {
 									String breakStr = brH + "h " + String.format("%02d", brM) + "m";
 									String inOutStr = pi != null ? timeFmt.format(pi) : "--";
 									if (po != null)
-										inOutStr += " (" + timeFmt.format(po) + ")";
+								inOutStr += " (" + timeFmt.format(po) + ")";
 							%>
 							<tr data-log-row>
 								<td><%=e.getAttendanceDate() != null ? dateFmt.format(e.getAttendanceDate()) : "--"%></td>
 								<td><%=inOutStr%></td>
 								<td><%=breakStr%></td>
 								<td><%=totalStr%></td>
-								<td><span class="<%="Present".equals(e.getStatus()) ? "status-badge-present" : "status-badge-absent"%>"><%=e.getStatus() != null ? e.getStatus() : "--"%></span></td>
+								<td><span
+									class="<%="Present".equals(e.getStatus()) ? "status-badge-present" : "status-badge-absent"%>"><%=e.getStatus() != null ? e.getStatus() : "--"%></span></td>
 							</tr>
 							<%
 							}
 							} else {
 							%>
 							<tr>
-								<td colspan="5" style="text-align: center; padding: 24px; color: #64748b;">No attendance records yet.</td>
+								<td colspan="5"
+									style="text-align: center; padding: 24px; color: #64748b;">No
+									attendance records yet.</td>
 							</tr>
 							<%
 							}
@@ -1806,7 +2169,9 @@ body {
 			<!-- Tasks -->
 			<div class="box" id="taskSection" style="display: none;">
 				<fieldset class="attendance-fieldset">
-					<legend><i class="fa-solid fa-list-check"></i> Assigned Tasks</legend>
+					<legend>
+						<i class="fa-solid fa-list-check"></i> Assigned Tasks
+					</legend>
 					<%
 					List<Task> tasks = (List<Task>) request.getAttribute("tasks");
 					if (tasks == null || tasks.isEmpty()) {
@@ -1814,26 +2179,27 @@ body {
 					<p class="no-task-text">No tasks assigned.</p>
 					<%
 					} else {
-						for (Task t : tasks) {
+					for (Task t : tasks) {
 					%>
 					<div class="task-card" id="task-card-<%=t.getId()%>">
 						<div class="task-left">
 							<i class="fa-solid fa-file-lines"></i>
 							<div>
 								<b><%=t.getTitle() != null ? t.getTitle() : t.getDescription()%></b><br>
-								<small><%=t.getDescription()%></small><br>
-								<small>
+								<small><%=t.getDescription()%></small><br> <small>
 									<%
 									java.sql.Date dl = t.getDeadline();
 									String pr = t.getPriority();
-									%>
-									Deadline: <%=dl != null ? dl.toString() : "--"%> &nbsp; | Priority: <%=pr != null ? pr : "MEDIUM"%>
+									%> Deadline: <%=dl != null ? dl.toString() : "--"%> &nbsp; |
+									Priority: <%=pr != null ? pr : "MEDIUM"%>
 								</small><br>
 								<%
 								String attName = t.getAttachmentName();
 								if (attName != null && !attName.isEmpty()) {
 								%>
-								<small><a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>" target="_blank">Download: <%=attName%></a></small><br>
+								<small><a
+									href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
+									target="_blank">Download: <%=attName%></a></small><br>
 								<%
 								}
 								%>
@@ -1844,19 +2210,22 @@ body {
 							<div class="task-update-form" id="task-form-<%=t.getId()%>">
 								<select id="status-<%=t.getId()%>" class="task-dropdown">
 									<option value="">Update Status</option>
-									<option value="COMPLETED" <%="COMPLETED".equals(t.getStatus()) ? "selected" : ""%>>Complete</option>
-									<option value="INCOMPLETE" <%="INCOMPLETE".equals(t.getStatus()) ? "selected" : ""%>>Incomplete</option>
-									<option value="ERRORS_RAISED" <%="ERRORS_RAISED".equals(t.getStatus()) ? "selected" : ""%>>Errors Raised</option>
-									<option value="DOCUMENT_VERIFICATION" <%="DOCUMENT_VERIFICATION".equals(t.getStatus()) ? "selected" : ""%>>Document Verification</option>
-								</select>
-								<input type="file" id="file-<%=t.getId()%>" accept="*/*">
-								<textarea id="comment-<%=t.getId()%>" placeholder="Add comment" style="height:48px; resize:none; padding:7px 10px; border-radius:8px; border:1.5px solid #e0e4ff; font-size:13px; background:#f8f9ff; outline:none; width:100%; box-sizing:border-box;"></textarea>
-								<button
-									class="submit-btn"
-									onclick="submitTaskUpdate(<%=t.getId()%>, this)"
-									type="button">
-									Submit Update
-								</button>
+									<option value="COMPLETED"
+										<%="COMPLETED".equals(t.getStatus()) ? "selected" : ""%>>Complete</option>
+									<option value="INCOMPLETE"
+										<%="INCOMPLETE".equals(t.getStatus()) ? "selected" : ""%>>Incomplete</option>
+									<option value="ERRORS_RAISED"
+										<%="ERRORS_RAISED".equals(t.getStatus()) ? "selected" : ""%>>Errors
+										Raised</option>
+									<option value="DOCUMENT_VERIFICATION"
+										<%="DOCUMENT_VERIFICATION".equals(t.getStatus()) ? "selected" : ""%>>Document
+										Verification</option>
+								</select> <input type="file" id="file-<%=t.getId()%>" accept="*/*">
+								<textarea id="comment-<%=t.getId()%>" placeholder="Add comment"
+									style="height: 48px; resize: none; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #e0e4ff; font-size: 13px; background: #f8f9ff; outline: none; width: 100%; box-sizing: border-box;"></textarea>
+								<button class="submit-btn"
+									onclick="submitTaskUpdate(<%=t.getId()%>, this)" type="button">
+									Submit Update</button>
 							</div>
 						</div>
 					</div>
@@ -1870,7 +2239,9 @@ body {
 			<!-- My Team -->
 			<div class="box" id="myTeamSection" style="display: none;">
 				<fieldset class="attendance-fieldset">
-					<legend><i class="fa-solid fa-users"></i> My Team</legend>
+					<legend>
+						<i class="fa-solid fa-users"></i> My Team
+					</legend>
 					<div class="team-scroll">
 						<div class="employee-grid">
 							<%
@@ -1882,22 +2253,20 @@ body {
 								<div class="task-left">
 									<i class="fa-solid fa-people-group"></i>
 									<div>
-										<b><%=t.getName()%></b><br>
-										<small>Manager: <%=t.getManagerFullname() != null ? t.getManagerFullname() : t.getManagerUsername()%></small><br>
+										<b><%=t.getName()%></b><br> <small>Manager: <%=t.getManagerFullname() != null ? t.getManagerFullname() : t.getManagerUsername()%></small><br>
 										<small>Members: <%=t.getMembers().size()%></small>
 										<%
 										if (!t.getMembers().isEmpty()) {
 										%>
-										<br><small>
-											<%
-											for (com.smartoffice.model.User m : t.getMembers()) {
-											%>
-											<span style="display: inline-block; background: #e2e8f0; padding: 2px 8px; border-radius: 999px; margin: 1px; font-size: 11px;">
+										<br>
+										<small> <%
+ for (com.smartoffice.model.User m : t.getMembers()) {
+ %> <span
+											style="display: inline-block; background: #e2e8f0; padding: 2px 8px; border-radius: 999px; margin: 1px; font-size: 11px;">
 												<%=m.getFullname() != null ? m.getFullname() : m.getEmail()%>
-											</span>
-											<%
-											}
-											%>
+										</span> <%
+ }
+ %>
 										</small>
 										<%
 										}
@@ -1921,34 +2290,85 @@ body {
 			<!-- Meetings -->
 			<div class="box" id="meetingSection" style="display: none;">
 				<fieldset class="attendance-fieldset">
-					<legend><i class="fa-solid fa-video"></i> Scheduled Meetings</legend>
+					<legend>
+						<i class="fa-solid fa-video"></i> Scheduled Meetings
+					</legend>
 					<%
 					List<Meeting> meetings = (List<Meeting>) request.getAttribute("meetings");
+					SimpleDateFormat dateTimeFmt = new SimpleDateFormat("MMM dd, yyyy hh:mm a");
+
 					if (meetings == null || meetings.isEmpty()) {
 					%>
-					<p class="no-task-text">No upcoming meetings.</p>
+					<p class="no-task-text">No upcoming meetings scheduled.</p>
 					<%
 					} else {
-						for (Meeting m : meetings) {
+					for (Meeting m : meetings) {
+						// Determine who created the meeting
+						String creatorLabel = "";
+						String creatorBadgeClass = "";
+
+						if (m.getCreatorRole() != null) {
+							if ("ADMIN".equalsIgnoreCase(m.getCreatorRole())) {
+						creatorLabel = "Admin";
+						creatorBadgeClass = "creator-badge-admin";
+							} else if ("MANAGER".equalsIgnoreCase(m.getCreatorRole())) {
+						creatorLabel = "Manager";
+						creatorBadgeClass = "creator-badge-manager";
+							} else {
+						creatorLabel = m.getCreatorRole();
+						creatorBadgeClass = "creator-badge-other";
+							}
+						}
+
+						String creatorName = m.getCreatorName() != null ? m.getCreatorName() : m.getCreatedBy();
 					%>
 					<div class="task-card">
 						<div class="task-left">
-							<i class="fa-solid fa-users"></i>
+							<i class="fa-solid fa-video"></i>
 							<div>
-								<b><%=m.getTitle()%></b><br>
-								<small><%=m.getDescription()%></small><br>
-								<small>🕒 <%=m.getStartTime()%> → <%=m.getEndTime()%></small>
+								<b><%=m.getTitle()%></b>
+
+								<!-- Creator Badge -->
+								<span class="creator-badge <%=creatorBadgeClass%>"> <i
+									class="fa-solid fa-user-tie"></i> By <%=creatorLabel%>
+								</span> <br> <small style="color: #64748b;"><%=m.getDescription() != null ? m.getDescription() : ""%></small><br>
+
+								<small style="color: #475569; font-weight: 600;"> <i
+									class="fa-solid fa-calendar"></i> <%=m.getStartTime() != null ? dateTimeFmt.format(m.getStartTime()) : ""%>
+								</small> <br> <small style="color: #64748b;"> <i
+									class="fa-solid fa-clock"></i> Duration: <%
+ if (m.getStartTime() != null && m.getEndTime() != null) {
+ 	long diffMs = m.getEndTime().getTime() - m.getStartTime().getTime();
+ 	long minutes = diffMs / (60 * 1000);
+ 	long hours = minutes / 60;
+ 	long mins = minutes % 60;
+ 	if (hours > 0) {
+ 		out.print(hours + "h " + mins + "m");
+ 	} else {
+ 		out.print(mins + " minutes");
+ 	}
+ }
+ %>
+								</small> <br> <small style="color: #64748b;"> <i
+									class="fa-solid fa-user"></i> Organizer: <%=creatorName%>
+								</small>
 							</div>
 						</div>
-						<%
-						if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
-						%>
-						<a href="<%=m.getMeetingLink()%>" target="_blank">
-							<button class="task-btn">Join</button>
-						</a>
-						<%
-						}
-						%>
+						<div>
+							<%
+							if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
+							%>
+							<a href="<%=m.getMeetingLink()%>" target="_blank"
+								style="text-decoration: none;">
+								<button class="task-btn">
+									<i class="fa-solid fa-arrow-up-right-from-square"></i> Join
+									Meeting
+								</button>
+							</a>
+							<%
+							}
+							%>
+						</div>
 					</div>
 					<%
 					}
@@ -1959,21 +2379,23 @@ body {
 
 			<!-- Calendar -->
 			<div class="box" id="calendarSection" style="display: none;">
-				<iframe id="calendarFrame" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+				<iframe id="calendarFrame" src=""
+					style="width: 100%; height: 100%; border: none;"></iframe>
 			</div>
 
 			<!-- ===== Leave — updated 2-column layout ===== -->
 			<div class="box" id="leaveSection" style="display: none;">
 				<fieldset class="attendance-fieldset">
-					<legend><i class="fa-solid fa-calendar-days"></i> Leave</legend>
+					<legend>
+						<i class="fa-solid fa-calendar-days"></i> Leave
+					</legend>
 
 					<!-- Tab buttons -->
 					<div class="leave-tab-row">
 						<button id="applyLeaveTabBtn" type="button"
-							class="leave-tab-btn leave-tab-active"
-							onclick="showApplyLeave()">Apply Leave</button>
-						<button id="myLeavesTabBtn" type="button"
-							class="leave-tab-btn"
+							class="leave-tab-btn leave-tab-active" onclick="showApplyLeave()">Apply
+							Leave</button>
+						<button id="myLeavesTabBtn" type="button" class="leave-tab-btn"
 							onclick="showMyLeaves()">My Leave Requests</button>
 					</div>
 
@@ -1984,13 +2406,12 @@ body {
 							<!-- LEFT: form -->
 							<div class="leave-apply-left">
 								<h4>
-									<i class="fa-solid fa-paper-plane" style="color:#667eea;"></i>
+									<i class="fa-solid fa-paper-plane" style="color: #667eea;"></i>
 									Submit Request
 								</h4>
 								<form class="leave-form-inner" action="applyLeave" method="post">
 									<div>
-										<label>Leave Type</label>
-										<select name="leaveType" required>
+										<label>Leave Type</label> <select name="leaveType" required>
 											<option value="">Select</option>
 											<option>Casual Leave</option>
 											<option>Sick Leave</option>
@@ -2000,18 +2421,19 @@ body {
 
 									<div class="leave-date-row">
 										<div>
-											<label>From Date</label>
-											<input type="date" name="fromDate" required>
+											<label>From Date</label> <input type="date" name="fromDate"
+												required>
 										</div>
 										<div>
-											<label>To Date</label>
-											<input type="date" name="toDate" required>
+											<label>To Date</label> <input type="date" name="toDate"
+												required>
 										</div>
 									</div>
 
 									<div>
 										<label>Reason</label>
-										<textarea name="reason" required placeholder="Briefly describe the reason..."></textarea>
+										<textarea name="reason" required
+											placeholder="Briefly describe the reason..."></textarea>
 									</div>
 
 									<button type="submit" class="leave-submit-btn">
@@ -2023,28 +2445,29 @@ body {
 							<!-- RIGHT: leave policy -->
 							<div class="leave-apply-right">
 								<h4>
-									<i class="fa-solid fa-circle-info" style="color:#667eea;"></i>
+									<i class="fa-solid fa-circle-info" style="color: #667eea;"></i>
 									Leave Policy
 								</h4>
 
 								<div class="leave-policy-item leave-policy-casual">
-									<b>Casual Leave</b>
-									For personal errands or short-notice absences. Typically limited to a set number of days per year.
+									<b>Casual Leave</b> For personal errands or short-notice
+									absences. Typically limited to a set number of days per year.
 								</div>
 
 								<div class="leave-policy-item leave-policy-sick">
-									<b>Sick Leave</b>
-									Applicable when you are unwell and unable to attend work. A medical certificate may be required.
+									<b>Sick Leave</b> Applicable when you are unwell and unable to
+									attend work. A medical certificate may be required.
 								</div>
 
 								<div class="leave-policy-item leave-policy-earned">
-									<b>Earned Leave</b>
-									Accrued over time based on service. Plan in advance and get approval from HR.
+									<b>Earned Leave</b> Accrued over time based on service. Plan in
+									advance and get approval from HR.
 								</div>
 
 								<div class="leave-policy-note">
-									<i class="fa-solid fa-triangle-exclamation"></i>
-									<span>All leave requests are subject to admin approval. Submit at least 2 working days in advance when possible.</span>
+									<i class="fa-solid fa-triangle-exclamation"></i> <span>All
+										leave requests are subject to admin approval. Submit at least
+										2 working days in advance when possible.</span>
 								</div>
 							</div>
 
@@ -2060,21 +2483,23 @@ body {
 							<p class="no-task-text">No leave requests found.</p>
 							<%
 							} else {
-								for (LeaveRequest lr : myLeaves) {
+							for (LeaveRequest lr : myLeaves) {
 							%>
 							<div class="task-card">
 								<div class="task-left">
 									<i class="fa-solid fa-plane-departure"></i>
 									<div>
-										<b><%=lr.getLeaveType()%></b><br>
-										<small><%=lr.getFromDate()%> → <%=lr.getToDate()%></small>
+										<b><%=lr.getLeaveType()%></b><br> <small><%=lr.getFromDate()%>
+											→ <%=lr.getToDate()%></small>
 									</div>
 								</div>
 								<%
 								String st = lr.getStatus();
 								String cls = "pending";
-								if ("APPROVED".equalsIgnoreCase(st)) cls = "done";
-								if ("REJECTED".equalsIgnoreCase(st)) cls = "out";
+								if ("APPROVED".equalsIgnoreCase(st))
+									cls = "done";
+								if ("REJECTED".equalsIgnoreCase(st))
+									cls = "out";
 								%>
 								<span class="task-status <%=cls%>"><%=st%></span>
 							</div>
@@ -2091,17 +2516,23 @@ body {
 			<!-- ===== Settings Section (full panel — replaces modals) ===== -->
 			<div id="settingsSection" style="display: none;">
 				<div class="settings-page-header">
-					<h2><i class="fa-solid fa-gear" style="margin-right: 8px;"></i>Settings</h2>
+					<h2>
+						<i class="fa-solid fa-gear" style="margin-right: 8px;"></i>Settings
+					</h2>
 					<p>Manage your profile and account preferences.</p>
 				</div>
 
 				<!-- Inner tabs -->
 				<div class="settings-inner-tab-row">
-					<button class="settings-inner-tab-btn active" id="settingsTabProfile" onclick="showSettingsTab('profile')">
-						<i class="fa-solid fa-user" style="margin-right: 6px;"></i>My Profile
+					<button class="settings-inner-tab-btn active"
+						id="settingsTabProfile" onclick="showSettingsTab('profile')">
+						<i class="fa-solid fa-user" style="margin-right: 6px;"></i>My
+						Profile
 					</button>
-					<button class="settings-inner-tab-btn" id="settingsTabPassword" onclick="showSettingsTab('password')">
-						<i class="fa-solid fa-lock" style="margin-right: 6px;"></i>Change Password
+					<button class="settings-inner-tab-btn" id="settingsTabPassword"
+						onclick="showSettingsTab('password')">
+						<i class="fa-solid fa-lock" style="margin-right: 6px;"></i>Change
+						Password
 					</button>
 				</div>
 
@@ -2109,20 +2540,26 @@ body {
 				<div id="settingsContentProfile">
 					<div class="profile-info-card">
 						<div class="profile-info-row">
-							<span class="profile-info-label"><i class="fa-solid fa-id-card"></i> Full Name</span>
-							<span class="profile-info-value"><%=userObj != null && userObj.getFullname() != null && !userObj.getFullname().isEmpty() ? userObj.getFullname() : "--"%></span>
+							<span class="profile-info-label"><i
+								class="fa-solid fa-id-card"></i> Full Name</span> <span
+								class="profile-info-value"><%=userObj != null && userObj.getFullname() != null && !userObj.getFullname().isEmpty()
+		? userObj.getFullname()
+		: "--"%></span>
 						</div>
 						<div class="profile-info-row">
-							<span class="profile-info-label"><i class="fa-solid fa-envelope"></i> Email</span>
-							<span class="profile-info-value"><%=userObj != null ? userObj.getEmail() : "--"%></span>
+							<span class="profile-info-label"><i
+								class="fa-solid fa-envelope"></i> Email</span> <span
+								class="profile-info-value"><%=userObj != null ? userObj.getEmail() : "--"%></span>
 						</div>
 						<div class="profile-info-row">
-							<span class="profile-info-label"><i class="fa-solid fa-briefcase"></i> Role</span>
-							<span class="profile-info-value"><%=userObj != null ? userObj.getRole() : "--"%></span>
+							<span class="profile-info-label"><i
+								class="fa-solid fa-briefcase"></i> Role</span> <span
+								class="profile-info-value"><%=userObj != null ? userObj.getRole() : "--"%></span>
 						</div>
 						<div class="profile-info-row">
-							<span class="profile-info-label"><i class="fa-solid fa-phone"></i> Phone</span>
-							<span class="profile-info-value"><%=userObj != null ? userObj.getPhone() : "--"%></span>
+							<span class="profile-info-label"><i
+								class="fa-solid fa-phone"></i> Phone</span> <span
+								class="profile-info-value"><%=userObj != null ? userObj.getPhone() : "--"%></span>
 						</div>
 					</div>
 				</div>
@@ -2130,16 +2567,19 @@ body {
 				<!-- Change Password tab content -->
 				<div id="settingsContentPassword" style="display: none;">
 					<div class="change-password-card">
-						<h4><i class="fa-solid fa-lock"></i> Update Password</h4>
+						<h4>
+							<i class="fa-solid fa-lock"></i> Update Password
+						</h4>
 						<div class="cp-field">
-							<label>New Password</label>
-							<input type="password" id="cpNewPassword" placeholder="Enter new password">
+							<label>New Password</label> <input type="password"
+								id="cpNewPassword" placeholder="Enter new password">
 						</div>
 						<div class="cp-field">
-							<label>Confirm Password</label>
-							<input type="password" id="cpConfirmPassword" placeholder="Confirm new password">
+							<label>Confirm Password</label> <input type="password"
+								id="cpConfirmPassword" placeholder="Confirm new password">
 						</div>
-						<button class="cp-submit-btn" onclick="submitPasswordFromSettings()">
+						<button class="cp-submit-btn"
+							onclick="submitPasswordFromSettings()">
 							<i class="fa-solid fa-floppy-disk"></i> Update Password
 						</button>
 					</div>
@@ -2159,8 +2599,8 @@ body {
 						for (Notification n : notifications) {
 					%>
 					<div class="notification-item" id="notif-<%=n.getId()%>">
-						🔔 <%=n.getMessage()%><br>
-						<small>By <%=n.getCreatedBy()%></small>
+						🔔
+						<%=n.getMessage()%><br> <small>By <%=n.getCreatedBy()%></small>
 						<div style="margin-top: 8px; text-align: right;">
 							<button
 								style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 4px 10px; border-radius: 12px; cursor: pointer; font-size: 12px; font-weight: 600;"

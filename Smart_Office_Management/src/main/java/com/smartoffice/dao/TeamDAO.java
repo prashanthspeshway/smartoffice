@@ -106,12 +106,40 @@ public class TeamDAO {
     }
 
     public static boolean addMemberToTeam(int teamId, String username) {
-        String sql = "INSERT IGNORE INTO team_members (team_id, username) VALUES (?, ?)";
-        try (Connection con = DBConnectionUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, teamId);
-            ps.setString(2, username);
-            return ps.executeUpdate() > 0;
+        String insertSql = "INSERT IGNORE INTO team_members (team_id, username) VALUES (?, ?)";
+        String managerSql = "SELECT manager_username FROM teams WHERE id = ?";
+        String updateUserSql = "UPDATE users SET manager_email = ? WHERE email = ?";
+
+        try (Connection con = DBConnectionUtil.getConnection()) {
+
+            // Step 1: Add member
+            try (PreparedStatement ps = con.prepareStatement(insertSql)) {
+                ps.setInt(1, teamId);
+                ps.setString(2, username);
+                ps.executeUpdate();
+            }
+
+            // Step 2: Get manager of that team
+            String managerEmail = null;
+            try (PreparedStatement ps = con.prepareStatement(managerSql)) {
+                ps.setInt(1, teamId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    managerEmail = rs.getString("manager_username");
+                }
+            }
+
+            // Step 3: Update user's manager
+            if (managerEmail != null) {
+                try (PreparedStatement ps = con.prepareStatement(updateUserSql)) {
+                    ps.setString(1, managerEmail);
+                    ps.setString(2, username);
+                    ps.executeUpdate();
+                }
+            }
+
+            return true;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -119,12 +147,27 @@ public class TeamDAO {
     }
 
     public static boolean removeMemberFromTeam(int teamId, String username) {
-        String sql = "DELETE FROM team_members WHERE team_id = ? AND username = ?";
-        try (Connection con = DBConnectionUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, teamId);
-            ps.setString(2, username);
-            return ps.executeUpdate() > 0;
+
+        String deleteSql = "DELETE FROM team_members WHERE team_id = ? AND username = ?";
+        String clearManagerSql = "UPDATE users SET manager_email = NULL WHERE email = ?";
+
+        try (Connection con = DBConnectionUtil.getConnection()) {
+
+            // Remove from team
+            try (PreparedStatement ps = con.prepareStatement(deleteSql)) {
+                ps.setInt(1, teamId);
+                ps.setString(2, username);
+                ps.executeUpdate();
+            }
+
+            // Clear manager
+            try (PreparedStatement ps = con.prepareStatement(clearManagerSql)) {
+                ps.setString(1, username);
+                ps.executeUpdate();
+            }
+
+            return true;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -132,12 +175,30 @@ public class TeamDAO {
     }
 
     public static boolean updateTeamManager(int teamId, String managerUsername) {
-        String sql = "UPDATE teams SET manager_username = ? WHERE id = ?";
-        try (Connection con = DBConnectionUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, managerUsername);
-            ps.setInt(2, teamId);
-            return ps.executeUpdate() > 0;
+
+        String updateTeamSql = "UPDATE teams SET manager_username = ? WHERE id = ?";
+        String updateUsersSql = 
+            "UPDATE users SET manager_email = ? WHERE email IN " +
+            "(SELECT username FROM team_members WHERE team_id = ?)";
+
+        try (Connection con = DBConnectionUtil.getConnection()) {
+
+            // Step 1: Update team
+            try (PreparedStatement ps = con.prepareStatement(updateTeamSql)) {
+                ps.setString(1, managerUsername);
+                ps.setInt(2, teamId);
+                ps.executeUpdate();
+            }
+
+            // Step 2: Update all members
+            try (PreparedStatement ps = con.prepareStatement(updateUsersSql)) {
+                ps.setString(1, managerUsername);
+                ps.setInt(2, teamId);
+                ps.executeUpdate();
+            }
+
+            return true;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
