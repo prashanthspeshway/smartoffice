@@ -2615,89 +2615,101 @@ body.dark-theme .perf-selected-emp, body.dark-theme .perf-selected-banner
 			</div>
 		</div>
 
-<!-- ===== NEW SETTINGS (exactly like your screenshot) ===== -->
-<div class="box" id="settings" style="display: none; padding: 32px;">
-    <div class="flex items-center gap-3 mb-2">
-        <i class="fa-solid fa-gear text-4xl text-indigo-600"></i>
-        <h1 class="text-3xl font-semibold text-gray-900">Settings</h1>
-    </div>
-    <p class="text-gray-600 mb-10">Manage your profile and account preferences.</p>
+		<!-- ===== NEW SETTINGS (exactly like your screenshot) ===== -->
+		<div class="box" id="settings" style="display: none; padding: 32px;">
+			<div class="flex items-center gap-3 mb-2">
+				<i class="fa-solid fa-gear text-4xl text-indigo-600"></i>
+				<h1 class="text-3xl font-semibold text-gray-900">Settings</h1>
+			</div>
+			<p class="text-gray-600 mb-10">Manage your profile and account
+				preferences.</p>
 
-    <!-- TABS -->
-    <div class="flex border-b border-gray-200 mb-10">
-        <button onclick="openProfileTab()" id="profile-tab-btn"
-                class="tab-button active flex items-center gap-3 px-10 py-4 text-base font-medium text-indigo-600">
-            <i class="fa-solid fa-user"></i> My Profile
-        </button>
-        <button onclick="openChangePasswordTab()" id="password-tab-btn"
-                class="tab-button flex items-center gap-3 px-10 py-4 text-base font-medium text-gray-600 hover:text-gray-900">
-            <i class="fa-solid fa-lock"></i> Change Password
-        </button>
-    </div>
+			<!-- TABS -->
+			<div class="flex border-b border-gray-200 mb-10">
+				<button onclick="openProfileTab()" id="profile-tab-btn"
+					class="tab-button active flex items-center gap-3 px-10 py-4 text-base font-medium text-indigo-600">
+					<i class="fa-solid fa-user"></i> My Profile
+				</button>
+				<button onclick="openChangePasswordTab()" id="password-tab-btn"
+					class="tab-button flex items-center gap-3 px-10 py-4 text-base font-medium text-gray-600 hover:text-gray-900">
+					<i class="fa-solid fa-lock"></i> Change Password
+				</button>
+			</div>
 
-    <!-- MY PROFILE CARD (exactly like image) -->
-    <div id="profile-content" class="bg-slate-50 rounded-3xl p-8 shadow-sm">
-        <div class="space-y-6">
-            <!-- Full Name -->
-            <div class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
-                <div class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <i class="fa-solid fa-user text-2xl"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-500">Full Name</p>
-                    <p class="text-xl font-semibold text-gray-900">
-                        <%= userObj != null && userObj.getFullname() != null && !userObj.getFullname().isEmpty() ? userObj.getFullname() : "--" %>
-                    </p>
-                </div>
-            </div>
+			<!-- MY PROFILE CARD (exactly like image) -->
+			<div id="profile-content"
+				class="bg-slate-50 rounded-3xl p-8 shadow-sm">
+				<div class="space-y-6">
+					<!-- Full Name -->
+					<div
+						class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
+						<div
+							class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+							<i class="fa-solid fa-user text-2xl"></i>
+						</div>
+						<div class="flex-1">
+							<p class="text-sm font-medium text-gray-500">Full Name</p>
+							<p class="text-xl font-semibold text-gray-900">
+								<%=userObj != null && userObj.getFullname() != null && !userObj.getFullname().isEmpty()
+		? userObj.getFullname()
+		: "--"%>
+							</p>
+						</div>
+					</div>
 
-            <!-- Email -->
-            <div class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
-                <div class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <i class="fa-solid fa-envelope text-2xl"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-500">Email</p>
-                    <p class="text-xl font-semibold text-gray-900">
-                        <%= userObj != null ? userObj.getEmail() : "--" %>
-                    </p>
-                </div>
-            </div>
+					<!-- Email -->
+					<div
+						class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
+						<div
+							class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+							<i class="fa-solid fa-envelope text-2xl"></i>
+						</div>
+						<div class="flex-1">
+							<p class="text-sm font-medium text-gray-500">Email</p>
+							<p class="text-xl font-semibold text-gray-900">
+								<%=userObj != null ? userObj.getEmail() : "--"%>
+							</p>
+						</div>
+					</div>
 
-            <!-- Role -->
-            <div class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
-                <div class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <i class="fa-solid fa-briefcase text-2xl"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-500">Role</p>
-                    <p class="text-xl font-semibold text-gray-900">
-                        <%= userObj != null ? userObj.getRole() : "Manager" %>
-                    </p>
-                </div>
-            </div>
+					<!-- Role -->
+					<div
+						class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
+						<div
+							class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+							<i class="fa-solid fa-briefcase text-2xl"></i>
+						</div>
+						<div class="flex-1">
+							<p class="text-sm font-medium text-gray-500">Role</p>
+							<p class="text-xl font-semibold text-gray-900">
+								<%=userObj != null ? userObj.getRole() : "Manager"%>
+							</p>
+						</div>
+					</div>
 
-            <!-- Phone -->
-            <div class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
-                <div class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <i class="fa-solid fa-phone text-2xl"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-500">Phone</p>
-                    <p class="text-xl font-semibold text-gray-900">
-                        <%= userObj != null && userObj.getPhone() != null ? userObj.getPhone() : "--" %>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+					<!-- Phone -->
+					<div
+						class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
+						<div
+							class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+							<i class="fa-solid fa-phone text-2xl"></i>
+						</div>
+						<div class="flex-1">
+							<p class="text-sm font-medium text-gray-500">Phone</p>
+							<p class="text-xl font-semibold text-gray-900">
+								<%=userObj != null && userObj.getPhone() != null ? userObj.getPhone() : "--"%>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
 
-    <!-- (Change Password tab will open your existing modal - no new code needed) -->
-</div>
-			
-			
-			
-			
+			<!-- (Change Password tab will open your existing modal - no new code needed) -->
+		</div>
+
+
+
+
 		<div class="content-area">
 			<div class="box" id="blank" style="display: none;">
 				<h3>Welcome 👋</h3>
@@ -3579,8 +3591,8 @@ body.dark-theme .perf-selected-emp, body.dark-theme .perf-selected-banner
 										style="font-size: 11px; color: #6b7280;"> <%
  java.sql.Date dl = t.getDeadline();
  String pr = t.getPriority();
- %> Deadline: <%=dl != null ? dl.toString() : "--"%> &nbsp; |
-										Priority: <%=pr != null ? pr : "MEDIUM"%>
+ %> Deadline: <%=dl != null ? dl.toString() : "--"%> &nbsp; | Priority:
+										<%=pr != null ? pr : "MEDIUM"%>
 									</small>
 									<%
 									String attName = t.getAttachmentName();
@@ -4148,6 +4160,22 @@ document.onkeydown = e =>
   e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))
     ? false
     : true;
+  
+  
+  
+  function openProfileTab() {
+	    document.getElementById('profile-content').style.display = 'block';
+	    document.getElementById('profile-tab-btn').classList.add('active');
+	    document.getElementById('password-tab-btn').classList.remove('active');
+	}
+
+	function openChangePasswordTab() {
+	    // Keep your existing modal - no change in functionality
+	    openChangePassword();
+	    // Highlight tab
+	    document.getElementById('profile-tab-btn').classList.remove('active');
+	    document.getElementById('password-tab-btn').classList.add('active');
+	}
 </script>
 	<!-- Toast -->
 	<div id="toast" class="toast"></div>
