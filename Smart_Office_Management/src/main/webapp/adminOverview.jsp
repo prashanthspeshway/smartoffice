@@ -648,11 +648,11 @@ var weekLabels  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 var weekPresent = [<%=attr(request, "weekPresent", "18,20,17,21,19,10,5")%>];
 var weekAbsent  = [<%=attr(request, "weekAbsent", "7,5,8,4,6,15,20")%>];
 
-var taskCompleted    = <%=attrInt(request, "taskCompleted", 42)%>;
-var taskInProgress   = <%=attrInt(request, "taskInProgress", 18)%>;
-var taskPending      = <%=attrInt(request, "taskPending", 11)%>;
-var taskErrorsRaised = <%=attrInt(request, "taskErrorsRaised", 5)%>;
-var taskDocVerify    = <%=attrInt(request, "taskDocVerify", 7)%>;
+// Updated task status variables to match actual database values
+var taskCompleted    = <%=attrInt(request, "taskCompleted", 0)%>;
+var taskAssigned     = <%=attrInt(request, "taskAssigned", 0)%>;
+var taskDocVerify    = <%=attrInt(request, "taskDocVerify", 0)%>;
+var taskErrorsRaised = <%=attrInt(request, "taskErrorsRaised", 0)%>;
 
 var trendLabels = [];
 var trendData   = [<%=attr(request, "attendanceTrend",
@@ -691,13 +691,24 @@ new Chart(document.getElementById('attendanceBarChart'), {
   }
 });
 
+// Updated Task Pie Chart with actual database status values
 new Chart(document.getElementById('taskPieChart'), {
   type: 'pie',
   data: {
-    labels: ['Completed','In Progress','Pending','Errors Raised','Doc Verify'],
-    datasets: [{ data:[taskCompleted,taskInProgress,taskPending,taskErrorsRaised,taskDocVerify], backgroundColor:['#22c55e','#4f6ef7','#f59e0b','#ef4444','#8b5cf6'], borderWidth:2, borderColor:'#fff' }]
+    labels: ['Completed','Assigned','Document Verification','Errors Raised'],
+    datasets: [{
+      data:[taskCompleted, taskAssigned, taskDocVerify, taskErrorsRaised],
+      backgroundColor:['#22c55e','#4f6ef7','#f59e0b','#ef4444'],
+      borderWidth:2,
+      borderColor:'#fff'
+    }]
   },
-  options: { responsive:true, plugins:{ legend:{ position:'bottom' } } }
+  options: { 
+    responsive:true, 
+    plugins:{ 
+      legend:{ position:'bottom' } 
+    } 
+  }
 });
 
 new Chart(document.getElementById('attendanceTrendChart'), {

@@ -1,13 +1,16 @@
 package com.smartoffice.controller;
 
 import java.io.IOException;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
-import javax.servlet.*;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.smartoffice.dao.DesignationDAO;
 import com.smartoffice.utils.DBConnectionUtil;
@@ -83,23 +86,19 @@ public class EditUser extends HttpServlet {
         }
 
         // Username = firstname + lastname (fallback to email if empty)
-        String username = ((firstname != null ? firstname : "") + " " + (lastname != null ? lastname : "")).trim();
-        if (username.isEmpty()) username = email;
 
         try (Connection con = DBConnectionUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(
-                     "UPDATE users SET username=?, role=?, status=?, firstname=?, lastname=?, designation=?, email=?, joinedDate=?, phone=? WHERE id=?")) {
-            ps.setString(1, username);
-            ps.setString(2, role);
-            ps.setString(3, status);
-            ps.setString(4, firstname);
-            ps.setString(5, lastname);
-            String designationVal = (role != null && role.equalsIgnoreCase("employee")) ? (designation != null && !designation.trim().isEmpty() ? designation.trim() : null) : null;
-            ps.setString(6, designationVal);
-            ps.setString(7, email);
-            ps.setDate(8, joinedDate);
-            ps.setString(9, phone);
-            ps.setInt(10, id);
+        		PreparedStatement ps = con.prepareStatement(
+        			    "UPDATE users SET role=?, status=?, firstname=?, lastname=?, designation=?, email=?, joinedDate=?, phone=? WHERE id=?")) {
+        	ps.setString(1, role);
+        	ps.setString(2, status);
+        	ps.setString(3, firstname);
+        	ps.setString(4, lastname);
+        	ps.setString(5, designation);
+        	ps.setString(6, email);
+        	ps.setDate(7, joinedDate);
+        	ps.setString(8, phone);
+        	ps.setInt(9, id);
 
             ps.executeUpdate();
 

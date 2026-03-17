@@ -18,6 +18,7 @@ int lateArrivals = laAttr != null ? laAttr : 0;
 int absentCount = abAttr != null ? abAttr : 0;
 
 String search = request.getParameter("search") != null ? request.getParameter("search") : "";
+String statusFilter = request.getParameter("status") != null ? request.getParameter("status") : "";
 String deptFilter = request.getParameter("department") != null ? request.getParameter("department") : "";
 String escapedSearch = "";
 if (search != null) {
@@ -282,6 +283,12 @@ body {
 				}
 				}
 				%>
+			</select> <select name="status" class="filter-select">
+				<option value="">All Status</option>
+				<option value="Present"
+					<%="Present".equals(request.getParameter("status")) ? "selected" : ""%>>Present</option>
+				<option value="Absent"
+					<%="Absent".equals(request.getParameter("status")) ? "selected" : ""%>>Absent</option>
 			</select>
 			<button type="submit"
 				class="p-2.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -300,7 +307,7 @@ body {
 						<th>Punch Out</th>
 						<th>Break Duration</th>
 						<th>Live Status</th>
-						<th>Action</th>
+						<th>Status</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -310,10 +317,16 @@ body {
 					for (AdminAttendanceRow row : attendanceList) {
 						String name = row.getFullName() != null ? row.getFullName() : "";
 						String desig = row.getDesignation() != null ? row.getDesignation() : "";
+						String rowStatus = (row.getPunchIn() != null) ? "Present" : "Absent";
+
 						if (!searchLower.isEmpty() && !name.toLowerCase().contains(searchLower))
-							continue;
+						    continue;
+
 						if (!dept.isEmpty() && !dept.equalsIgnoreCase(desig))
-							continue;
+						    continue;
+
+						if (!statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase(rowStatus))
+						    continue;
 						String initials = "";
 						if (name != null && !name.isEmpty()) {
 							String[] parts = name.trim().split("\\s+");
@@ -352,8 +365,15 @@ body {
 						<td><%=row.getBreakDurationFormatted() != null ? row.getBreakDurationFormatted() : "--"%></td>
 						<td><span
 							class="px-3 py-1 rounded-full text-xs font-semibold <%=badgeClass%>"><%=liveStatus%></span></td>
-						<td><span class="action-dots"><i
-								class="fa-solid fa-ellipsis-vertical"></i></span></td>
+						<td>
+							<%
+							String status = (row.getPunchIn() != null) ? "Present" : "Absent";
+							String statusClass = status.equals("Present") ? "badge-punched-in" : "badge-absent";
+							%> <span
+							class="px-3 py-1 rounded-full text-xs font-semibold <%=statusClass%>">
+								<%=status%>
+						</span>
+						</td>
 					</tr>
 					<%
 					}
@@ -389,7 +409,7 @@ body {
 	
 document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
-<script>
+	<script>
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 // Live clock
