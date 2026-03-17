@@ -397,9 +397,16 @@ body {
 	background: #60a5fa;
 }
 
-@keyframes modalFade {
-	from { opacity:0; transform: scale(0.96); }
-	to { opacity: 1; transform: scale(1); }
+@
+keyframes modalFade {from { opacity:0;
+	transform: scale(0.96);
+}
+
+to {
+	opacity: 1;
+	transform: scale(1);
+}
+
 }
 
 /* ===== Password Modal Form Styling ONLY ===== */
@@ -450,7 +457,7 @@ body {
 	transform: scale(0.97);
 }
 
-@media (max-width: 480px) {
+@media ( max-width : 480px) {
 	#passwordModal input[type="password"], #passwordModal button {
 		max-width: 100%;
 	}
@@ -911,7 +918,8 @@ body {
 	box-sizing: border-box;
 }
 
-.leave-form input:focus, .leave-form select:focus, .leave-form textarea:focus {
+.leave-form input:focus, .leave-form select:focus, .leave-form textarea:focus
+	{
 	outline: none;
 	border-color: #4f46e5;
 	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
@@ -960,7 +968,7 @@ body {
 	border-bottom: 1px solid #e2e8f0;
 }
 
-@media (max-width: 768px) {
+@media ( max-width : 768px) {
 	.leave-apply-grid {
 		grid-template-columns: 1fr;
 	}
@@ -974,7 +982,7 @@ body {
 	border-radius: 10px;
 	padding: 14px 16px;
 	margin-bottom: 12px;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .pending-leave-card .plc-header {
@@ -1050,7 +1058,7 @@ body {
 	align-items: start;
 }
 
-@media (max-width: 900px) {
+@media ( max-width : 900px) {
 	.meeting-grid {
 		grid-template-columns: 1fr;
 	}
@@ -1447,9 +1455,16 @@ body {
 	box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
 }
 
-@keyframes fadeIn {
-	from { opacity:0; transform: scale(0.95); }
-	to { opacity: 1; transform: scale(1); }
+@
+keyframes fadeIn {from { opacity:0;
+	transform: scale(0.95);
+}
+
+to {
+	opacity: 1;
+	transform: scale(1);
+}
+
 }
 
 /* ================= BREAK TIME ================= */
@@ -1570,7 +1585,7 @@ body {
 	align-items: stretch;
 }
 
-@media (max-width: 768px) {
+@media ( max-width : 768px) {
 	.attendance-cards-row {
 		grid-template-columns: 1fr;
 	}
@@ -1589,7 +1604,8 @@ body {
 	transition: box-shadow 0.2s ease;
 }
 
-.attendance-cards-row .status-card:hover, .attendance-cards-row .break-card:hover {
+.attendance-cards-row .status-card:hover, .attendance-cards-row .break-card:hover
+	{
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -1769,13 +1785,13 @@ body {
 	margin-top: 12px;
 }
 
-@media (max-width: 1100px) {
+@media ( max-width : 1100px) {
 	.employee-grid-3 {
 		grid-template-columns: repeat(2, 1fr);
 	}
 }
 
-@media (max-width: 600px) {
+@media ( max-width : 600px) {
 	.employee-grid-3 {
 		grid-template-columns: 1fr;
 	}
@@ -2012,7 +2028,7 @@ body {
 	align-items: start;
 }
 
-@media (max-width: 900px) {
+@media ( max-width : 900px) {
 	.performance-layout {
 		grid-template-columns: 1fr;
 	}
@@ -2255,7 +2271,7 @@ body {
 	border-color: #a5b4fc;
 }
 
-.radio-group input[type="radio"]:checked + span {
+.radio-group input[type="radio"]:checked+span {
 	font-weight: 700;
 	color: #4f46e5;
 }
@@ -2265,7 +2281,7 @@ body {
 	background: #eef2ff;
 }
 
-@media (max-width: 600px) {
+@media ( max-width : 600px) {
 	.radio-group {
 		grid-template-columns: 1fr;
 	}
@@ -2328,14 +2344,27 @@ body {
 	content: "✖";
 }
 
-@keyframes toastIn {
-	from { opacity:0; transform: translateX(120px); }
-	to { opacity: 1; transform: translateX(0); }
+@
+keyframes toastIn {from { opacity:0;
+	transform: translateX(120px);
 }
 
-@keyframes toastOut {
-	from { opacity:1; transform: translateX(0); }
-	to { opacity: 0; transform: translateX(120px); }
+to {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+}
+@
+keyframes toastOut {from { opacity:1;
+	transform: translateX(0);
+}
+
+to {
+	opacity: 0;
+	transform: translateX(120px);
+}
+
 }
 
 /* ================= FULL DARK MODE ================= */
@@ -2345,7 +2374,8 @@ body.dark-theme {
 }
 
 body.dark-theme .top-bar {
-	background: linear-gradient(135deg, #0f172a, #1e293b, #1e3a8a) !important;
+	background: linear-gradient(135deg, #0f172a, #1e293b, #1e3a8a)
+		!important;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
@@ -2355,7 +2385,7 @@ body.dark-theme .sidebar {
 }
 
 body.dark-theme .sidebar-bottom {
-	border-top: 1px solid rgba(255,255,255,0.1) !important;
+	border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 body.dark-theme .sidebar-btn.active {
@@ -2453,13 +2483,9 @@ body.dark-theme .settings-item i {
 	color: #a5b4fc !important;
 }
 
-body.dark-theme .perf-team-panel,
-body.dark-theme .perf-rating-panel,
-body.dark-theme .perf-member-card,
-body.dark-theme .meeting-left,
-body.dark-theme .meeting-right,
-body.dark-theme .leave-apply-left,
-body.dark-theme .leave-apply-right {
+body.dark-theme .perf-team-panel, body.dark-theme .perf-rating-panel,
+	body.dark-theme .perf-member-card, body.dark-theme .meeting-left, body.dark-theme .meeting-right,
+	body.dark-theme .leave-apply-left, body.dark-theme .leave-apply-right {
 	background: rgba(30, 41, 59, 0.8) !important;
 	border-color: #334155 !important;
 	color: #eee !important;
@@ -2470,8 +2496,8 @@ body.dark-theme .perf-member-card.selected {
 	border-color: #818cf8 !important;
 }
 
-body.dark-theme .perf-selected-emp,
-body.dark-theme .perf-selected-banner {
+body.dark-theme .perf-selected-emp, body.dark-theme .perf-selected-banner
+	{
 	background: rgba(79, 70, 229, 0.2) !important;
 	border-color: #4f46e5 !important;
 }
@@ -2550,19 +2576,22 @@ body.dark-theme .perf-selected-banner {
 				<button
 					class="sidebar-btn <%=activeTab.equals("schedulemeeting") ? "active" : ""%>"
 					onclick="setActive(this); showSection('schedulemeeting')">
-					<i class="fa-solid fa-handshake"></i> <span>Schedule Meetings</span>
+					<i class="fa-solid fa-handshake"></i> <span>Schedule
+						Meetings</span>
 				</button>
 
 				<button
 					class="sidebar-btn <%=activeTab.equals("leave") ? "active" : ""%>"
 					onclick="setActive(this); location.href='<%=request.getContextPath()%>/manager?tab=leave'">
-					<i class="fa-solid fa-calendar-xmark"></i> <span>Leave Requests</span>
+					<i class="fa-solid fa-calendar-xmark"></i> <span>Leave
+						Requests</span>
 				</button>
 
 				<button
 					class="sidebar-btn <%=activeTab.equals("performance") ? "active" : ""%>"
 					onclick="setActive(this); showSection('performance')">
-					<i class="fa-solid fa-chart-line"></i> <span>Performance Matrix</span>
+					<i class="fa-solid fa-chart-line"></i> <span>Performance
+						Matrix</span>
 				</button>
 
 				<button
@@ -2574,15 +2603,101 @@ body.dark-theme .perf-selected-banner {
 
 			<!-- Bottom: Settings + Logout -->
 			<div class="sidebar-bottom">
-				<button class="sidebar-btn" onclick="openSettings()">
+				<button
+					class="sidebar-btn <%=activeTab.equals("settings") ? "active" : ""%>"
+					onclick="setActive(this); showSection('settings')">
 					<i class="fa-solid fa-gear"></i> <span>Settings</span>
 				</button>
-				<a href="<%=request.getContextPath()%>/logout" class="sidebar-logout-btn">
-					<i class="fa-solid fa-right-to-bracket"></i> <span>Logout</span>
+				<a href="<%=request.getContextPath()%>/logout"
+					class="sidebar-logout-btn"> <i
+					class="fa-solid fa-right-to-bracket"></i> <span>Logout</span>
 				</a>
 			</div>
 		</div>
 
+<!-- ===== NEW SETTINGS (exactly like your screenshot) ===== -->
+<div class="box" id="settings" style="display: none; padding: 32px;">
+    <div class="flex items-center gap-3 mb-2">
+        <i class="fa-solid fa-gear text-4xl text-indigo-600"></i>
+        <h1 class="text-3xl font-semibold text-gray-900">Settings</h1>
+    </div>
+    <p class="text-gray-600 mb-10">Manage your profile and account preferences.</p>
+
+    <!-- TABS -->
+    <div class="flex border-b border-gray-200 mb-10">
+        <button onclick="openProfileTab()" id="profile-tab-btn"
+                class="tab-button active flex items-center gap-3 px-10 py-4 text-base font-medium text-indigo-600">
+            <i class="fa-solid fa-user"></i> My Profile
+        </button>
+        <button onclick="openChangePasswordTab()" id="password-tab-btn"
+                class="tab-button flex items-center gap-3 px-10 py-4 text-base font-medium text-gray-600 hover:text-gray-900">
+            <i class="fa-solid fa-lock"></i> Change Password
+        </button>
+    </div>
+
+    <!-- MY PROFILE CARD (exactly like image) -->
+    <div id="profile-content" class="bg-slate-50 rounded-3xl p-8 shadow-sm">
+        <div class="space-y-6">
+            <!-- Full Name -->
+            <div class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
+                <div class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-user text-2xl"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-500">Full Name</p>
+                    <p class="text-xl font-semibold text-gray-900">
+                        <%= userObj != null && userObj.getFullname() != null && !userObj.getFullname().isEmpty() ? userObj.getFullname() : "--" %>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
+                <div class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-envelope text-2xl"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-500">Email</p>
+                    <p class="text-xl font-semibold text-gray-900">
+                        <%= userObj != null ? userObj.getEmail() : "--" %>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Role -->
+            <div class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
+                <div class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-briefcase text-2xl"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-500">Role</p>
+                    <p class="text-xl font-semibold text-gray-900">
+                        <%= userObj != null ? userObj.getRole() : "Manager" %>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="flex items-center gap-6 px-5 py-5 hover:bg-white rounded-2xl transition-all">
+                <div class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-phone text-2xl"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-500">Phone</p>
+                    <p class="text-xl font-semibold text-gray-900">
+                        <%= userObj != null && userObj.getPhone() != null ? userObj.getPhone() : "--" %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- (Change Password tab will open your existing modal - no new code needed) -->
+</div>
+			
+			
+			
+			
 		<div class="content-area">
 			<div class="box" id="blank" style="display: none;">
 				<h3>Welcome 👋</h3>
@@ -2645,7 +2760,8 @@ body.dark-theme .perf-selected-banner {
 						<!-- PANEL 1: Team Selection -->
 						<div class="perf-team-panel" id="panelTeam">
 							<h4>
-								<i class="fa-solid fa-layer-group" style="margin-right:6px; color:#ec4899;"></i>Select Team
+								<i class="fa-solid fa-layer-group"
+									style="margin-right: 6px; color: #ec4899;"></i>Select Team
 							</h4>
 							<div class="perf-member-list" id="perfTeamList">
 								<%
@@ -2656,28 +2772,31 @@ body.dark-theme .perf-selected-banner {
 										String tInitials = "";
 										String[] tParts = tName.trim().split("\\s+");
 										for (String tp : tParts) {
-											if (!tp.isEmpty()) tInitials += tp.substring(0,1).toUpperCase();
+									if (!tp.isEmpty())
+										tInitials += tp.substring(0, 1).toUpperCase();
 										}
-										if (tInitials.length() > 2) tInitials = tInitials.substring(0, 2);
+										if (tInitials.length() > 2)
+									tInitials = tInitials.substring(0, 2);
 										int memberCount = t.getMembers() != null ? t.getMembers().size() : 0;
 								%>
-								<div class="perf-member-card"
-									data-teamname="<%=tName%>"
+								<div class="perf-member-card" data-teamname="<%=tName%>"
 									onclick="selectPerfTeam(this)">
 									<div class="perf-member-avatar perf-team-avatar"><%=tInitials%></div>
 									<div class="perf-member-info">
 										<div class="perf-member-name"><%=tName%></div>
-										<div class="perf-member-email"><%=memberCount%> member<%=memberCount != 1 ? "s" : ""%></div>
+										<div class="perf-member-email"><%=memberCount%>
+											member<%=memberCount != 1 ? "s" : ""%></div>
 									</div>
 									<div class="perf-member-check">
-										<i class="fa-solid fa-check" style="font-size:10px; display:none;"></i>
+										<i class="fa-solid fa-check"
+											style="font-size: 10px; display: none;"></i>
 									</div>
 								</div>
 								<%
-									}
+								}
 								} else {
 								%>
-								<p class="no-data" style="padding:16px 0;">No teams found.</p>
+								<p class="no-data" style="padding: 16px 0;">No teams found.</p>
 								<%
 								}
 								%>
@@ -2687,25 +2806,31 @@ body.dark-theme .perf-selected-banner {
 						<!-- PANEL 2: Member Selection (locked until team chosen) -->
 						<div class="perf-team-panel locked" id="panelMember">
 							<h4>
-								<i class="fa-solid fa-users" style="margin-right:6px; color:#4f46e5;"></i>Select Member
+								<i class="fa-solid fa-users"
+									style="margin-right: 6px; color: #4f46e5;"></i>Select Member
 							</h4>
 							<div class="perf-selected-banner" id="perfTeamBanner">
-								<span style="font-style:italic; color:#94a3b8; font-size:12px;">← Select a team first</span>
+								<span
+									style="font-style: italic; color: #94a3b8; font-size: 12px;">←
+									Select a team first</span>
 							</div>
 							<div class="perf-member-list" id="perfMemberList">
-								<p class="no-data" style="padding:10px 0; font-size:13px;">No team selected.</p>
+								<p class="no-data" style="padding: 10px 0; font-size: 13px;">No
+									team selected.</p>
 							</div>
 						</div>
 
 						<!-- PANEL 3: Rating (locked until member chosen) -->
 						<div class="perf-rating-panel locked" id="panelRating">
 							<h4>
-								<i class="fa-solid fa-star" style="margin-right:6px; color:#f59e0b;"></i>Rate Performance
+								<i class="fa-solid fa-star"
+									style="margin-right: 6px; color: #f59e0b;"></i>Rate Performance
 							</h4>
 
 							<!-- Selected member display -->
 							<div class="perf-selected-emp" id="perfSelectedDisplay">
-								<span class="placeholder-text">← Select a team member to rate</span>
+								<span class="placeholder-text">← Select a team member to
+									rate</span>
 							</div>
 
 							<form id="performanceForm"
@@ -2713,43 +2838,40 @@ body.dark-theme .perf-selected-banner {
 								method="post">
 
 								<!-- Hidden fields -->
-								<input type="hidden" id="perfTeamInput"    name="team"     value="">
-								<input type="hidden" id="perfEmployeeInput" name="employee" value="">
+								<input type="hidden" id="perfTeamInput" name="team" value="">
+								<input type="hidden" id="perfEmployeeInput" name="employee"
+									value="">
 
 								<!-- Rating Options -->
 								<div>
-									<div style="font-size:13px; font-weight:600; color:#475569; margin-bottom:10px;">
-										Performance Rating
-									</div>
+									<div
+										style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 10px;">
+										Performance Rating</div>
 									<div class="radio-group">
-										<label>
-											<input type="radio" name="rating" value="EXCELLENCE" required>
-											<span>⭐ Excellence</span>
-										</label>
-										<label>
-											<input type="radio" name="rating" value="GOOD">
-											<span>👍 Good</span>
-										</label>
-										<label>
-											<input type="radio" name="rating" value="AVERAGE">
-											<span>😐 Average</span>
-										</label>
-										<label>
-											<input type="radio" name="rating" value="BELOW_AVERAGE">
-											<span>📉 Below Average</span>
+										<label> <input type="radio" name="rating"
+											value="EXCELLENCE" required> <span>⭐
+												Excellence</span>
+										</label> <label> <input type="radio" name="rating"
+											value="GOOD"> <span>👍 Good</span>
+										</label> <label> <input type="radio" name="rating"
+											value="AVERAGE"> <span>😐 Average</span>
+										</label> <label> <input type="radio" name="rating"
+											value="BELOW_AVERAGE"> <span>📉 Below Average</span>
 										</label>
 									</div>
 								</div>
 
 								<button class="primary-btn" type="submit" id="perfSubmitBtn"
-									disabled style="width:100%; margin-top:8px; opacity:0.6;">
-									<i class="fa-solid fa-paper-plane" style="margin-right:6px;"></i>Submit Performance
+									disabled style="width: 100%; margin-top: 8px; opacity: 0.6;">
+									<i class="fa-solid fa-paper-plane" style="margin-right: 6px;"></i>Submit
+									Performance
 								</button>
 
 							</form>
 						</div>
 
-					</div><!-- /.performance-layout -->
+					</div>
+					<!-- /.performance-layout -->
 				</fieldset>
 			</div>
 
@@ -2760,7 +2882,8 @@ body.dark-theme .perf-selected-banner {
 					<legend>Schedule Meeting</legend>
 
 					<div class="section-header">
-						<span style="font-size:13px; color:#64748b;">Fill in the details below to schedule a new meeting.</span>
+						<span style="font-size: 13px; color: #64748b;">Fill in the
+							details below to schedule a new meeting.</span>
 						<button class="view-all-btn" onclick="openAllMeetings()">
 							<i class="fa-solid fa-eye"></i> View All
 						</button>
@@ -2771,37 +2894,41 @@ body.dark-theme .perf-selected-banner {
 
 						<!-- LEFT: Schedule Form -->
 						<div class="meeting-left">
-							<h4><i class="fa-solid fa-calendar-plus" style="margin-right:6px; color:#4f46e5;"></i>New Meeting</h4>
+							<h4>
+								<i class="fa-solid fa-calendar-plus"
+									style="margin-right: 6px; color: #4f46e5;"></i>New Meeting
+							</h4>
 
 							<form id="scheduleMeetingForm"
 								action="<%=request.getContextPath()%>/schedulemeeting"
 								method="post">
 
-								<label>Meeting Title</label>
-								<input class="form-control" type="text" name="title"
-									placeholder="e.g. Weekly Standup" required>
-
-								<label>Description</label>
+								<label>Meeting Title</label> <input class="form-control"
+									type="text" name="title" placeholder="e.g. Weekly Standup"
+									required> <label>Description</label>
 								<textarea class="form-control" name="description"
 									placeholder="Briefly describe the agenda" rows="3" required></textarea>
 
 								<div class="form-row">
 									<div>
-										<label>Start Time</label>
-										<input class="form-control" type="datetime-local" name="startTime" required>
+										<label>Start Time</label> <input class="form-control"
+											type="datetime-local" name="startTime" required>
 									</div>
 									<div>
-										<label>End Time</label>
-										<input class="form-control" type="datetime-local" name="endTime" required>
+										<label>End Time</label> <input class="form-control"
+											type="datetime-local" name="endTime" required>
 									</div>
 								</div>
 
-								<label>Meeting Link <span style="font-weight:400; color:#94a3b8;">(optional)</span></label>
-								<input class="form-control" type="text" name="meetingLink"
+								<label>Meeting Link <span
+									style="font-weight: 400; color: #94a3b8;">(optional)</span></label> <input
+									class="form-control" type="text" name="meetingLink"
 									placeholder="Zoom / Google Meet link">
 
-								<button class="primary-btn" type="submit" style="width:100%; margin-top:16px;">
-									<i class="fa-solid fa-calendar-check" style="margin-right:6px;"></i>Schedule Meeting
+								<button class="primary-btn" type="submit"
+									style="width: 100%; margin-top: 16px;">
+									<i class="fa-solid fa-calendar-check"
+										style="margin-right: 6px;"></i>Schedule Meeting
 								</button>
 
 							</form>
@@ -2821,19 +2948,23 @@ body.dark-theme .perf-selected-banner {
 								if (todayMeetings != null && !todayMeetings.isEmpty()) {
 									for (com.smartoffice.model.Meeting m : todayMeetings) {
 								%>
-								<div class="employee-card" style="margin-bottom:10px;">
+								<div class="employee-card" style="margin-bottom: 10px;">
 									<div class="emp-header">
-										<i class="fa-solid fa-video"></i>
-										<span class="emp-name"><%=m.getTitle()%></span>
+										<i class="fa-solid fa-video"></i> <span class="emp-name"><%=m.getTitle()%></span>
 									</div>
 									<div class="emp-body">
-										<div><b>Start:</b> <%=new java.text.SimpleDateFormat("hh:mm a").format(m.getStartTime())%></div>
-										<div><b>End:</b> <%=new java.text.SimpleDateFormat("hh:mm a").format(m.getEndTime())%></div>
+										<div>
+											<b>Start:</b>
+											<%=new java.text.SimpleDateFormat("hh:mm a").format(m.getStartTime())%></div>
+										<div>
+											<b>End:</b>
+											<%=new java.text.SimpleDateFormat("hh:mm a").format(m.getEndTime())%></div>
 										<%
 										if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
 										%>
-										<a href="<%=m.getMeetingLink()%>" target="_blank" class="join-meeting-btn">
-											<i class="fa-solid fa-video"></i> Join Meeting
+										<a href="<%=m.getMeetingLink()%>" target="_blank"
+											class="join-meeting-btn"> <i class="fa-solid fa-video"></i>
+											Join Meeting
 										</a>
 										<%
 										}
@@ -2868,12 +2999,12 @@ body.dark-theme .perf-selected-banner {
 					<div class="status-card">
 						<div class="attendance-section-title">Status</div>
 						<div class="punch-row">
-							<span class="punch-label">Punch In</span>
-							<span class="punch-value"><%=punchIn != null ? new SimpleDateFormat("HH:mm:ss").format(punchIn) : "--"%></span>
+							<span class="punch-label">Punch In</span> <span
+								class="punch-value"><%=punchIn != null ? new SimpleDateFormat("HH:mm:ss").format(punchIn) : "--"%></span>
 						</div>
 						<div class="punch-row">
-							<span class="punch-label">Punch Out</span>
-							<span class="punch-value"><%=punchOut != null ? new SimpleDateFormat("HH:mm:ss").format(punchOut) : "--"%></span>
+							<span class="punch-label">Punch Out</span> <span
+								class="punch-value"><%=punchOut != null ? new SimpleDateFormat("HH:mm:ss").format(punchOut) : "--"%></span>
 						</div>
 						<%
 						if (isWeekend) {
@@ -2884,17 +3015,20 @@ body.dark-theme .perf-selected-banner {
 						} else {
 						%>
 						<div class="punch-actions-nexus">
-							<form action="<%=request.getContextPath()%>/attendance" method="post" style="display: inline;">
-								<input type="hidden" name="action" value="punchin">
-								<input type="hidden" name="tab" value="attendance">
+							<form action="<%=request.getContextPath()%>/attendance"
+								method="post" style="display: inline;">
+								<input type="hidden" name="action" value="punchin"> <input
+									type="hidden" name="tab" value="attendance">
 								<button type="submit" class="punch-in-btn-nexus"
 									<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
 							</form>
-							<form action="<%=request.getContextPath()%>/attendance" method="post" style="display: inline;">
-								<input type="hidden" name="action" value="punchout">
-								<input type="hidden" name="tab" value="attendance">
+							<form action="<%=request.getContextPath()%>/attendance"
+								method="post" style="display: inline;">
+								<input type="hidden" name="action" value="punchout"> <input
+									type="hidden" name="tab" value="attendance">
 								<button type="submit" class="punch-out-btn-nexus"
-									<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>Punch Out</button>
+									<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>Punch
+									Out</button>
 							</form>
 						</div>
 						<%
@@ -2906,33 +3040,35 @@ body.dark-theme .perf-selected-banner {
 					<div class="break-card">
 						<div class="attendance-section-title">TOTAL BREAK TODAY</div>
 						<div class="break-total-row">
-							<span class="tr-label">Total Break Today</span>
-							<span class="tr-val">
-								<%
-								int mgrBreakSecs = 0;
-								if (request.getAttribute("breakTotalSeconds") != null) {
-									mgrBreakSecs = (Integer) request.getAttribute("breakTotalSeconds");
-								}
-								int mbh = mgrBreakSecs / 3600;
-								int mbm = (mgrBreakSecs % 3600) / 60;
-								int mbs = mgrBreakSecs % 60;
-								%>
-								<%=String.format("%02d:%02d:%02d", mbh, mbm, mbs)%>
+							<span class="tr-label">Total Break Today</span> <span
+								class="tr-val"> <%
+ int mgrBreakSecs = 0;
+ if (request.getAttribute("breakTotalSeconds") != null) {
+ 	mgrBreakSecs = (Integer) request.getAttribute("breakTotalSeconds");
+ }
+ int mbh = mgrBreakSecs / 3600;
+ int mbm = (mgrBreakSecs % 3600) / 60;
+ int mbs = mgrBreakSecs % 60;
+ %> <%=String.format("%02d:%02d:%02d", mbh, mbm, mbs)%>
 							</span>
 						</div>
 						<div class="break-actions">
-							<form action="<%=request.getContextPath()%>/break" method="post" style="display: inline;">
-								<input type="hidden" name="action" value="start">
-								<input type="hidden" name="redirect" value="manager">
-								<input type="hidden" name="tab" value="attendance">
+							<form action="<%=request.getContextPath()%>/break" method="post"
+								style="display: inline;">
+								<input type="hidden" name="action" value="start"> <input
+									type="hidden" name="redirect" value="manager"> <input
+									type="hidden" name="tab" value="attendance">
 								<button type="submit" class="start-break-btn break-action-btn"
-									<%=(punchIn == null || punchOut != null || onBreak) ? "disabled" : ""%>>Start Break</button>
+									<%=(punchIn == null || punchOut != null || onBreak) ? "disabled" : ""%>>Start
+									Break</button>
 							</form>
-							<form action="<%=request.getContextPath()%>/break" method="post" style="display: inline; margin-left: 8px;">
-								<input type="hidden" name="action" value="end">
-								<input type="hidden" name="redirect" value="manager">
-								<input type="hidden" name="tab" value="attendance">
-								<button type="submit" class="end-break-btn-nexus break-action-btn"
+							<form action="<%=request.getContextPath()%>/break" method="post"
+								style="display: inline; margin-left: 8px;">
+								<input type="hidden" name="action" value="end"> <input
+									type="hidden" name="redirect" value="manager"> <input
+									type="hidden" name="tab" value="attendance">
+								<button type="submit"
+									class="end-break-btn-nexus break-action-btn"
 									<%=!onBreak ? "disabled" : ""%>>End Break</button>
 							</form>
 						</div>
@@ -2973,7 +3109,8 @@ body.dark-theme .perf-selected-banner {
 									<i class="fa-solid fa-file-export"></i> Export Attendance
 								</button>
 							</form>
-							<form action="<%=request.getContextPath()%>/exportTeamPerformance"
+							<form
+								action="<%=request.getContextPath()%>/exportTeamPerformance"
 								method="get" style="display: inline; margin-left: 8px;">
 								<button type="submit" class="export-btn">
 									<i class="fa-solid fa-file-export"></i> Export Performance
@@ -3009,14 +3146,17 @@ body.dark-theme .perf-selected-banner {
 							<div class="employee-card">
 								<div class="emp-header">
 									<div class="emp-left">
-										<i class="fa-solid fa-user"></i>
-										<span class="emp-name"><%=ta.getFullName()%></span>
+										<i class="fa-solid fa-user"></i> <span class="emp-name"><%=ta.getFullName()%></span>
 									</div>
 									<span class="emp-status"><%=ta.getStatus()%></span>
 								</div>
 								<div class="emp-body">
-									<div><b>Punch In:</b> <%=ta.getPunchIn() != null ? ta.getPunchIn() : "--"%></div>
-									<div><b>Punch Out:</b> <%=ta.getPunchOut() != null ? ta.getPunchOut() : "--"%></div>
+									<div>
+										<b>Punch In:</b>
+										<%=ta.getPunchIn() != null ? ta.getPunchIn() : "--"%></div>
+									<div>
+										<b>Punch Out:</b>
+										<%=ta.getPunchOut() != null ? ta.getPunchOut() : "--"%></div>
 								</div>
 							</div>
 							<%
@@ -3043,7 +3183,8 @@ body.dark-theme .perf-selected-banner {
 										: (st.contains("absent") ? "absent" : "punched-in");
 									%>
 									<tr>
-										<td><i class="fa-solid fa-user" style="margin-right: 8px; color: #64748b;"></i><strong><%=ta.getFullName()%></strong></td>
+										<td><i class="fa-solid fa-user"
+											style="margin-right: 8px; color: #64748b;"></i><strong><%=ta.getFullName()%></strong></td>
 										<td><span class="list-status <%=listStatusClass%>"><%=ta.getStatus()%></span></td>
 										<td><%=ta.getPunchIn() != null ? ta.getPunchIn() : "--"%></td>
 										<td><%=ta.getPunchOut() != null ? ta.getPunchOut() : "--"%></td>
@@ -3076,7 +3217,8 @@ body.dark-theme .perf-selected-banner {
 							class="leave-tab-btn leave-tab-active"
 							onclick="showManagerApplyLeave()">Apply Leave</button>
 						<button id="managerMyLeavesTab" type="button"
-							class="leave-tab-btn" onclick="showManagerMyLeaves()">My Leave Requests</button>
+							class="leave-tab-btn" onclick="showManagerMyLeaves()">My
+							Leave Requests</button>
 					</div>
 
 					<!-- Apply Leave: two-column layout -->
@@ -3084,34 +3226,39 @@ body.dark-theme .perf-selected-banner {
 						<div class="leave-apply-grid">
 							<!-- Left: form -->
 							<div class="leave-apply-left">
-								<h4 style="font-size:14px; font-weight:700; color:#1e293b; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid #e2e8f0;">
-									<i class="fa-solid fa-paper-plane" style="margin-right:6px; color:#4f46e5;"></i>Submit Request
+								<h4
+									style="font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0;">
+									<i class="fa-solid fa-paper-plane"
+										style="margin-right: 6px; color: #4f46e5;"></i>Submit Request
 								</h4>
 								<form class="leave-form" action="applyLeave" method="post">
-									<label>Leave Type</label>
-									<select name="leaveType" required>
+									<label>Leave Type</label> <select name="leaveType" required>
 										<option value="">Select</option>
 										<option>Casual Leave</option>
 										<option>Sick Leave</option>
 										<option>Earned Leave</option>
 									</select>
 
-									<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+									<div
+										style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
 										<div>
-											<label>From Date</label>
-											<input type="date" name="fromDate" required>
+											<label>From Date</label> <input type="date" name="fromDate"
+												required>
 										</div>
 										<div>
-											<label>To Date</label>
-											<input type="date" name="toDate" required>
+											<label>To Date</label> <input type="date" name="toDate"
+												required>
 										</div>
 									</div>
 
 									<label>Reason</label>
-									<textarea name="reason" required placeholder="Briefly describe the reason..."></textarea>
+									<textarea name="reason" required
+										placeholder="Briefly describe the reason..."></textarea>
 
-									<button type="submit" class="primary-btn" style="width:100%; margin-top:16px;">
-										<i class="fa-solid fa-paper-plane" style="margin-right:6px;"></i>Submit Request
+									<button type="submit" class="primary-btn"
+										style="width: 100%; margin-top: 16px;">
+										<i class="fa-solid fa-paper-plane" style="margin-right: 6px;"></i>Submit
+										Request
 									</button>
 								</form>
 							</div>
@@ -3119,24 +3266,35 @@ body.dark-theme .perf-selected-banner {
 							<!-- Right: leave policy / info -->
 							<div class="leave-apply-right">
 								<h4>
-									<i class="fa-solid fa-circle-info" style="margin-right:6px; color:#4f46e5;"></i>Leave Policy
+									<i class="fa-solid fa-circle-info"
+										style="margin-right: 6px; color: #4f46e5;"></i>Leave Policy
 								</h4>
-								<div style="display:flex; flex-direction:column; gap:12px; font-size:13px; color:#475569;">
-									<div style="padding:12px 14px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; border-left:4px solid #4f46e5;">
-										<b style="color:#1e293b;">Casual Leave</b><br>
-										For personal errands or short-notice absences. Typically limited to a set number of days per year.
+								<div
+									style="display: flex; flex-direction: column; gap: 12px; font-size: 13px; color: #475569;">
+									<div
+										style="padding: 12px 14px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; border-left: 4px solid #4f46e5;">
+										<b style="color: #1e293b;">Casual Leave</b><br> For
+										personal errands or short-notice absences. Typically limited
+										to a set number of days per year.
 									</div>
-									<div style="padding:12px 14px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; border-left:4px solid #10b981;">
-										<b style="color:#1e293b;">Sick Leave</b><br>
-										Applicable when you are unwell and unable to attend work. A medical certificate may be required.
+									<div
+										style="padding: 12px 14px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; border-left: 4px solid #10b981;">
+										<b style="color: #1e293b;">Sick Leave</b><br> Applicable
+										when you are unwell and unable to attend work. A medical
+										certificate may be required.
 									</div>
-									<div style="padding:12px 14px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; border-left:4px solid #f59e0b;">
-										<b style="color:#1e293b;">Earned Leave</b><br>
-										Accrued over time based on service. Plan in advance and get approval from HR.
+									<div
+										style="padding: 12px 14px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; border-left: 4px solid #f59e0b;">
+										<b style="color: #1e293b;">Earned Leave</b><br> Accrued
+										over time based on service. Plan in advance and get approval
+										from HR.
 									</div>
-									<div style="padding:12px 14px; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; font-size:12px;">
-										<i class="fa-solid fa-triangle-exclamation" style="color:#dc2626; margin-right:4px;"></i>
-										All leave requests are subject to admin approval. Submit at least 2 working days in advance when possible.
+									<div
+										style="padding: 12px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; font-size: 12px;">
+										<i class="fa-solid fa-triangle-exclamation"
+											style="color: #dc2626; margin-right: 4px;"></i> All leave
+										requests are subject to admin approval. Submit at least 2
+										working days in advance when possible.
 									</div>
 								</div>
 							</div>
@@ -3153,22 +3311,29 @@ body.dark-theme .perf-selected-banner {
 							<p class="no-data">No leave requests found.</p>
 							<%
 							} else {
-								for (LeaveRequest lr : myLeaves) {
+							for (LeaveRequest lr : myLeaves) {
 							%>
 							<div class="employee-card">
 								<div class="emp-header">
 									<div class="emp-left">
-										<i class="fa-solid fa-plane-departure"></i>
-										<span class="emp-name"><%=lr.getLeaveType()%></span>
+										<i class="fa-solid fa-plane-departure"></i> <span
+											class="emp-name"><%=lr.getLeaveType()%></span>
 									</div>
-									<span class="emp-status <%="APPROVED".equalsIgnoreCase(lr.getStatus())
+									<span
+										class="emp-status <%="APPROVED".equalsIgnoreCase(lr.getStatus())
 		? "done"
 		: "REJECTED".equalsIgnoreCase(lr.getStatus()) ? "out" : "pending"%>"><%=lr.getStatus()%></span>
 								</div>
 								<div class="emp-body">
-									<div><b>From:</b> <%=lr.getFromDate()%></div>
-									<div><b>To:</b> <%=lr.getToDate()%></div>
-									<div><b>Reason:</b> <%=lr.getReason()%></div>
+									<div>
+										<b>From:</b>
+										<%=lr.getFromDate()%></div>
+									<div>
+										<b>To:</b>
+										<%=lr.getToDate()%></div>
+									<div>
+										<b>Reason:</b>
+										<%=lr.getReason()%></div>
 								</div>
 							</div>
 							<%
@@ -3181,7 +3346,8 @@ body.dark-theme .perf-selected-banner {
 			</div>
 
 			<!-- Calendar -->
-			<div class="box centered-box" id="calendarSection" style="display: none;">
+			<div class="box centered-box" id="calendarSection"
+				style="display: none;">
 				<iframe id="calendarFrame" src=""
 					style="width: 100%; height: 600px; border: none;"></iframe>
 			</div>
@@ -3195,7 +3361,8 @@ body.dark-theme .perf-selected-banner {
 				<p>
 					<b>Role:</b> Manager
 				</p>
-				<button class="secondary-btn" onclick="toggleTheme()">Toggle Theme</button>
+				<button class="secondary-btn" onclick="toggleTheme()">Toggle
+					Theme</button>
 			</div>
 
 			<!-- ===== My Teams ONLY (My Team Members section removed) ===== -->
@@ -3216,13 +3383,17 @@ body.dark-theme .perf-selected-banner {
 							<div class="employee-card" style="min-width: 280px;">
 								<div class="emp-header">
 									<div class="emp-left">
-										<i class="fa-solid fa-people-group"></i>
-										<span class="emp-name"><%=t.getName()%></span>
+										<i class="fa-solid fa-people-group"></i> <span
+											class="emp-name"><%=t.getName()%></span>
 									</div>
 								</div>
 								<div class="emp-body">
-									<div><b>Manager:</b> <%=t.getManagerFullname() != null ? t.getManagerFullname() : t.getManagerUsername()%></div>
-									<div><b>Members:</b> <%=t.getMembers().size()%></div>
+									<div>
+										<b>Manager:</b>
+										<%=t.getManagerFullname() != null ? t.getManagerFullname() : t.getManagerUsername()%></div>
+									<div>
+										<b>Members:</b>
+										<%=t.getMembers().size()%></div>
 									<%
 									if (!t.getMembers().isEmpty()) {
 									%>
@@ -3230,7 +3401,8 @@ body.dark-theme .perf-selected-banner {
 										<%
 										for (User m : t.getMembers()) {
 										%>
-										<span style="display: inline-block; background: #e2e8f0; padding: 4px 8px; border-radius: 6px; margin: 2px; font-size: 12px;"><%=m.getFullname() != null ? m.getFullname() : m.getEmail()%></span>
+										<span
+											style="display: inline-block; background: #e2e8f0; padding: 4px 8px; border-radius: 6px; margin: 2px; font-size: 12px;"><%=m.getFullname() != null ? m.getFullname() : m.getEmail()%></span>
 										<%
 										}
 										%>
@@ -3256,9 +3428,11 @@ body.dark-theme .perf-selected-banner {
 			</div>
 
 			<!-- ===== Assign Tasks ===== -->
-			<div class="box" id="assignTask" style="display: none; padding: 20px;">
+			<div class="box" id="assignTask"
+				style="display: none; padding: 20px;">
 
-				<div style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px;">
+				<div
+					style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px;">
 
 					<!-- Assign Task Fieldset -->
 					<fieldset class="task-fieldset" style="background: #f8fafc;">
@@ -3279,8 +3453,8 @@ body.dark-theme .perf-selected-banner {
 							method="post" enctype="multipart/form-data"
 							style="display: flex; flex-direction: column; gap: 12px;">
 
-							<label style="font-size: 13px; font-weight: 600; color: #475569;">Assign to</label>
-							<select class="form-control" name="employeeUsername" required>
+							<label style="font-size: 13px; font-weight: 600; color: #475569;">Assign
+								to</label> <select class="form-control" name="employeeUsername" required>
 								<option value="">Select Employee</option>
 								<%
 								List<User> team = (List<User>) request.getAttribute("teamList");
@@ -3300,23 +3474,23 @@ body.dark-theme .perf-selected-banner {
 								<%
 								}
 								%>
-							</select>
-
-							<label style="font-size: 13px; font-weight: 600; color: #475569;">Task title</label>
-							<input class="form-control" type="text" name="title"
-								placeholder="E.g. Submit weekly report" required>
-
-							<label style="font-size: 13px; font-weight: 600; color: #475569;">Description</label>
+							</select> <label
+								style="font-size: 13px; font-weight: 600; color: #475569;">Task
+								title</label> <input class="form-control" type="text" name="title"
+								placeholder="E.g. Submit weekly report" required> <label
+								style="font-size: 13px; font-weight: 600; color: #475569;">Description</label>
 							<textarea class="form-control" name="taskDesc" rows="4"
 								placeholder="Add clear instructions and details" required></textarea>
 
 							<div style="display: flex; gap: 12px; flex-wrap: wrap;">
 								<div style="flex: 1; min-width: 160px;">
-									<label style="font-size: 13px; font-weight: 600; color: #475569;">Deadline</label>
+									<label
+										style="font-size: 13px; font-weight: 600; color: #475569;">Deadline</label>
 									<input class="form-control" type="date" name="deadline">
 								</div>
 								<div style="flex: 1; min-width: 160px;">
-									<label style="font-size: 13px; font-weight: 600; color: #475569;">Priority</label>
+									<label
+										style="font-size: 13px; font-weight: 600; color: #475569;">Priority</label>
 									<select class="form-control" name="priority">
 										<option value="HIGH">High</option>
 										<option value="MEDIUM" selected>Medium</option>
@@ -3326,17 +3500,19 @@ body.dark-theme .perf-selected-banner {
 							</div>
 
 							<div>
-								<label style="font-size: 13px; font-weight: 600; color: #475569;">Attachment (optional)</label>
-								<input class="form-control" type="file" name="attachment"
+								<label
+									style="font-size: 13px; font-weight: 600; color: #475569;">Attachment
+									(optional)</label> <input class="form-control" type="file"
+									name="attachment"
 									accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg">
-								<small style="font-size: 11px; color: #6b7280;">
-									Attach any reference document or file your employee needs.
-								</small>
+								<small style="font-size: 11px; color: #6b7280;"> Attach
+									any reference document or file your employee needs. </small>
 							</div>
 
 							<div style="margin-top: 4px;">
 								<button class="primary-btn" type="submit"
-									style="min-width: 150px; border-radius: 999px;">Assign Task</button>
+									style="min-width: 150px; border-radius: 999px;">Assign
+									Task</button>
 							</div>
 						</form>
 					</fieldset>
@@ -3374,7 +3550,8 @@ body.dark-theme .perf-selected-banner {
 							</select>
 
 							<button class="secondary-btn" type="submit"
-								style="align-self: flex-start; border-radius: 999px;">View Tasks</button>
+								style="align-self: flex-start; border-radius: 999px;">View
+								Tasks</button>
 						</form>
 
 						<%
@@ -3392,25 +3569,25 @@ body.dark-theme .perf-selected-banner {
 							<p class="no-data">No tasks found for this employee.</p>
 							<%
 							} else {
-								for (Task t : viewTasks) {
+							for (Task t : viewTasks) {
 							%>
-							<div class="task-card <%=t.getStatus().equals("COMPLETED") ? "completed" : ""%>">
+							<div
+								class="task-card <%=t.getStatus().equals("COMPLETED") ? "completed" : ""%>">
 								<div class="task-desc">
 									<strong><%=t.getTitle() != null ? t.getTitle() : "Task"%></strong><br>
-									<%=t.getDescription()%><br>
-									<small style="font-size: 11px; color: #6b7280;">
-										<%
-										java.sql.Date dl = t.getDeadline();
-										String pr = t.getPriority();
-										%>
-										Deadline: <%=dl != null ? dl.toString() : "--"%> &nbsp; | Priority: <%=pr != null ? pr : "MEDIUM"%>
+									<%=t.getDescription()%><br> <small
+										style="font-size: 11px; color: #6b7280;"> <%
+ java.sql.Date dl = t.getDeadline();
+ String pr = t.getPriority();
+ %> Deadline: <%=dl != null ? dl.toString() : "--"%> &nbsp; |
+										Priority: <%=pr != null ? pr : "MEDIUM"%>
 									</small>
 									<%
 									String attName = t.getAttachmentName();
 									if (attName != null && !attName.isEmpty()) {
 									%>
-									<br>
-									<a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
+									<br> <a
+										href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
 										target="_blank"
 										style="font-size: 12px; color: #2563eb; text-decoration: underline;">
 										Download: <%=attName%>
@@ -3419,15 +3596,16 @@ body.dark-theme .perf-selected-banner {
 									}
 									%>
 								</div>
-								<span class="task-status <%=t.getStatus().equals("COMPLETED") ? "completed" : "assigned"%>">
+								<span
+									class="task-status <%=t.getStatus().equals("COMPLETED") ? "completed" : "assigned"%>">
 									<%=t.getStatus()%>
 								</span>
 								<%
 								String empFile = t.getEmployeeAttachmentName();
 								if (empFile != null && !empFile.isEmpty()) {
 								%>
-								<br>
-								<a href="<%=request.getContextPath()%>/employeeTaskAttachment?id=<%=t.getId()%>"
+								<br> <a
+									href="<%=request.getContextPath()%>/employeeTaskAttachment?id=<%=t.getId()%>"
 									target="_blank"
 									style="font-size: 12px; color: #16a34a; text-decoration: underline;">
 									Employee Submission: <%=empFile%>
@@ -3477,13 +3655,14 @@ body.dark-theme .perf-selected-banner {
 				for (Notification n : notifications) {
 			%>
 			<div class="notification-item" id="notif-<%=n.getId()%>">
-				🔔 <%=n.getMessage()%><br>
-				<small>By <%=n.getCreatedBy()%></small>
+				🔔
+				<%=n.getMessage()%><br> <small>By <%=n.getCreatedBy()%></small>
 				<div style="margin-top: 8px; text-align: right;">
 					<button
 						style="background: linear-gradient(135deg, #6366f1, #818cf8); color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;"
 						data-id="<%=n.getId()%>"
-						onclick="markAsRead(parseInt(this.dataset.id, 10));">Mark as read</button>
+						onclick="markAsRead(parseInt(this.dataset.id, 10));">Mark
+						as read</button>
 				</div>
 			</div>
 			<%
@@ -3525,31 +3704,31 @@ function setTeamAttendanceView(mode) {
    =============================================================== */
 
 var perfTeamMembers = {};
-<%
-List<Team> perfTeamsJS = (List<Team>) request.getAttribute("myTeams");
+<%List<Team> perfTeamsJS = (List<Team>) request.getAttribute("myTeams");
 if (perfTeamsJS != null && !perfTeamsJS.isEmpty()) {
-    out.println("perfTeamMembers = {");
-    boolean firstTeam = true;
-    for (Team t : perfTeamsJS) {
-        if (!firstTeam) out.println(",");
-        firstTeam = false;
-        String tNameJs = t.getName().replace("\"", "\\\"").replace("'", "\\'");
-        out.print("  \"" + tNameJs + "\": [");
-        boolean firstMember = true;
-        if (t.getMembers() != null) {
-            for (User m : t.getMembers()) {
-                if (!firstMember) out.print(",");
-                firstMember = false;
-                String mName  = (m.getFullname()  != null ? m.getFullname()  : m.getEmail()).replace("\"","\\\"");
-                String mEmail = m.getEmail().replace("\"","\\\"");
-                out.print("{\"name\":\"" + mName + "\",\"email\":\"" + mEmail + "\"}");
-            }
-        }
-        out.print("]");
-    }
-    out.println("};");
-}
-%>
+	out.println("perfTeamMembers = {");
+	boolean firstTeam = true;
+	for (Team t : perfTeamsJS) {
+		if (!firstTeam)
+			out.println(",");
+		firstTeam = false;
+		String tNameJs = t.getName().replace("\"", "\\\"").replace("'", "\\'");
+		out.print("  \"" + tNameJs + "\": [");
+		boolean firstMember = true;
+		if (t.getMembers() != null) {
+			for (User m : t.getMembers()) {
+				if (!firstMember)
+					out.print(",");
+				firstMember = false;
+				String mName = (m.getFullname() != null ? m.getFullname() : m.getEmail()).replace("\"", "\\\"");
+				String mEmail = m.getEmail().replace("\"", "\\\"");
+				out.print("{\"name\":\"" + mName + "\",\"email\":\"" + mEmail + "\"}");
+			}
+		}
+		out.print("]");
+	}
+	out.println("};");
+}%>
 
 function setPerfStep(n) {
     for (var i = 1; i <= 3; i++) {
