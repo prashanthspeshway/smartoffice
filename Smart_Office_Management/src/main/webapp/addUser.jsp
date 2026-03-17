@@ -137,10 +137,10 @@ String errorSafe = h(errorMsg);
               autocomplete="tel"
               placeholder="10 digits"
               maxlength="10"
-              pattern="[0-9]{10}"
+              pattern="[6-9][0-9]{9}"
               class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 outline-none bg-white"
             >
-            <p class="text-xs text-slate-400 mt-1">Digits only (10). Leave empty if not available.</p>
+            <p class="text-xs text-slate-400 mt-1">Must start with 6, 7, 8, or 9 and be 10 digits.</p>
           </div>
 
           <div>
@@ -313,6 +313,33 @@ String errorSafe = h(errorMsg);
         if (e) showToast(e, 'error');
       }
 
+      // Phone number: allow only digits, and block first digit if not 6-9
+      var phoneInput = document.getElementById('phonenumber');
+      if (phoneInput) {
+        phoneInput.addEventListener('input', function () {
+          // Strip non-digits
+          this.value = this.value.replace(/\D/g, '');
+          // If first digit is not 6-9, clear the input
+          if (this.value.length > 0 && !/^[6-9]/.test(this.value)) {
+            this.value = '';
+          }
+        });
+
+        phoneInput.addEventListener('keypress', function (e) {
+          var char = String.fromCharCode(e.which);
+          // Allow only digits
+          if (!/[0-9]/.test(char)) {
+            e.preventDefault();
+            return;
+          }
+          // Block first digit if not 6-9
+          if (this.value.length === 0 && !/[6-9]/.test(char)) {
+            e.preventDefault();
+            showToast('Phone number must start with 6, 7, 8, or 9.', 'error');
+          }
+        });
+      }
+
       var form = document.getElementById('addEmployeeForm');
       if (form) {
         form.addEventListener('submit', function (ev) {
@@ -321,6 +348,14 @@ String errorSafe = h(errorMsg);
           if (pwd !== confirm) {
             ev.preventDefault();
             showToast('Passwords do not match.', 'error');
+            return;
+          }
+
+          // Extra phone validation on submit
+          var phone = document.getElementById('phonenumber').value;
+          if (phone && !/^[6-9][0-9]{9}$/.test(phone)) {
+            ev.preventDefault();
+            showToast('Phone number must start with 6, 7, 8, or 9 and be 10 digits.', 'error');
           }
         });
       }

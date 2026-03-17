@@ -2884,13 +2884,15 @@ body.dark-theme .perf-selected-banner {
 						} else {
 						%>
 						<div class="punch-actions-nexus">
-							<form action="attendance" method="post" style="display: inline;">
+							<form action="<%=request.getContextPath()%>/attendance" method="post" style="display: inline;">
 								<input type="hidden" name="action" value="punchin">
+								<input type="hidden" name="tab" value="attendance">
 								<button type="submit" class="punch-in-btn-nexus"
 									<%=punchIn != null ? "disabled" : ""%>>Punch In</button>
 							</form>
-							<form action="attendance" method="post" style="display: inline;">
+							<form action="<%=request.getContextPath()%>/attendance" method="post" style="display: inline;">
 								<input type="hidden" name="action" value="punchout">
+								<input type="hidden" name="tab" value="attendance">
 								<button type="submit" class="punch-out-btn-nexus"
 									<%=(punchIn == null || punchOut != null) ? "disabled" : ""%>>Punch Out</button>
 							</form>
@@ -2919,15 +2921,17 @@ body.dark-theme .perf-selected-banner {
 							</span>
 						</div>
 						<div class="break-actions">
-							<form action="break" method="post" style="display: inline;">
+							<form action="<%=request.getContextPath()%>/break" method="post" style="display: inline;">
 								<input type="hidden" name="action" value="start">
 								<input type="hidden" name="redirect" value="manager">
+								<input type="hidden" name="tab" value="attendance">
 								<button type="submit" class="start-break-btn break-action-btn"
 									<%=(punchIn == null || punchOut != null || onBreak) ? "disabled" : ""%>>Start Break</button>
 							</form>
-							<form action="break" method="post" style="display: inline; margin-left: 8px;">
+							<form action="<%=request.getContextPath()%>/break" method="post" style="display: inline; margin-left: 8px;">
 								<input type="hidden" name="action" value="end">
 								<input type="hidden" name="redirect" value="manager">
+								<input type="hidden" name="tab" value="attendance">
 								<button type="submit" class="end-break-btn-nexus break-action-btn"
 									<%=!onBreak ? "disabled" : ""%>>End Break</button>
 							</form>
@@ -3194,7 +3198,7 @@ body.dark-theme .perf-selected-banner {
 				<button class="secondary-btn" onclick="toggleTheme()">Toggle Theme</button>
 			</div>
 
-			<!-- ===== My Teams & My Team Members ===== -->
+			<!-- ===== My Teams ONLY (My Team Members section removed) ===== -->
 			<div class="box" id="teamSection" style="display: none;">
 
 				<!-- My Teams -->
@@ -3249,40 +3253,6 @@ body.dark-theme .perf-selected-banner {
 					</div>
 				</fieldset>
 
-				<!-- Individual team members -->
-				<fieldset class="team-fieldset" style="margin-top: 16px;">
-					<legend>My Team Members</legend>
-					<div class="team-scroll">
-						<div class="employee-grid">
-							<%
-							List<User> team = (List<User>) request.getAttribute("teamList");
-							if (team != null && !team.isEmpty()) {
-								for (User u : team) {
-							%>
-							<div class="employee-card">
-								<div class="emp-header">
-									<div class="emp-left">
-										<i class="fa-solid fa-user"></i>
-										<span class="emp-name"><%=u.getFullname()%></span>
-									</div>
-									<span class="emp-status"><%=u.getStatus()%></span>
-								</div>
-								<div class="emp-body">
-									<div><b>Email:</b> <%=u.getEmail()%></div>
-									<div><b>Phone:</b> <%=u.getPhone()%></div>
-								</div>
-							</div>
-							<%
-							}
-							} else {
-							%>
-							<p class="no-data">No employees found</p>
-							<%
-							}
-							%>
-						</div>
-					</div>
-				</fieldset>
 			</div>
 
 			<!-- ===== Assign Tasks ===== -->
@@ -3313,6 +3283,7 @@ body.dark-theme .perf-selected-banner {
 							<select class="form-control" name="employeeUsername" required>
 								<option value="">Select Employee</option>
 								<%
+								List<User> team = (List<User>) request.getAttribute("teamList");
 								String assignEmployee = (String) request.getAttribute("assignEmployee");
 								if (team != null && !team.isEmpty()) {
 									for (User u : team) {
@@ -3553,11 +3524,6 @@ function setTeamAttendanceView(mode) {
    PERFORMANCE MATRIX — 3-Step: Team → Member → Rate
    =============================================================== */
 
-/*
- * Team member data embedded from server.
- * Each entry: { name, email }
- * Keyed by team name.
- */
 var perfTeamMembers = {};
 <%
 List<Team> perfTeamsJS = (List<Team>) request.getAttribute("myTeams");
@@ -3585,7 +3551,6 @@ if (perfTeamsJS != null && !perfTeamsJS.isEmpty()) {
 }
 %>
 
-/* Update the 3-step indicator */
 function setPerfStep(n) {
     for (var i = 1; i <= 3; i++) {
         var stepEl = document.getElementById("perfStep" + i);
@@ -3593,14 +3558,12 @@ function setPerfStep(n) {
         if (i < n)  stepEl.classList.add("done");
         if (i === n) stepEl.classList.add("active");
     }
-    /* colour connector lines */
     var line1 = document.getElementById("perfLine1");
     var line2 = document.getElementById("perfLine2");
     if (line1) line1.classList.toggle("done", n > 1);
     if (line2) line2.classList.toggle("done", n > 2);
 }
 
-/* Build initials from a full name */
 function perfInitials(name) {
     var parts = name.trim().split(/\s+/);
     var ini = parts[0].charAt(0).toUpperCase();
@@ -3608,9 +3571,7 @@ function perfInitials(name) {
     return ini;
 }
 
-/* ---- Step 1: Team selected ---- */
 function selectPerfTeam(card) {
-    /* Deselect all team cards */
     document.querySelectorAll('#perfTeamList .perf-member-card').forEach(function(c) {
         c.classList.remove('selected');
         var ico = c.querySelector('.perf-member-check i');
@@ -3624,7 +3585,6 @@ function selectPerfTeam(card) {
     var teamName = card.getAttribute('data-teamname');
     document.getElementById('perfTeamInput').value = teamName;
 
-    /* Populate member panel */
     var members = perfTeamMembers[teamName] || [];
     var list = document.getElementById('perfMemberList');
 
@@ -3649,12 +3609,10 @@ function selectPerfTeam(card) {
         }).join('');
     }
 
-    /* Update banner */
     document.getElementById('perfTeamBanner').innerHTML =
         '<i class="fa-solid fa-layer-group" style="color:#ec4899; font-size:13px;"></i>' +
         '<span class="sel-tag">' + teamName + '</span>';
 
-    /* Unlock panel 2, lock panel 3, reset rating */
     document.getElementById('panelMember').classList.remove('locked');
     document.getElementById('panelRating').classList.add('locked');
     document.getElementById('perfSelectedDisplay').innerHTML =
@@ -3667,9 +3625,7 @@ function selectPerfTeam(card) {
     setPerfStep(2);
 }
 
-/* ---- Step 2: Member selected ---- */
 function selectPerfMember(card) {
-    /* Deselect all member cards */
     document.querySelectorAll('#perfMemberList .perf-member-card').forEach(function(c) {
         c.classList.remove('selected');
         var ico = c.querySelector('.perf-member-check i');
@@ -3684,7 +3640,6 @@ function selectPerfMember(card) {
     var empName  = card.getAttribute('data-name');
     document.getElementById('perfEmployeeInput').value = empEmail;
 
-    /* Update selected display in panel 3 */
     var ini = perfInitials(empName);
     document.getElementById('perfSelectedDisplay').innerHTML =
         '<div class="perf-member-avatar" style="width:40px;height:40px;border-radius:50%;' +
@@ -3696,15 +3651,11 @@ function selectPerfMember(card) {
           '<div class="selected-email">' + empEmail + '</div>' +
         '</div>';
 
-    /* Unlock panel 3 */
     document.getElementById('panelRating').classList.remove('locked');
-
-    /* Re-check if rating already picked to enable submit */
     checkPerfSubmit();
     setPerfStep(3);
 }
 
-/* ---- Enable submit only when member + rating both chosen ---- */
 function checkPerfSubmit() {
     var emp   = document.getElementById('perfEmployeeInput').value;
     var rated = document.querySelector('input[name="rating"]:checked');
@@ -3713,14 +3664,13 @@ function checkPerfSubmit() {
     btn.style.opacity = (emp && rated) ? '1' : '0.6';
 }
 
-/* Attach rating change listener after DOM ready */
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('input[name="rating"]').forEach(function(r) {
         r.addEventListener('change', checkPerfSubmit);
     });
 });
 
-/* ================= MAIN ================= */
+/* ================= MAIN DOMContentLoaded ================= */
 document.addEventListener("DOMContentLoaded", function () {
 
     const params = new URLSearchParams(window.location.search);
@@ -3728,8 +3678,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const success = params.get("success");
     const error = params.get("error");
 
-    /* -------- Restore Tab -------- */
-    showSection(tab || "attendance");
+    var serverTab = "<%=activeTab%>";
+    showSection(serverTab || tab || "attendance");
+
+    /* Sync sidebar active state with shown section */
+    syncSidebarActive(serverTab || tab || "attendance");
 
     /* -------- SUCCESS MESSAGES -------- */
     if (success === "Login")
@@ -3764,9 +3717,10 @@ document.addEventListener("DOMContentLoaded", function () {
         showToast("Access denied. You do not have permission for that page.", "error");
 
     /* -------- Clean URL -------- */
-    if (tab || success || error) {
+    if (success || error) {
         setTimeout(() => {
-            window.history.replaceState({}, document.title, window.location.pathname);
+            const cleanUrl = window.location.pathname + (tab ? "?tab=" + tab : "");
+            window.history.replaceState({}, document.title, cleanUrl);
         }, 100);
     }
 
@@ -3804,6 +3758,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+/* Sync sidebar button highlight with the currently visible section */
+function syncSidebarActive(sectionId) {
+    document.querySelectorAll('.sidebar-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+    var map = {
+        'attendance':     0,
+        'teamSection':    1,
+        'assignTask':     2,
+        'schedulemeeting':3,
+        'leave':          4,
+        'performance':    5,
+        'calendarSection':6
+    };
+    var idx = map[sectionId];
+    if (idx !== undefined) {
+        var btns = document.querySelectorAll('.sidebar-nav .sidebar-btn');
+        if (btns[idx]) btns[idx].classList.add('active');
+    }
+}
+
 /* ================= TOAST FUNCTION ================= */
 function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
@@ -3825,9 +3800,11 @@ function showToast(message, type = "success") {
 /* ================= UI FUNCTIONS ================= */
 
 function showSection(id) {
-    document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
-    if (document.getElementById(id))
-        document.getElementById(id).style.display = 'block';
+    document.querySelectorAll(".content-area > .box").forEach(b => {
+        if (b.id !== "profileModal") b.style.display = "none";
+    });
+    var el = document.getElementById(id);
+    if (el) el.style.display = "block";
 }
 
 function setManagerLeaveTabs(active) {
@@ -3949,7 +3926,9 @@ function submitPassword() {
 }
 
 function openCalendar() {
-    document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
+    document.querySelectorAll(".content-area > .box").forEach(b => {
+        if (b.id !== "profileModal") b.style.display = "none";
+    });
     document.getElementById("calendarSection").style.display = "block";
     document.getElementById("calendarFrame").src =
         "<%=request.getContextPath()%>/calendar.jsp";

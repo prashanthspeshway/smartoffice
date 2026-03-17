@@ -266,21 +266,27 @@ body {
 	color: #4f46e5;
 }
 
+.settings-sub-btn.active {
+	background: #eef2ff;
+	color: #4f46e5;
+	font-weight: 600;
+}
+
 /* ===== Logout button ===== */
 .sidebar-logout-btn {
 	width: 100%;
 	padding: 10px 14px;
 	border-radius: 8px;
-	border: 1px solid #fecaca;
+	border: none;
 	cursor: pointer;
 	font-size: 13px;
 	font-weight: 600;
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	background: #fef2f2;
+/* 	background: #fef2f2; */
 	color: #dc2626;
-	transition: all 0.2s;
+/* 	transition: all 0.2s; */
 	text-align: left;
 	text-decoration: none;
 	margin-top: 4px;
@@ -294,7 +300,7 @@ body {
 .sidebar-logout-btn i {
 	width: 18px;
 	text-align: center;
-	flex-shrink: 0;
+/* 	flex-shrink: 0; */
 }
 
 /* ===== Card ===== */
@@ -1335,6 +1341,164 @@ body {
 	height: 48px;
 	resize: none;
 }
+
+/* ================= SETTINGS SECTION ================= */
+#settingsSection {
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: 24px;
+	height: 100%;
+	background: #ffffff;
+	border-radius: 12px;
+	border: 1px solid #e2e8f0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.settings-page-header {
+	margin-bottom: 24px;
+}
+
+.settings-page-header h2 {
+	font-size: 20px;
+	font-weight: 700;
+	color: #1e293b;
+	margin: 0 0 4px 0;
+}
+
+.settings-page-header p {
+	color: #64748b;
+	font-size: 14px;
+	margin: 0;
+	font-weight: 500;
+}
+
+/* Settings inner tab row */
+.settings-inner-tab-row {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 24px;
+	border-bottom: 2px solid #e2e8f0;
+	padding-bottom: 0;
+}
+
+.settings-inner-tab-btn {
+	padding: 10px 20px;
+	border: none;
+	background: transparent;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	color: #64748b;
+	border-bottom: 3px solid transparent;
+	margin-bottom: -2px;
+	transition: color 0.2s, border-color 0.2s;
+	border-radius: 0;
+}
+
+.settings-inner-tab-btn:hover { color: #4f46e5; }
+
+.settings-inner-tab-btn.active {
+	color: #4f46e5;
+	border-bottom-color: #4f46e5;
+}
+
+/* Profile info card */
+.profile-info-card {
+	background: #f8faff;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 28px;
+	max-width: 520px;
+}
+
+.profile-info-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 14px 0;
+	border-bottom: 1px solid #f1f5f9;
+	font-size: 14px;
+}
+
+.profile-info-row:last-child { border-bottom: none; }
+.profile-info-label { color: #64748b; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.profile-info-label i { color: #6366f1; width: 16px; text-align: center; }
+.profile-info-value { color: #1e293b; font-weight: 600; }
+
+/* Change password card */
+.change-password-card {
+	background: #f8faff;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 28px;
+	max-width: 420px;
+}
+
+.change-password-card h4 {
+	font-size: 15px;
+	font-weight: 700;
+	color: #1e293b;
+	margin: 0 0 20px 0;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.change-password-card h4 i { color: #6366f1; }
+
+.cp-field {
+	margin-bottom: 14px;
+}
+
+.cp-field label {
+	display: block;
+	font-size: 13px;
+	font-weight: 600;
+	color: #475569;
+	margin-bottom: 6px;
+}
+
+.cp-field input {
+	width: 100%;
+	padding: 11px 14px;
+	border-radius: 8px;
+	border: 1.5px solid #e2e8f0;
+	font-size: 14px;
+	box-sizing: border-box;
+	outline: none;
+	transition: border-color 0.2s, box-shadow 0.2s;
+	background: #fff;
+	color: #1e293b;
+}
+
+.cp-field input:focus {
+	border-color: #667eea;
+	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.cp-submit-btn {
+	width: 100%;
+	padding: 12px;
+	border-radius: 8px;
+	border: none;
+	font-weight: 700;
+	font-size: 14px;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: white;
+	cursor: pointer;
+	box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+	transition: all 0.2s;
+	margin-top: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+}
+
+.cp-submit-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
 </style>
 </head>
 
@@ -1433,22 +1597,10 @@ body {
 			<!-- Bottom: Settings (inline expand) + Logout -->
 			<div class="sidebar-bottom">
 
-				<!-- Settings toggle -->
-				<button class="settings-toggle-btn" id="settingsToggleBtn" onclick="toggleSettingsMenu()">
-					<i class="fa-solid fa-gear main-icon"></i>
-					<span>Settings</span>
-					<i class="fa-solid fa-chevron-down chevron"></i>
+				<!-- Settings single button -->
+				<button class="nav-btn" id="settingsNavBtn" onclick="setActiveSettings(this); openSettingsSection('profile');">
+					<i class="fa-solid fa-gear"></i> <span>Settings</span>
 				</button>
-
-				<!-- Inline sub-menu -->
-				<div class="settings-submenu" id="settingsSubmenu">
-					<button class="settings-sub-btn" onclick="openProfile()">
-						<i class="fa-solid fa-user"></i> My Profile
-					</button>
-					<button class="settings-sub-btn" onclick="openChangePassword()">
-						<i class="fa-solid fa-lock"></i> Change Password
-					</button>
-				</div>
 
 				<!-- Logout -->
 				<a href="<%=request.getContextPath()%>/logout" style="text-decoration: none;">
@@ -1936,6 +2088,64 @@ body {
 				</fieldset>
 			</div>
 
+			<!-- ===== Settings Section (full panel — replaces modals) ===== -->
+			<div id="settingsSection" style="display: none;">
+				<div class="settings-page-header">
+					<h2><i class="fa-solid fa-gear" style="margin-right: 8px;"></i>Settings</h2>
+					<p>Manage your profile and account preferences.</p>
+				</div>
+
+				<!-- Inner tabs -->
+				<div class="settings-inner-tab-row">
+					<button class="settings-inner-tab-btn active" id="settingsTabProfile" onclick="showSettingsTab('profile')">
+						<i class="fa-solid fa-user" style="margin-right: 6px;"></i>My Profile
+					</button>
+					<button class="settings-inner-tab-btn" id="settingsTabPassword" onclick="showSettingsTab('password')">
+						<i class="fa-solid fa-lock" style="margin-right: 6px;"></i>Change Password
+					</button>
+				</div>
+
+				<!-- Profile tab content -->
+				<div id="settingsContentProfile">
+					<div class="profile-info-card">
+						<div class="profile-info-row">
+							<span class="profile-info-label"><i class="fa-solid fa-id-card"></i> Full Name</span>
+							<span class="profile-info-value"><%=userObj != null && userObj.getFullname() != null && !userObj.getFullname().isEmpty() ? userObj.getFullname() : "--"%></span>
+						</div>
+						<div class="profile-info-row">
+							<span class="profile-info-label"><i class="fa-solid fa-envelope"></i> Email</span>
+							<span class="profile-info-value"><%=userObj != null ? userObj.getEmail() : "--"%></span>
+						</div>
+						<div class="profile-info-row">
+							<span class="profile-info-label"><i class="fa-solid fa-briefcase"></i> Role</span>
+							<span class="profile-info-value"><%=userObj != null ? userObj.getRole() : "--"%></span>
+						</div>
+						<div class="profile-info-row">
+							<span class="profile-info-label"><i class="fa-solid fa-phone"></i> Phone</span>
+							<span class="profile-info-value"><%=userObj != null ? userObj.getPhone() : "--"%></span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Change Password tab content -->
+				<div id="settingsContentPassword" style="display: none;">
+					<div class="change-password-card">
+						<h4><i class="fa-solid fa-lock"></i> Update Password</h4>
+						<div class="cp-field">
+							<label>New Password</label>
+							<input type="password" id="cpNewPassword" placeholder="Enter new password">
+						</div>
+						<div class="cp-field">
+							<label>Confirm Password</label>
+							<input type="password" id="cpConfirmPassword" placeholder="Confirm new password">
+						</div>
+						<button class="cp-submit-btn" onclick="submitPasswordFromSettings()">
+							<i class="fa-solid fa-floppy-disk"></i> Update Password
+						</button>
+					</div>
+				</div>
+			</div>
+
 			<!-- Notification Panel -->
 			<div id="notificationPanel" class="notification-panel">
 				<div class="notification-header">
@@ -1975,12 +2185,32 @@ body {
 	</div>
 
 	<script>
-	/* ================= SETTINGS INLINE TOGGLE ================= */
-	function toggleSettingsMenu() {
-	    var btn = document.getElementById("settingsToggleBtn");
-	    var menu = document.getElementById("settingsSubmenu");
-	    btn.classList.toggle("open");
-	    menu.classList.toggle("open");
+	/* ================= SETTINGS INLINE TOGGLE (no-op, kept for compatibility) ================= */
+	function toggleSettingsMenu() { openSettingsSection('profile'); }
+
+	/* ================= OPEN SETTINGS SECTION ================= */
+	function openSettingsSection(tab) {
+	    // Clear active from all nav buttons, highlight settings btn
+	    document.querySelectorAll(".nav-btn").forEach(function(b) { b.classList.remove("active"); });
+	    var settingsBtn = document.getElementById("settingsNavBtn");
+	    if (settingsBtn) settingsBtn.classList.add("active");
+
+	    // Show settings section
+	    hideAllSections();
+	    document.getElementById("settingsSection").style.display = "block";
+
+	    // Switch to the correct inner tab
+	    showSettingsTab(tab);
+
+	    setTab('settings_' + tab);
+	}
+
+	/* ================= SETTINGS INNER TAB SWITCH ================= */
+	function showSettingsTab(tab) {
+	    document.getElementById("settingsContentProfile").style.display  = tab === 'profile'  ? "block" : "none";
+	    document.getElementById("settingsContentPassword").style.display = tab === 'password' ? "block" : "none";
+	    document.getElementById("settingsTabProfile").classList.toggle("active",  tab === 'profile');
+	    document.getElementById("settingsTabPassword").classList.toggle("active", tab === 'password');
 	}
 
 	/* ================= THEME ================= */
@@ -2002,15 +2232,36 @@ body {
 	    document.getElementById("leaveSection").style.display = "none";
 	    document.getElementById("calendarSection").style.display = "none";
 	    document.getElementById("meetingSection").style.display = "none";
+	    document.getElementById("settingsSection").style.display = "none";
 	    var myTeam = document.getElementById("myTeamSection");
 	    if (myTeam) myTeam.style.display = "none";
 	}
 
-	function showAttendance() { hideAllSections(); document.getElementById("attendanceSection").style.display = "block"; }
-	function showTasks()      { hideAllSections(); document.getElementById("taskSection").style.display = "block"; }
-	function showMyTeam()     { hideAllSections(); var t = document.getElementById("myTeamSection"); if (t) t.style.display = "block"; }
-	function showMeetings()   { hideAllSections(); document.getElementById("meetingSection").style.display = "block"; }
-	function showLeave()      { hideAllSections(); document.getElementById("leaveSection").style.display = "block"; }
+	function showAttendance() {
+	    hideAllSections();
+	    document.getElementById("attendanceSection").style.display = "block";
+	}
+
+	function showTasks() {
+	    hideAllSections();
+	    document.getElementById("taskSection").style.display = "block";
+	}
+
+	function showMyTeam() {
+	    hideAllSections();
+	    var t = document.getElementById("myTeamSection");
+	    if (t) t.style.display = "block";
+	}
+
+	function showMeetings() {
+	    hideAllSections();
+	    document.getElementById("meetingSection").style.display = "block";
+	}
+
+	function showLeave() {
+	    hideAllSections();
+	    document.getElementById("leaveSection").style.display = "block";
+	}
 
 	function openCalendar() {
 	    hideAllSections();
@@ -2058,11 +2309,10 @@ body {
 	        .catch(err => console.error(err));
 	}
 
-	/* ================= MODALS ================= */
+	/* ================= MODALS (kept for backward compatibility) ================= */
 	function openChangePassword() {
-	    var modal = document.getElementById("passwordModal");
-	    modal.style.visibility = "visible";
-	    modal.style.opacity = "1";
+	    setActiveSettings(document.getElementById("settingsNavBtn"));
+	    openSettingsSection('password');
 	}
 
 	function closeChangePassword() {
@@ -2072,9 +2322,8 @@ body {
 	}
 
 	function openProfile() {
-	    var modal = document.getElementById("profileModal");
-	    modal.style.visibility = "visible";
-	    modal.style.opacity = "1";
+	    setActiveSettings(document.getElementById("settingsNavBtn"));
+	    openSettingsSection('profile');
 	}
 
 	function closeProfile() {
@@ -2111,7 +2360,36 @@ body {
 	    }, 2500);
 	}
 
-	/* ================= PASSWORD CHANGE ================= */
+	/* ================= PASSWORD CHANGE (from settings panel) ================= */
+	function submitPasswordFromSettings() {
+	    var newPassword = document.getElementById("cpNewPassword").value.trim();
+	    var confirmPassword = document.getElementById("cpConfirmPassword").value.trim();
+	    if (!newPassword || !confirmPassword) { showToast("Please fill all fields", "error"); return; }
+	    fetch("<%=request.getContextPath()%>/changePassword", {
+	        method: "POST",
+	        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	        body: new URLSearchParams({ newPassword: newPassword, confirmPassword: confirmPassword })
+	    })
+	    .then(function(res) { return res.text(); })
+	    .then(function(data) {
+	        if (data === "Success") {
+	            showToast("Password updated successfully", "success");
+	            document.getElementById("cpNewPassword").value = "";
+	            document.getElementById("cpConfirmPassword").value = "";
+	        } else if (data === "PasswordMismatch") {
+	            showToast("Passwords do not match", "error");
+	        } else if (data === "MissingFields") {
+	            showToast("All fields are required", "error");
+	        } else if (data === "Unauthorized") {
+	            showToast("Session expired. Please login again.", "error");
+	        } else {
+	            showToast("Something went wrong", "error");
+	        }
+	    })
+	    .catch(function() { showToast("Server error", "error"); });
+	}
+
+	/* ================= PASSWORD CHANGE (from modal — kept for compatibility) ================= */
 	function submitPassword() {
 	    var newPassword = document.getElementById("newPassword").value.trim();
 	    var confirmPassword = document.getElementById("confirmPassword").value.trim();
@@ -2193,6 +2471,13 @@ body {
 	/* ================= SET ACTIVE NAV ================= */
 	function setActive(btn) {
 	    document.querySelectorAll(".nav-btn").forEach(function(b) { b.classList.remove("active"); });
+	    document.querySelectorAll(".settings-sub-btn").forEach(function(b) { b.classList.remove("active"); });
+	    btn.classList.add("active");
+	}
+
+	function setActiveSettings(btn) {
+	    document.querySelectorAll(".nav-btn").forEach(function(b) { b.classList.remove("active"); });
+	    document.querySelectorAll(".settings-sub-btn").forEach(function(b) { b.classList.remove("active"); });
 	    btn.classList.add("active");
 	}
 
