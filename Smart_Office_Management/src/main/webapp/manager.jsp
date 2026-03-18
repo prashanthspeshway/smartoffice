@@ -3048,7 +3048,7 @@ body.dark-theme .perf-selected-emp, body.dark-theme .perf-selected-banner
 						%>
 					</div>
 
-					<!-- Break card -->
+					<!-- Break card -->	
 					<div class="break-card">
 						<div class="attendance-section-title">TOTAL BREAK TODAY</div>
 						<div class="break-total-row">

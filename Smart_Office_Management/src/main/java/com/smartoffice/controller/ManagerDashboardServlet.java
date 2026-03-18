@@ -2,7 +2,6 @@ package com.smartoffice.controller;
 
 import java.io.IOException;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -123,6 +122,13 @@ public class ManagerDashboardServlet extends HttpServlet {
 			NotificationReadsDAO nrDAO = new NotificationReadsDAO();
 			List<Notification> notifications = nrDAO.getUnreadNotifications(username);
 			request.setAttribute("notifications", notifications);
+			
+			MeetingDao dao = new MeetingDao();
+			String email = (String) session.getAttribute("username");
+
+			List<Meeting> allMeetings = dao.getAllMeetingsForManager(email);
+
+			request.setAttribute("allMeetings", allMeetings);
 
 		} catch (Exception e) {
 			throw new ServletException("Error loading manager dashboard", e);
