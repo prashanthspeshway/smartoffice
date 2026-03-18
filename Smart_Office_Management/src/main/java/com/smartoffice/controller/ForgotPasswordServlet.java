@@ -3,17 +3,17 @@ package com.smartoffice.controller;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.UUID;
- 
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
- 
+
 import com.smartoffice.dao.UserDao;
 import com.smartoffice.model.User;
 import com.smartoffice.utils.ConfigUtil;
- 
+
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -23,6 +23,7 @@ import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
  
+@SuppressWarnings("serial")
 @WebServlet("/ForgotPasswordServlet")
 public class ForgotPasswordServlet extends HttpServlet {
  
