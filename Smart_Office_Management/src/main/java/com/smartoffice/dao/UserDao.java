@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.smartoffice.model.TokenData;
 import com.smartoffice.model.User;
 import com.smartoffice.utils.DBConnectionUtil;
 
@@ -125,4 +126,80 @@ public class UserDao {
 		}
 		return user;
 	}
+	
+	public static void saveResetToken(String email, String token, long expiryTime) {
+		 
+	    String sql = "INSERT INTO password_reset (email, token, expiry_time) VALUES (?, ?, ?)";
+ 
+	    try (Connection con = DBConnectionUtil.getConnection();
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+ 
+	        ps.setString(1, email);
+	        ps.setString(2, token);
+	        ps.setLong(3, expiryTime);
+ 
+	        ps.executeUpdate();
+ 
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+	//getting token for forget Password
+	public static TokenData getResetToken(String token) {
+ 
+	    String sql = "SELECT email, expiry_time FROM password_reset WHERE token=?";
+ 
+	    try (Connection con = DBConnectionUtil.getConnection();
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+ 
+	        ps.setString(1, token);
+	        ResultSet rs = ps.executeQuery();
+ 
+	        if (rs.next()) {
+	            return new TokenData(
+	                rs.getString("email"),
+	                rs.getLong("expiry_time")
+	            );
+	        }
+ 
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+ 
+	    return null;
+	}
+	
+	//updating password
+	public static void updatePassword(String email, String newPassword) {
+ 
+	    String sql = "UPDATE users SET password=? WHERE email=?";
+ 
+	    try (Connection con = DBConnectionUtil.getConnection();
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+ 
+	        ps.setString(1, newPassword);
+	        ps.setString(2, email);
+ 
+	        ps.executeUpdate();
+ 
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+	//Deleting token
+	public static void deleteResetToken(String token) {
+ 
+	    String sql = "DELETE FROM password_reset WHERE token=?";
+ 
+	    try (Connection con = DBConnectionUtil.getConnection();
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+ 
+	        ps.setString(1, token);
+	        ps.executeUpdate();
+ 
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+ 
 }

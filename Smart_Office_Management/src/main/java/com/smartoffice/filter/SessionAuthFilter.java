@@ -29,22 +29,35 @@ import com.smartoffice.utils.DBConnectionUtil;
 @WebFilter(urlPatterns = "/*")
 public class SessionAuthFilter implements Filter {
 
-    private static final List<String> PUBLIC_PATHS = Arrays.asList(
-        "/", "/index.html", "/Login", "/login", "/logout", "/initAdmin"
-    );
-
-    private static boolean isPublicPath(String path) {
-        if (path == null) return true;
-        String p = path.toLowerCase();
-        for (String pub : PUBLIC_PATHS) {
-            if (p.equals(pub.toLowerCase()) || p.equals(pub.toLowerCase() + "/")) return true;
-        }
-        if (p.endsWith("index.html")) return true;
-        return p.endsWith(".css") || p.endsWith(".js") || p.endsWith(".png")
-            || p.endsWith(".jpg") || p.endsWith(".jpeg") || p.endsWith(".gif")
-            || p.endsWith(".ico") || p.endsWith(".svg") || p.endsWith(".woff")
-            || p.endsWith(".woff2") || p.endsWith(".ttf");
-    }
+	private static final List<String> PUBLIC_PATHS = Arrays.asList(
+		    "/",
+		    "/index.html",
+		    "/forgotpassword.jsp",
+		    "/resetPassword.jsp",
+		    "/ForgotPasswordServlet",
+		    "/ResetPasswordServlet",
+		    "/Login",
+		    "/login",
+		    "/logout",
+		    "/initAdmin"
+		);
+	private static boolean isPublicPath(String path) {
+	    if (path == null) return true;
+ 
+	    String p = path.toLowerCase();
+ 
+	    for (String pub : PUBLIC_PATHS) {
+	        if (p.contains(pub.toLowerCase())) {
+	            return true;
+	        }
+	    }
+ 
+	    return p.endsWith(".css") || p.endsWith(".js") || p.endsWith(".png")
+	        || p.endsWith(".jpg") || p.endsWith(".jpeg") || p.endsWith(".gif")
+	        || p.endsWith(".ico") || p.endsWith(".svg") || p.endsWith(".woff")
+	        || p.endsWith(".woff2") || p.endsWith(".ttf");
+	}
+ 
 
     private static boolean isAdminPath(String path) {
         if (path == null) return false;

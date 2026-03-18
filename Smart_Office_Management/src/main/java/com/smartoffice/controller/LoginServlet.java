@@ -26,7 +26,7 @@ public class LoginServlet extends HttpServlet {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    private boolean isStrongPassword(String password) {
+    static boolean isStrongPassword(String password) {
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$";
         return password != null && password.matches(regex);
     }
