@@ -257,11 +257,11 @@ body {
 			<div class="flex flex-wrap items-center gap-2">
 				<a href="exportUsers" target="_blank"
 					class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium transition-colors">
-					<i class="fa-solid fa-download"></i> Export
+					<i class="fa-solid fa-upload"></i> Export
 				</a>
 				<button type="button" onclick="openImportModal()"
 					class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium transition-colors">
-					<i class="fa-solid fa-upload"></i> Import
+					<i class="fa-solid fa-download"></i> Import
 				</button>
 				<button type="button" onclick="loadAddEmployee()"
 					class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-medium transition-colors">
