@@ -12,6 +12,7 @@ public class Team {
 	private String managerFullname;
 	private String createdBy;
 	private Timestamp createdAt;
+	private String description;
 	private List<User> members = new ArrayList<>();
 
 	public int getId() {
@@ -60,6 +61,13 @@ public class Team {
 
 	public void setCreatedAt(Timestamp createdAt) {
 		this.createdAt = createdAt;
+	}
+
+	public String getDescription() {
+	    return description;
+	}
+	public void setDescription(String description) {
+	    this.description = description;
 	}
 
 	public List<User> getMembers() {

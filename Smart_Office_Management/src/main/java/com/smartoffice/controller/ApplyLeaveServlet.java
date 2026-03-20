@@ -2,7 +2,6 @@ package com.smartoffice.controller;
 
 import java.io.IOException;
 import java.sql.Date;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -15,36 +14,43 @@ import com.smartoffice.dao.LeaveRequestDAO;
 @SuppressWarnings("serial")
 @WebServlet("/applyLeave")
 public class ApplyLeaveServlet extends HttpServlet {
-
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		
 		HttpSession session = request.getSession(false);
 		if (session == null || session.getAttribute("username") == null) {
 			response.sendRedirect(request.getContextPath() + "/index.html");
 			return;
 		}
-
+		
 		String sessionValue = (String) session.getAttribute("username");
-
 		String leaveType = request.getParameter("leaveType");
 		String fromDate = request.getParameter("fromDate");
 		String toDate = request.getParameter("toDate");
 		String reason = request.getParameter("reason");
-
 		String role = (String) session.getAttribute("role");
+		
 		try {
 			LeaveRequestDAO dao = new LeaveRequestDAO();
 			dao.applyLeave(sessionValue, leaveType, Date.valueOf(fromDate), Date.valueOf(toDate), reason);
+			
+			// ✅ CHANGED: Redirect to modular dashboard pages
 			if ("manager".equalsIgnoreCase(role)) {
-				response.sendRedirect(request.getContextPath() + "/manager?tab=leave&success=LeaveApplied");
+				response.sendRedirect(request.getContextPath() + "/managerLeave?success=LeaveApplied");
 			} else {
 				response.sendRedirect(request.getContextPath() + "/user?tab=leave&success=LeaveApplied");
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
-			String redirect = "manager".equalsIgnoreCase(role) ? "/manager?tab=leave" : "/user?tab=leave";
-			response.sendRedirect(request.getContextPath() + redirect + "&error=LeaveFailed");
+			
+			// ✅ CHANGED: Error redirects to modular dashboard pages
+			if ("manager".equalsIgnoreCase(role)) {
+				response.sendRedirect(request.getContextPath() + "/managerLeave?error=LeaveFailed");
+			} else {
+				response.sendRedirect(request.getContextPath() + "/user?tab=leave&error=LeaveFailed");
+			}
 		}
 	}
 }

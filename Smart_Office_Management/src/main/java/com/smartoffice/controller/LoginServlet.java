@@ -106,6 +106,7 @@ public class LoginServlet extends HttpServlet {
                     }
                 }
 
+                // ✅ FIXED: Updated routing to new dashboard files
                 switch (role.toLowerCase()) {
                     case "user":
                     case "employee":
@@ -113,9 +114,11 @@ public class LoginServlet extends HttpServlet {
                         res.sendRedirect("user?success=Login");
                         break;
                     case "manager":
-                        res.sendRedirect("manager?success=Login");
+                        // ✅ CHANGED: Now redirects to managerDashboard.jsp instead of manager servlet
+                        res.sendRedirect("managerDashboard.jsp?success=Login");
                         break;
                     case "admin":
+                        // ✅ CHANGED: Now redirects to adminDashboard.jsp instead of admin.jsp
                         res.sendRedirect("admin.jsp?success=Login");
                         break;
                     default:
