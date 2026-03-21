@@ -1,137 +1,156 @@
 package com.smartoffice.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import com.smartoffice.dao.TeamDAO;
-import com.smartoffice.model.User;
-import com.smartoffice.utils.DBConnectionUtil;
+import com.smartoffice.dao.MeetingDao;
+import com.smartoffice.service.NotificationService;
 
+/**
+ * Handles /schedulemeeting — the URL that managerMeetings.jsp form posts to.
+ * Saves the meeting and fires notifications to all participants + admins.
+ */
 @SuppressWarnings("serial")
 @WebServlet("/schedulemeeting")
 public class ScheduleMeetingServlet extends HttpServlet {
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		
-		HttpSession session = request.getSession(false);
-		if (session == null || session.getAttribute("username") == null) {
-			response.sendRedirect(request.getContextPath() + "/index.html");
-			return;
-		}
-		
-		String title = request.getParameter("title");
-		String description = request.getParameter("description");
-		String startTimeStr = request.getParameter("startTime");
-		String endTimeStr = request.getParameter("endTime");
-		String meetingLink = request.getParameter("meetingLink");
-		String[] users = request.getParameterValues("participants");
-		String[] teams = request.getParameterValues("teamParticipants");
-		String email = (String) session.getAttribute("email");
-		String role = (String) session.getAttribute("role");
-		
-		Set<String> finalParticipants = new HashSet<>();
-		
-		try {
-			// Validation
-			if (title == null || title.trim().isEmpty() || 
-			    description == null || description.trim().isEmpty() ||
-			    startTimeStr == null || endTimeStr == null) {
-				
-				String redirectUrl = "manager".equalsIgnoreCase(role) 
-					? "/managerMeetings?error=InvalidInput" 
-					: "/user?tab=meetings&error=InvalidInput";
-				response.sendRedirect(request.getContextPath() + redirectUrl);
-				return;
-			}
-			
-			/* ADD INDIVIDUAL USERS */
-			if (users != null) {
-				for (String u : users) {
-					finalParticipants.add(u);
-				}
-			}
-			
-			/* ADD TEAM MEMBERS */
-			if (teams != null) {
-				for (String teamId : teams) {
-					List<User> members = TeamDAO.getTeamById(Integer.parseInt(teamId)).getMembers();
-					for (User member : members) {
-						finalParticipants.add(member.getEmail());
-					}
-				}
-			}
-			
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-			LocalDateTime start = LocalDateTime.parse(startTimeStr, formatter);
-			LocalDateTime end = LocalDateTime.parse(endTimeStr, formatter);
-			
-			// Validate end time is after start time
-			if (end.isBefore(start) || end.isEqual(start)) {
-				String redirectUrl = "manager".equalsIgnoreCase(role) 
-					? "/managerMeetings?error=InvalidTime" 
-					: "/user?tab=meetings&error=InvalidTime";
-				response.sendRedirect(request.getContextPath() + redirectUrl);
-				return;
-			}
-			
-			String sql = "INSERT INTO meetings(title, description, start_time, end_time, meeting_link, created_by) VALUES (?, ?, ?, ?, ?, ?)";
-			try (Connection con = DBConnectionUtil.getConnection();
-					PreparedStatement ps = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
-				
-				ps.setString(1, title);
-				ps.setString(2, description);
-				ps.setTimestamp(3, Timestamp.valueOf(start));
-				ps.setTimestamp(4, Timestamp.valueOf(end));
-				
-				if (meetingLink == null || meetingLink.trim().isEmpty()) {
-					ps.setNull(5, java.sql.Types.VARCHAR);
-				} else {
-					ps.setString(5, meetingLink.trim());
-				}
-				ps.setString(6, email);
-				
-				ps.executeUpdate();
-				ResultSet rs = ps.getGeneratedKeys();
-				
-				if (rs.next()) {
-					int meetingId = rs.getInt(1);
-					
-					/* INSERT PARTICIPANTS */
-					String insert = "INSERT INTO meeting_participants(meeting_id,user_email) VALUES (?,?)";
-					PreparedStatement ps2 = con.prepareStatement(insert);
-					for (String participant : finalParticipants) {
-					    ps2.setInt(1, meetingId);
-					    ps2.setString(2, participant);
-					    ps2.addBatch();
-					}
-					ps2.executeBatch();
-				}
-			}
-			
-			// ✅ CHANGED: Redirect to modular dashboard pages
-			if ("manager".equalsIgnoreCase(role)) {
-				response.sendRedirect(request.getContextPath() + "/managerMeetings?success=MeetingScheduled");
-			} else {
-				response.sendRedirect(request.getContextPath() + "/user?tab=meetings&success=MeetingScheduled");
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			String redirectUrl = "manager".equalsIgnoreCase(role) 
-				? "/managerMeetings?error=ServerError" 
-				: "/user?tab=meetings&error=ServerError";
-			response.sendRedirect(request.getContextPath() + redirectUrl);
-		}
-	}
+
+    private static final SimpleDateFormat DISPLAY_FMT =
+            new SimpleDateFormat("MMM dd, yyyy hh:mm a");
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("username") == null) {
+            response.sendRedirect(request.getContextPath() + "/index.html");
+            return;
+        }
+
+        String managerEmail = (String) session.getAttribute("username");
+        String managerName  = getDisplayName(session);
+        String role         = (String) session.getAttribute("role");
+
+        try {
+            String title       = request.getParameter("title");
+            String description = request.getParameter("description");
+            String startStr    = request.getParameter("startTime");
+            String endStr      = request.getParameter("endTime");
+            String meetingLink = request.getParameter("meetingLink");
+
+            // Validate
+            if (title == null || title.isEmpty() ||
+                startStr == null || startStr.isEmpty() ||
+                endStr == null || endStr.isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/managerMeetings?error=InvalidInput");
+                return;
+            }
+
+            Timestamp startTime = Timestamp.valueOf(startStr.replace("T", " ") + ":00");
+            Timestamp endTime   = Timestamp.valueOf(endStr.replace("T", " ") + ":00");
+
+            if (endTime.before(startTime)) {
+                response.sendRedirect(request.getContextPath() + "/managerMeetings?error=InvalidTime");
+                return;
+            }
+
+            // Build meeting object
+            com.smartoffice.model.Meeting meeting = new com.smartoffice.model.Meeting();
+            meeting.setTitle(title);
+            meeting.setDescription(description);
+            meeting.setStartTime(startTime);
+            meeting.setEndTime(endTime);
+            meeting.setMeetingLink(meetingLink);
+            meeting.setCreatedBy(managerEmail);
+
+            MeetingDao meetingDao = new MeetingDao();
+            int meetingId = meetingDao.createMeeting(meeting);
+
+            // Collect participants — supports both "participants" checkboxes
+            // and the participantType radio pattern
+            List<String> participantEmails = new ArrayList<>();
+            String participantType = request.getParameter("participantType");
+
+            if (participantType != null && !participantType.isEmpty()) {
+                switch (participantType) {
+                    case "specific":
+                        String[] sel = request.getParameterValues("participants");
+                        if (sel != null) participantEmails.addAll(Arrays.asList(sel));
+                        break;
+                    case "team":
+                        String teamIdStr = request.getParameter("teamId");
+                        if (teamIdStr != null && !teamIdStr.isEmpty())
+                            participantEmails.addAll(
+                                    meetingDao.getTeamMemberEmails(Integer.parseInt(teamIdStr)));
+                        break;
+                    case "allEmployees":
+                        participantEmails.addAll(meetingDao.getAllEmployeeEmails()); break;
+                    case "everyone":
+                        participantEmails.addAll(meetingDao.getAllManagerEmails());
+                        participantEmails.addAll(meetingDao.getAllEmployeeEmails()); break;
+                }
+            } else {
+                // managerMeetings.jsp uses plain "participants" checkboxes
+                String[] sel = request.getParameterValues("participants");
+                if (sel != null) participantEmails.addAll(Arrays.asList(sel));
+            }
+
+            // Deduplicate
+            List<String> unique = new ArrayList<>();
+            for (String e : participantEmails)
+                if (!unique.contains(e)) unique.add(e);
+
+            if (!unique.isEmpty()) meetingDao.addParticipants(meetingId, unique);
+
+            // ── NOTIFICATIONS ───────────────────────────────────────
+            String startFmt = formatDateTime(startStr);
+            String roleLabel = "Manager".equalsIgnoreCase(role) ? "Manager" : "User";
+
+            // Notify all participants
+            if (!unique.isEmpty()) {
+                String participantMsg = "📅 Meeting scheduled by " + roleLabel + " " + managerName +
+                                       ": \"" + title + "\" on " + startFmt;
+                NotificationService.notifyMany(
+                        unique, managerEmail,
+                        NotificationService.TYPE_MEETING, participantMsg);
+            }
+
+            // Notify all admins about the new meeting
+            NotificationService.notifyAllAdmins(
+                    managerEmail,
+                    NotificationService.TYPE_MEETING,
+                    "📅 " + roleLabel + " " + managerName +
+                    " scheduled meeting: \"" + title + "\" on " + startFmt);
+            // ────────────────────────────────────────────────────────
+
+            response.sendRedirect(request.getContextPath() + "/managerMeetings?success=MeetingScheduled");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/managerMeetings?error=ServerError");
+        }
+    }
+
+    private String getDisplayName(HttpSession session) {
+        String fn = (String) session.getAttribute("fullName");
+        return (fn != null && !fn.isEmpty()) ? fn : (String) session.getAttribute("username");
+    }
+
+    private String formatDateTime(String dt) {
+        try {
+            return DISPLAY_FMT.format(
+                    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(dt));
+        } catch (Exception e) { return dt != null ? dt : ""; }
+    }
 }

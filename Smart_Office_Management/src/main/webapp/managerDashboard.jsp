@@ -33,7 +33,7 @@ body {
 		<h1 class="text-xl font-semibold text-slate-800">Smart Office •
 			Manager Dashboard</h1>
 		<div class="flex items-center gap-4">
-			<button onclick="loadPage(this,'sendNotification.jsp')"
+			<button onclick="loadPage(this,'sharedNotifications.jsp')"
 				class="w-10 h-10 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white flex items-center justify-center transition-colors">
 				<i class="fa-solid fa-bell"></i>
 			</button>

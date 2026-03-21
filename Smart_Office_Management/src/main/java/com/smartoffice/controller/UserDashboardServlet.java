@@ -29,118 +29,162 @@ import com.smartoffice.model.User;
 import com.smartoffice.utils.DBConnectionUtil;
 
 @SuppressWarnings("serial")
-@WebServlet("/user")
+@WebServlet({
+    "/user",
+    "/userAttendance",
+    "/userTasks",
+    "/userTeam",
+    "/userLeave",
+    "/userMeetings",
+    "/userSettings",
+    "/userNotifications"
+})
 public class UserDashboardServlet extends HttpServlet {
 
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		HttpSession session = request.getSession(false);
-		if (session == null || session.getAttribute("username") == null) {
-			response.sendRedirect("index.html");
-			return;
-		}
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		String username = (String) session.getAttribute("username");
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("username") == null) {
+            response.sendRedirect("index.html");
+            return;
+        }
 
-		try {
-             //USER PROFILe
-			User user = UserDao.getUserByEmail(username);
+        String username = (String) session.getAttribute("username");
+        String path = request.getServletPath(); // e.g. "/userAttendance"
+
+        try {
+            // ===== USER PROFILE (always load for settings & display) =====
+            User user = UserDao.getUserByEmail(username);
             request.setAttribute("user", user);
             String fn = user != null ? user.getFullname() : null;
-            if (fn != null && !fn.isEmpty()) request.getSession().setAttribute("fullName", fn);
-			/* ================= ATTENDANCE ================= */
-			AttendanceDAO attendanceDAO = new AttendanceDAO();
-			ResultSet rs = attendanceDAO.getTodayAttendance(username);
+            if (fn != null && !fn.isEmpty()) session.setAttribute("fullName", fn);
 
-			if (rs != null && rs.next()) {
-				request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
-				request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
-			}
+            // ===== Shell dashboard — load all & forward to user.jsp =====
+            if ("/user".equals(path)) {
+                loadAll(request, username);
+                request.getRequestDispatcher("user.jsp").forward(request, response);
+                return;
+            }
 
-			/* ================= BREAK TIME ================= */
-			request.setAttribute("breakTotalSeconds", BreakDAO.getTodayTotalSeconds(username));
-			request.setAttribute("breakLogs", BreakDAO.getTodayBreaks(username));
-			request.setAttribute("onBreak", BreakDAO.isCurrentlyOnBreak(username));
+            // ===== Individual section servlets (called from iframe) =====
+            switch (path) {
+                case "/userAttendance":
+                    loadAttendance(request, username);
+                    request.getRequestDispatcher("userAttendance.jsp").forward(request, response);
+                    break;
 
-			/* ================= RECENT ACTIVITY LOG ================= */
-			List<AttendanceLogEntry> activityLog = attendanceDAO.getRecentAttendance(username, 30);
-			for (AttendanceLogEntry e : activityLog) {
-				e.setBreakSeconds(BreakDAO.getTotalSecondsForDate(username, e.getAttendanceDate()));
-			}
-			request.setAttribute("attendanceLog", activityLog);
+                case "/userTasks":
+                    TaskDAO.deleteOldCompletedTasks();
+                    request.setAttribute("tasks", TaskDAO.getTasksForEmployee(username));
+                    request.getRequestDispatcher("userTasks.jsp").forward(request, response);
+                    break;
 
-			/* ================= TASKS ================= */
-			TaskDAO.deleteOldCompletedTasks();
-			request.setAttribute("tasks", TaskDAO.getTasksForEmployee(username));
+                case "/userTeam":
+                    request.setAttribute("myTeams", TeamDAO.getTeamsForMember(username));
+                    request.getRequestDispatcher("userTeam.jsp").forward(request, response);
+                    break;
 
-			/* ================= LEAVES ================= */
-			LeaveRequestDAO leaveDAO = new LeaveRequestDAO();
-			List<LeaveRequest> myLeaves = leaveDAO.getLeavesByUsername(username);
-			request.setAttribute("myLeaves", myLeaves);
+                case "/userLeave":
+                    request.setAttribute("myLeaves", new LeaveRequestDAO().getLeavesByUsername(username));
+                    request.getRequestDispatcher("userLeave.jsp").forward(request, response);
+                    break;
 
-			/* ================= MEETINGS ================= */
-			List<Meeting> meetings = new ArrayList<>();
+                case "/userMeetings":
+                    request.setAttribute("meetings", loadMeetings(username));
+                    request.getRequestDispatcher("userMeetings.jsp").forward(request, response);
+                    break;
 
-			// Updated query to fetch meetings where user is a participant
-			// Joins with meeting_participants and users tables to get creator info
-			String meetingSql = "SELECT DISTINCT m.id, m.title, m.description, m.start_time, m.end_time,\r\n"
-					+ "       m.meeting_link, m.created_by, m.created_at,\r\n"
-					+ "       CONCAT(u.firstname, ' ', u.lastname) AS creator_name,\r\n"
-					+ "       u.role AS creator_role\r\n"
-					+ "FROM meetings m\r\n"
-					+ "LEFT JOIN meeting_participants mp ON m.id = mp.meeting_id\r\n"
-					+ "LEFT JOIN users u ON m.created_by = u.email\r\n"
-					+ "LEFT JOIN users emp ON emp.email = ?\r\n"
-					+ "WHERE \r\n"
-					+ "(\r\n"
-					+ "    mp.user_email = ? \r\n"
-					+ "    OR m.created_by = emp.manager_email\r\n"
-					+ ")\r\n"
-					+ "AND m.end_time >= NOW()\r\n"
-					+ "ORDER BY m.start_time ASC;";
+                case "/userSettings":
+                    // user already loaded above
+                    request.getRequestDispatcher("userSettings.jsp").forward(request, response);
+                    break;
 
-			try (Connection con = DBConnectionUtil.getConnection();
-			        PreparedStatement ps = con.prepareStatement(meetingSql)) {
+                case "/userNotifications":
+                    request.setAttribute("notifications", new NotificationReadsDAO().getUnreadNotifications(username));
+                    request.getRequestDispatcher("userNotifications.jsp").forward(request, response);
+                    break;
 
-				ps.setString(1, username); // for emp.email
-				ps.setString(2, username); // for participant
-			    ResultSet rsMeetings = ps.executeQuery();
+                default:
+                    response.sendRedirect("user");
+            }
 
-			    while (rsMeetings.next()) {
-			        Meeting m = new Meeting();
-			        m.setId(rsMeetings.getInt("id"));
-			        m.setTitle(rsMeetings.getString("title"));
-			        m.setDescription(rsMeetings.getString("description"));
-			        m.setStartTime(rsMeetings.getTimestamp("start_time"));
-			        m.setEndTime(rsMeetings.getTimestamp("end_time"));
-			        m.setMeetingLink(rsMeetings.getString("meeting_link"));
-			        m.setCreatedBy(rsMeetings.getString("created_by"));
-			        m.setCreatedAt(rsMeetings.getTimestamp("created_at"));
-			        
-			        // Set creator information
-			        m.setCreatorName(rsMeetings.getString("creator_name"));
-			        m.setCreatorRole(rsMeetings.getString("creator_role"));
-			        
-			        meetings.add(m);
-			    }
-			}
+        } catch (Exception e) {
+            throw new ServletException("Error loading user dashboard", e);
+        }
+    }
 
-			request.setAttribute("meetings", meetings);
+    // ---------------------------------------------------------------
+    // Load everything (for the old /user shell if needed)
+    // ---------------------------------------------------------------
+    private void loadAll(HttpServletRequest request, String username) throws Exception {
+        loadAttendance(request, username);
+        TaskDAO.deleteOldCompletedTasks();
+        request.setAttribute("tasks", TaskDAO.getTasksForEmployee(username));
+        request.setAttribute("myLeaves", new LeaveRequestDAO().getLeavesByUsername(username));
+        request.setAttribute("meetings", loadMeetings(username));
+        request.setAttribute("myTeams", TeamDAO.getTeamsForMember(username));
+        request.setAttribute("notifications", new NotificationReadsDAO().getUnreadNotifications(username));
+    }
 
-			/* ================= MY TEAMS (as member) ================= */
-			request.setAttribute("myTeams", TeamDAO.getTeamsForMember(username));
+    // ---------------------------------------------------------------
+    // Attendance helpers
+    // ---------------------------------------------------------------
+    private void loadAttendance(HttpServletRequest request, String username) throws Exception {
+        AttendanceDAO attendanceDAO = new AttendanceDAO();
+        ResultSet rs = attendanceDAO.getTodayAttendance(username);
+        if (rs != null && rs.next()) {
+            request.setAttribute("punchIn",  rs.getTimestamp("punch_in"));
+            request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
+        }
+        request.setAttribute("breakTotalSeconds", BreakDAO.getTodayTotalSeconds(username));
+        request.setAttribute("breakLogs",         BreakDAO.getTodayBreaks(username));
+        request.setAttribute("onBreak",           BreakDAO.isCurrentlyOnBreak(username));
 
-			/* ================= NOTIFICATIONS ================= */
-			NotificationReadsDAO nrDAO = new NotificationReadsDAO();
-			List<Notification> notifications = nrDAO.getUnreadNotifications(username);
-			request.setAttribute("notifications", notifications);
+        List<AttendanceLogEntry> log = attendanceDAO.getRecentAttendance(username, 30);
+        for (AttendanceLogEntry e : log) {
+            e.setBreakSeconds(BreakDAO.getTotalSecondsForDate(username, e.getAttendanceDate()));
+        }
+        request.setAttribute("attendanceLog", log);
+    }
 
-			/* ================= FORWARD ================= */
-			request.getRequestDispatcher("user.jsp").forward(request, response);
+    // ---------------------------------------------------------------
+    // Meetings helper
+    // ---------------------------------------------------------------
+    private List<Meeting> loadMeetings(String username) throws Exception {
+        List<Meeting> meetings = new ArrayList<>();
+        String sql = "SELECT DISTINCT m.id, m.title, m.description, m.start_time, m.end_time, " +
+                     "m.meeting_link, m.created_by, m.created_at, " +
+                     "CONCAT(u.firstname, ' ', u.lastname) AS creator_name, u.role AS creator_role " +
+                     "FROM meetings m " +
+                     "LEFT JOIN meeting_participants mp ON m.id = mp.meeting_id " +
+                     "LEFT JOIN users u ON m.created_by = u.email " +
+                     "LEFT JOIN users emp ON emp.email = ? " +
+                     "WHERE (mp.user_email = ? OR m.created_by = emp.manager_email) " +
+                     "AND m.end_time >= NOW() " +
+                     "ORDER BY m.start_time ASC";
 
-		} catch (Exception e) {
-			throw new ServletException("Error loading user dashboard", e);
-		}
-	}
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setString(2, username);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Meeting m = new Meeting();
+                m.setId(rs.getInt("id"));
+                m.setTitle(rs.getString("title"));
+                m.setDescription(rs.getString("description"));
+                m.setStartTime(rs.getTimestamp("start_time"));
+                m.setEndTime(rs.getTimestamp("end_time"));
+                m.setMeetingLink(rs.getString("meeting_link"));
+                m.setCreatedBy(rs.getString("created_by"));
+                m.setCreatedAt(rs.getTimestamp("created_at"));
+                m.setCreatorName(rs.getString("creator_name"));
+                m.setCreatorRole(rs.getString("creator_role"));
+                meetings.add(m);
+            }
+        }
+        return meetings;
+    }
 }

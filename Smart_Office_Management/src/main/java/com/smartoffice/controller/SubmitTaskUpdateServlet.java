@@ -1,71 +1,135 @@
 package com.smartoffice.controller;
 
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
+import java.io.IOException;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
-import com.smartoffice.utils.DBConnectionUtil;
+import com.smartoffice.dao.TaskDAO;
+import com.smartoffice.model.Task;
+import com.smartoffice.service.NotificationService;
 
 @SuppressWarnings("serial")
 @WebServlet("/submitTaskUpdate")
-@MultipartConfig
+@MultipartConfig(maxFileSize = 10 * 1024 * 1024)
 public class SubmitTaskUpdateServlet extends HttpServlet {
 
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		try {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("username") == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 
-			int taskId = Integer.parseInt(req.getParameter("taskId"));
-			String status = req.getParameter("status");
-			String comment = req.getParameter("comment");
+        // "username" attribute holds the email
+        String employeeEmail = (String) session.getAttribute("username");
+        String employeeName  = getDisplayName(session);
 
-			Part filePart = req.getPart("employeeFile");
+        try {
+            int    taskId    = Integer.parseInt(request.getParameter("taskId"));
+            String newStatus = request.getParameter("status");
+            String comment   = request.getParameter("comment");
 
-			String fileName = null;
-			InputStream fileData = null;
+            if (newStatus == null || newStatus.isEmpty()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Status is required");
+                return;
+            }
 
-			if (filePart != null && filePart.getSize() > 0) {
-				fileName = filePart.getSubmittedFileName();
-				fileData = filePart.getInputStream();
-			}
+            // Get task BEFORE updating — needed to find who assigned it
+            Task task = TaskDAO.getTaskById(taskId);
 
-			String sql = """
-					 UPDATE tasks
-					 SET status=?,
-					     employee_attachment=?,
-					     employee_attachment_name=?,
-					     employee_comment=?,
-					     submitted_at=NOW()
-					 WHERE id=?
-					""";
+            // Handle optional file
+            Part filePart = null;
+            try { filePart = request.getPart("employeeFile"); } catch (Exception ignore) {}
 
-			try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            boolean hasFile = filePart != null
+                    && filePart.getSize() > 0
+                    && filePart.getSubmittedFileName() != null
+                    && !filePart.getSubmittedFileName().isEmpty();
 
-				ps.setString(1, status);
+            if (hasFile) {
+                // Update with file
+                TaskDAO.submitEmployeeWork(
+                        taskId,
+                        filePart.getSubmittedFileName(),
+                        filePart.getInputStream().readAllBytes(),
+                        comment);
+                // Also update status to the employee's chosen value
+                TaskDAO.updateStatus(taskId, newStatus);
+            } else {
+                // Status + comment only
+                TaskDAO.updateTaskStatus(taskId, newStatus, comment, null);
+            }
 
-				if (fileData != null) {
-					ps.setBlob(2, fileData);
-					ps.setString(3, fileName);
-				} else {
-					ps.setNull(2, java.sql.Types.BLOB);
-					ps.setNull(3, java.sql.Types.VARCHAR);
-				}
+            // ── NOTIFICATIONS ─────────────────────────────────────────
+            if (task != null) {
+                String assignedBy = task.getAssignedBy(); // who assigned the task
+                String taskTitle  = task.getTitle() != null
+                        ? task.getTitle() : task.getDescription();
 
-				ps.setString(4, comment);
-				ps.setInt(5, taskId);
+                String msg = getStatusEmoji(newStatus) + " " + employeeName +
+                             " updated task \"" + taskTitle +
+                             "\" → " + formatStatus(newStatus) +
+                             (comment != null && !comment.isEmpty()
+                                     ? ". Comment: " + comment : "");
 
-				ps.executeUpdate();
-			}
+                // Notify whoever assigned the task (manager or admin)
+                if (assignedBy != null && !assignedBy.isEmpty()) {
+                    NotificationService.notify(
+                            assignedBy, employeeEmail,
+                            NotificationService.TYPE_TASK, msg);
+                }
 
-			resp.sendRedirect("user?tab=tasks");
+                // Always also notify all admins
+                NotificationService.notifyAllAdmins(
+                        employeeEmail, NotificationService.TYPE_TASK, msg);
+            }
+            // ─────────────────────────────────────────────────────────
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+            response.setStatus(HttpServletResponse.SC_OK);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Task update failed: " + e.getMessage());
+        }
+    }
+
+    private String getStatusEmoji(String status) {
+        if (status == null) return "📋";
+        switch (status.toUpperCase()) {
+            case "COMPLETED":             return "✅";
+            case "INCOMPLETE":            return "⏳";
+            case "ERRORS_RAISED":         return "⚠️";
+            case "DOCUMENT_VERIFICATION": return "📄";
+            case "SUBMITTED":             return "📨";
+            default:                      return "📋";
+        }
+    }
+
+    private String formatStatus(String status) {
+        if (status == null) return "";
+        switch (status.toUpperCase()) {
+            case "COMPLETED":             return "Completed";
+            case "INCOMPLETE":            return "Incomplete";
+            case "ERRORS_RAISED":         return "Errors Raised";
+            case "DOCUMENT_VERIFICATION": return "Document Verification";
+            case "SUBMITTED":             return "Submitted";
+            default:                      return status;
+        }
+    }
+
+    private String getDisplayName(HttpSession session) {
+        String fn = (String) session.getAttribute("fullName");
+        return (fn != null && !fn.isEmpty()) ? fn : (String) session.getAttribute("username");
+    }
 }

@@ -2,6 +2,7 @@ package com.smartoffice.controller;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,185 +21,182 @@ import com.smartoffice.model.Meeting;
 import com.smartoffice.model.MeetingParticipant;
 import com.smartoffice.model.Team;
 import com.smartoffice.model.User;
+import com.smartoffice.service.NotificationService;
 
 @SuppressWarnings("serial")
 @WebServlet("/adminMeetings")
 public class AdminMeetingsServlet extends HttpServlet {
 
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
-			throws ServletException, IOException {
-		
-		// Check admin authorization
-		HttpSession session = req.getSession(false);
-		if (session == null || !"admin".equalsIgnoreCase((String) session.getAttribute("role"))) {
-			resp.sendRedirect(req.getContextPath() + "/login.jsp");
-			return;
-		}
+    private static final SimpleDateFormat DISPLAY_FMT =
+            new SimpleDateFormat("MMM dd, yyyy hh:mm a");
 
-		String action = req.getParameter("action");
-		MeetingDao meetingDao = new MeetingDao();
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-		try {
-			if ("view".equals(action)) {
-				// View meeting details with participants
-				int meetingId = Integer.parseInt(req.getParameter("id"));
-				List<MeetingParticipant> participants = meetingDao.getMeetingParticipants(meetingId);
-				req.setAttribute("participants", participants);
-				req.setAttribute("meetingId", meetingId);
-				req.getRequestDispatcher("adminMeetings.jsp").forward(req, resp);
-				return;
-			}
+        HttpSession session = req.getSession(false);
+        if (session == null || !"admin".equalsIgnoreCase((String) session.getAttribute("role"))) {
+            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+            return;
+        }
 
-			// Default: Load all data for the meetings page
-			String adminEmail = (String) session.getAttribute("email");
-			List<Meeting> meetings = meetingDao.getMeetingsByAdmin(adminEmail);
-			List<User> users = UserDao.getAllUsers();
-			List<Team> teams = TeamDAO.getAllTeams();
+        String action = req.getParameter("action");
+        MeetingDao meetingDao = new MeetingDao();
 
-			req.setAttribute("meetings", meetings);
-			req.setAttribute("users", users);
-			req.setAttribute("teams", teams);
-			req.getRequestDispatcher("adminMeetings.jsp").forward(req, resp);
+        try {
+            if ("view".equals(action)) {
+                int meetingId = Integer.parseInt(req.getParameter("id"));
+                List<MeetingParticipant> participants = meetingDao.getMeetingParticipants(meetingId);
+                req.setAttribute("participants", participants);
+                req.setAttribute("meetingId", meetingId);
+                req.getRequestDispatcher("adminMeetings.jsp").forward(req, resp);
+                return;
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			req.setAttribute("error", "Error loading meetings: " + e.getMessage());
-			req.getRequestDispatcher("adminMeetings.jsp").forward(req, resp);
-		}
-	}
+            // FIX: session stores email under "username" key not "email"
+            String adminEmail = (String) session.getAttribute("username");
+            List<Meeting> meetings  = meetingDao.getMeetingsByAdmin(adminEmail);
+            List<User>    users     = UserDao.getAllUsers();
+            List<Team>    teams     = TeamDAO.getAllTeams();
 
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
-			throws ServletException, IOException {
-		
-		// Check admin authorization
-		HttpSession session = req.getSession(false);
-		if (session == null || !"admin".equalsIgnoreCase((String) session.getAttribute("role"))) {
-			resp.sendRedirect(req.getContextPath() + "/login.jsp");
-			return;
-		}
+            req.setAttribute("meetings", meetings);
+            req.setAttribute("users",    users);
+            req.setAttribute("teams",    teams);
+            req.getRequestDispatcher("adminMeetings.jsp").forward(req, resp);
 
-		String action = req.getParameter("action");
-		MeetingDao meetingDao = new MeetingDao();
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("error", "Error loading meetings: " + e.getMessage());
+            req.getRequestDispatcher("adminMeetings.jsp").forward(req, resp);
+        }
+    }
 
-		try {
-			if ("create".equals(action)) {
-				createMeeting(req, meetingDao, session);
-				resp.sendRedirect(req.getContextPath() + "/adminMeetings?success=Meeting created successfully");
-				return;
-			}
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-			if ("delete".equals(action)) {
-				int meetingId = Integer.parseInt(req.getParameter("id"));
-				meetingDao.deleteMeeting(meetingId);
-				resp.sendRedirect(req.getContextPath() + "/adminMeetings?success=Meeting deleted successfully");
-				return;
-			}
+        HttpSession session = req.getSession(false);
+        if (session == null || !"admin".equalsIgnoreCase((String) session.getAttribute("role"))) {
+            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+            return;
+        }
 
-			if ("update".equals(action)) {
-				updateMeeting(req, meetingDao);
-				resp.sendRedirect(req.getContextPath() + "/adminMeetings?success=Meeting updated successfully");
-				return;
-			}
+        String action = req.getParameter("action");
+        MeetingDao meetingDao = new MeetingDao();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			resp.sendRedirect(req.getContextPath() + "/adminMeetings?error=" + e.getMessage());
-		}
-	}
+        try {
+            if ("create".equals(action)) {
+                String adminEmail = (String) session.getAttribute("username");
+                String adminName  = getDisplayName(session);
+                String title      = req.getParameter("title");
+                String startTime  = req.getParameter("startTime");
 
-	private void createMeeting(HttpServletRequest req, MeetingDao meetingDao, HttpSession session) 
-			throws Exception {
-		
-		// Parse meeting details
-		String title = req.getParameter("title");
-		String description = req.getParameter("description");
-		String startTimeStr = req.getParameter("startTime");
-		String endTimeStr = req.getParameter("endTime");
-		String meetingLink = req.getParameter("meetingLink");
-		String participantType = req.getParameter("participantType");
+                List<String> participantEmails = createMeeting(req, meetingDao, session);
 
-		// Create meeting object
-		Meeting meeting = new Meeting();
-		meeting.setTitle(title);
-		meeting.setDescription(description);
-		meeting.setStartTime(Timestamp.valueOf(startTimeStr.replace("T", " ") + ":00"));
-		meeting.setEndTime(Timestamp.valueOf(endTimeStr.replace("T", " ") + ":00"));
-		meeting.setMeetingLink(meetingLink);
-		meeting.setCreatedBy((String) session.getAttribute("email"));
+                // NOTIFICATION: notify all participants
+                String msg = "📅 Meeting scheduled by Admin " + adminName +
+                             ": \"" + title + "\" on " + formatDateTime(startTime);
 
-		// Insert meeting and get generated ID
-		int meetingId = meetingDao.createMeeting(meeting);
+                NotificationService.notifyMany(
+                        participantEmails, adminEmail,
+                        NotificationService.TYPE_MEETING, msg);
 
-		// Collect participant emails based on type
-		List<String> participantEmails = new ArrayList<>();
+                resp.sendRedirect(req.getContextPath() + "/adminMeetings?success=Meeting created successfully");
+                return;
+            }
 
-		switch (participantType) {
-			case "specific":
-				// Specific users selected
-				String[] selectedUsers = req.getParameterValues("participants");
-				if (selectedUsers != null) {
-					participantEmails.addAll(Arrays.asList(selectedUsers));
-				}
-				break;
+            if ("delete".equals(action)) {
+                int meetingId = Integer.parseInt(req.getParameter("id"));
+                meetingDao.deleteMeeting(meetingId);
+                resp.sendRedirect(req.getContextPath() + "/adminMeetings?success=Meeting deleted successfully");
+                return;
+            }
 
-			case "team":
-				// Entire team selected
-				String teamIdStr = req.getParameter("teamId");
-				if (teamIdStr != null && !teamIdStr.isEmpty()) {
-					int teamId = Integer.parseInt(teamIdStr);
-					participantEmails.addAll(meetingDao.getTeamMemberEmails(teamId));
-				}
-				break;
+            if ("update".equals(action)) {
+                updateMeeting(req, meetingDao);
+                resp.sendRedirect(req.getContextPath() + "/adminMeetings?success=Meeting updated successfully");
+                return;
+            }
 
-			case "allManagers":
-				// All managers
-				participantEmails.addAll(meetingDao.getAllManagerEmails());
-				break;
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.sendRedirect(req.getContextPath() + "/adminMeetings?error=" + e.getMessage());
+        }
+    }
 
-			case "allEmployees":
-				// All employees
-				participantEmails.addAll(meetingDao.getAllEmployeeEmails());
-				break;
+    private List<String> createMeeting(HttpServletRequest req,
+            MeetingDao meetingDao, HttpSession session) throws Exception {
 
-			case "everyone":
-				// All users (managers + employees)
-				participantEmails.addAll(meetingDao.getAllManagerEmails());
-				participantEmails.addAll(meetingDao.getAllEmployeeEmails());
-				break;
-		}
+        String title           = req.getParameter("title");
+        String description     = req.getParameter("description");
+        String startTimeStr    = req.getParameter("startTime");
+        String endTimeStr      = req.getParameter("endTime");
+        String meetingLink     = req.getParameter("meetingLink");
+        String participantType = req.getParameter("participantType");
 
-		// Remove duplicates
-		List<String> uniqueEmails = new ArrayList<>();
-		for (String email : participantEmails) {
-			if (!uniqueEmails.contains(email)) {
-				uniqueEmails.add(email);
-			}
-		}
+        Meeting meeting = new Meeting();
+        meeting.setTitle(title);
+        meeting.setDescription(description);
+        meeting.setStartTime(Timestamp.valueOf(startTimeStr.replace("T", " ") + ":00"));
+        meeting.setEndTime(Timestamp.valueOf(endTimeStr.replace("T", " ") + ":00"));
+        meeting.setMeetingLink(meetingLink);
+        // FIX: email is stored under "username" in session
+        meeting.setCreatedBy((String) session.getAttribute("username"));
 
-		// Add participants to the meeting
-		if (!uniqueEmails.isEmpty()) {
-			meetingDao.addParticipants(meetingId, uniqueEmails);
-		}
-	}
+        int meetingId = meetingDao.createMeeting(meeting);
 
-	private void updateMeeting(HttpServletRequest req, MeetingDao meetingDao) 
-			throws Exception {
-		
-		int meetingId = Integer.parseInt(req.getParameter("id"));
-		String title = req.getParameter("title");
-		String description = req.getParameter("description");
-		String startTimeStr = req.getParameter("startTime");
-		String endTimeStr = req.getParameter("endTime");
-		String meetingLink = req.getParameter("meetingLink");
+        List<String> participantEmails = new ArrayList<>();
+        if (participantType != null) {
+            switch (participantType) {
+                case "specific":
+                    String[] sel = req.getParameterValues("participants");
+                    if (sel != null) participantEmails.addAll(Arrays.asList(sel));
+                    break;
+                case "team":
+                    String teamIdStr = req.getParameter("teamId");
+                    if (teamIdStr != null && !teamIdStr.isEmpty())
+                        participantEmails.addAll(
+                                meetingDao.getTeamMemberEmails(Integer.parseInt(teamIdStr)));
+                    break;
+                case "allManagers":
+                    participantEmails.addAll(meetingDao.getAllManagerEmails()); break;
+                case "allEmployees":
+                    participantEmails.addAll(meetingDao.getAllEmployeeEmails()); break;
+                case "everyone":
+                    participantEmails.addAll(meetingDao.getAllManagerEmails());
+                    participantEmails.addAll(meetingDao.getAllEmployeeEmails()); break;
+            }
+        }
 
-		Meeting meeting = new Meeting();
-		meeting.setId(meetingId);
-		meeting.setTitle(title);
-		meeting.setDescription(description);
-		meeting.setStartTime(Timestamp.valueOf(startTimeStr.replace("T", " ") + ":00"));
-		meeting.setEndTime(Timestamp.valueOf(endTimeStr.replace("T", " ") + ":00"));
-		meeting.setMeetingLink(meetingLink);
+        // Deduplicate
+        List<String> unique = new ArrayList<>();
+        for (String e : participantEmails)
+            if (!unique.contains(e)) unique.add(e);
 
-		meetingDao.updateMeeting(meeting);
-	}
+        if (!unique.isEmpty()) meetingDao.addParticipants(meetingId, unique);
+        return unique;
+    }
+
+    private void updateMeeting(HttpServletRequest req, MeetingDao meetingDao) throws Exception {
+        Meeting meeting = new Meeting();
+        meeting.setId(Integer.parseInt(req.getParameter("id")));
+        meeting.setTitle(req.getParameter("title"));
+        meeting.setDescription(req.getParameter("description"));
+        meeting.setStartTime(Timestamp.valueOf(req.getParameter("startTime").replace("T", " ") + ":00"));
+        meeting.setEndTime(Timestamp.valueOf(req.getParameter("endTime").replace("T", " ") + ":00"));
+        meeting.setMeetingLink(req.getParameter("meetingLink"));
+        meetingDao.updateMeeting(meeting);
+    }
+
+    private String getDisplayName(HttpSession session) {
+        String fn = (String) session.getAttribute("fullName");
+        return (fn != null && !fn.isEmpty()) ? fn : (String) session.getAttribute("username");
+    }
+
+    private String formatDateTime(String dt) {
+        try {
+            return DISPLAY_FMT.format(
+                    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(dt));
+        } catch (Exception e) { return dt != null ? dt : ""; }
+    }
 }
