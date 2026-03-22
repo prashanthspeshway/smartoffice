@@ -21,6 +21,7 @@ public class AddHolidayServlet extends HttpServlet {
 
         String date = request.getParameter("date");
         String name = request.getParameter("name");
+        String type = request.getParameter("type");
 
         if(date == null || date.isEmpty()){
             response.getWriter().write("Date missing");
@@ -57,10 +58,11 @@ public class AddHolidayServlet extends HttpServlet {
             }
 
             PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO holidays (holiday_date, holiday_name) VALUES(?, ?)");
+                    "INSERT INTO holidays (holiday_date, holiday_name, holiday_type) VALUES(?, ?, ?)");
 
             ps.setDate(1, sqlDate);
             ps.setString(2, name);
+            ps.setString(3, type);
 
             ps.executeUpdate();
 

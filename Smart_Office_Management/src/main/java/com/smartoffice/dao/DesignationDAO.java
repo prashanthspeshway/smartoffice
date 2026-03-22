@@ -45,7 +45,7 @@ public class DesignationDAO {
 
     public void deactivateDesignation(String name) throws Exception {
         String clean = name != null ? name.trim() : "";
-        String sql = "UPDATE designations SET is_active=0 WHERE name=?";
+        String sql = "DELETE FROM designations WHERE name=?";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, clean);

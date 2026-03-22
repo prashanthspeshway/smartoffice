@@ -9,40 +9,100 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.smartoffice.dao.AttendanceDAO;
 import com.smartoffice.dao.LeaveRequestDAO;
+import com.smartoffice.model.LeaveRequest;
+import com.smartoffice.service.NotificationService;
 
 @SuppressWarnings("serial")
 @WebServlet("/leave-approval")
 public class LeaveApprovalServlet extends HttpServlet {
 
-	private LeaveRequestDAO dao = new LeaveRequestDAO();
+    private LeaveRequestDAO dao = new LeaveRequestDAO();
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-		HttpSession session = req.getSession(false);
-		if (session == null || session.getAttribute("username") == null) {
-			resp.sendRedirect(req.getContextPath() + "/index.html");
-			return;
-		}
-		String role = (String) session.getAttribute("role");
-		if (role == null || !"admin".equalsIgnoreCase(role)) {
-			resp.sendRedirect(req.getContextPath() + "/index.html?error=accessDenied");
-			return;
-		}
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("username") == null) {
+            resp.sendRedirect(req.getContextPath() + "/index.html");
+            return;
+        }
 
-		try {
-			int leaveId = Integer.parseInt(req.getParameter("leaveId"));
-			String action = req.getParameter("action");
+        String role     = (String) session.getAttribute("role");
+        String approver = (String) session.getAttribute("username");
 
-			String status = "approve".equalsIgnoreCase(action) ? "APPROVED" : "REJECTED";
+        boolean isAdmin   = "admin".equalsIgnoreCase(role);
+        boolean isManager = "manager".equalsIgnoreCase(role);
 
-			dao.updateLeaveStatus(leaveId, status);
+        if (!isAdmin && !isManager) {
+            resp.sendRedirect(req.getContextPath() + "/index.html?error=accessDenied");
+            return;
+        }
 
-			resp.sendRedirect(req.getContextPath() + "/adminLeave?success=" + ("approve".equalsIgnoreCase(action) ? "Approved" : "Rejected"));
+        try {
+            int     leaveId  = Integer.parseInt(req.getParameter("leaveId"));
+            String  action   = req.getParameter("action");
+            boolean approved = "approve".equalsIgnoreCase(action);
+            String  status   = approved ? "APPROVED" : "REJECTED";
 
-		} catch (Exception e) {
-			throw new ServletException(e);
-		}
-	}
+            // Fetch leave BEFORE updating so we have employee email + dates
+            LeaveRequest leave = dao.getLeaveById(leaveId);
+
+            dao.updateLeaveStatus(leaveId, status);
+
+            // ✅ If approved, mark attendance as 'On Leave' for each day in the range
+            if (approved && leave != null
+                    && leave.getFromDate() != null && leave.getToDate() != null) {
+                try {
+                    new AttendanceDAO().markLeaveInAttendance(
+                            leave.getUsername(), leave.getFromDate(), leave.getToDate());
+                } catch (Exception attEx) {
+                    System.err.println("[LeaveApprovalServlet] Failed to mark attendance On Leave: "
+                            + attEx.getMessage());
+                }
+            }
+
+            // ── NOTIFICATIONS ──────────────────────────────────────────────────
+            if (leave != null) {
+                String employeeEmail = leave.getUsername();
+                String approverName  = getDisplayName(session);
+
+                String emoji = approved ? "✅" : "❌";
+                String label = approved ? "Approved" : "Rejected";
+
+                String msgForEmployee = emoji + " Your leave request ("
+                        + leave.getFromDate() + " → " + leave.getToDate()
+                        + ") has been " + label + " by " + approverName + ".";
+
+                if (employeeEmail != null && !employeeEmail.isEmpty()) {
+                    NotificationService.notify(
+                            employeeEmail, approver,
+                            NotificationService.TYPE_LEAVE, msgForEmployee);
+                }
+
+                if (isManager) {
+                    String msgForAdmin = emoji + " Manager " + approverName
+                            + " has " + label.toLowerCase() + " leave for "
+                            + employeeEmail
+                            + " (" + leave.getFromDate() + " → " + leave.getToDate() + ").";
+                    NotificationService.notifyAllAdmins(
+                            approver, NotificationService.TYPE_LEAVE, msgForAdmin);
+                }
+            }
+
+            String redirectPage = isManager ? "managerLeave" : "adminLeave";
+            resp.sendRedirect(req.getContextPath() + "/" + redirectPage
+                    + "?success=" + (approved ? "Approved" : "Rejected"));
+
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
+    }
+
+    private String getDisplayName(HttpSession session) {
+        String fn = (String) session.getAttribute("fullName");
+        return (fn != null && !fn.isEmpty()) ? fn : (String) session.getAttribute("username");
+    }
 }

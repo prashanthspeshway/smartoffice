@@ -714,5 +714,6 @@ document.addEventListener('DOMContentLoaded', function() {
 							}
 						});
 	</script>
+	<script src="employeeProfile.js"></script>
 </body>
 </html>

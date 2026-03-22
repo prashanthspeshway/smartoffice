@@ -51,13 +51,15 @@ public class LeaveRequestDAO {
     private LeaveRequest mapRow(ResultSet rs, String lrCol) throws Exception {
         LeaveRequest lr = new LeaveRequest();
         lr.setId(rs.getInt("id"));
-        lr.setUsername(rs.getString(lrCol));   // username = email in your schema
+        lr.setUsername(rs.getString(lrCol));
         lr.setLeaveType(rs.getString("leave_type"));
         lr.setFromDate(rs.getDate("from_date"));
         lr.setToDate(rs.getDate("to_date"));
         lr.setReason(rs.getString("reason"));
         lr.setStatus(rs.getString("status"));
         lr.setAppliedAt(rs.getTimestamp("applied_at"));
+        // safely read rejection_reason — won't crash if column missing
+        try { lr.setRejectionReason(rs.getString("rejection_reason")); } catch (Exception ignored) {}
         return lr;
     }
 
@@ -113,6 +115,17 @@ public class LeaveRequestDAO {
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, leaveId);
+            ps.executeUpdate();
+        }
+    }
+    
+    public void updateLeaveStatus(int leaveId, String status, String rejectionReason) throws Exception {
+        String sql = "UPDATE leave_requests SET status = ?, rejection_reason = ? WHERE id = ?";
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setString(2, (rejectionReason != null && !rejectionReason.trim().isEmpty()) ? rejectionReason.trim() : null);
+            ps.setInt(3, leaveId);
             ps.executeUpdate();
         }
     }

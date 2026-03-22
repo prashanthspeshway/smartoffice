@@ -1,12 +1,10 @@
 package com.smartoffice.model;
-
 import java.sql.Date;
 import java.sql.Timestamp;
 
 public class LeaveRequest {
-
     private int id;
-    private String username;      // stores email (dual-purpose field)
+    private String username;
     private String leaveType;
     private Date fromDate;
     private Date toDate;
@@ -14,28 +12,20 @@ public class LeaveRequest {
     private String status;
     private Timestamp appliedAt;
     private String displayName;
+    private String rejectionReason; // ✅ NEW
 
-    // ── id ────────────────────────────────────────────────────────
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    // ── username / email (same field, dual alias) ─────────────────
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
-    /** Email alias — username column stores email in your schema */
     public String getEmail() { return username; }
     public void setEmail(String email) { this.username = email; }
 
-    /**
-     * Returns whoever applied for the leave.
-     * Points to the same username/email field.
-     * Used by notification service to know who to notify.
-     */
     public String getAppliedBy() { return username; }
     public void setAppliedBy(String appliedBy) { this.username = appliedBy; }
 
-    // ── leave details ─────────────────────────────────────────────
     public String getLeaveType() { return leaveType; }
     public void setLeaveType(String leaveType) { this.leaveType = leaveType; }
 
@@ -54,7 +44,10 @@ public class LeaveRequest {
     public Timestamp getAppliedAt() { return appliedAt; }
     public void setAppliedAt(Timestamp appliedAt) { this.appliedAt = appliedAt; }
 
-    // ── display ───────────────────────────────────────────────────
     public String getDisplayName() { return displayName != null ? displayName : username; }
     public void setDisplayName(String displayName) { this.displayName = displayName; }
+
+    // ✅ NEW — rejection reason from admin
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 }

@@ -253,29 +253,35 @@ public class ViewUser extends HttpServlet {
 					// Table row: Full Name | Role | Status | Designation | Email | Actions
 					String designation = nullToEmpty(rs.getString("designation"));
 
-					rows.append("<tr class=\"border-b border-slate-200 hover:bg-slate-50\">")
-					        .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(fullName)).append("</td>")
-					        .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(roleDisplay)).append("</td>")
-					        .append("<td class=\"px-4 py-3\"><span class=\"badge ").append(statusClass).append("\">").append(escapeHtml(statusText)).append("</span></td>")
-					        .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(designation.isEmpty() ? "-" : escapeHtml(designation)).append("</td>")
-					        .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(email)).append("</td>")
-					        .append("<td class=\"px-4 py-3\">")
-					        .append("<a href=\"editUser?id=").append(userId).append("\" class=\"icon-btn edit\"><i class=\"fa-solid fa-pen\"></i></a>")
-					        .append("<a href=\"#\" class=\"icon-btn delete\" onclick=\"openDeleteModal(").append(userId).append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a>")
-					        .append("</td>").append("</tr>");
+					rows.append("<tr class=\"border-b border-slate-200 hover:bg-slate-50\" ")
+				    .append("data-profile-email=\"").append(escapeHtml(email)).append("\">")
+				    .append("<td class=\"px-4 py-3 text-sm font-medium text-slate-700 cursor-pointer hover:text-indigo-600\">")
+				    .append(escapeHtml(fullName)).append("</td>")
+				    .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(roleDisplay)).append("</td>")
+				    .append("<td class=\"px-4 py-3\"><span class=\"badge ").append(statusClass).append("\">").append(escapeHtml(statusText)).append("</span></td>")
+				    .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(designation.isEmpty() ? "-" : escapeHtml(designation)).append("</td>")
+				    .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(email)).append("</td>")
+				    .append("<td class=\"px-4 py-3\" onclick=\"event.stopPropagation()\">")
+				    .append("<a href=\"editUser?id=").append(userId).append("\" class=\"icon-btn edit\"><i class=\"fa-solid fa-pen\"></i></a>")
+				    .append("<a href=\"#\" class=\"icon-btn delete\" onclick=\"openDeleteModal(").append(userId).append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a>")
+				    .append("</td>")
+				    .append("</tr>");
 
 					// Grid card: Full Name, Role, Status, First Name, Last Name, Email, Joined
 					// Date, Actions
 					// Grid card: Full Name, Role, Status, Designation, Email, Actions
-					gridRows.append("<div class=\"grid-card bg-white rounded-xl border border-slate-200 p-4\">")
-					        .append("<div class=\"font-medium text-slate-800 mb-1\">").append(escapeHtml(fullName)).append("</div>")
-					        .append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Role:</span> ").append(escapeHtml(roleDisplay)).append("</div>")
-					        .append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Status:</span> <span class=\"badge ").append(statusClass).append("\">").append(escapeHtml(statusText)).append("</span></div>")
-					        .append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Designation:</span> ").append(designation.isEmpty() ? "-" : escapeHtml(designation)).append("</div>")
-					        .append("<div class=\"text-sm text-slate-500 mb-3\">").append(escapeHtml(email)).append("</div>")
-					        .append("<div><a href=\"editUser?id=").append(userId).append("\" class=\"icon-btn edit inline-block\"><i class=\"fa-solid fa-pen\"></i></a>")
-					        .append("<a href=\"#\" class=\"icon-btn delete inline-block\" onclick=\"openDeleteModal(").append(userId).append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a></div>")
-					        .append("</div>");
+					gridRows.append("<div class=\"grid-card bg-white rounded-xl border border-slate-200 p-4\" ")
+				    .append("data-profile-email=\"").append(escapeHtml(email)).append("\">")
+				    .append("<div class=\"font-medium text-slate-800 mb-1 cursor-pointer hover:text-indigo-600\">").append(escapeHtml(fullName)).append("</div>")
+				    .append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Role:</span> ").append(escapeHtml(roleDisplay)).append("</div>")
+				    .append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Status:</span> <span class=\"badge ").append(statusClass).append("\">").append(escapeHtml(statusText)).append("</span></div>")
+				    .append("<div class=\"text-sm text-slate-600 mb-3\"><span class=\"font-medium\">Designation:</span> ").append(designation.isEmpty() ? "-" : escapeHtml(designation)).append("</div>")
+				    .append("<div class=\"text-sm text-slate-500 mb-3\">").append(escapeHtml(email)).append("</div>")
+				    .append("<div onclick=\"event.stopPropagation()\">")
+				    .append("<a href=\"editUser?id=").append(userId).append("\" class=\"icon-btn edit inline-block\"><i class=\"fa-solid fa-pen\"></i></a>")
+				    .append("<a href=\"#\" class=\"icon-btn delete inline-block\" onclick=\"openDeleteModal(").append(userId).append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a>")
+				    .append("</div>")
+				    .append("</div>");
 				}
 			}
 

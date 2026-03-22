@@ -19,92 +19,95 @@ import com.smartoffice.model.Meeting;
 @WebServlet("/allMeetings")
 public class AllMeetingsServlet extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("username") == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
+	    HttpSession session = request.getSession(false);
+	    if (session == null || session.getAttribute("username") == null) {
+	        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+	        return;
+	    }
 
-        String email = (String) session.getAttribute("username");
+	    String email = (String) session.getAttribute("username");
 
-        response.setContentType("text/html; charset=UTF-8");
-        PrintWriter out = response.getWriter();
+	    response.setContentType("text/html; charset=UTF-8");
+	    PrintWriter out = response.getWriter();
 
-        try {
-            MeetingDao dao = new MeetingDao();
-            List<Meeting> meetings = dao.getAllMeetingsForManager(email);
+	    try {
+	        List<Meeting> meetings = MeetingDao.getTodayMeetings(email);
 
-            SimpleDateFormat dateFmt = new SimpleDateFormat("dd MMM yyyy");
-            SimpleDateFormat timeFmt = new SimpleDateFormat("hh:mm a");
+	        SimpleDateFormat timeFmt = new SimpleDateFormat("hh:mm a");
 
-            if (meetings == null || meetings.isEmpty()) {
-                out.println("<p style='text-align:center; color:#64748b; padding:20px;'>No meetings found.</p>");
-                return;
-            }
+	        if (meetings == null || meetings.isEmpty()) {
+	            out.println(
+	                "<div class='flex flex-col items-center justify-center py-16 text-center'>" +
+	                "  <i class='fa-solid fa-calendar-xmark text-5xl text-slate-300 mb-4'></i>" +
+	                "  <p class='text-slate-500 font-medium'>No meetings scheduled for today.</p>" +
+	                "  <p class='text-slate-400 text-sm mt-1'>Enjoy your free day!</p>" +
+	                "</div>"
+	            );
+	            return;
+	        }
 
-            for (Meeting m : meetings) {
-                String createdBy    = m.getCreatedBy();
-                boolean isSelf      = createdBy != null && createdBy.equalsIgnoreCase(email);
-                String badgeLabel   = isSelf ? "BY YOU" : "BY ADMIN";
-                String badgeColor   = isSelf ? "#4f46e5" : "#7c3aed";
-                String badgeIcon    = isSelf ? "fa-user-tie" : "fa-user-shield";
+	        out.println("<div class='space-y-3'>");
 
-                String startDate = m.getStartTime() != null ? dateFmt.format(m.getStartTime()) : "--";
-                String startTime = m.getStartTime() != null ? timeFmt.format(m.getStartTime()) : "--";
-                String endTime   = m.getEndTime()   != null ? timeFmt.format(m.getEndTime())   : "--";
+	        for (Meeting m : meetings) {
+	            String createdBy = m.getCreatedBy();
+	            boolean isSelf   = createdBy != null && createdBy.equalsIgnoreCase(email);
 
-                out.println("<div class='meeting-item'>");
+	            String badgeText  = isSelf ? "BY YOU" : "BY ADMIN";
+	            String badgeCls   = isSelf
+	                ? "bg-indigo-100 text-indigo-700"
+	                : "bg-purple-100 text-purple-700";
+	            String badgeIcon  = isSelf ? "fa-user-tie" : "fa-user-shield";
 
-                // Header row: title + badge
-                out.println("  <div class='meeting-title' style='justify-content: space-between;'>");
-                out.println("    <div style='display:flex; align-items:center; gap:8px;'>");
-                out.println("      <i class='fa-solid fa-video'></i>");
-                out.println("      <span>" + escapeHtml(m.getTitle()) + "</span>");
-                out.println("    </div>");
-                out.println("    <span style='" +
-                        "display:inline-flex; align-items:center; gap:5px;" +
-                        "background:" + badgeColor + "; color:#fff;" +
-                        "font-size:11px; font-weight:700; padding:3px 10px;" +
-                        "border-radius:20px; letter-spacing:0.4px;'>" +
-                        "<i class='fa-solid " + badgeIcon + "' style='font-size:10px;'></i>" +
-                        badgeLabel + "</span>");
-                out.println("  </div>");
+	            String startTime = m.getStartTime() != null ? timeFmt.format(m.getStartTime()) : "--";
+	            String endTime   = m.getEndTime()   != null ? timeFmt.format(m.getEndTime())   : "--";
 
-                // Description
-                if (m.getDescription() != null && !m.getDescription().isEmpty()) {
-                    out.println("  <div class='meeting-info'>" + escapeHtml(m.getDescription()) + "</div>");
-                }
+	            out.println(
+	                "<div class='bg-slate-50 rounded-lg p-4 border border-slate-200 hover:shadow-md transition-shadow'>" +
 
-                // Date / Time
-                out.println("  <div class='meeting-info'><b>Date:</b> " + startDate + "</div>");
-                out.println("  <div class='meeting-info'><b>Start:</b> " + startTime + "</div>");
-                out.println("  <div class='meeting-info'><b>End:</b> "   + endTime   + "</div>");
+	                "  <div class='flex items-start justify-between gap-3 mb-2'>" +
+	                "    <div class='flex items-start gap-3'>" +
+	                "      <i class='fa-solid fa-video text-indigo-600 mt-1'></i>" +
+	                "      <div>" +
+	                "        <h4 class='font-semibold text-slate-800'>" + escapeHtml(m.getTitle()) + "</h4>" +
+	                (m.getDescription() != null && !m.getDescription().isEmpty()
+	                    ? "<p class='text-sm text-slate-500 mt-0.5'>" + escapeHtml(m.getDescription()) + "</p>"
+	                    : "") +
+	                "      </div>" +
+	                "    </div>" +
+	                "    <span class='inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full shrink-0 " + badgeCls + "'>" +
+	                "      <i class='fa-solid " + badgeIcon + " text-[10px]'></i>" + badgeText +
+	                "    </span>" +
+	                "  </div>" +
 
-                // Scheduled-by line for admin meetings
-                if (!isSelf) {
-                    out.println("  <div style='font-size:12px; color:#7c3aed; margin-top:4px;'>" +
-                            "<i class='fa-solid fa-user-shield' style='margin-right:4px;'></i>" +
-                            "Scheduled by Admin</div>");
-                }
+	                "  <div class='flex items-center gap-4 text-xs text-slate-500 ml-8'>" +
+	                "    <span><i class='fa-solid fa-clock mr-1'></i>" + startTime + " – " + endTime + "</span>" +
+	                "  </div>" +
 
-                // Join button
-                if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
-                    out.println("  <a href='" + escapeHtml(m.getMeetingLink()) + "' target='_blank' class='join-btn'>" +
-                            "<i class='fa-solid fa-video'></i> Join Meeting</a>");
-                }
+	                (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()
+	                    ? "<a href='" + escapeHtml(m.getMeetingLink()) + "' target='_blank' " +
+	                      "class='inline-flex items-center gap-2 mt-3 ml-8 px-3 py-1 bg-blue-100 text-blue-700 " +
+	                      "rounded-full text-xs font-semibold hover:bg-blue-200 transition-colors'>" +
+	                      "<i class='fa-solid fa-video'></i> Join Meeting</a>"
+	                    : "") +
 
-                out.println("</div>"); // .meeting-item
-            }
+	                "</div>"
+	            );
+	        }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            out.println("<p style='color:#dc2626; padding:16px;'>Error loading meetings. Please try again.</p>");
-        }
-    }
+	        out.println("</div>");
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        out.println(
+	            "<p class='text-red-500 text-center py-8'>" +
+	            "<i class='fa-solid fa-triangle-exclamation mr-2'></i>Error loading meetings. Please try again.</p>"
+	        );
+	    }
+	}
 
     private String escapeHtml(String s) {
         if (s == null) return "";

@@ -3,12 +3,31 @@ package com.smartoffice.model;
 public class User {
 
 	private int id;
+	private String username; // email used as username
 	private String email;
 	private String firstname;
 	private String lastname;
 	private String role;
 	private String status;
 	private String phone;
+	private String designation;
+	private java.sql.Date joinedDate;
+
+	public String getDesignation() {
+		return designation;
+	}
+
+	public void setDesignation(String designation) {
+		this.designation = designation;
+	}
+
+	public java.sql.Date getJoinedDate() {
+		return joinedDate;
+	}
+
+	public void setJoinedDate(java.sql.Date joinedDate) {
+		this.joinedDate = joinedDate;
+	}
 
 	// getters & setters
 	public int getId() {
@@ -21,11 +40,11 @@ public class User {
 
 	/** Returns email (session stores it as "username" for compatibility). */
 	public String getUsername() {
-		return email;
+		return username;
 	}
 
 	public void setUsername(String username) {
-		this.email = username;
+		this.username = username;
 	}
 
 	public String getFullname() {

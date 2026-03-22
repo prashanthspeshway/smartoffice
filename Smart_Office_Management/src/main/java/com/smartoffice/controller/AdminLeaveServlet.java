@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.smartoffice.dao.AttendanceDAO;
 import com.smartoffice.dao.LeaveRequestDAO;
 import com.smartoffice.model.LeaveRequest;
 import com.smartoffice.service.NotificationService;
@@ -19,9 +20,6 @@ import com.smartoffice.service.NotificationService;
 @WebServlet("/adminLeave")
 public class AdminLeaveServlet extends HttpServlet {
 
-    // ─────────────────────────────────────────────────────────────
-    // GET — load and show all leave requests
-    // ─────────────────────────────────────────────────────────────
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -44,9 +42,6 @@ public class AdminLeaveServlet extends HttpServlet {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // POST — approve or reject leave
-    // ─────────────────────────────────────────────────────────────
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -67,34 +62,56 @@ public class AdminLeaveServlet extends HttpServlet {
                 int leaveId      = Integer.parseInt(request.getParameter("leaveId"));
                 String newStatus = "approve".equals(action) ? "APPROVED" : "REJECTED";
 
+                // Read optional rejection reason (only relevant for reject)
+                String rejectionReason = request.getParameter("rejectionReason");
+                if (rejectionReason != null) rejectionReason = rejectionReason.trim();
+                if ("approve".equals(action)) rejectionReason = null;
+
                 LeaveRequestDAO dao = new LeaveRequestDAO();
 
-                // Fetch leave BEFORE updating so we know who applied
+                // Fetch leave BEFORE updating
                 LeaveRequest lr = dao.getLeaveById(leaveId);
 
-                // Update status in DB
-                dao.updateLeaveStatus(leaveId, newStatus);
+                // Update status + rejection reason in DB
+                dao.updateLeaveStatus(leaveId, newStatus, rejectionReason);
+
+                // ✅ If approved, mark attendance as 'On Leave' for each day in the range
+                if ("APPROVED".equals(newStatus) && lr != null
+                        && lr.getFromDate() != null && lr.getToDate() != null) {
+                    try {
+                        new AttendanceDAO().markLeaveInAttendance(
+                                lr.getAppliedBy(), lr.getFromDate(), lr.getToDate());
+                    } catch (Exception attEx) {
+                        System.err.println("[AdminLeaveServlet] Failed to mark attendance On Leave: "
+                                + attEx.getMessage());
+                    }
+                }
 
                 // ── NOTIFICATION ──────────────────────────────────────
                 if (lr != null) {
-                    String empEmail = lr.getAppliedBy();  // username = email in your schema
+                    String empEmail = lr.getAppliedBy();
                     String emoji    = "APPROVED".equals(newStatus) ? "✅" : "❌";
 
-                    String empMsg = emoji + " Your " + lr.getLeaveType() + " request (" +
-                                   lr.getFromDate() + " → " + lr.getToDate() + ") has been " +
-                                   newStatus + " by Admin " + adminName + ".";
+                    String empMsg;
+                    if ("REJECTED".equals(newStatus) && rejectionReason != null && !rejectionReason.isEmpty()) {
+                        empMsg = emoji + " Your " + lr.getLeaveType() + " request (" +
+                                 lr.getFromDate() + " → " + lr.getToDate() +
+                                 ") has been REJECTED by Admin " + adminName +
+                                 ". Reason: " + rejectionReason;
+                    } else {
+                        empMsg = emoji + " Your " + lr.getLeaveType() + " request (" +
+                                 lr.getFromDate() + " → " + lr.getToDate() +
+                                 ") has been " + newStatus + " by Admin " + adminName + ".";
+                    }
 
-                    // Notify the employee who applied
                     NotificationService.notify(empEmail, adminEmail,
                             NotificationService.TYPE_LEAVE, empMsg);
 
-                    // Notify the employee's direct manager
                     NotificationService.notifyManagerOf(empEmail, adminEmail,
                             NotificationService.TYPE_LEAVE,
                             "ℹ️ Leave for " + lr.getDisplayName() +
                             " has been " + newStatus + " by Admin " + adminName + ".");
                 }
-                // ─────────────────────────────────────────────────────
 
                 response.sendRedirect(request.getContextPath() +
                         "/adminLeave?success=Leave " + newStatus.toLowerCase());
@@ -107,9 +124,6 @@ public class AdminLeaveServlet extends HttpServlet {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────────────────────
     private void loadLeaveData(HttpServletRequest request) throws Exception {
         LeaveRequestDAO dao = new LeaveRequestDAO();
         List<LeaveRequest> all = dao.getAllLeaveRequests();

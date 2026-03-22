@@ -40,28 +40,47 @@ public class AdminMeetingsServlet extends HttpServlet {
             return;
         }
 
-        String action = req.getParameter("action");
+        String action     = req.getParameter("action");
+        String adminEmail = (String) session.getAttribute("username");
         MeetingDao meetingDao = new MeetingDao();
 
         try {
-            if ("view".equals(action)) {
+            // ✅ NEW: JSON endpoint for participants — called by fetch() in JSP
+            if ("participants".equals(action)) {
+                resp.setContentType("application/json; charset=UTF-8");
                 int meetingId = Integer.parseInt(req.getParameter("id"));
-                List<MeetingParticipant> participants = meetingDao.getMeetingParticipants(meetingId);
-                req.setAttribute("participants", participants);
-                req.setAttribute("meetingId", meetingId);
-                req.getRequestDispatcher("adminMeetings.jsp").forward(req, resp);
+                List<MeetingParticipant> parts = meetingDao.getMeetingParticipants(meetingId);
+
+                StringBuilder json = new StringBuilder("[");
+                for (int i = 0; i < parts.size(); i++) {
+                    MeetingParticipant p = parts.get(i);
+                    json.append("{")
+                        .append("\"name\":\"").append(escapeJson(p.getFullName())).append("\",")
+                        .append("\"role\":\"").append(escapeJson(p.getRole())).append("\"")
+                        .append("}");
+                    if (i < parts.size() - 1) json.append(",");
+                }
+                json.append("]");
+
+                resp.getWriter().write(json.toString());
                 return;
             }
 
-            // FIX: session stores email under "username" key not "email"
-            String adminEmail = (String) session.getAttribute("username");
-            List<Meeting> meetings  = meetingDao.getMeetingsByAdmin(adminEmail);
-            List<User>    users     = UserDao.getAllUsers();
-            List<Team>    teams     = TeamDAO.getAllTeams();
+            // Always load base data for the page
+            List<Meeting> meetings = MeetingDao.getTodayMeetings(adminEmail);
+            List<User>    users    = UserDao.getAllUsers();
+            List<Team>    teams    = TeamDAO.getAllTeams();
+
+            // Patch participant count since getTodayMeetings() doesn't include it
+            for (Meeting m : meetings) {
+                List<MeetingParticipant> mp = meetingDao.getMeetingParticipants(m.getId());
+                m.setParticipantCount(mp.size());
+            }
 
             req.setAttribute("meetings", meetings);
             req.setAttribute("users",    users);
             req.setAttribute("teams",    teams);
+
             req.getRequestDispatcher("adminMeetings.jsp").forward(req, resp);
 
         } catch (Exception e) {
@@ -93,7 +112,6 @@ public class AdminMeetingsServlet extends HttpServlet {
 
                 List<String> participantEmails = createMeeting(req, meetingDao, session);
 
-                // NOTIFICATION: notify all participants
                 String msg = "📅 Meeting scheduled by Admin " + adminName +
                              ": \"" + title + "\" on " + formatDateTime(startTime);
 
@@ -140,7 +158,6 @@ public class AdminMeetingsServlet extends HttpServlet {
         meeting.setStartTime(Timestamp.valueOf(startTimeStr.replace("T", " ") + ":00"));
         meeting.setEndTime(Timestamp.valueOf(endTimeStr.replace("T", " ") + ":00"));
         meeting.setMeetingLink(meetingLink);
-        // FIX: email is stored under "username" in session
         meeting.setCreatedBy((String) session.getAttribute("username"));
 
         int meetingId = meetingDao.createMeeting(meeting);
@@ -168,7 +185,6 @@ public class AdminMeetingsServlet extends HttpServlet {
             }
         }
 
-        // Deduplicate
         List<String> unique = new ArrayList<>();
         for (String e : participantEmails)
             if (!unique.contains(e)) unique.add(e);
@@ -198,5 +214,14 @@ public class AdminMeetingsServlet extends HttpServlet {
             return DISPLAY_FMT.format(
                     new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(dt));
         } catch (Exception e) { return dt != null ? dt : ""; }
+    }
+
+    // ✅ NEW: Escapes special characters for safe JSON string output
+    private String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r");
     }
 }

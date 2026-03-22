@@ -12,7 +12,9 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import com.smartoffice.dao.TaskDAO;
+import com.smartoffice.dao.UserDao;
 import com.smartoffice.model.Task;
+import com.smartoffice.model.User;
 import com.smartoffice.service.NotificationService;
 
 @SuppressWarnings("serial")
@@ -72,20 +74,40 @@ public class SubmitTaskUpdateServlet extends HttpServlet {
 
             // ── NOTIFICATIONS ─────────────────────────────────────────
             if (task != null) {
-                String assignedBy = task.getAssignedBy(); // who assigned the task
-                String taskTitle  = task.getTitle() != null
+                /*
+                 * BUG FIX: task.getAssignedBy() stores the DB username which may NOT
+                 * be the email. NotificationService inserts into recipient_email, so
+                 * we must resolve the username → email first.
+                 */
+                String assignedByRaw   = task.getAssignedBy();
+                String assignedByEmail = resolveToEmail(assignedByRaw);
+
+                String taskTitle = task.getTitle() != null
                         ? task.getTitle() : task.getDescription();
 
-                String msg = getStatusEmoji(newStatus) + " " + employeeName +
-                             " updated task \"" + taskTitle +
-                             "\" → " + formatStatus(newStatus) +
-                             (comment != null && !comment.isEmpty()
-                                     ? ". Comment: " + comment : "");
+                String msg = getStatusEmoji(newStatus) + " " + employeeName
+                        + " updated task \"" + taskTitle
+                        + "\" → " + formatStatus(newStatus)
+                        + (comment != null && !comment.isEmpty()
+                                ? ". Comment: " + comment : "");
 
-                // Notify whoever assigned the task (manager or admin)
-                if (assignedBy != null && !assignedBy.isEmpty()) {
+                // Notify whoever assigned the task (manager OR admin)
+                if (assignedByEmail != null && !assignedByEmail.isEmpty()
+                        && !assignedByEmail.equalsIgnoreCase(employeeEmail)) {
                     NotificationService.notify(
-                            assignedBy, employeeEmail,
+                            assignedByEmail, employeeEmail,
+                            NotificationService.TYPE_TASK, msg);
+                }
+
+                /*
+                 * BUG FIX: If the task was assigned by an admin (not the manager),
+                 * the manager was never notified. We check the assigner's role and
+                 * additionally ping the employee's direct manager in that case.
+                 */
+                String assignerRole = getRoleOf(assignedByEmail);
+                if ("admin".equalsIgnoreCase(assignerRole)) {
+                    NotificationService.notifyManagerOf(
+                            employeeEmail, employeeEmail,
                             NotificationService.TYPE_TASK, msg);
                 }
 
@@ -102,6 +124,45 @@ public class SubmitTaskUpdateServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Task update failed: " + e.getMessage());
         }
+    }
+
+    /**
+     * Resolves a DB username or email to an email address.
+     * If the value already contains '@' it is returned as-is.
+     * Otherwise UserDao.getUserByUsername() is called to look up the email.
+     *
+     * NOTE: If UserDao does not yet have getUserByUsername(), add:
+     *   public static User getUserByUsername(String username) {
+     *       String sql = "SELECT * FROM users WHERE username = ? LIMIT 1";
+     *       // ... standard query ...
+     *   }
+     */
+    private String resolveToEmail(String usernameOrEmail) {
+        if (usernameOrEmail == null || usernameOrEmail.trim().isEmpty()) return null;
+        String val = usernameOrEmail.trim();
+        if (val.contains("@")) return val; // already an email
+
+        try {
+            User user = UserDao.getUserByUsername(val);
+            if (user != null && user.getEmail() != null) return user.getEmail();
+        } catch (Exception e) {
+            System.err.println("[SubmitTaskUpdateServlet] resolveToEmail error for '"
+                    + val + "': " + e.getMessage());
+        }
+        return val; // fall back to raw value
+    }
+
+    /** Returns the role stored in the users table for the given email. */
+    private String getRoleOf(String email) {
+        if (email == null || email.isEmpty()) return null;
+        try {
+            User user = UserDao.getUserByEmail(email);
+            return user != null ? user.getRole() : null;
+        } catch (Exception e) {
+            System.err.println("[SubmitTaskUpdateServlet] getRoleOf error for '"
+                    + email + "': " + e.getMessage());
+        }
+        return null;
     }
 
     private String getStatusEmoji(String status) {

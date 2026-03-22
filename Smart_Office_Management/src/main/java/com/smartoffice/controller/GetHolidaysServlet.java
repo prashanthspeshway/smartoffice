@@ -28,7 +28,7 @@ public class GetHolidaysServlet extends HttpServlet {
             Connection con = DBConnectionUtil.getConnection();
 
             PreparedStatement ps = con.prepareStatement(
-                "SELECT holiday_date, holiday_name FROM holidays");
+                "SELECT holiday_date, holiday_name, holiday_type FROM holidays");
 
             ResultSet rs = ps.executeQuery();
 
@@ -40,6 +40,7 @@ public class GetHolidaysServlet extends HttpServlet {
                 json.append("{");
                 json.append("\"date\":\"").append(rs.getDate("holiday_date")).append("\",");
                 json.append("\"name\":\"").append(rs.getString("holiday_name")).append("\"");
+                json.append(",\"type\":\"").append(rs.getString("holiday_type")).append("\"");
                 json.append("}");
                 first = false;
             }

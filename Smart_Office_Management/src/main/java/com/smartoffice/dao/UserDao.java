@@ -19,7 +19,7 @@ public class UserDao {
 
 		List<User> users = new ArrayList<>();
 
-		String sql = "SELECT id, email, firstname, lastname, role, status, phone FROM users";
+		String sql = "SELECT id, username, email, firstname, lastname, role, status, phone, designation, joinedDate FROM users";
 
 		try (Connection con = DBConnectionUtil.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql);
@@ -28,18 +28,42 @@ public class UserDao {
 			while (rs.next()) {
 				User u = new User();
 				u.setId(rs.getInt("id"));
+				u.setUsername(rs.getString("username"));
 				u.setEmail(rs.getString("email"));
 				u.setFirstname(rs.getString("firstname"));
 				u.setLastname(rs.getString("lastname"));
 				u.setRole(rs.getString("role"));
 				u.setStatus(rs.getString("status"));
 				u.setPhone(rs.getString("phone"));
+				u.setDesignation(rs.getString("designation"));
+				u.setJoinedDate(rs.getDate("joinedDate"));
 				users.add(u);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return users;
+	}
+	
+	public static User getUserByUsername(String username) {
+	    String sql = "SELECT id, email, firstname, lastname, role, status, phone FROM users WHERE username = ? LIMIT 1";
+	    try (Connection con = DBConnectionUtil.getConnection();
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+	        ps.setString(1, username);
+	        ResultSet rs = ps.executeQuery();
+	        if (rs.next()) {
+	            User u = new User();
+	            u.setId(rs.getInt("id"));
+	            u.setEmail(rs.getString("email"));
+	            u.setFirstname(rs.getString("firstname"));
+	            u.setLastname(rs.getString("lastname"));
+	            u.setRole(rs.getString("role"));
+	            u.setStatus(rs.getString("status"));
+	            u.setPhone(rs.getString("phone"));
+	            return u;
+	        }
+	    } catch (Exception e) { e.printStackTrace(); }
+	    return null;
 	}
 
 	/*

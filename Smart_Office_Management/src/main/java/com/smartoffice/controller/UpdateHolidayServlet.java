@@ -20,21 +20,39 @@ public class UpdateHolidayServlet extends HttpServlet {
 
         String date = request.getParameter("date");
         String name = request.getParameter("name");
+        String type = request.getParameter("type");
 
-        try(Connection con = DBConnectionUtil.getConnection();
-            PreparedStatement ps = con.prepareStatement(
-                    "UPDATE holidays SET holiday_name=? WHERE holiday_date=?")) {
+        // Validate
+        if (date == null || date.trim().isEmpty()) {
+            response.getWriter().write("Date missing");
+            return;
+        }
+        if (name == null || name.trim().isEmpty()) {
+            response.getWriter().write("Holiday name missing");
+            return;
+        }
+        if (type == null || type.trim().isEmpty()) {
+            type = "Public";
+        }
 
-            ps.setString(1, name);
-            ps.setDate(2, java.sql.Date.valueOf(date));
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                     "UPDATE holidays SET holiday_name = ?, holiday_type = ? WHERE holiday_date = ?")) {
 
-            ps.executeUpdate();
+            ps.setString(1, name.trim());
+            ps.setString(2, type.trim());
+            ps.setDate(3, java.sql.Date.valueOf(date));
 
-            response.getWriter().write("Holiday Updated");
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                response.getWriter().write("Holiday Updated Successfully");
+            } else {
+                response.getWriter().write("No holiday found for that date");
+            }
 
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            response.getWriter().write("Update Failed");
+            response.getWriter().write("Update Failed: " + e.getMessage());
         }
     }
 }
