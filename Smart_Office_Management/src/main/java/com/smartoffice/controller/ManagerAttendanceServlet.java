@@ -52,10 +52,19 @@ public class ManagerAttendanceServlet extends HttpServlet {
                 request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
             }
 
+            // ✅ FIX: Pass On Leave flag — was missing, caused leave banner to never show
+            request.setAttribute("isOnLeave", attendanceDAO.isOnLeaveToday(username));
+
             // ── Break state ────────────────────────────────────────────────
+            // ✅ FIX: Re-query break state AFTER any punch-out auto-close
+            // so onBreak=false correctly disables End Break button post punch-out
+            boolean currentlyOnBreak = BreakDAO.isCurrentlyOnBreak(username);
+            request.setAttribute("onBreak",           currentlyOnBreak);
             request.setAttribute("breakTotalSeconds", BreakDAO.getTodayTotalSeconds(username));
             request.setAttribute("breakLogs",         BreakDAO.getTodayBreaks(username));
-            request.setAttribute("onBreak",           BreakDAO.isCurrentlyOnBreak(username));
+
+            System.out.println("[ManagerAttendanceServlet] username=" + username
+                    + " onBreak=" + currentlyOnBreak);
 
             // ── Team Attendance (today) ────────────────────────────────────
             List<TeamAttendance> teamAttendance = attendanceDAO.getTeamAttendanceForToday(username);
