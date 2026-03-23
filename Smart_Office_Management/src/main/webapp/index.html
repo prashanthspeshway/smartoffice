@@ -3,515 +3,541 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login</title>
-
-<!-- Font Awesome -->
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<title>Smart Office — Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-* {
-	box-sizing: border-box;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --panel-bg:   #c3cfe3;
+  --panel-dark: #1a2540;
+  --panel-mid:  #3d4f6e;
+  --panel-soft: #8fa0bc;
+
+  --slate-50:  #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+
+  --indigo-50:  #eef2ff;
+  --indigo-100: #e0e7ff;
+  --indigo-400: #818cf8;
+  --indigo-500: #6366f1;
+  --indigo-600: #4f46e5;
+  --indigo-700: #4338ca;
+
+  --white: #ffffff;
+  --bg:        var(--slate-100);
+  --surface:   var(--white);
+  --border:    var(--slate-200);
+  --text:      var(--slate-800);
+  --muted:     var(--slate-500);
+  --accent:    var(--indigo-600);
+  --accent-lt: var(--indigo-50);
+  --accent-ring: rgba(99,102,241,.16);
 }
 
-body {
-	margin: 0;
-	height: 100vh;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: linear-gradient(135deg, #c3cfe2 0%, #e2ebf0 100%);
-	color: #333;
+html, body { height: 100%; font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); overflow: hidden; }
+
+.page { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+
+/* ══ LEFT PANEL ══ */
+.left {
+  flex: 0 0 46%;
+  position: relative;
+  background: var(--panel-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 52px 52px;
+  overflow: hidden;
 }
 
-.login-box {
-	width: min(90%, 380px);
-	padding: 40px 30px;
-	background: rgba(255, 255, 255, 0.155);
-	/* background:transparent; */
-	backdrop-filter: blur(10px);
-	border-radius: 16px;
-	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-	border: 1px solid rgba(255, 255, 255, 0.2);
-	transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* dot grid */
+.left::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(26,37,64,.15) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
 }
 
-.login-box:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+.grid-marks {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(26,37,64,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,37,64,.05) 1px, transparent 1px);
+  background-size: 56px 56px;
 }
 
-.login-box h1 {
-	text-align: center;
-	margin-bottom: 10px;
-	color: #2d3748;
-	font-size: 29px;
-	font-weight: 700;
-	letter-spacing: -0.2px;
+.stripe-band {
+  position: absolute;
+  width: 200%; height: 70px;
+  background: repeating-linear-gradient(
+    -55deg, transparent, transparent 12px,
+    rgba(26,37,64,.04) 12px, rgba(26,37,64,.04) 24px
+  );
+  top: 50%; transform: translateY(-50%);
+  left: -50%;
+  pointer-events: none;
 }
 
-.login-box label {
-	display: block;
-	margin-bottom: 8px;
-	font-size: 15px;
-	color: #000;
-	font-weight: 500;
+.arc-bl {
+  position: absolute;
+  width: 340px; height: 340px;
+  border-radius: 50%;
+  border: 2px solid rgba(26,37,64,.08);
+  bottom: -160px; left: -120px;
+  pointer-events: none;
 }
 
-.login-box input {
-	width: 100%;
-	margin-bottom: 16px;
-	padding: 12px 16px;
-	border-radius: 8px;
-	border: 1px solid #000;
-	font-size: 15px;
-	background: #f7fafc;
-	transition: border-color 0.2s ease, box-shadow 0.2s ease,
-		background-color 0.2s ease;
+.dot-accent { position: absolute; border-radius: 50%; pointer-events: none; }
+.dot-accent.da1 { width: 76px; height: 76px; background: rgba(26,37,64,.09); top: 60px; right: 60px; animation: dotPulse 6s ease-in-out infinite; }
+.dot-accent.da2 { width: 38px; height: 38px; background: rgba(79,70,229,.2); bottom: 100px; right: 88px; animation: dotPulse 8s ease-in-out infinite 2s; }
+.dot-accent.da3 { width: 13px; height: 13px; background: var(--panel-dark); opacity: .22; top: 140px; left: 54px; animation: dotPulse 7s ease-in-out infinite 1s; }
+@keyframes dotPulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.12);opacity:.7;} }
+
+.panel-rule {
+  position: absolute; top: 0; right: 0; width: 1px; height: 100%;
+  background: linear-gradient(to bottom, transparent 0%, rgba(26,37,64,.14) 20%, rgba(26,37,64,.14) 80%, transparent 100%);
 }
 
-.login-box input:focus {
-	outline: none;
-	border-color: #667eea;
-	background: #fff;
-	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+.logo-mark {
+  position: relative; z-index: 2;
+  width: 76px; height: 76px;
+  background: var(--panel-dark);
+  border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; color: var(--panel-bg);
+  margin-bottom: 28px;
+  box-shadow: 0 0 0 6px rgba(26,37,64,.1), 0 12px 36px rgba(26,37,64,.28);
+  animation: floatY 5s ease-in-out infinite;
+}
+@keyframes floatY { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-9px);} }
+
+.brand { position: relative; z-index: 2; text-align: center; margin-bottom: 34px; }
+.brand-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.6rem, 2.5vw, 2.15rem);
+  font-weight: 800;
+  color: var(--panel-dark);
+  letter-spacing: -.04em;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+.brand-title span { color: var(--indigo-600); }
+.brand-sub { font-size: .875rem; color: var(--panel-mid); line-height: 1.7; max-width: 270px; margin: 0 auto; font-weight: 400; }
+
+.features { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 280px; }
+.feature-item {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,.5);
+  border: 1px solid rgba(26,37,64,.1);
+  border-radius: 10px;
+  padding: 11px 15px;
+  color: var(--panel-dark);
+  font-size: .83rem; font-weight: 600;
+  opacity: 0; transform: translateX(-16px);
+  animation: featureIn .5s cubic-bezier(.22,1,.36,1) forwards;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 1px 4px rgba(26,37,64,.07);
+}
+.feature-item:nth-child(1){animation-delay:.4s;}
+.feature-item:nth-child(2){animation-delay:.56s;}
+.feature-item:nth-child(3){animation-delay:.72s;}
+@keyframes featureIn{to{opacity:1;transform:translateX(0);}}
+
+.feature-item .fi-icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--panel-dark);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--panel-bg); flex-shrink: 0;
 }
 
-.login-box input::placeholder {
-	color: #444;
+.version-tag {
+  position: absolute; bottom: 22px; z-index: 2;
+  font-family: 'DM Mono', monospace;
+  font-size: .67rem; color: var(--panel-mid);
+  letter-spacing: .1em; opacity: .7;
 }
 
-/* ===== Password Wrapper ===== */
-.password-wrapper {
-	position: relative;
-	margin-bottom: 20px;
+/* ══ RIGHT PANEL ══ */
+.right {
+  flex: 0 0 54%;
+  background: var(--slate-100);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.right::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 65% 50% at 75% 10%, rgba(195,207,227,.35) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 45% at 15% 90%, rgba(238,242,255,.6) 0%, transparent 55%);
+}
+.right::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, #1a2540 0%, var(--indigo-500) 50%, transparent 100%);
+  opacity: .5;
 }
 
-.password-wrapper input {
-	padding-right: 48px;
+.card {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 400px; margin: 0 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 36px 32px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 6px 24px rgba(0,0,0,.08), inset 0 0 0 1px rgba(255,255,255,.9);
 }
 
-.password-wrapper i {
-	position: absolute;
-	right: 16px;
-	top: 37%;
-	transform: translateY(-50%);
-	cursor: pointer;
-	color: #444;
-	transition: color 0.2s ease;
-	font-size: 16px;
-}
+.frm { width: 100%; }
+#frmForgot { display: none; }
 
-.password-wrapper i:hover {
-	color: #667eea;
-}
-
-/* ===== Button ===== */
-.login-box button {
-	width: 100%;
-	padding: 12px;
-	border: none;
-	border-radius: 8px;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	color: white;
-	font-size: 16px;
-	font-weight: 500;
-	cursor: pointer;
-	transition: transform 0.2s ease, box-shadow 0.2s ease;
-	letter-spacing: 0.5px;
-}
-
-.login-box button i {
-	margin-left: 8px;
-	transition: transform 0.2s ease;
-}
-
-.login-box button:hover {
-	transform: translateY(-1px);
-	transition: transform 1.5s ease;
-	box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-	background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-}
-
-.login-box button:active {
-	transform: translateY(0);
-}
-
-/* ================= TOAST ================= */
-.toast {
-	position: fixed;
-	top: 30px;
-	right: 30px;
-	background: #e2ebf0;
-	color: black;
-	padding: 14px 20px 14px 44px;
-	border-radius: 10px;
-	font-size: 15px;
-	font-weight: 500;
-	display: none;
-	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-	z-index: 3000;
-	line-height: 1.4;
-	animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.toast.hide {
-	animation: toastOut 0.4s ease forwards;
-}
-
-/* Icon */
-.toast::before {
-	content: "✔";
-	position: absolute;
-	left: 16px;
-	top: 50%;
-	transform: translateY(-50%);
-	font-size: 16px;
-	font-weight: bold;
-}
-
-/* ===== TOAST TYPES ===== */
-
-/* SUCCESS */
-.toast.success {
-	background: #e2ebf0;
-	color: black
-}
-
-.toast.success::before {
-	content: "✔";
-}
-
-/* ERROR */
-.toast.error {
-	background: #e2ebf0;
-	color: black
-}
-
-.toast.error::before {
-	content: "✖";
-}
-
-/* Animations */
-@keyframes toastIn {from { opacity:0;
-	transform: translateX(120px);
-}
-
-to {
-	opacity: 1;
-	transform: translateX(0);
-}
-
-}
-@keyframes toastOut {from { opacity:1;
-	transform: translateX(0);
-}
-
-to {
-	opacity: 0;
-	transform: translateX(120px);
-}
-
-}
-
-/* Container animation */
-.login-box {
-	animation: fadeSlideIn 0.8s ease-out forwards;
-}
-
-@keyframes fadeSlideIn {from { opacity:0;
-	transform: translateY(30px) scale(0.98);
-}
-
-to {
-	opacity: 1;
-	transform: translateY(0) scale(1);
-}
-
-}
-
-/* ===== Background Lines ===== */
-.bg-lines {
-	position: fixed;
-	inset: 0;
-	overflow: hidden;
-	z-index: -1;
-}
-
-.bg-lines span {
-	position: absolute;
-	width: 2px;
-	height: 120%;
-	background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.5),
-		transparent);
-	animation: moveLines 8s linear infinite;
-	opacity: 0.4;
-}
-
-/* Different positions & speeds */
-.bg-lines span:nth-child(1) {
-	left: 20%;
-	animation-duration: 9s;
-}
-
-.bg-lines span:nth-child(2) {
-	left: 45%;
-	animation-duration: 12s;
-}
-
-.bg-lines span:nth-child(3) {
-	left: 65%;
-	animation-duration: 10s;
-}
-
-.bg-lines span:nth-child(4) {
-	left: 85%;
-	animation-duration: 14s;
-}
-
-@keyframes moveLines {from { transform:translateY(-120%);
-	
-}
-
-to {
-	transform: translateY(120%);
-}
-
-}
-.divider {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	margin: 22px 0 0;
-	animation: fieldSlide 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
-}
-
-.divider-line {
-	flex: 1;
-	height: 1px;
-	background: grey;
-}
-
-.divider span {
-	font-size: 11.5px;
-	color: var(--text-light);
-	letter-spacing: 0.5px;
-	white-space: nowrap;
-}
+@keyframes slideOutLeft  { from{opacity:1;transform:translateX(0);}     to{opacity:0;transform:translateX(-100%);} }
+@keyframes slideInRight  { from{opacity:0;transform:translateX(100%);}  to{opacity:1;transform:translateX(0);}    }
+@keyframes slideOutRight { from{opacity:1;transform:translateX(0);}     to{opacity:0;transform:translateX(100%);} }
+@keyframes slideInLeft   { from{opacity:0;transform:translateX(-100%);} to{opacity:1;transform:translateX(0);}   }
+@keyframes entryReveal   { from{opacity:0;transform:translateY(18px);}  to{opacity:1;transform:translateY(0);}   }
+.anim-slide-out-left  { animation: slideOutLeft  .4s cubic-bezier(.77,0,.18,1) forwards; }
+.anim-slide-in-right  { animation: slideInRight  .4s cubic-bezier(.22,1,.36,1) forwards; }
+.anim-slide-out-right { animation: slideOutRight .4s cubic-bezier(.77,0,.18,1) forwards; }
+.anim-slide-in-left   { animation: slideInLeft   .4s cubic-bezier(.22,1,.36,1) forwards; }
+.anim-entry           { animation: entryReveal   .55s cubic-bezier(.22,1,.36,1) .08s both; }
 
 .card-header {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 12px;
-	text-align: center;
-	margin-bottom: 10px;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 22px; padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
 }
-
-.logo-ring {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 35px;
-	height: 35px;
-	background: linear-gradient(135deg, #667eea, #764ba2);
-	border-radius: 12px;
-	animation: cardReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+.card-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--panel-dark);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--panel-bg); flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(26,37,64,.22);
 }
+.card-title { font-family: 'Syne', sans-serif; font-size: 1.22rem; font-weight: 700; color: var(--text); letter-spacing: -.03em; line-height: 1.2; }
+.card-sub { font-size: .78rem; color: var(--muted); margin-top: 2px; }
 
-.logo-ring i {
-	color: #fff;
-	font-size: 12px;
+.field { margin-bottom: 13px; }
+.field label { display: block; font-size: .76rem; font-weight: 600; color: var(--slate-700); margin-bottom: 5px; letter-spacing: .01em; }
+
+.inp-wrap { position: relative; }
+.inp-wrap .ico { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--slate-400); font-size: 12px; pointer-events: none; transition: color .2s; }
+.inp-wrap input {
+  width: 100%; padding: 10px 13px 10px 34px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: .875rem;
+  color: var(--text); background: var(--slate-50); outline: none;
+  transition: border-color .2s, box-shadow .2s, background .2s;
 }
+.inp-wrap input::placeholder { color: var(--slate-300); }
+.inp-wrap input:hover  { border-color: var(--slate-300); background: var(--white); }
+.inp-wrap input:focus  { border-color: var(--panel-dark); box-shadow: 0 0 0 3px rgba(26,37,64,.1); background: var(--white); }
+.inp-wrap:focus-within .ico { color: var(--panel-dark); }
 
-.card-header h1 {
-	margin: 0;
-	font-family: "outfit", sans-serif;
-	font-size: 28px;
-	font-weight: 600;
-	color: #2d3748;
-	letter-spacing: -0.3px;
-	line-height: 1.1;
+.eye-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--slate-400); font-size: 12px; padding: 4px; transition: color .2s; }
+.eye-btn:hover { color: var(--panel-dark); }
+
+.mid-row { display: flex; align-items: center; justify-content: flex-end; margin: 4px 0 16px; }
+.fp-btn {
+  background: none; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: .78rem; font-weight: 600; color: var(--accent);
+  display: inline-flex; align-items: center; gap: 4px; padding: 0;
+  transition: color .2s, gap .2s;
 }
+.fp-btn:hover { color: var(--panel-dark); gap: 7px; }
+.fp-btn i { font-size: 9px; }
 
-.card-header p {
-	text-align: center;
-	margin-top: 6px;
-	font-size: 13.5px;
-	color: black;
-	margin-bottom: 25px;
-	font-weight: 400;
-	letter-spacing: 0.2px;
+.btn-submit {
+  width: 100%; padding: 11.5px 16px; border: none; border-radius: 8px;
+  background: var(--panel-dark); color: var(--panel-bg);
+  font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700;
+  letter-spacing: .01em; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  position: relative; overflow: hidden;
+  transition: background .2s, transform .15s, box-shadow .2s;
+  box-shadow: 0 2px 10px rgba(26,37,64,.3);
 }
+.btn-submit:hover { background: var(--panel-mid); transform: translateY(-1px); box-shadow: 0 5px 18px rgba(26,37,64,.35); }
+.btn-submit:active { transform: translateY(0); }
+.btn-submit > * { position: relative; z-index: 1; }
 
-.card-subtitle {
-	text-align: center;
-	font-size: 13.5px;
-	color: black;
-	font-family: "Outfit", sans-serif;
-	font-optical-sizing: auto;
-	font-style: normal;
-	margin-bottom: 25px;
-	font-weight: 400;
-	letter-spacing: 0.2px;
-	animation: fieldSlide 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+.ripple { position: absolute; border-radius: 50%; background: rgba(195,207,227,.3); transform: scale(0); animation: rippleOut .55s linear; pointer-events: none; }
+@keyframes rippleOut { to { transform: scale(4); opacity: 0; } }
+
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: .81rem; font-weight: 600; color: var(--accent);
+  padding: 0; margin-top: 16px;
+  transition: gap .2s, color .2s;
 }
+.back-btn:hover { gap: 10px; color: var(--panel-dark); }
 
-
-.forgot-password{
-
-    text-align:right;
-
-    margin-top:-10px;
-
-    margin-bottom:18px;
-
+.card-footer {
+  margin-top: 18px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 7px;
+  font-size: .72rem; color: var(--slate-400);
 }
- 
-.forgot-password a{
+.card-footer i { font-size: 10px; color: var(--slate-300); }
 
-    font-size:13px;
-
-    text-decoration:none;
-
-    color:#667eea;
-
-    font-weight:500;
-
+#toast {
+  position: fixed; top: 18px; right: 18px;
+  display: none; align-items: center; gap: 10px;
+  background: var(--white); border: 1px solid var(--border);
+  border-left: 4px solid var(--panel-dark);
+  color: var(--text); padding: 11px 16px; border-radius: 10px;
+  font-size: .845rem; font-weight: 500;
+  box-shadow: 0 4px 20px rgba(0,0,0,.1); z-index: 9999; max-width: 320px;
 }
- 
-.forgot-password a:hover{
+#toast.error   { border-left-color: #ef4444; }
+#toast.success { border-left-color: #22c55e; }
+#toast i { font-size: 14px; flex-shrink: 0; }
+#toast.error   i { color: #ef4444; }
+#toast.success i { color: #22c55e; }
+#toast.info    i { color: var(--panel-dark); }
+@keyframes toastIn  { from{opacity:0;transform:translateX(40px);} to{opacity:1;transform:translateX(0);} }
+@keyframes toastOut { to{opacity:0;transform:translateX(40px);} }
 
-    text-decoration:underline;
-
-}
- 
+@media (max-width: 780px) { .left{display:none;} .right{flex:0 0 100%;} .card{margin:0 20px;} }
+@media (max-height: 600px) { .card{padding:24px 28px 20px;} .field{margin-bottom:10px;} .mid-row{margin:2px 0 10px;} }
 </style>
 </head>
-
 <body>
 
-	<div class="login-box">
-		<div class="card-header">
-			<div class="logo-ring">
-				<i class="fa-solid fa-user-shield"></i>
-			</div>
-			<h1>Login</h1>
-		</div>
-		<div class="card-subtitle">Please login to your account to
-			continue.</div>
-		<form action="Login" method="post">
-			<label for="email">Email</label> <input type="email" id="email"
-				name="email" placeholder="Enter your email address" required>
-			<label for="password">Password</label>
-			<div class="password-wrapper">
-				<input type="password" id="password" name="password"
-					placeholder="Enter your password" required> <i
-					class="fa-solid fa-eye" id="eyeIcon" title="Hold to view password"></i>
-			</div>
+<div class="page">
 
-			<div class="forgot-password" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-				<label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0; font-weight:400;">
-					<input type="checkbox" name="remember" value="on" checked style="width:auto; margin:0;">
-					<span>Remember me</span>
-				</label>
-				<a href="forgotpassword.jsp">Forgot Password?</a>
-			</div>
+  <!-- ══ LEFT ══ -->
+  <div class="left">
+    <div class="grid-marks"></div>
+    <div class="stripe-band"></div>
+    <div class="arc-bl"></div>
+    <div class="dot-accent da1"></div>
+    <div class="dot-accent da2"></div>
+    <div class="dot-accent da3"></div>
+    <div class="panel-rule"></div>
 
-			<button type="submit">
-				Login<i class="fa-solid fa-right-to-bracket"></i>
-			</button>
-			<div class="divider">
-				<div class="divider-line"></div>
-				<span>Secured with end-to-end encryption</span>
-				<div class="divider-line"></div>
-			</div>
-		</form>
-	</div>
+    <!-- Inline SVG decorative geometry -->
+    <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:hidden;" viewBox="0 0 460 700" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <!-- Top-right filled corner triangle -->
+      <polygon points="340,0 460,0 460,160" fill="rgba(26,37,64,.07)"/>
+      <!-- Top-right triangle outline -->
+      <polygon points="320,0 460,0 460,180" fill="none" stroke="rgba(26,37,64,.12)" stroke-width="1.5"/>
+      <!-- Small inner triangle -->
+      <polygon points="390,0 460,0 460,80" fill="none" stroke="rgba(26,37,64,.09)" stroke-width="1"/>
+      <!-- Rotated square bottom-left -->
+      <rect x="22" y="555" width="84" height="84" rx="5" fill="rgba(26,37,64,.05)" stroke="rgba(26,37,64,.1)" stroke-width="1.5" transform="rotate(18 64 597)"/>
+      <!-- Inner rotated square -->
+      <rect x="36" y="569" width="56" height="56" rx="3" fill="none" stroke="rgba(26,37,64,.07)" stroke-width="1" transform="rotate(18 64 597)"/>
+      <!-- Hexagon left-mid -->
+      <polygon points="48,248 68,236 88,248 88,272 68,284 48,272" fill="rgba(26,37,64,.05)" stroke="rgba(26,37,64,.1)" stroke-width="1.5"/>
+      <!-- Cross-hair right -->
+      <line x1="395" y1="418" x2="395" y2="462" stroke="rgba(26,37,64,.13)" stroke-width="1.5"/>
+      <line x1="373" y1="440" x2="417" y2="440" stroke="rgba(26,37,64,.13)" stroke-width="1.5"/>
+      <circle cx="395" cy="440" r="5" fill="none" stroke="rgba(26,37,64,.13)" stroke-width="1.5"/>
+      <!-- Diagonal accent line -->
+      <line x1="0" y1="680" x2="110" y2="490" stroke="rgba(79,70,229,.15)" stroke-width="2"/>
+      <!-- Circle outline top-left area -->
+      <circle cx="80" cy="80" r="38" fill="none" stroke="rgba(26,37,64,.08)" stroke-width="1.5"/>
+      <circle cx="80" cy="80" r="20" fill="none" stroke="rgba(26,37,64,.06)" stroke-width="1"/>
+    </svg>
 
-	<!-- TOAST -->
-	<div id="toast" class="toast"></div>
+    <div class="logo-mark">
+      <i class="fa-solid fa-building-columns"></i>
+    </div>
 
+    <div class="brand">
+      <div class="brand-title">Smart<span> Office</span><br>HRMS</div>
+      <p class="brand-sub">All-in-one platform for modern workplace operations, teams &amp; productivity.</p>
+    </div>
 
-	<script>
-/* ===== Password View (Hold) ===== */
-const eyeIcon = document.getElementById("eyeIcon");
-const password = document.getElementById("password");
+    <div class="features">
+      <div class="feature-item">
+        <div class="fi-icon"><i class="fa-solid fa-users"></i></div>
+        Employee &amp; Team Management
+      </div>
+      <div class="feature-item">
+        <div class="fi-icon"><i class="fa-solid fa-user-check"></i></div>
+        Attendance &amp; Leave Tracking
+      </div>
+      <div class="feature-item">
+        <div class="fi-icon"><i class="fa-solid fa-chart-line"></i></div>
+        Analytics &amp; Admin Overview
+      </div>
+    </div>
 
-eyeIcon.addEventListener("mousedown", () => password.type = "text");
-eyeIcon.addEventListener("mouseup", () => password.type = "password");
-eyeIcon.addEventListener("mouseleave", () => password.type = "password");
+    <span class="version-tag">v2.0 · Smart Office</span>
+  </div>
 
-eyeIcon.addEventListener("touchstart", () => password.type = "text");
-eyeIcon.addEventListener("touchend", () => password.type = "password");
+  <!-- ══ RIGHT ══ -->
+  <div class="right">
+    <div class="card">
 
-/* ===== TOASTER FUNCTION ===== */
-function showToast(message, type = "success") {
-    const toast = document.getElementById("toast");
+      <!-- LOGIN -->
+      <div class="frm anim-entry" id="frmLogin">
+        <div class="card-header">
+          <div class="card-icon"><i class="fa-solid fa-user-shield"></i></div>
+          <div>
+            <div class="card-title">Sign in</div>
+            <div class="card-sub">Access your workspace</div>
+          </div>
+        </div>
+        <form action="Login" method="post" autocomplete="on">
+          <div class="field">
+            <label for="loginEmail">Email address</label>
+            <div class="inp-wrap">
+              <i class="fa-regular fa-envelope ico"></i>
+              <input type="email" id="loginEmail" name="email" placeholder="you@company.com" required autocomplete="email">
+            </div>
+          </div>
+          <div class="field">
+            <label for="loginPwd">Password</label>
+            <div class="inp-wrap">
+              <i class="fa-solid fa-lock ico"></i>
+              <input type="password" id="loginPwd" name="password" placeholder="Enter your password" required autocomplete="current-password">
+              <button type="button" class="eye-btn" id="eyeBtn" title="Hold to reveal">
+                <i class="fa-regular fa-eye" id="eyeIco"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mid-row">
+            <button type="button" class="fp-btn" id="btnShowForgot">
+              Forgot password? <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+          <button type="submit" class="btn-submit">
+            <span>Sign in</span>
+            <i class="fa-solid fa-right-to-bracket"></i>
+          </button>
+        </form>
+        <div class="card-footer">
+          <i class="fa-solid fa-shield-halved"></i>
+          Secured with end-to-end encryption
+        </div>
+      </div>
 
-    // FULL reset
-    toast.style.display = "none";
-    toast.className = "toast"; 
-    toast.offsetHeight; // force reflow (important!)
+      <!-- FORGOT -->
+      <div class="frm" id="frmForgot">
+        <div class="card-header">
+          <div class="card-icon"><i class="fa-solid fa-key"></i></div>
+          <div>
+            <div class="card-title">Reset password</div>
+            <div class="card-sub">We'll send a secure link</div>
+          </div>
+        </div>
+        <p style="font-size:.82rem;color:var(--muted);line-height:1.65;margin-bottom:18px;">
+          Enter your registered email and we'll send a reset link valid for 20 minutes.
+        </p>
+        <form action="ForgotPasswordServlet" method="post" autocomplete="off">
+          <div class="field">
+            <label for="forgotEmail">Email address</label>
+            <div class="inp-wrap">
+              <i class="fa-regular fa-envelope ico"></i>
+              <input type="email" id="forgotEmail" name="email" placeholder="you@company.com" required autocomplete="email">
+            </div>
+          </div>
+          <button type="submit" class="btn-submit">
+            <span>Send reset link</span>
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+        <button type="button" class="back-btn" id="btnShowLogin">
+          <i class="fa-solid fa-arrow-left" style="font-size:10px"></i>
+          Back to sign in
+        </button>
+        <div class="card-footer">
+          <i class="fa-solid fa-shield-halved"></i>
+          Secured with end-to-end encryption
+        </div>
+      </div>
 
-    // Apply new state
-    toast.classList.add(type);
-    toast.textContent = message;
-    toast.style.display = "block";
+    </div>
+  </div>
 
-    setTimeout(() => {
-        toast.classList.add("hide");
+</div>
 
-        setTimeout(() => {
-            toast.style.display = "none";
-            toast.className = "toast"; // reset completely
-        }, 400);
-    }, 2500);
+<div id="toast"><i id="toastIco"></i><span id="toastMsg"></span></div>
+
+<script>
+const frmLogin  = document.getElementById('frmLogin');
+const frmForgot = document.getElementById('frmForgot');
+let busy = false;
+
+document.getElementById('btnShowForgot').addEventListener('click', function () {
+  if (busy) return; busy = true;
+  frmLogin.classList.add('anim-slide-out-left');
+  setTimeout(function () {
+    frmLogin.style.display = 'none'; frmLogin.classList.remove('anim-slide-out-left');
+    frmForgot.style.display = 'block';
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      frmForgot.classList.add('anim-slide-in-right');
+      setTimeout(function () { frmForgot.classList.remove('anim-slide-in-right'); document.getElementById('forgotEmail').focus(); busy = false; }, 420);
+    }); });
+  }, 420);
+});
+
+document.getElementById('btnShowLogin').addEventListener('click', function () {
+  if (busy) return; busy = true;
+  frmForgot.classList.add('anim-slide-out-right');
+  setTimeout(function () {
+    frmForgot.style.display = 'none'; frmForgot.classList.remove('anim-slide-out-right');
+    frmLogin.style.display = 'block';
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      frmLogin.classList.add('anim-slide-in-left');
+      setTimeout(function () { frmLogin.classList.remove('anim-slide-in-left'); document.getElementById('loginEmail').focus(); busy = false; }, 420);
+    }); });
+  }, 420);
+});
+
+const eyeBtn = document.getElementById('eyeBtn');
+const eyeIco = document.getElementById('eyeIco');
+const pwInp  = document.getElementById('loginPwd');
+const showPw = () => { pwInp.type = 'text';     eyeIco.className = 'fa-regular fa-eye-slash'; };
+const hidePw = () => { pwInp.type = 'password'; eyeIco.className = 'fa-regular fa-eye'; };
+eyeBtn.addEventListener('mousedown',  showPw);
+eyeBtn.addEventListener('mouseup',    hidePw);
+eyeBtn.addEventListener('mouseleave', hidePw);
+eyeBtn.addEventListener('touchstart', e => { e.preventDefault(); showPw(); });
+eyeBtn.addEventListener('touchend',   hidePw);
+
+document.querySelectorAll('.btn-submit').forEach(btn => {
+  btn.addEventListener('click', function (e) {
+    const r = document.createElement('span');
+    const rect = this.getBoundingClientRect();
+    const sz = Math.max(rect.width, rect.height);
+    r.className = 'ripple';
+    r.style.cssText = `width:${sz}px;height:${sz}px;left:${e.clientX-rect.left-sz/2}px;top:${e.clientY-rect.top-sz/2}px`;
+    this.appendChild(r); setTimeout(() => r.remove(), 600);
+  });
+});
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast'); const ti = document.getElementById('toastIco'); const tm = document.getElementById('toastMsg');
+  t.style.display = 'none'; t.className = ''; t.offsetHeight;
+  ti.className   = type === 'error' ? 'fa-solid fa-circle-xmark' : type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-info';
+  tm.textContent = msg; t.className = type; t.style.display = 'flex';
+  t.style.animation = 'toastIn .38s cubic-bezier(.22,1,.36,1) both';
+  setTimeout(() => { t.style.animation = 'toastOut .32s ease forwards'; setTimeout(() => { t.style.display='none'; t.className=''; }, 350); }, 3400);
 }
 
-/* ===== Read URL Error ===== */
-const params = new URLSearchParams(window.location.search);
-const error = params.get("error");
-
-if (error === "invalid") {
-	showToast("Invalid email or password", "error");
-}
-else if (error === "inactive") {
-    showToast("Your account is inactive. Contact admin.", "error");
-}
-else if (error === "invalidRole") {
-    showToast("Invalid role assigned. Contact admin.", "error");
-}
-else if (error === "server") {
-    showToast("Server error. Please try again later.", "error");
-}
-else if (error === "weakPassword") {
-    showToast(
-        "Password must be at least 8 characters with uppercase, lowercase, number, and symbol",
-        "error"
-    );
-}
-else if (error === "sessionExpired") {
-    showToast("Session expired or another user logged in. Please login again.", "error");
-}
-
-const logout = params.get("logout");
-
-if (logout === "success") {
-    showToast("Logged-out successfully", "success");
-
-    // Optional: clean URL after showing toast
-    window.history.replaceState({}, document.title, window.location.pathname);
-}
+const sp = new URLSearchParams(window.location.search);
+const MSGS = { invalid:'Invalid email or password.', inactive:'Your account is inactive. Contact admin.', invalidRole:'Invalid role assigned. Contact admin.', server:'Server error. Please try again later.', weakPassword:'Password must be ≥8 chars: upper, lower, number & symbol.', sessionExpired:'Session expired. Please login again.' };
+const err = sp.get('error');
+if (err && MSGS[err]) showToast(MSGS[err], 'error');
+if (sp.get('logout') === 'success') { showToast('Logged out successfully.', 'success'); window.history.replaceState({}, '', window.location.pathname); }
 
 document.addEventListener('contextmenu', e => e.preventDefault());
-document.onkeydown = e =>
-  e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))
-    ? false
-    : true;
-
+document.onkeydown = e => e.keyCode===123||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key.toUpperCase()))?false:true;
 </script>
-
 </body>
 </html>
