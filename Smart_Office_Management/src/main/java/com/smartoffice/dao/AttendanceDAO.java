@@ -417,35 +417,44 @@ public class AttendanceDAO {
 	}
 
 	public void autoCloseMissedPunchOuts() throws Exception {
-		// Step 1: Close missed punch-outs — but NOT On Leave days
-		String closeSql = "UPDATE attendance "
-				+ "SET punch_out = TIMESTAMP(punch_date, '19:00:00'), status = 'Present' "
-				+ "WHERE punch_in  IS NOT NULL "
-				+ "  AND punch_out IS NULL "
-				+ "  AND punch_date < CURDATE() "
-				+ "  AND status NOT IN ('On Leave')";
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(closeSql)) {
-			int rows = ps.executeUpdate();
-			if (rows > 0) {
-				System.out.println("[AttendanceDAO] Auto-closed " + rows + " missed punch-out(s) from past days.");
-			}
-		}
 
-		// Step 2: Mark as Half Day if worked < 4 hours — but NOT On Leave days
-		String halfDaySql = "UPDATE attendance "
-				+ "SET status = 'Half Day' "
-				+ "WHERE punch_in  IS NOT NULL "
-				+ "  AND punch_out IS NOT NULL "
-				+ "  AND punch_date < CURDATE() "
-				+ "  AND status NOT IN ('On Leave') "
-				+ "  AND TIMESTAMPDIFF(HOUR, punch_in, punch_out) < 4";
-		try (Connection con = DBConnectionUtil.getConnection();
-				PreparedStatement ps = con.prepareStatement(halfDaySql)) {
-			int rows = ps.executeUpdate();
-			if (rows > 0) {
-				System.out.println("[AttendanceDAO] Marked " + rows + " record(s) as Half Day (< 4 hours).");
-			}
-		}
+	    // Safety guard: never touch today's records from this method
+	    // Today's punch-out is the user's responsibility or MySQL event's at end of day
+	    java.time.LocalDate today = java.time.LocalDate.now();
+	    System.out.println("[AttendanceDAO] autoCloseMissedPunchOuts() called on: " + today
+	            + " at " + java.time.LocalTime.now());
+
+	    // Step 1: Close missed punch-outs for PAST days only — never today
+	    String closeSql = "UPDATE attendance "
+	            + "SET punch_out = TIMESTAMP(punch_date, '19:30:00'), "
+	            + "    status    = 'Present' "
+	            + "WHERE punch_in  IS NOT NULL "
+	            + "  AND punch_out IS NULL "
+	            + "  AND punch_date < CURDATE() "          // ← strictly past days
+	            + "  AND status NOT IN ('On Leave')";
+
+	    try (Connection con = DBConnectionUtil.getConnection();
+	         PreparedStatement ps = con.prepareStatement(closeSql)) {
+	        int rows = ps.executeUpdate();
+	        System.out.println("[AttendanceDAO] Auto-closed " + rows
+	                + " missed punch-out(s) from past days.");
+	    }
+
+	    // Step 2: Mark Half Day if worked < 4 hours — PAST days only, never today
+	    String halfDaySql = "UPDATE attendance "
+	            + "SET status = 'Half Day' "
+	            + "WHERE punch_in  IS NOT NULL "
+	            + "  AND punch_out IS NOT NULL "
+	            + "  AND punch_date < CURDATE() "          // ← strictly past days
+	            + "  AND status NOT IN ('On Leave') "
+	            + "  AND TIMESTAMPDIFF(HOUR, punch_in, punch_out) < 4";
+
+	    try (Connection con = DBConnectionUtil.getConnection();
+	         PreparedStatement ps = con.prepareStatement(halfDaySql)) {
+	        int rows = ps.executeUpdate();
+	        System.out.println("[AttendanceDAO] Marked " + rows
+	                + " record(s) as Half Day (< 4 hours worked).");
+	    }
 	}
 
 	public void markLeaveInAttendance(String sessionValue, java.sql.Date fromDate, java.sql.Date toDate)
