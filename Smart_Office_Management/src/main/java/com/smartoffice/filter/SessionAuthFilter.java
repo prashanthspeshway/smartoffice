@@ -88,7 +88,14 @@ public class SessionAuthFilter implements Filter {
     private static boolean isUserPath(String path) {
         if (path == null) return false;
         String p = path.toLowerCase();
-        return p.equals("/user") || p.startsWith("/user?");
+        if (p.equals("/user") || p.startsWith("/user?")) {
+            return true;
+        }
+        // Employee dashboard iframe routes (restrict to employee roles in filter below)
+        return p.startsWith("/useroverview") || p.startsWith("/userattendance")
+            || p.startsWith("/usertasks") || p.startsWith("/userteam")
+            || p.startsWith("/userleave") || p.startsWith("/usermeetings")
+            || p.startsWith("/usersettings") || p.startsWith("/usernotifications");
     }
 
     private static String getRedirectForRole(String role) {

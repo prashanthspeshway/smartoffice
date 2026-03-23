@@ -1,0 +1,30 @@
+# Maven
+target/
+**/target/
+
+# Compiled Java
+*.class
+**/*.class
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Maven release backups
+pom.xml.tag
+pom.xml.releaseBackup
+release.properties
+
+# Logs & local
+*.log
+local.properties
+
+# OS
+.DS_Store
+Thumbs.db

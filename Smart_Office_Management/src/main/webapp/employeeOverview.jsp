@@ -76,7 +76,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Employee Overview</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 
@@ -117,18 +119,19 @@
     --shadow-md: 0 8px 30px rgba(102,126,234,0.16);
     --shadow-lg: 0 16px 48px rgba(102,126,234,0.22);
 
-    --fs-xs:  11px;
-    --fs-sm:  12px;
-    --fs-base:13px;
-    --fs-md:  14px;
-    --fs-lg:  15px;
+    /* Type scale aligned with Admin (adminOverview.jsp) */
+    --fs-xs:  12px;
+    --fs-sm:  13px;
+    --fs-base:15px;
+    --fs-md:  15px;
+    --fs-lg:  16px;
     --fs-xl:  18px;
-    --fs-2xl: 22px;
+    --fs-2xl: 26px;
     --fs-3xl: 28px;
 }
 
 body {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     font-size: var(--fs-base);
     line-height: 1.5;
     background: var(--bg);
@@ -196,8 +199,9 @@ body {
 .hero-left { position: relative; z-index: 1; }
 
 .hero-left h1 {
+    font-family: 'Fraunces', Georgia, serif;
     font-size: var(--fs-2xl);
-    font-weight: 800;
+    font-weight: 600;
     color: #fff;
     line-height: 1.2;
     margin-bottom: 4px;
@@ -465,8 +469,8 @@ body {
     display: flex;
     align-items: center;
     gap: 9px;
-    font-size: var(--fs-lg);
-    font-weight: 800;
+    font-size: 14px;
+    font-weight: 700;
     color: var(--text);
     line-height: 1.2;
 }
@@ -573,7 +577,7 @@ body {
     justify-content: center;
     gap: 7px;
     transition: transform .15s, box-shadow .15s, opacity .15s;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'DM Sans', system-ui, sans-serif;
 }
 
 .punch-btn:hover:not(:disabled) {
@@ -713,7 +717,7 @@ body {
     justify-content: center;
     gap: 7px;
     transition: transform .15s, box-shadow .15s, opacity .15s;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'DM Sans', system-ui, sans-serif;
 }
 .break-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.14); }
 .break-btn:disabled { opacity:.4; cursor:not-allowed; }
@@ -852,7 +856,7 @@ body {
     background: var(--surface);
     color: var(--text);
     transition: border-color .2s;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'DM Sans', system-ui, sans-serif;
     flex-shrink: 0;
 }
 .task-dropdown:hover { border-color: var(--indigo); }
@@ -1007,7 +1011,7 @@ body {
     font-size:var(--fs-xs); font-weight:700;
     cursor:pointer; flex-shrink:0; align-self:center;
     transition: background .2s;
-    font-family:'Outfit',sans-serif;
+    font-family:'DM Sans',system-ui,sans-serif;
 }
 .mark-read-btn:hover { background: rgba(102,126,234,.22); }
 
@@ -1036,7 +1040,7 @@ body {
     transition: all .2s ease;
     box-shadow: 0 2px 6px rgba(0,0,0,.04);
     white-space: nowrap;
-    font-family:'Outfit',sans-serif;
+    font-family:'DM Sans',system-ui,sans-serif;
     line-height: 1;
     text-decoration: none;
 }
@@ -1066,7 +1070,7 @@ body {
     display:flex; align-items:center; gap:8px;
 }
 .rib-emoji { font-size:var(--fs-lg); line-height:1; }
-.rib-val   { font-size:var(--fs-xl); font-weight:900; font-family:'Outfit',sans-serif; line-height:1.1; }
+.rib-val   { font-size:var(--fs-3xl); font-weight:700; font-family:'DM Sans',system-ui,sans-serif; line-height:1.1; }
 .rib-lbl   { font-size:var(--fs-xs); color:var(--muted); font-weight:500; line-height:1.2; }
 
 /* ══════════════════════════════════════════════════

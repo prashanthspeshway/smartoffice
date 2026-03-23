@@ -14,6 +14,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <tomcat.embed.version>9.0.95</tomcat.embed.version>
     </properties>
 
     <dependencies>
@@ -70,6 +71,23 @@
             <artifactId>log4j-api</artifactId>
             <version>2.18.0</version>
         </dependency>
+        <!-- Jakarta Mail (ForgotPasswordServlet) -->
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+        <!-- Embedded Tomcat for LanTomcatLauncher (dev / LAN). Excluded from WAR via maven-war-plugin. -->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>${tomcat.embed.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <version>${tomcat.embed.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -91,6 +109,29 @@
                 <configuration>
                     <warSourceDirectory>src/main/webapp</warSourceDirectory>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <!-- Do not ship embedded Tomcat or dev launcher inside the WAR (production deploy uses external Tomcat). -->
+                    <packagingExcludes>
+                        WEB-INF/classes/com/smartoffice/tools/**,
+                        WEB-INF/lib/tomcat-embed-*.jar,
+                        WEB-INF/lib/ecj-*.jar
+                    </packagingExcludes>
+                </configuration>
+            </plugin>
+            <!-- LAN dev server: binds 0.0.0.0 (Cargo embedded often ignores cargo.hostname on the connector). -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <mainClass>com.smartoffice.tools.LanTomcatLauncher</mainClass>
+                    <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                    <vmArgs>
+                        <vmArg>-Djava.net.preferIPv4Stack=true</vmArg>
+                        <vmArg>--add-opens=java.base/java.lang=ALL-UNNAMED</vmArg>
+                        <vmArg>--add-opens=java.base/java.lang.reflect=ALL-UNNAMED</vmArg>
+                        <vmArg>--add-opens=java.base/java.io=ALL-UNNAMED</vmArg>
+                        <vmArg>--add-opens=java.base/java.util=ALL-UNNAMED</vmArg>
+                    </vmArgs>
                 </configuration>
             </plugin>
             <!-- Cargo: runs embedded Tomcat 9 - no separate install needed -->
@@ -109,7 +150,7 @@
                     <configuration>
                         <properties>
                             <cargo.servlet.port>8080</cargo.servlet.port>
-                            <!-- Bind to all interfaces so friends on same network can access via your IP -->
+                            <!-- Listen on all interfaces (not just 127.0.0.1) so LAN devices can connect -->
                             <cargo.hostname>0.0.0.0</cargo.hostname>
                         </properties>
                     </configuration>

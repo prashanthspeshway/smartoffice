@@ -14,6 +14,8 @@ List<LeaveRequest> myLeaves = (List<LeaveRequest>) request.getAttribute("myLeave
 <title>Leave</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
+<style>body{font-family:'DM Sans',system-ui,sans-serif;}</style>
 </head>
 <body class="bg-slate-100 p-6">
     <div class="max-w-7xl mx-auto">

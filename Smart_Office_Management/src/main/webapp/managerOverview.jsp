@@ -110,21 +110,21 @@ String todayStr = new java.text.SimpleDateFormat("EEEE, MMMM d yyyy").format(new
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-.pg{max-width:1240px;margin:0 auto;padding:26px 18px}
+.pg{max-width:1200px;margin:0 auto;padding:32px 20px}
 
 /* HERO */
 .hero{background:linear-gradient(135deg,#4f6ef7 0%,#6366f1 50%,#8b5cf6 100%);border-radius:20px;padding:26px 30px;color:#fff;margin-bottom:18px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:20px;box-shadow:0 8px 32px rgba(79,110,247,.28)}
 .hero::before{content:'';position:absolute;top:-60px;right:-60px;width:250px;height:250px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none}
 .hero::after{content:'';position:absolute;bottom:-70px;right:140px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.05);pointer-events:none}
 .hl{position:relative;z-index:1}
-.h-eye{font-size:10px;font-weight:600;opacity:.7;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
-.h-title{font-family:'Fraunces',Georgia,serif;font-size:23px;font-weight:600;margin-bottom:5px;line-height:1.25}
-.h-sub{font-size:12px;opacity:.72;display:flex;align-items:center;gap:6px}
+.h-eye{font-size:11px;font-weight:600;opacity:.7;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
+.h-title{font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;margin-bottom:5px;line-height:1.25}
+.h-sub{font-size:13px;opacity:.72;display:flex;align-items:center;gap:6px}
 .hdot{width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;box-shadow:0 0 6px #4ade80}
 .hr{position:relative;z-index:1;display:flex;gap:9px;flex-shrink:0}
 .hs{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);border-radius:12px;padding:11px 16px;text-align:center;min-width:72px}
-.hs-n{font-size:20px;font-weight:700;color:#fff;line-height:1}
-.hs-l{font-size:10px;opacity:.72;margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
+.hs-n{font-size:22px;font-weight:700;color:#fff;line-height:1}
+.hs-l{font-size:12px;font-weight:500;opacity:.72;margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
 
 /* KPI */
 .krow{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:16px}
@@ -136,38 +136,38 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .kpi.bl::before{background:var(--blue)}.kpi.gr::before{background:var(--green)}
 .kpi.am::before{background:var(--amber)}.kpi.vi::before{background:var(--violet)}.kpi.re::before{background:var(--red)}
 .k-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
-.k-ico{width:36px;height:36px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:15px}
+.k-ico{width:38px;height:38px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:16px}
 .kpi.bl .k-ico{background:#eef1fe;color:var(--blue)}.kpi.gr .k-ico{background:#f0fdf4;color:var(--green)}
 .kpi.am .k-ico{background:#fffbeb;color:var(--amber)}.kpi.vi .k-ico{background:#f5f3ff;color:var(--violet)}
 .kpi.re .k-ico{background:#fef2f2;color:var(--red)}
-.k-chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px}
-.k-num{font-size:27px;font-weight:700;line-height:1;color:var(--text)}
-.k-lbl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
-.k-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.k-chip{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+.k-num{font-size:28px;font-weight:700;line-height:1;color:var(--text)}
+.k-lbl{font-size:12px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.k-sub{font-size:11px;color:var(--text3);margin-top:2px}
 
 /* INSIGHT STRIP */
 .irow{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:16px}
 @media(max-width:700px){.irow{grid-template-columns:1fr 1fr}}
 .ins{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 17px;display:flex;align-items:center;gap:13px;box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .2s}
 .ins:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
-.ins-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.ins-lbl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.ins-val{font-size:21px;font-weight:700;color:var(--text);line-height:1.1;margin:2px 0}
+.ins-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ins-lbl{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.ins-val{font-size:20px;font-weight:700;color:var(--text);line-height:1.1;margin:2px 0}
 .ins-bar{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:5px}
 .ins-fill{height:100%;border-radius:99px;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
 
 /* SECTION */
-.sec{font-family:'Fraunces',Georgia,serif;font-size:14px;font-weight:600;color:var(--text);margin-bottom:11px;display:flex;align-items:center;gap:8px}
+.sec{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:600;color:var(--text);margin-bottom:11px;display:flex;align-items:center;gap:8px}
 .sec::after{content:'';flex:1;height:1px;background:var(--border)}
 
 /* CARD */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--shadow-sm);transition:box-shadow .2s}
 .card:hover{box-shadow:var(--shadow)}
 .ch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:13px}
-.ct{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
-.ci{width:25px;height:25px;border-radius:7px;background:#eef1fe;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:10px}
-.cs{font-size:10px;color:var(--text3);margin-top:2px}
-.badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:#eef1fe;color:var(--blue);border:1px solid #d4dcfc;white-space:nowrap}
+.ct{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
+.ci{width:26px;height:26px;border-radius:8px;background:#eef1fe;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11px}
+.cs{font-size:11px;color:var(--text3);margin-top:2px}
+.badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:#eef1fe;color:var(--blue);border:1px solid #d4dcfc;white-space:nowrap}
 .badge.gr{background:#f0fdf4;color:var(--green);border-color:#bbf7d0}
 .badge.am{background:#fffbeb;color:var(--amber);border-color:#fde68a}
 .badge.re{background:#fef2f2;color:var(--red);border-color:#fecaca}
@@ -186,27 +186,27 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .mi{display:flex;align-items:center;gap:11px;padding:12px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:7px;transition:all .2s}
 .mi:last-child{margin-bottom:0}.mi:hover{border-color:#c7d2fe;background:#f5f7ff}
 .md{width:3px;height:36px;border-radius:99px;background:var(--blue);flex-shrink:0}
-.mt{font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mm{font-size:11px;color:var(--text2);margin-top:2px;display:flex;align-items:center;gap:7px}
-.jb{padding:6px 12px;background:var(--blue);color:#fff;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;flex-shrink:0;transition:background .2s,transform .15s}
+.mt{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mm{font-size:12px;color:var(--text2);margin-top:2px;display:flex;align-items:center;gap:7px}
+.jb{padding:6px 12px;background:var(--blue);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;flex-shrink:0;transition:background .2s,transform .15s}
 .jb:hover{background:#3d5fff;transform:scale(1.04)}
 
 /* QUICK ACTIONS */
 .qg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .qa{display:flex;flex-direction:column;align-items:center;gap:6px;padding:13px 7px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-family:inherit}
 .qa:hover{border-color:#c7d2fe;background:#eef1fe;transform:translateY(-2px);box-shadow:var(--shadow-sm)}
-.qi{width:36px;height:36px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:14px}
-.ql{font-size:10px;font-weight:600;color:var(--text2);text-align:center;line-height:1.3}
+.qi{width:38px;height:38px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:15px}
+.ql{font-size:11px;font-weight:600;color:var(--text2);text-align:center;line-height:1.3}
 
 /* TEAMS */
 .tg{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .tc{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px;transition:all .2s}
 .tc:hover{border-color:#c7d2fe;transform:translateY(-2px);box-shadow:var(--shadow-sm)}
 .tt{display:flex;align-items:center;gap:8px;margin-bottom:7px}
-.ta{width:32px;height:32px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
-.tn{font-weight:700;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tct{font-size:10px;color:var(--text3)}
-.td{font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.ta{width:34px;height:34px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.tn{font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tct{font-size:11px;color:var(--text3)}
+.td{font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .tb{height:3px;background:var(--border);border-radius:99px;overflow:hidden}
 .tf{height:100%;border-radius:99px;transition:width 1.2s ease}
 
@@ -214,20 +214,20 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .al{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:9px;border:1px solid;text-decoration:none;margin-bottom:7px;transition:all .15s}
 .al:last-child{margin-bottom:0}.al:hover{transform:translateX(3px);filter:brightness(.97)}
 .ali{display:flex;align-items:center;gap:9px}
-.alic{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
-.alt{font-size:12px;font-weight:700;color:var(--text)}.als{font-size:10px;color:var(--text3);margin-top:1px}
-.alb{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px}
+.alic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.alt{font-size:13px;font-weight:700;color:var(--text)}.als{font-size:11px;color:var(--text3);margin-top:1px}
+.alb{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px}
 
 /* ACTIVITY */
 .aci{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--border)}
 .aci:last-child{border-bottom:none}
-.acd{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
-.act-t{font-size:11px;font-weight:700;color:var(--text)}.act-d{font-size:10px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}.act-tm{font-size:10px;color:var(--text3);margin-top:1px}
+.acd{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.act-t{font-size:12px;font-weight:700;color:var(--text)}.act-d{font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}.act-tm{font-size:11px;color:var(--text3);margin-top:1px}
 
 /* PERF */
 .perf{background:linear-gradient(135deg,#4f6ef7 0%,#6366f1 50%,#8b5cf6 100%);border-radius:var(--r);padding:18px;color:#fff;box-shadow:0 8px 24px rgba(79,110,247,.22)}
 .pb-wrap{margin-bottom:10px}
-.pb-lbl{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.pb-lbl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
 .pb-lbl span:first-child{opacity:.8}.pb-lbl span:last-child{font-weight:700}
 .pb-trk{height:5px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden}
 .pb-fill{height:100%;border-radius:99px;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
@@ -235,17 +235,17 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 
 /* DONUT LEGEND */
 .leg{display:flex;justify-content:center;gap:12px;margin-top:9px;flex-wrap:wrap}
-.leg span{font-size:10px;color:var(--text2);display:flex;align-items:center;gap:4px}
+.leg span{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px}
 .ld{width:8px;height:8px;border-radius:50%;display:inline-block}
 
 /* EMPTY */
 .empty{text-align:center;padding:22px;color:var(--text3)}
 .empty i{font-size:26px;color:var(--border);display:block;margin-bottom:7px}
-.empty span{font-size:11px}
+.empty span{font-size:12px}
 
 /* CHART STAT PILLS — shown below charts */
 .cpills{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
-.cpill{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--border)}
+.cpill{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--border)}
 .cpill-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 @keyframes fu{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:translateY(0)}}
@@ -324,7 +324,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
       <div class="ins-lbl">Task Completion</div>
       <div class="ins-val" style="color:var(--blue)"><%=compRate%>%</div>
       <div class="ins-bar"><div class="ins-fill" style="width:<%=compRate%>%;background:var(--blue)"></div></div>
-      <div style="font-size:10px;color:var(--text3);margin-top:4px"><%=sCT%> completed of <%=totalT%> total</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px"><%=sCT%> completed of <%=totalT%> total</div>
     </div>
   </div>
   <div class="ins">
@@ -333,7 +333,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
       <div class="ins-lbl">Reviews Done</div>
       <div class="ins-val" style="color:var(--violet)"><%=revRate%>%</div>
       <div class="ins-bar"><div class="ins-fill" style="width:<%=revRate%>%;background:var(--violet)"></div></div>
-      <div style="font-size:10px;color:var(--text3);margin-top:4px"><%=sR%> rated · <%=sPR%> pending</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px"><%=sR%> rated · <%=sPR%> pending</div>
     </div>
   </div>
 </div>
@@ -410,7 +410,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
     <div class="card">
       <div class="ch">
         <div class="ct"><div class="ci" style="background:#ecfeff;color:var(--cyan)"><i class="fa-solid fa-calendar-day"></i></div> Today's Meetings</div>
-        <a href="#" onclick="parent.loadPage(null,'managerMeetings');return false;" style="font-size:11px;font-weight:700;color:var(--blue);text-decoration:none">View All →</a>
+        <a href="#" onclick="parent.loadPage(null,'managerMeetings');return false;" style="font-size:12px;font-weight:700;color:var(--blue);text-decoration:none">View All →</a>
       </div>
       <%
       if(todayMeetings!=null&&!todayMeetings.isEmpty()){
@@ -421,7 +421,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
         <div style="flex:1;min-width:0">
           <div class="mt"><%=m.getTitle()%></div>
           <div class="mm">
-            <span><i class="fa-solid fa-clock" style="opacity:.45;margin-right:3px;font-size:9px"></i><%=tf.format(m.getStartTime())%> – <%=tf.format(m.getEndTime())%></span>
+            <span><i class="fa-solid fa-clock" style="opacity:.45;margin-right:3px;font-size:10px"></i><%=tf.format(m.getStartTime())%> – <%=tf.format(m.getEndTime())%></span>
             <%if(m.getDescription()!=null&&!m.getDescription().isEmpty()){%>
             <span style="color:var(--text3)">·</span>
             <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;color:var(--text3)"><%=m.getDescription()%></span>
@@ -429,7 +429,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
           </div>
         </div>
         <%if(m.getMeetingLink()!=null&&!m.getMeetingLink().isEmpty()){%>
-        <a href="<%=m.getMeetingLink()%>" target="_blank" class="jb"><i class="fa-solid fa-arrow-up-right-from-square" style="font-size:8px;margin-right:3px"></i>Join</a>
+        <a href="<%=m.getMeetingLink()%>" target="_blank" class="jb"><i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;margin-right:3px"></i>Join</a>
         <%}%>
       </div><%
         }}else{%>
@@ -502,11 +502,11 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
       <div style="display:flex;justify-content:center;margin-top:10px;gap:8px;flex-wrap:wrap">
         <div style="text-align:center;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;flex:1">
           <div style="font-size:16px;font-weight:700;color:var(--green)"><%=attRate%>%</div>
-          <div style="font-size:10px;color:var(--text3)">Attendance Rate</div>
+          <div style="font-size:12px;color:var(--text3)">Attendance Rate</div>
         </div>
         <div style="text-align:center;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;flex:1">
           <div style="font-size:16px;font-weight:700;color:var(--red)"><%=sA>0?(sA*100/Math.max(totalAtt,1)):0%>%</div>
-          <div style="font-size:10px;color:var(--text3)">Absent Rate</div>
+          <div style="font-size:12px;color:var(--text3)">Absent Rate</div>
         </div>
       </div>
     </div>
@@ -563,7 +563,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 
     <!-- Performance Card -->
     <div class="perf">
-      <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:12px">
+      <div style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:12px">
         <i class="fa-solid fa-chart-line"></i> Performance Review
       </div>
       <div class="pb-wrap">
@@ -585,7 +585,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
           <div style="font-size:21px;font-weight:700;margin-top:2px"><%=sR%> <span style="font-size:12px;opacity:.55">/ <%=totalRev%></span></div>
         </div>
         <a href="#" onclick="parent.loadPage(null,'managerPerformance');return false;"
-          style="padding:8px 15px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:9px;font-size:12px;font-weight:600;text-decoration:none"
+          style="padding:8px 15px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none"
           onmouseover="this.style.background='rgba(255,255,255,.28)'" onmouseout="this.style.background='rgba(255,255,255,.18)'">Rate Now →</a>
       </div>
     </div>
@@ -596,7 +596,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 
 <script>
 Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
-Chart.defaults.font.size   = 11;
+Chart.defaults.font.size   = 12;
 Chart.defaults.color       = '#9aa0b8';
 Chart.defaults.plugins.legend.labels.boxWidth  = 10;
 Chart.defaults.plugins.legend.labels.padding   = 11;

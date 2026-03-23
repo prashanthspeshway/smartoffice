@@ -124,34 +124,69 @@ function submitPassword(e) {
 }
 
 function loadDesignations() {
-	fetch('<%=request.getContextPath()%>/manageDesignations')
-		.then(function(r){ return r.json(); })
-		.then(function(list){
-			var wrap = document.getElementById('designationList');
-			var empty = document.getElementById('designationEmpty');
-			wrap.innerHTML = '';
-			if (!list || list.length === 0) {
-				empty.classList.remove('hidden');
-				return;
-			}
-			empty.classList.add('hidden');
-			list.forEach(function(name){
-				var row = document.createElement('div');
-				row.className = 'flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50';
-				row.innerHTML =
-					'<div class=\"font-medium text-slate-800\">' + escapeHtml(name) + '</div>' +
-					'<form action=\"<%=request.getContextPath()%>/manageDesignations\" method=\"post\">' +
-					'<input type=\"hidden\" name=\"action\" value=\"deactivate\">' +
-					'<input type=\"hidden\" name=\"name\" value=\"' + escapeAttr(name) + '\">' +
-					'<button type=\"submit\" class=\"px-3 py-1.5 text-sm bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg\">Remove</button>' +
-					'</form>';
-				wrap.appendChild(row);
-			});
-		})
-		.catch(function(){
-			var wrap = document.getElementById('designationList');
-			wrap.innerHTML = '<p class=\"text-sm text-red-600\">Unable to load designations</p>';
-		});
+    fetch('<%=request.getContextPath()%>/manageDesignations')
+        .then(function(r) { return r.json(); })
+        .then(function(list) {
+            var wrap  = document.getElementById('designationList');
+            var empty = document.getElementById('designationEmpty');
+            wrap.innerHTML = '';
+            if (!list || list.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+            list.forEach(function(name) {
+                var row = document.createElement('div');
+                row.className = 'flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50';
+                row.innerHTML =
+                    '<div class="font-medium text-slate-800">' + escapeHtml(name) + '</div>' +
+                    '<button type="button" class="px-3 py-1.5 text-sm bg-white border border-slate-300 hover:bg-red-50 hover:border-red-300 hover:text-red-600 text-slate-700 rounded-lg transition-colors">' +
+                    '<i class="fa-solid fa-trash mr-1"></i>Remove</button>';
+
+                // ✅ FIX: attach click with the actual name variable — no form, no redirect
+                row.querySelector('button').addEventListener('click', function() {
+                    removeDesignation(name, row);
+                });
+                wrap.appendChild(row);
+            });
+        })
+        .catch(function() {
+            document.getElementById('designationList').innerHTML =
+                '<p class="text-sm text-red-600">Unable to load designations</p>';
+        });
+}
+
+function removeDesignation(name, rowEl) {
+    // Optimistic UI — remove the row immediately
+    rowEl.style.opacity = '0.4';
+    rowEl.style.pointerEvents = 'none';
+
+    var params = new URLSearchParams();
+    params.append('action', 'deactivate');
+    params.append('name', name);   // ✅ name passed directly — no HTML escaping issues
+
+    fetch('<%=request.getContextPath()%>/manageDesignations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+    })
+    .then(function(r) {
+        // Servlet redirects (302) — fetch follows it, response is the redirected page HTML
+        // We don't care about the response body, just reload the list
+        loadDesignations();
+        // Show toast if available
+        if (window.parent && window.parent.showToast) {
+            window.parent.showToast('Designation removed', 'success');
+        }
+    })
+    .catch(function() {
+        // Restore row on failure
+        rowEl.style.opacity = '1';
+        rowEl.style.pointerEvents = '';
+        if (window.parent && window.parent.showToast) {
+            window.parent.showToast('Failed to remove designation', 'error');
+        }
+    });
 }
 
 function escapeHtml(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;'); }

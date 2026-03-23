@@ -1,1229 +1,726 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ page import="java.util.List"%>
-<%@ page import="java.util.Map"%>
-<%@ page import="java.util.HashMap"%>
-<%@ page import="com.smartoffice.model.User"%>
-<%@ page import="com.smartoffice.model.Task"%>
-<%@ page import="com.smartoffice.model.TeamAttendance"%>
-<%@ page import="com.smartoffice.model.LeaveRequest"%>
-<%@ page import="com.smartoffice.model.Notification"%>
-<%@ page import="com.smartoffice.model.Meeting"%>
-
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List, java.util.Map, com.smartoffice.model.Team, com.smartoffice.model.Meeting, java.text.SimpleDateFormat"%>
 <%
-    String username = (String) session.getAttribute("username");
-    if (username == null) {
-        response.sendRedirect(request.getContextPath() + "/index.html");
-        return;
-    }
-    String role = (String) session.getAttribute("role");
+String username = (String) session.getAttribute("username");
+if (username == null) { response.sendRedirect(request.getContextPath() + "/index.html"); return; }
 
-    // Team data
-    List<User> teamList       = (List<User>) request.getAttribute("teamList");
-    List<TeamAttendance> teamAttendance = (List<TeamAttendance>) request.getAttribute("teamAttendance");
-    List<LeaveRequest>   leaveRequests  = (List<LeaveRequest>)  request.getAttribute("myLeaves");
-    List<Task>           viewTasks      = (List<Task>)           request.getAttribute("viewTasks");
-    List<Meeting>        todayMeetings  = (List<Meeting>)        request.getAttribute("todayMeetings");
-    List<Notification>   notifications  = (List<Notification>)   request.getAttribute("notifications");
+Integer totalTeams    = (Integer) request.getAttribute("totalTeams");
+Integer totalMembers  = (Integer) request.getAttribute("totalMembers");
+Integer presentCount  = (Integer) request.getAttribute("presentCount");
+Integer absentCount   = (Integer) request.getAttribute("absentCount");
+Integer onBreakCount  = (Integer) request.getAttribute("onBreakCount");
+Integer pendingTasks  = (Integer) request.getAttribute("pendingTasks");
+Integer completedTasks= (Integer) request.getAttribute("completedTasks");
+Integer overdueTasks  = (Integer) request.getAttribute("overdueTasks");
+Integer pendingLeaves = (Integer) request.getAttribute("pendingLeaves");
+Integer meetingCount  = (Integer) request.getAttribute("meetingCount");
+Integer ratedEmployees= (Integer) request.getAttribute("ratedEmployees");
+Integer pendingRatings= (Integer) request.getAttribute("pendingRatings");
 
-    // Attendance stats
-    int totalTeam     = (teamList      != null) ? teamList.size()      : 0;
-    int presentCount  = 0, absentCount  = 0, lateCount = 0;
-    if (teamAttendance != null) {
-        for (TeamAttendance ta : teamAttendance) {
-            String s = ta.getStatus();
-            if      ("PRESENT".equalsIgnoreCase(s))  presentCount++;
-            else if ("LATE".equalsIgnoreCase(s))     lateCount++;
-            else                                      absentCount++;
-        }
-    }
-    int pendingLeave = 0;
-    if (leaveRequests != null) {
-        for (LeaveRequest lr : leaveRequests)
-            if ("PENDING".equalsIgnoreCase(lr.getStatus())) pendingLeave++;
-    }
-    int meetingsToday = (todayMeetings != null) ? todayMeetings.size() : 0;
-    int unreadNotifs  = (notifications != null) ? notifications.size() : 0;
+List<Team> teams                          = (List<Team>) request.getAttribute("teams");
+List<Meeting> todayMeetings               = (List<Meeting>) request.getAttribute("todayMeetings");
+List<Map<String,String>> recentActivities = (List<Map<String,String>>) request.getAttribute("recentActivities");
 
-    // Task stats
-    int totalTasks = 0, completedTasks = 0, pendingTasks = 0;
-    if (viewTasks != null) {
-        totalTasks = viewTasks.size();
-        for (Task t : viewTasks) {
-            if ("COMPLETED".equalsIgnoreCase(t.getStatus())) completedTasks++;
-            else pendingTasks++;
-        }
-    }
+// Analytics — weekly attendance
+String weekLabels      = (String) request.getAttribute("weekLabels");
+String weekPresentData = (String) request.getAttribute("weekPresentData");
+String weekAbsentData  = (String) request.getAttribute("weekAbsentData");
 
-    double attendanceRate = totalTeam > 0 ? Math.round(((presentCount + lateCount) * 100.0) / totalTeam) : 0;
+// Analytics — task status (exact DB values: ASSIGNED / COMPLETED / SUBMITTED + computed OVERDUE)
+Integer taskAssigned  = (Integer) request.getAttribute("taskAssigned");
+Integer taskCompleted = (Integer) request.getAttribute("taskCompleted");
+Integer taskSubmitted = (Integer) request.getAttribute("taskSubmitted");
+Integer taskOverdue   = (Integer) request.getAttribute("taskOverdue");
+
+// Analytics — leave types (keyword-bucketed)
+Integer leaveSick      = (Integer) request.getAttribute("leaveSick");
+Integer leaveAnnual    = (Integer) request.getAttribute("leaveAnnual");
+Integer leavePersonal  = (Integer) request.getAttribute("leavePersonal");
+Integer leaveMaternity = (Integer) request.getAttribute("leaveMaternity");
+Integer leaveOther     = (Integer) request.getAttribute("leaveOther");
+
+// Analytics — punch-in distribution
+Integer punchBefore8 = (Integer) request.getAttribute("punchBefore8");
+Integer punch8to9    = (Integer) request.getAttribute("punch8to9");
+Integer punch9to10   = (Integer) request.getAttribute("punch9to10");
+Integer punch10to11  = (Integer) request.getAttribute("punch10to11");
+Integer punchAfter11 = (Integer) request.getAttribute("punchAfter11");
+
+// Safe int conversions
+int sP  = presentCount   != null ? presentCount   : 0;
+int sA  = absentCount    != null ? absentCount     : 0;
+int sB  = onBreakCount   != null ? onBreakCount    : 0;
+int sPT = pendingTasks   != null ? pendingTasks    : 0;
+int sCT = completedTasks != null ? completedTasks  : 0;
+int sOT = overdueTasks   != null ? overdueTasks    : 0;
+int sR  = ratedEmployees != null ? ratedEmployees  : 0;
+int sPR = pendingRatings != null ? pendingRatings  : 0;
+int sL  = pendingLeaves  != null ? pendingLeaves   : 0;
+int sM  = meetingCount   != null ? meetingCount    : 0;
+int sTM = totalMembers   != null ? totalMembers    : 0;
+int sTC = totalTeams     != null ? totalTeams      : 0;
+
+// Computed rates
+int totalAtt = sP + sA + sB;
+int attRate  = totalAtt > 0 ? (sP * 100 / totalAtt) : 0;
+int totalT   = sPT + sCT;
+int compRate = totalT > 0 ? (sCT * 100 / totalT) : 0;
+int totalRev = sR + sPR;
+int revRate  = totalRev > 0 ? (sR * 100 / totalRev) : 0;
+
+// Chart data safe defaults
+if (weekLabels      == null) weekLabels      = "'Mon','Tue','Wed','Thu','Fri','Sat','Sun'";
+if (weekPresentData == null) weekPresentData = "0,0,0,0,0,0,0";
+if (weekAbsentData  == null) weekAbsentData  = "0,0,0,0,0,0,0";
+int vTA = taskAssigned  != null ? taskAssigned  : 0;
+int vTC = taskCompleted != null ? taskCompleted : 0;
+int vTS = taskSubmitted != null ? taskSubmitted : 0;
+int vTO = taskOverdue   != null ? taskOverdue   : 0;
+int vLS = leaveSick     != null ? leaveSick     : 0;
+int vLA = leaveAnnual   != null ? leaveAnnual   : 0;
+int vLP = leavePersonal != null ? leavePersonal : 0;
+int vLM = leaveMaternity!= null ? leaveMaternity: 0;
+int vLO = leaveOther    != null ? leaveOther    : 0;
+int vP0 = punchBefore8  != null ? punchBefore8  : 0;
+int vP1 = punch8to9     != null ? punch8to9     : 0;
+int vP2 = punch9to10    != null ? punch9to10    : 0;
+int vP3 = punch10to11   != null ? punch10to11   : 0;
+int vP4 = punchAfter11  != null ? punchAfter11  : 0;
+
+String todayStr = new java.text.SimpleDateFormat("EEEE, MMMM d yyyy").format(new java.util.Date());
 %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manager Overview</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Manager Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-/* ─── Reset & Variables ─── */
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
 :root {
-    --bg:        #c3cfe2;
-    --surface:   rgba(255,255,255,0.65);
-    --surface2:  rgba(255,255,255,0.45);
-    --glass:     rgba(255,255,255,0.3);
-    --border:    rgba(255,255,255,0.55);
-    --text-main: #1a2540;
-    --text-muted:#4a5578;
-    --text-light:#8492b4;
-    --accent1:   #6366f1;
-    --accent2:   #764ba2;
-    --green:     #10b981;
-    --amber:     #f59e0b;
-    --red:       #ef4444;
-    --blue:      #3b82f6;
-    --radius:    16px;
-    --shadow:    0 8px 32px rgba(30,41,100,.13);
-    --shadow-lg: 0 16px 48px rgba(30,41,100,.18);
+  --bg:#f0f2f8; --surface:#fff; --surface2:#f7f8fc; --border:#e4e8f0;
+  --text:#1a1d2e; --text2:#5a6278; --text3:#9aa0b8;
+  --blue:#4f6ef7; --green:#22c55e; --violet:#8b5cf6;
+  --amber:#f59e0b; --red:#ef4444; --cyan:#06b6d4;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06);
+  --shadow:0 4px 16px rgba(0,0,0,.08);
+  --r:16px; --r2:10px;
 }
-
-body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text-main);
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-/* ─── Scrollbar ─── */
-::-webkit-scrollbar        { width:6px; }
-::-webkit-scrollbar-track  { background:transparent; }
-::-webkit-scrollbar-thumb  { background:rgba(99,102,241,.35); border-radius:8px; }
-
-/* ─── Page Wrapper ─── */
-.overview-page {
-    padding: 28px 32px 40px;
-    max-width: 1400px;
-    margin: 0 auto;
-    animation: pageIn .5s ease both;
-}
-
-@keyframes pageIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
-
-/* ─── Header ─── */
-.ov-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.ov-title-block h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--accent1), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.1;
-}
-
-.ov-title-block p {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-top: 4px;
-    font-weight: 400;
-}
-
-.live-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 30px;
-    background: rgba(16,185,129,.12);
-    border: 1px solid rgba(16,185,129,.3);
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--green);
-}
-
-.live-dot {
-    width:8px; height:8px;
-    border-radius:50%;
-    background: var(--green);
-    animation: pulse 1.6s infinite;
-}
-
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.6;transform:scale(1.3);} }
-
-/* ─── Quick-Nav Pills ─── */
-.quick-nav {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 28px;
-}
-
-.qn-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 8px 18px;
-    border-radius: 30px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-main);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    backdrop-filter: blur(10px);
-    transition: all .2s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-}
-
-.qn-pill:hover, .qn-pill.active {
-    background: linear-gradient(135deg, var(--accent1), var(--accent2));
-    color: #fff;
-    border-color: transparent;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(99,102,241,.35);
-}
-
-.qn-pill i { font-size: 12px; }
-
-/* ─── Stat Cards Row ─── */
-.stat-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 18px;
-    margin-bottom: 28px;
-}
-
-.stat-card {
-    background: var(--surface);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 22px 20px;
-    box-shadow: var(--shadow);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    cursor: default;
-    transition: transform .22s ease, box-shadow .22s ease;
-    animation: cardIn .45s ease both;
-}
-
-.stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-}
-
-@keyframes cardIn { from{opacity:0;transform:translateY(18px);} to{opacity:1;transform:translateY(0);} }
-.stat-card:nth-child(1){animation-delay:.05s}
-.stat-card:nth-child(2){animation-delay:.10s}
-.stat-card:nth-child(3){animation-delay:.15s}
-.stat-card:nth-child(4){animation-delay:.20s}
-.stat-card:nth-child(5){animation-delay:.25s}
-.stat-card:nth-child(6){animation-delay:.30s}
-
-.stat-icon {
-    width: 52px; height: 52px;
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    flex-shrink: 0;
-}
-
-.si-purple { background: rgba(99,102,241,.15);  color: var(--accent1); }
-.si-green  { background: rgba(16,185,129,.15);  color: var(--green);   }
-.si-amber  { background: rgba(245,158,11,.15);  color: var(--amber);   }
-.si-red    { background: rgba(239,68,68,.15);   color: var(--red);     }
-.si-blue   { background: rgba(59,130,246,.15);  color: var(--blue);    }
-.si-teal   { background: rgba(20,184,166,.15);  color: #14b8a6;        }
-
-.stat-info { flex:1; min-width:0; }
-
-.stat-info .label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-light);
-    text-transform: uppercase;
-    letter-spacing: .6px;
-    margin-bottom: 4px;
-}
-
-.stat-info .value {
-    font-family: 'Syne', sans-serif;
-    font-size: 30px;
-    font-weight: 800;
-    color: var(--text-main);
-    line-height: 1;
-}
-
-.stat-info .sub {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 3px;
-}
-
-/* ─── Progress Bar ─── */
-.progress-wrap { margin-top: 8px; }
-
-.progress-bar-bg {
-    height: 6px;
-    background: rgba(0,0,0,.08);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    border-radius: 10px;
-    background: linear-gradient(90deg, var(--accent1), var(--accent2));
-    transition: width 1.2s cubic-bezier(.4,0,.2,1);
-}
-
-/* ─── Two-Column Layout ─── */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-.dashboard-grid.triple {
-    grid-template-columns: 1.2fr 1fr 1fr;
-}
-
-@media(max-width:1100px) {
-    .dashboard-grid, .dashboard-grid.triple { grid-template-columns: 1fr 1fr; }
-}
-@media(max-width:700px) {
-    .dashboard-grid, .dashboard-grid.triple { grid-template-columns: 1fr; }
-}
-
-/* ─── Panel Card ─── */
-.panel {
-    background: var(--surface);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 22px;
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.panel.full { grid-column: 1 / -1; }
-
-.panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.panel-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text-main);
-}
-
-.panel-title .icon-dot {
-    width: 32px; height: 32px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-}
-
-.panel-action {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--accent1);
-    text-decoration: none;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 8px;
-    transition: background .2s;
-}
-.panel-action:hover { background: rgba(99,102,241,.1); }
-
-/* ─── Attendance Donut ─── */
-.donut-wrap {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-}
-
-.donut-svg { flex-shrink: 0; }
-
-.donut-legend {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    flex: 1;
-}
-
-.legend-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    font-size: 13px;
-}
-
-.legend-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.legend-label { color: var(--text-muted); flex: 1; }
-.legend-count  { font-weight: 700; color: var(--text-main); }
-
-/* ─── Attendance Rate Arc ─── */
-.arc-label {
-    text-anchor: middle;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    fill: var(--text-main);
-}
-
-.arc-sub {
-    text-anchor: middle;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 10px;
-    fill: var(--text-muted);
-}
-
-/* ─── Mini List Items ─── */
-.mini-list { display: flex; flex-direction: column; gap: 10px; }
-
-.mini-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: var(--glass);
-    border: 1px solid var(--border);
-    transition: background .2s;
-}
-
-.mini-item:hover { background: rgba(255,255,255,.55); }
-
-.mini-avatar {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent1), var(--accent2));
-    color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    flex-shrink: 0;
-}
-
-.mini-info { flex: 1; min-width: 0; }
-.mini-name { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mini-sub  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-
-/* ─── Status Chips ─── */
-.chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.chip-green  { background: rgba(16,185,129,.15);  color: #059669; }
-.chip-amber  { background: rgba(245,158,11,.15);  color: #d97706; }
-.chip-red    { background: rgba(239,68,68,.15);   color: #dc2626; }
-.chip-blue   { background: rgba(59,130,246,.15);  color: #2563eb; }
-.chip-purple { background: rgba(99,102,241,.15);  color: #6366f1; }
-.chip-gray   { background: rgba(100,116,139,.12); color: #64748b; }
-
-/* ─── Meeting Timeline ─── */
-.meeting-timeline { display: flex; flex-direction: column; gap: 10px; }
-
-.mt-item {
-    display: flex;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: var(--glass);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--accent1);
-    transition: transform .15s;
-}
-
-.mt-item:hover { transform: translateX(3px); }
-
-.mt-time {
-    min-width: 60px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--accent1);
-    padding-top: 2px;
-    line-height: 1.3;
-}
-
-.mt-body { flex: 1; }
-.mt-title { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 3px; }
-.mt-desc  { font-size: 11px; color: var(--text-muted); }
-
-.join-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 10px;
-    border-radius: 14px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--blue);
-    background: rgba(59,130,246,.1);
-    text-decoration: none;
-    margin-top: 6px;
-    transition: background .2s;
-}
-.join-link:hover { background: rgba(59,130,246,.2); }
-
-/* ─── Leave Pending Items ─── */
-.leave-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: var(--glass);
-    border: 1px solid var(--border);
-}
-
-.leave-meta { flex: 1; min-width: 0; }
-.leave-name { font-size: 13px; font-weight: 600; }
-.leave-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-
-.leave-btns { display: flex; gap: 6px; }
-
-.btn-xs {
-    padding: 5px 12px;
-    border-radius: 10px;
-    border: none;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: transform .15s, box-shadow .15s;
-}
-.btn-xs:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,.15); }
-
-.btn-approve { background: var(--green); color: #fff; }
-.btn-reject  { background: var(--red);   color: #fff; }
-
-/* ─── Stacked Bar Chart ─── */
-.bar-chart { display: flex; flex-direction: column; gap: 10px; }
-
-.bar-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 12px;
-}
-
-.bar-label { width: 90px; color: var(--text-muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bar-track { flex: 1; height: 10px; background: rgba(0,0,0,.07); border-radius: 8px; overflow: hidden; }
-.bar-fill  { height: 100%; border-radius: 8px; }
-.bar-val   { width: 32px; text-align: right; color: var(--text-main); font-weight: 700; }
-
-/* ─── Empty State ─── */
-.empty-state {
-    text-align: center;
-    padding: 24px;
-    color: var(--text-light);
-    font-size: 13px;
-}
-.empty-state i { font-size: 28px; margin-bottom: 8px; display: block; opacity: .4; }
-
-/* ─── Notification Badge in panel ─── */
-.notif-count {
-    background: var(--red);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 800;
-    padding: 2px 7px;
-    border-radius: 20px;
-}
-
-/* ─── Team Member Row ─── */
-.team-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: var(--glass);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    transition: background .2s;
-}
-.team-row:hover { background: rgba(255,255,255,.55); }
-.team-row .tr-info { flex:1; min-width: 0; }
-.team-row .tr-name  { font-size:13px; font-weight:600; }
-.team-row .tr-email { font-size:11px; color:var(--text-muted); margin-top:1px; }
-
-/* ─── Notification items ─── */
-.notif-item {
-    display: flex;
-    gap: 10px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: var(--glass);
-    border: 1px solid var(--border);
-}
-.notif-icon { font-size: 18px; flex-shrink: 0; padding-top: 1px; }
-.notif-body { flex: 1; min-width: 0; }
-.notif-msg  { font-size: 13px; font-weight: 500; color: var(--text-main); }
-.notif-by   { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-
-/* ─── Scroll area ─── */
-.panel-scroll {
-    max-height: 300px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-right: 4px;
-}
-
-/* ─── Summary row at bottom ─── */
-.summary-ribbon {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 14px;
-    padding: 18px 22px;
-    background: var(--surface);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-top: 4px;
-}
-
-.ribbon-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.ribbon-icon { font-size: 18px; }
-.ribbon-info .r-val  { font-size: 18px; font-weight: 800; font-family: 'Syne', sans-serif; }
-.ribbon-info .r-lbl  { font-size: 11px; color: var(--text-muted); font-weight: 500; }
-
-/* ─── Divider ─── */
-.divider { width:100%; height:1px; background:rgba(0,0,0,.07); border:none; margin: 4px 0; }
-
-/* ─── Responsive ─── */
-@media(max-width:600px) {
-    .overview-page  { padding: 16px 14px 32px; }
-    .ov-header      { flex-direction: column; align-items: flex-start; }
-    .stat-grid      { grid-template-columns: 1fr 1fr; }
-    .donut-wrap     { flex-direction: column; }
-}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.pg{max-width:1200px;margin:0 auto;padding:32px 20px}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#4f6ef7 0%,#6366f1 50%,#8b5cf6 100%);border-radius:20px;padding:26px 30px;color:#fff;margin-bottom:18px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:20px;box-shadow:0 8px 32px rgba(79,110,247,.28)}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:250px;height:250px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:-70px;right:140px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.05);pointer-events:none}
+.hl{position:relative;z-index:1}
+.h-eye{font-size:11px;font-weight:600;opacity:.7;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
+.h-title{font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;margin-bottom:5px;line-height:1.25}
+.h-sub{font-size:13px;opacity:.72;display:flex;align-items:center;gap:6px}
+.hdot{width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;box-shadow:0 0 6px #4ade80}
+.hr{position:relative;z-index:1;display:flex;gap:9px;flex-shrink:0}
+.hs{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);border-radius:12px;padding:11px 16px;text-align:center;min-width:72px}
+.hs-n{font-size:22px;font-weight:700;color:#fff;line-height:1}
+.hs-l{font-size:12px;font-weight:500;opacity:.72;margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
+
+/* KPI */
+.krow{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:16px}
+@media(max-width:1000px){.krow{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.krow{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:17px 15px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s}
+.kpi:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0}
+.kpi.bl::before{background:var(--blue)}.kpi.gr::before{background:var(--green)}
+.kpi.am::before{background:var(--amber)}.kpi.vi::before{background:var(--violet)}.kpi.re::before{background:var(--red)}
+.k-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.k-ico{width:38px;height:38px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:16px}
+.kpi.bl .k-ico{background:#eef1fe;color:var(--blue)}.kpi.gr .k-ico{background:#f0fdf4;color:var(--green)}
+.kpi.am .k-ico{background:#fffbeb;color:var(--amber)}.kpi.vi .k-ico{background:#f5f3ff;color:var(--violet)}
+.kpi.re .k-ico{background:#fef2f2;color:var(--red)}
+.k-chip{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+.k-num{font-size:28px;font-weight:700;line-height:1;color:var(--text)}
+.k-lbl{font-size:12px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.k-sub{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* INSIGHT STRIP */
+.irow{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:16px}
+@media(max-width:700px){.irow{grid-template-columns:1fr 1fr}}
+.ins{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 17px;display:flex;align-items:center;gap:13px;box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .2s}
+.ins:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.ins-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ins-lbl{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.ins-val{font-size:20px;font-weight:700;color:var(--text);line-height:1.1;margin:2px 0}
+.ins-bar{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:5px}
+.ins-fill{height:100%;border-radius:99px;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+
+/* SECTION */
+.sec{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:600;color:var(--text);margin-bottom:11px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--shadow-sm);transition:box-shadow .2s}
+.card:hover{box-shadow:var(--shadow)}
+.ch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:13px}
+.ct{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
+.ci{width:26px;height:26px;border-radius:8px;background:#eef1fe;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11px}
+.cs{font-size:11px;color:var(--text3);margin-top:2px}
+.badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:#eef1fe;color:var(--blue);border:1px solid #d4dcfc;white-space:nowrap}
+.badge.gr{background:#f0fdf4;color:var(--green);border-color:#bbf7d0}
+.badge.am{background:#fffbeb;color:var(--amber);border-color:#fde68a}
+.badge.re{background:#fef2f2;color:var(--red);border-color:#fecaca}
+
+/* CHART GRIDS */
+.cr2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px}
+.crw{display:grid;grid-template-columns:3fr 2fr;gap:13px;margin-bottom:13px}
+@media(max-width:900px){.cr2,.crw{grid-template-columns:1fr}}
+
+/* MAIN LAYOUT */
+.mg{display:grid;grid-template-columns:1fr 340px;gap:13px}
+@media(max-width:1000px){.mg{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:13px}
+
+/* MEETINGS */
+.mi{display:flex;align-items:center;gap:11px;padding:12px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:7px;transition:all .2s}
+.mi:last-child{margin-bottom:0}.mi:hover{border-color:#c7d2fe;background:#f5f7ff}
+.md{width:3px;height:36px;border-radius:99px;background:var(--blue);flex-shrink:0}
+.mt{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mm{font-size:12px;color:var(--text2);margin-top:2px;display:flex;align-items:center;gap:7px}
+.jb{padding:6px 12px;background:var(--blue);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;flex-shrink:0;transition:background .2s,transform .15s}
+.jb:hover{background:#3d5fff;transform:scale(1.04)}
+
+/* QUICK ACTIONS */
+.qg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.qa{display:flex;flex-direction:column;align-items:center;gap:6px;padding:13px 7px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-family:inherit}
+.qa:hover{border-color:#c7d2fe;background:#eef1fe;transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.qi{width:38px;height:38px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:15px}
+.ql{font-size:11px;font-weight:600;color:var(--text2);text-align:center;line-height:1.3}
+
+/* TEAMS */
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.tc{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px;transition:all .2s}
+.tc:hover{border-color:#c7d2fe;transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.tt{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.ta{width:34px;height:34px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.tn{font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tct{font-size:11px;color:var(--text3)}
+.td{font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.tb{height:3px;background:var(--border);border-radius:99px;overflow:hidden}
+.tf{height:100%;border-radius:99px;transition:width 1.2s ease}
+
+/* ALERTS */
+.al{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:9px;border:1px solid;text-decoration:none;margin-bottom:7px;transition:all .15s}
+.al:last-child{margin-bottom:0}.al:hover{transform:translateX(3px);filter:brightness(.97)}
+.ali{display:flex;align-items:center;gap:9px}
+.alic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.alt{font-size:13px;font-weight:700;color:var(--text)}.als{font-size:11px;color:var(--text3);margin-top:1px}
+.alb{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px}
+
+/* ACTIVITY */
+.aci{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--border)}
+.aci:last-child{border-bottom:none}
+.acd{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.act-t{font-size:12px;font-weight:700;color:var(--text)}.act-d{font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}.act-tm{font-size:11px;color:var(--text3);margin-top:1px}
+
+/* PERF */
+.perf{background:linear-gradient(135deg,#4f6ef7 0%,#6366f1 50%,#8b5cf6 100%);border-radius:var(--r);padding:18px;color:#fff;box-shadow:0 8px 24px rgba(79,110,247,.22)}
+.pb-wrap{margin-bottom:10px}
+.pb-lbl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.pb-lbl span:first-child{opacity:.8}.pb-lbl span:last-child{font-weight:700}
+.pb-trk{height:5px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden}
+.pb-fill{height:100%;border-radius:99px;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+.sep{height:1px;background:rgba(255,255,255,.15);margin:12px 0}
+
+/* DONUT LEGEND */
+.leg{display:flex;justify-content:center;gap:12px;margin-top:9px;flex-wrap:wrap}
+.leg span{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px}
+.ld{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* EMPTY */
+.empty{text-align:center;padding:22px;color:var(--text3)}
+.empty i{font-size:26px;color:var(--border);display:block;margin-bottom:7px}
+.empty span{font-size:12px}
+
+/* CHART STAT PILLS — shown below charts */
+.cpills{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.cpill{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--border)}
+.cpill-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+@keyframes fu{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:translateY(0)}}
+.a1{animation:fu .4s ease .04s both}.a2{animation:fu .4s ease .08s both}
+.a3{animation:fu .4s ease .12s both}.a4{animation:fu .4s ease .16s both}
+.a5{animation:fu .4s ease .20s both}.a6{animation:fu .4s ease .24s both}
 </style>
 </head>
 <body>
-<div class="overview-page">
+<div class="pg">
 
-    <!-- ─── Header ─── -->
-    <div class="ov-header">
-        <div class="ov-title-block">
-            <h1>Manager Overview</h1>
-            <p>
-                Hello, <strong><%= username %></strong> &nbsp;•&nbsp;
-                <i class="fa-regular fa-calendar"></i>&nbsp;
-                <span id="liveDate"></span>
-            </p>
+<!-- HERO -->
+<div class="hero a1">
+  <div class="hl">
+    <div class="h-eye">Manager Dashboard</div>
+    <div class="h-title">Welcome back, ${sessionScope.fullName != null ? sessionScope.fullName : sessionScope.username}! 👋</div>
+    <div class="h-sub"><span class="hdot"></span><%=todayStr%></div>
+  </div>
+  <div class="hr">
+    <div class="hs"><div class="hs-n"><%=sTC%></div><div class="hs-l">Teams</div></div>
+    <div class="hs"><div class="hs-n"><%=sTM%></div><div class="hs-l">Members</div></div>
+    <div class="hs"><div class="hs-n"><%=attRate%>%</div><div class="hs-l">Attendance</div></div>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="krow a2">
+  <div class="kpi bl">
+    <div class="k-top"><div class="k-ico"><i class="fa-solid fa-user-check"></i></div>
+      <span class="k-chip" style="background:#f0fdf4;color:var(--green)">Today</span></div>
+    <div class="k-num"><%=sP%></div><div class="k-lbl">Present</div>
+    <div class="k-sub"><%=sA%> absent · <%=sB%> on break</div>
+  </div>
+  <div class="kpi gr">
+    <div class="k-top"><div class="k-ico"><i class="fa-solid fa-list-check"></i></div>
+      <span class="k-chip" style="background:#fffbeb;color:var(--amber)">Active</span></div>
+    <div class="k-num"><%=sPT%></div><div class="k-lbl">Pending Tasks</div>
+    <div class="k-sub"><%=sCT%> completed</div>
+  </div>
+  <div class="kpi am">
+    <div class="k-top"><div class="k-ico"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <%if(sOT>0){%><span class="k-chip" style="background:#fef2f2;color:var(--red)">Alert</span>
+      <%}else{%><span class="k-chip" style="background:#f0fdf4;color:var(--green)">Clear</span><%}%></div>
+    <div class="k-num" style="<%=sOT>0?"color:var(--red)":""%>"><%=sOT%></div>
+    <div class="k-lbl">Overdue Tasks</div><div class="k-sub">Past deadline</div>
+  </div>
+  <div class="kpi vi">
+    <div class="k-top"><div class="k-ico"><i class="fa-solid fa-video"></i></div>
+      <span class="k-chip" style="background:#f5f3ff;color:var(--violet)">Today</span></div>
+    <div class="k-num"><%=sM%></div><div class="k-lbl">Meetings</div>
+    <div class="k-sub">Scheduled today</div>
+  </div>
+  <div class="kpi re">
+    <div class="k-top"><div class="k-ico"><i class="fa-solid fa-calendar-xmark"></i></div>
+      <%if(sL>0){%><span class="k-chip" style="background:#fef2f2;color:var(--red)">Pending</span>
+      <%}else{%><span class="k-chip" style="background:#f0fdf4;color:var(--green)">Clear</span><%}%></div>
+    <div class="k-num" style="<%=sL>0?"color:var(--red)":""%>"><%=sL%></div>
+    <div class="k-lbl">Leave Requests</div><div class="k-sub">Awaiting approval</div>
+  </div>
+</div>
+
+<!-- INSIGHT STRIP -->
+<div class="irow a3">
+  <div class="ins">
+    <div class="ins-ico" style="background:#f0fdf4;color:var(--green)"><i class="fa-solid fa-arrow-trend-up"></i></div>
+    <div style="flex:1">
+      <div class="ins-lbl">Attendance Rate</div>
+      <div class="ins-val" style="color:var(--green)"><%=attRate%>%</div>
+      <div class="ins-bar"><div class="ins-fill" style="width:<%=attRate%>%;background:var(--green)"></div></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px"><%=sP%> present out of <%=totalAtt%></div>
+    </div>
+  </div>
+  <div class="ins">
+    <div class="ins-ico" style="background:#eef1fe;color:var(--blue)"><i class="fa-solid fa-circle-check"></i></div>
+    <div style="flex:1">
+      <div class="ins-lbl">Task Completion</div>
+      <div class="ins-val" style="color:var(--blue)"><%=compRate%>%</div>
+      <div class="ins-bar"><div class="ins-fill" style="width:<%=compRate%>%;background:var(--blue)"></div></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px"><%=sCT%> completed of <%=totalT%> total</div>
+    </div>
+  </div>
+  <div class="ins">
+    <div class="ins-ico" style="background:#f5f3ff;color:var(--violet)"><i class="fa-solid fa-star"></i></div>
+    <div style="flex:1">
+      <div class="ins-lbl">Reviews Done</div>
+      <div class="ins-val" style="color:var(--violet)"><%=revRate%>%</div>
+      <div class="ins-bar"><div class="ins-fill" style="width:<%=revRate%>%;background:var(--violet)"></div></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px"><%=sR%> rated · <%=sPR%> pending</div>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div class="sec a4">Analytics</div>
+
+<!-- Row 1: Weekly Attendance + Task Status -->
+<div class="cr2 a4">
+  <div class="card">
+    <div class="ch">
+      <div><div class="ct"><div class="ci"><i class="fa-solid fa-calendar-check"></i></div> Weekly Attendance</div>
+        <div class="cs">Present vs Absent — last 7 days</div></div>
+      <span class="badge">This Week</span>
+    </div>
+    <canvas id="weeklyAtt" height="190"></canvas>
+    <div class="cpills">
+      <span class="cpill"><span class="cpill-dot" style="background:#4f6ef7"></span>Present: <%=sP%> today</span>
+      <span class="cpill"><span class="cpill-dot" style="background:#fca5a5"></span>Absent: <%=sA%> today</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch">
+      <div><div class="ct"><div class="ci"><i class="fa-solid fa-chart-pie"></i></div> Task Status</div>
+        <div class="cs">Breakdown — Assigned · Completed · Submitted · Overdue</div></div>
+    </div>
+    <canvas id="taskPie" height="190"></canvas>
+    <div class="cpills">
+      <span class="cpill"><span class="cpill-dot" style="background:#4f6ef7"></span>Assigned: <%=vTA%></span>
+      <span class="cpill"><span class="cpill-dot" style="background:#22c55e"></span>Done: <%=vTC%></span>
+      <span class="cpill"><span class="cpill-dot" style="background:#f59e0b"></span>Submitted: <%=vTS%></span>
+      <%if(vTO>0){%><span class="cpill"><span class="cpill-dot" style="background:#ef4444"></span>Overdue: <%=vTO%></span><%}%>
+    </div>
+  </div>
+</div>
+
+<!-- Row 2: Punch-In Distribution + Leave Types -->
+<div class="crw a5">
+  <div class="card">
+    <div class="ch">
+      <div><div class="ct"><div class="ci" style="background:#f0fdf4;color:var(--green)"><i class="fa-solid fa-clock"></i></div> Punch-In Distribution</div>
+        <div class="cs">When your team arrives — this week</div></div>
+      <span class="badge gr">This Week</span>
+    </div>
+    <canvas id="punchBar" height="165"></canvas>
+    <div class="cpills">
+      <span class="cpill"><span class="cpill-dot" style="background:#22c55e"></span>Early (&lt;8am): <%=vP0%></span>
+      <span class="cpill"><span class="cpill-dot" style="background:#4f6ef7"></span>On time (8–9am): <%=vP1%></span>
+      <span class="cpill"><span class="cpill-dot" style="background:#ef4444"></span>Late (&gt;10am): <%=vP3+vP4%></span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch">
+      <div><div class="ct"><div class="ci" style="background:#fffbeb;color:var(--amber)"><i class="fa-solid fa-plane-departure"></i></div> Leave Breakdown</div>
+        <div class="cs">By leave type — all team members</div></div>
+    </div>
+    <canvas id="leaveDonut" height="165"></canvas>
+    <div class="cpills">
+      <%if(vLS>0){%><span class="cpill"><span class="cpill-dot" style="background:#ef4444"></span>Sick: <%=vLS%></span><%}%>
+      <%if(vLA>0){%><span class="cpill"><span class="cpill-dot" style="background:#22c55e"></span>Annual: <%=vLA%></span><%}%>
+      <%if(vLP>0){%><span class="cpill"><span class="cpill-dot" style="background:#f59e0b"></span>Personal: <%=vLP%></span><%}%>
+    </div>
+  </div>
+</div>
+
+<!-- OPERATIONS -->
+<div class="sec a6">Operations</div>
+<div class="mg a6">
+
+  <!-- LEFT -->
+  <div class="col">
+
+    <!-- Meetings -->
+    <div class="card">
+      <div class="ch">
+        <div class="ct"><div class="ci" style="background:#ecfeff;color:var(--cyan)"><i class="fa-solid fa-calendar-day"></i></div> Today's Meetings</div>
+        <a href="#" onclick="parent.loadPage(null,'managerMeetings');return false;" style="font-size:12px;font-weight:700;color:var(--blue);text-decoration:none">View All →</a>
+      </div>
+      <%
+      if(todayMeetings!=null&&!todayMeetings.isEmpty()){
+        SimpleDateFormat tf=new SimpleDateFormat("h:mm a");
+        for(Meeting m:todayMeetings){
+      %><div class="mi">
+        <div class="md"></div>
+        <div style="flex:1;min-width:0">
+          <div class="mt"><%=m.getTitle()%></div>
+          <div class="mm">
+            <span><i class="fa-solid fa-clock" style="opacity:.45;margin-right:3px;font-size:10px"></i><%=tf.format(m.getStartTime())%> – <%=tf.format(m.getEndTime())%></span>
+            <%if(m.getDescription()!=null&&!m.getDescription().isEmpty()){%>
+            <span style="color:var(--text3)">·</span>
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;color:var(--text3)"><%=m.getDescription()%></span>
+            <%}%>
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <div class="live-badge"><span class="live-dot"></span> Live Dashboard</div>
-            <button class="qn-pill" style="background:linear-gradient(135deg,#6366f1,#764ba2);color:#fff;border-color:transparent;"
-                    onclick="window.parent.showSection('selfAttendance'); window.parent.setActive(document.querySelectorAll('.sidebar-btn')[0])">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> Full Dashboard
-            </button>
-        </div>
+        <%if(m.getMeetingLink()!=null&&!m.getMeetingLink().isEmpty()){%>
+        <a href="<%=m.getMeetingLink()%>" target="_blank" class="jb"><i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;margin-right:3px"></i>Join</a>
+        <%}%>
+      </div><%
+        }}else{%>
+      <div class="empty"><i class="fa-solid fa-calendar-xmark"></i><span>No meetings scheduled today</span></div>
+      <%}%>
     </div>
 
-    <!-- ─── Quick Nav ─── -->
-    <div class="quick-nav">
-        <a class="qn-pill" onclick="scrollTo('sec-stats')"><i class="fa-solid fa-gauge-high"></i> Stats</a>
-        <a class="qn-pill" onclick="scrollTo('sec-attendance')"><i class="fa-solid fa-clipboard-user"></i> Attendance</a>
-        <a class="qn-pill" onclick="scrollTo('sec-team')"><i class="fa-solid fa-users"></i> My Team</a>
-        <a class="qn-pill" onclick="scrollTo('sec-meetings')"><i class="fa-solid fa-handshake"></i> Meetings</a>
-        <a class="qn-pill" onclick="scrollTo('sec-leave')"><i class="fa-solid fa-calendar-xmark"></i> Leave</a>
-        <a class="qn-pill" onclick="scrollTo('sec-notif')"><i class="fa-solid fa-bell"></i> Notifications</a>
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="ct" style="margin-bottom:12px"><div class="ci" style="background:#fffbeb;color:var(--amber)"><i class="fa-solid fa-bolt"></i></div> Quick Actions</div>
+      <div class="qg">
+        <button class="qa" onclick="parent.loadPage(null,'managerTasks')">
+          <div class="qi" style="background:#eef1fe;color:var(--blue)"><i class="fa-solid fa-plus"></i></div>
+          <span class="ql">Assign Task</span>
+        </button>
+        <button class="qa" onclick="parent.loadPage(null,'managerMeetings')">
+          <div class="qi" style="background:#f5f3ff;color:var(--violet)"><i class="fa-solid fa-calendar-plus"></i></div>
+          <span class="ql">Schedule Meeting</span>
+        </button>
+        <button class="qa" onclick="parent.loadPage(null,'managerPerformance')">
+          <div class="qi" style="background:#f0fdf4;color:var(--green)"><i class="fa-solid fa-star"></i></div>
+          <span class="ql">Rate Performance</span>
+        </button>
+        <button class="qa" onclick="parent.loadPage(null,'managerTeams')">
+          <div class="qi" style="background:#ecfeff;color:var(--cyan)"><i class="fa-solid fa-users"></i></div>
+          <span class="ql">Manage Teams</span>
+        </button>
+      </div>
     </div>
 
-    <!-- ─── Stat Cards ─── -->
-    <div class="stat-grid" id="sec-stats">
-
-        <div class="stat-card">
-            <div class="stat-icon si-purple"><i class="fa-solid fa-users"></i></div>
-            <div class="stat-info">
-                <div class="label">Team Size</div>
-                <div class="value"><%= totalTeam %></div>
-                <div class="sub">Direct reports</div>
-            </div>
+    <!-- My Teams -->
+    <div class="card">
+      <div class="ct" style="margin-bottom:12px"><div class="ci" style="background:#ecfeff;color:var(--cyan)"><i class="fa-solid fa-people-group"></i></div> My Teams</div>
+      <div class="tg">
+        <%
+        String[] tC={"var(--blue)","var(--violet)","var(--green)","var(--amber)","var(--red)","var(--cyan)"};
+        String[] tB={"#eef1fe","#f5f3ff","#f0fdf4","#fffbeb","#fef2f2","#ecfeff"};
+        if(teams!=null&&!teams.isEmpty()){int ti=0;for(Team t:teams){String col=tC[ti%tC.length],bg=tB[ti%tB.length];ti++;int pct=sTM>0?(t.getMembers().size()*100/sTM):0;%>
+        <div class="tc">
+          <div class="tt">
+            <div class="ta" style="background:<%=bg%>;color:<%=col%>"><i class="fa-solid fa-users"></i></div>
+            <div style="flex:1;min-width:0"><div class="tn"><%=t.getName()%></div><div class="tct"><%=t.getMembers().size()%> members</div></div>
+          </div>
+          <div class="td"><%=t.getDescription()!=null?t.getDescription():"No description available"%></div>
+          <div class="tb"><div class="tf" style="width:<%=pct%>%;background:<%=col%>"></div></div>
         </div>
+        <%}}else{%>
+        <div style="grid-column:span 2"><div class="empty"><i class="fa-solid fa-users-slash"></i><span>No teams assigned</span></div></div>
+        <%}%>
+      </div>
+    </div>
+  </div>
 
-        <div class="stat-card">
-            <div class="stat-icon si-green"><i class="fa-solid fa-user-check"></i></div>
-            <div class="stat-info">
-                <div class="label">Present Today</div>
-                <div class="value"><%= presentCount %></div>
-                <div class="progress-wrap">
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" id="presentBar"
-                             style="width:0%;background:linear-gradient(90deg,#10b981,#34d399);"
-                             data-target="<%= totalTeam > 0 ? (presentCount * 100 / totalTeam) : 0 %>">
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- RIGHT -->
+  <div class="col">
+
+    <!-- Live Attendance Donut -->
+    <div class="card">
+      <div class="ch">
+        <div><div class="ct"><div class="ci"><i class="fa-solid fa-circle-half-stroke"></i></div> Live Attendance</div>
+          <div class="cs">Team presence right now · <%=totalAtt%> total</div></div>
+        <span class="badge gr">Today</span>
+      </div>
+      <canvas id="attDonut" height="155"></canvas>
+      <div class="leg">
+        <span><span class="ld" style="background:var(--green)"></span>Present (<%=sP%>)</span>
+        <span><span class="ld" style="background:var(--red)"></span>Absent (<%=sA%>)</span>
+        <span><span class="ld" style="background:var(--amber)"></span>Break (<%=sB%>)</span>
+      </div>
+      <div style="display:flex;justify-content:center;margin-top:10px;gap:8px;flex-wrap:wrap">
+        <div style="text-align:center;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;flex:1">
+          <div style="font-size:16px;font-weight:700;color:var(--green)"><%=attRate%>%</div>
+          <div style="font-size:12px;color:var(--text3)">Attendance Rate</div>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-icon si-amber"><i class="fa-solid fa-clock-rotate-left"></i></div>
-            <div class="stat-info">
-                <div class="label">Late Arrivals</div>
-                <div class="value"><%= lateCount %></div>
-                <div class="sub">Checked in late</div>
-            </div>
+        <div style="text-align:center;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;flex:1">
+          <div style="font-size:16px;font-weight:700;color:var(--red)"><%=sA>0?(sA*100/Math.max(totalAtt,1)):0%>%</div>
+          <div style="font-size:12px;color:var(--text3)">Absent Rate</div>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-icon si-red"><i class="fa-solid fa-calendar-xmark"></i></div>
-            <div class="stat-info">
-                <div class="label">Pending Leave</div>
-                <div class="value"><%= pendingLeave %></div>
-                <div class="sub">Awaiting approval</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon si-blue"><i class="fa-solid fa-video"></i></div>
-            <div class="stat-info">
-                <div class="label">Meetings Today</div>
-                <div class="value"><%= meetingsToday %></div>
-                <div class="sub">Scheduled sessions</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon si-teal"><i class="fa-solid fa-bell"></i></div>
-            <div class="stat-info">
-                <div class="label">Notifications</div>
-                <div class="value"><%= unreadNotifs %></div>
-                <div class="sub">Unread messages</div>
-            </div>
-        </div>
-
+      </div>
     </div>
 
-    <!-- ─── Row 1: Attendance Donut + Team Attendance Bar ─── -->
-    <div class="dashboard-grid" id="sec-attendance">
-
-        <!-- Attendance Overview Donut -->
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">
-                    <div class="stat-icon si-green" style="width:32px;height:32px;border-radius:9px;font-size:13px;">
-                        <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-                    Attendance Overview
-                </div>
-                <button class="panel-action" onclick="navigateTo('attendance')">
-                    <i class="fa-solid fa-arrow-right"></i> View All
-                </button>
-            </div>
-
-            <div class="donut-wrap">
-                <!-- SVG Donut -->
-                <svg class="donut-svg" width="130" height="130" viewBox="0 0 130 130">
-                    <circle cx="65" cy="65" r="52" fill="none" stroke="#e2e8f0" stroke-width="14"/>
-                    <%
-                        double total = Math.max(totalTeam, 1);
-                        double pAngle = (presentCount / total) * 314.159;
-                        double lAngle = (lateCount / total) * 314.159;
-                        double aAngle = (absentCount / total) * 314.159;
-                        double p1 = presentCount > 0 ? pAngle : 0;
-                        double p2 = lateCount > 0 ? lAngle : 0;
-                        double p3 = absentCount > 0 ? aAngle : 0;
-                        double off1 = 0;
-                        double off2 = 314.159 - p1;
-                        double off3 = 314.159 - p1 - p2;
-                    %>
-                    <% if (presentCount > 0) { %>
-                    <circle cx="65" cy="65" r="50" fill="none"
-                            stroke="#10b981" stroke-width="14"
-                            stroke-dasharray="<%= String.format("%.1f", p1) %> 314.159"
-                            stroke-dashoffset="<%= String.format("%.1f", 314.159 * 0.25) %>"
-                            stroke-linecap="round"
-                            style="transform:rotate(-90deg);transform-origin:65px 65px;"/>
-                    <% } %>
-                    <% if (lateCount > 0) { %>
-                    <circle cx="65" cy="65" r="50" fill="none"
-                            stroke="#f59e0b" stroke-width="14"
-                            stroke-dasharray="<%= String.format("%.1f", p2) %> 314.159"
-                            stroke-dashoffset="<%= String.format("%.1f", 314.159 * 0.25 - p1) %>"
-                            stroke-linecap="round"
-                            style="transform:rotate(-90deg);transform-origin:65px 65px;"/>
-                    <% } %>
-                    <% if (absentCount > 0) { %>
-                    <circle cx="65" cy="65" r="50" fill="none"
-                            stroke="#ef4444" stroke-width="14"
-                            stroke-dasharray="<%= String.format("%.1f", p3) %> 314.159"
-                            stroke-dashoffset="<%= String.format("%.1f", 314.159 * 0.25 - p1 - p2) %>"
-                            stroke-linecap="round"
-                            style="transform:rotate(-90deg);transform-origin:65px 65px;"/>
-                    <% } %>
-                    <text x="65" y="62" class="arc-label" font-size="20"><%= (int)attendanceRate %>%</text>
-                    <text x="65" y="77" class="arc-sub">Present Rate</text>
-                </svg>
-
-                <div class="donut-legend">
-                    <div class="legend-row">
-                        <span class="legend-dot" style="background:#10b981;"></span>
-                        <span class="legend-label">Present</span>
-                        <span class="legend-count"><%= presentCount %></span>
-                    </div>
-                    <div class="legend-row">
-                        <span class="legend-dot" style="background:#f59e0b;"></span>
-                        <span class="legend-label">Late</span>
-                        <span class="legend-count"><%= lateCount %></span>
-                    </div>
-                    <div class="legend-row">
-                        <span class="legend-dot" style="background:#ef4444;"></span>
-                        <span class="legend-label">Absent</span>
-                        <span class="legend-count"><%= absentCount %></span>
-                    </div>
-                    <hr class="divider">
-                    <div class="legend-row">
-                        <span class="legend-dot" style="background:#6366f1;"></span>
-                        <span class="legend-label">Total</span>
-                        <span class="legend-count"><%= totalTeam %></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Team Punch-In Bar Chart -->
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">
-                    <div class="stat-icon si-blue" style="width:32px;height:32px;border-radius:9px;font-size:13px;">
-                        <i class="fa-solid fa-bars-progress"></i>
-                    </div>
-                    Today's Team Status
-                </div>
-                <button class="panel-action" onclick="navigateTo('attendance')">Details</button>
-            </div>
-
-            <div class="bar-chart panel-scroll">
-                <%
-                if (teamAttendance != null && !teamAttendance.isEmpty()) {
-                    for (TeamAttendance ta : teamAttendance) {
-                        String barColor = "#10b981";
-                        if ("LATE".equalsIgnoreCase(ta.getStatus())) barColor = "#f59e0b";
-                        else if ("ABSENT".equalsIgnoreCase(ta.getStatus())) barColor = "#ef4444";
-                        int barPct = "ABSENT".equalsIgnoreCase(ta.getStatus()) ? 15 : ("LATE".equalsIgnoreCase(ta.getStatus()) ? 55 : 90);
-                %>
-                <div class="bar-row">
-                    <div class="bar-label" title="<%= ta.getFullName() %>"><%= ta.getFullName() %></div>
-                    <div class="bar-track">
-                        <div class="bar-fill" style="width:<%= barPct %>%;background:<%= barColor %>;"></div>
-                    </div>
-                    <div class="bar-val">
-                        <span class="chip <%= "PRESENT".equalsIgnoreCase(ta.getStatus()) ? "chip-green" : "LATE".equalsIgnoreCase(ta.getStatus()) ? "chip-amber" : "chip-red" %>"
-                              style="font-size:10px;padding:2px 7px;">
-                            <%= ta.getStatus() %>
-                        </span>
-                    </div>
-                </div>
-                <%
-                    }
-                } else {
-                %>
-                <div class="empty-state"><i class="fa-solid fa-circle-info"></i>No attendance data for today</div>
-                <%
-                }
-                %>
-            </div>
-        </div>
-
+    <!-- Needs Attention -->
+    <div class="card">
+      <div class="ct" style="margin-bottom:11px"><div class="ci" style="background:#fef2f2;color:var(--red)"><i class="fa-solid fa-bell"></i></div> Needs Attention</div>
+      <%if(sL>0){%>
+      <a class="al" href="#" onclick="parent.loadPage(null,'managerLeave');return false;" style="background:#fef2f2;border-color:#fecaca">
+        <div class="ali"><div class="alic" style="background:#fecaca;color:var(--red)"><i class="fa-solid fa-calendar-xmark"></i></div>
+          <div><div class="alt">Leave Requests</div><div class="als"><%=sL%> pending approval</div></div></div>
+        <span class="alb" style="background:#fecaca;color:#991b1b"><%=sL%></span>
+      </a><%}%>
+      <%if(sOT>0){%>
+      <a class="al" href="#" onclick="parent.loadPage(null,'managerTasks');return false;" style="background:#fffbeb;border-color:#fde68a">
+        <div class="ali"><div class="alic" style="background:#fde68a;color:var(--amber)"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div><div class="alt">Overdue Tasks</div><div class="als"><%=sOT%> past deadline</div></div></div>
+        <span class="alb" style="background:#fde68a;color:#92400e"><%=sOT%></span>
+      </a><%}%>
+      <%if(sPR>0){%>
+      <a class="al" href="#" onclick="parent.loadPage(null,'managerPerformance');return false;" style="background:#f5f3ff;border-color:#ddd6fe">
+        <div class="ali"><div class="alic" style="background:#ddd6fe;color:var(--violet)"><i class="fa-solid fa-star"></i></div>
+          <div><div class="alt">Reviews Pending</div><div class="als"><%=sPR%> employees to rate</div></div></div>
+        <span class="alb" style="background:#ddd6fe;color:#5b21b6"><%=sPR%></span>
+      </a><%}%>
+      <%if(sL==0&&sOT==0&&sPR==0){%>
+      <div class="empty" style="padding:16px"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i>
+        <span style="color:var(--green);font-weight:700">All caught up!</span></div>
+      <%}%>
     </div>
 
-    <!-- ─── Row 2: Team Members + Meetings + Leave ─── -->
-    <div class="dashboard-grid triple" id="sec-team">
-
-        <!-- My Team -->
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">
-                    <div class="stat-icon si-purple" style="width:32px;height:32px;border-radius:9px;font-size:13px;">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    My Team
-                </div>
-                <button class="panel-action" onclick="navigateTo('teamSection')">View All</button>
-            </div>
-
-            <div class="panel-scroll">
-                <%
-                if (teamList != null && !teamList.isEmpty()) {
-                    for (User u : teamList) {
-                        String initials = u.getFullname() != null && u.getFullname().length() > 0
-                            ? (u.getFullname().substring(0,1).toUpperCase())
-                            : "?";
-                        if (u.getFullname() != null && u.getFullname().contains(" ")) {
-                            String[] parts = u.getFullname().split(" ");
-                            initials = parts[0].substring(0,1).toUpperCase() + parts[parts.length-1].substring(0,1).toUpperCase();
-                        }
-                        String chipClass = "ACTIVE".equalsIgnoreCase(u.getStatus()) ? "chip-green" : "chip-gray";
-                %>
-                <div class="team-row" onclick="navigateTo('teamSection')">
-                    <div class="mini-avatar"><%= initials %></div>
-                    <div class="tr-info">
-                        <div class="tr-name"><%= u.getFullname() %></div>
-                        <div class="tr-email"><%= u.getEmail() %></div>
-                    </div>
-                    <span class="chip <%= chipClass %>"><%= u.getStatus() != null ? u.getStatus() : "—" %></span>
-                </div>
-                <%
-                    }
-                } else {
-                %>
-                <div class="empty-state"><i class="fa-solid fa-users-slash"></i>No team members found</div>
-                <%
-                }
-                %>
-            </div>
+    <!-- Recent Activity -->
+    <div class="card">
+      <div class="ct" style="margin-bottom:11px"><div class="ci"><i class="fa-solid fa-clock-rotate-left"></i></div> Recent Activity</div>
+      <%
+      if(recentActivities!=null&&!recentActivities.isEmpty()){
+        for(Map<String,String> act:recentActivities){
+          String at=act.get("type"),ic="fa-circle",ac2="var(--text2)",ab2="#f1f5f9";
+          if("Task Assigned".equals(at)){ic="fa-list-check";ac2="var(--amber)";ab2="#fef3c7";}
+          else if("Leave Request".equals(at)){ic="fa-calendar-xmark";ac2="var(--red)";ab2="#fee2e2";}
+          else if("Meeting Scheduled".equals(at)){ic="fa-video";ac2="var(--violet)";ab2="#f3e8ff";}
+      %><div class="aci">
+        <div class="acd" style="background:<%=ab2%>;color:<%=ac2%>"><i class="fa-solid <%=ic%>"></i></div>
+        <div style="flex:1;min-width:0">
+          <div class="act-t"><%=at%></div>
+          <div class="act-d"><%=act.get("description")%></div>
+          <div class="act-tm"><%=act.get("time")%></div>
         </div>
-
-        <!-- Today's Meetings -->
-        <div class="panel" id="sec-meetings">
-            <div class="panel-header">
-                <div class="panel-title">
-                    <div class="stat-icon si-blue" style="width:32px;height:32px;border-radius:9px;font-size:13px;">
-                        <i class="fa-solid fa-video"></i>
-                    </div>
-                    Today's Meetings
-                </div>
-                <button class="panel-action" onclick="navigateTo('schedulemeeting')">Schedule</button>
-            </div>
-
-            <div class="panel-scroll meeting-timeline">
-                <%
-                if (todayMeetings != null && !todayMeetings.isEmpty()) {
-                    for (Meeting m : todayMeetings) {
-                        String timeStr = m.getStartTime() != null ? m.getStartTime().toString() : "--";
-                        if (timeStr.length() > 16) timeStr = timeStr.substring(11, 16);
-                %>
-                <div class="mt-item">
-                    <div class="mt-time"><i class="fa-regular fa-clock"></i><br><%= timeStr %></div>
-                    <div class="mt-body">
-                        <div class="mt-title"><%= m.getTitle() %></div>
-                        <div class="mt-desc">
-                            <b>End:</b> <%= m.getEndTime() != null ? m.getEndTime().toString().substring(0, Math.min(16, m.getEndTime().toString().length())) : "--" %>
-                        </div>
-                        <%
-                        if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) {
-                        %>
-                        <a href="<%= m.getMeetingLink() %>" target="_blank" class="join-link">
-                            <i class="fa-solid fa-video"></i> Join
-                        </a>
-                        <%
-                        }
-                        %>
-                    </div>
-                </div>
-                <%
-                    }
-                } else {
-                %>
-                <div class="empty-state"><i class="fa-solid fa-calendar-check"></i>No meetings today — enjoy the focus time!</div>
-                <%
-                }
-                %>
-            </div>
-        </div>
-
-        <!-- Pending Leave Requests -->
-        <div class="panel" id="sec-leave">
-            <div class="panel-header">
-                <div class="panel-title">
-                    <div class="stat-icon si-amber" style="width:32px;height:32px;border-radius:9px;font-size:13px;">
-                        <i class="fa-solid fa-calendar-xmark"></i>
-                    </div>
-                    My Leaves
-                    <% if (pendingLeave > 0) { %>
-                    <span class="notif-count"><%= pendingLeave %></span>
-                    <% } %>
-                </div>
-                <button class="panel-action" onclick="navigateTo('leave')">All</button>
-            </div>
-
-            <div class="panel-scroll">
-                <%
-                if (leaveRequests != null && !leaveRequests.isEmpty()) {
-                    int shown = 0;
-                    for (LeaveRequest lr : leaveRequests) {
-                        if (shown >= 5) break;
-                        shown++;
-                        String chipCls = "PENDING".equalsIgnoreCase(lr.getStatus()) ? "chip-amber"
-                            : "APPROVED".equalsIgnoreCase(lr.getStatus()) ? "chip-green" : "chip-red";
-                %>
-                <div class="leave-item">
-                    <div class="mini-avatar" style="font-size:11px;">
-                        <%= lr.getLeaveType() != null && lr.getLeaveType().length() > 0 ? lr.getLeaveType().substring(0,1).toUpperCase() : "?" %>
-                    </div>
-                    <div class="leave-meta">
-                        <div class="leave-name"><%= lr.getLeaveType() %></div>
-                        <div class="leave-detail">
-                            <%= lr.getFromDate() %> → <%= lr.getToDate() %>
-                        </div>
-                    </div>
-                    <span class="chip <%= chipCls %>"><%= lr.getStatus() %></span>
-                </div>
-                <%
-                    }
-                } else {
-                %>
-                <div class="empty-state"><i class="fa-solid fa-check-circle"></i>No leave requests</div>
-                <%
-                }
-                %>
-            </div>
-        </div>
-
+      </div><%
+        }}else{%>
+      <div class="empty" style="padding:14px"><i class="fa-solid fa-inbox"></i><span>No recent activity</span></div>
+      <%}%>
     </div>
 
-    <!-- ─── Row 3: Notifications + Quick Actions ─── -->
-    <div class="dashboard-grid" id="sec-notif">
-
-        <!-- Notifications -->
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">
-                    <div class="stat-icon si-teal" style="width:32px;height:32px;border-radius:9px;font-size:13px;">
-                        <i class="fa-solid fa-bell"></i>
-                    </div>
-                    Notifications
-                    <% if (unreadNotifs > 0) { %>
-                    <span class="notif-count"><%= unreadNotifs %></span>
-                    <% } %>
-                </div>
-            </div>
-
-            <div class="panel-scroll">
-                <%
-                if (notifications != null && !notifications.isEmpty()) {
-                    for (Notification n : notifications) {
-                %>
-                <div class="notif-item" id="notif-ov-<%= n.getId() %>">
-                    <div class="notif-icon">🔔</div>
-                    <div class="notif-body">
-                        <div class="notif-msg"><%= n.getMessage() %></div>
-                        <div class="notif-by">By <%= n.getCreatedBy() %></div>
-                    </div>
-                    <button class="btn-xs" style="background:rgba(99,102,241,.12);color:#6366f1;font-size:10px;"
-                            onclick="markRead(<%= n.getId() %>)">Done</button>
-                </div>
-                <%
-                    }
-                } else {
-                %>
-                <div class="empty-state"><i class="fa-solid fa-bell-slash"></i>You're all caught up!</div>
-                <%
-                }
-                %>
-            </div>
+    <!-- Performance Card -->
+    <div class="perf">
+      <div style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:12px">
+        <i class="fa-solid fa-chart-line"></i> Performance Review
+      </div>
+      <div class="pb-wrap">
+        <div class="pb-lbl"><span>Attendance Rate</span><span><%=attRate%>% (<%=sP%>/<%=totalAtt%>)</span></div>
+        <div class="pb-trk"><div class="pb-fill" style="width:<%=attRate%>%;background:rgba(255,255,255,.9)"></div></div>
+      </div>
+      <div class="pb-wrap">
+        <div class="pb-lbl"><span>Task Completion</span><span><%=compRate%>% (<%=sCT%>/<%=totalT%>)</span></div>
+        <div class="pb-trk"><div class="pb-fill" style="width:<%=compRate%>%;background:rgba(255,255,255,.75)"></div></div>
+      </div>
+      <div class="pb-wrap">
+        <div class="pb-lbl"><span>Reviews Done</span><span><%=revRate%>% (<%=sR%>/<%=totalRev%>)</span></div>
+        <div class="pb-trk"><div class="pb-fill" style="width:<%=revRate%>%;background:rgba(255,255,255,.6)"></div></div>
+      </div>
+      <div class="sep"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.05em">Rated this month</div>
+          <div style="font-size:21px;font-weight:700;margin-top:2px"><%=sR%> <span style="font-size:12px;opacity:.55">/ <%=totalRev%></span></div>
         </div>
-
-        <!-- Quick Actions Panel -->
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">
-                    <div class="stat-icon si-purple" style="width:32px;height:32px;border-radius:9px;font-size:13px;">
-                        <i class="fa-solid fa-bolt"></i>
-                    </div>
-                    Quick Actions
-                </div>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px;">
-
-                <button class="qn-pill" style="justify-content:center;padding:14px 10px;border-radius:12px;font-size:13px;"
-                        onclick="navigateTo('selfAttendance')">
-                    <i class="fa-solid fa-user-check"></i> My Attendance
-                </button>
-
-                <button class="qn-pill" style="justify-content:center;padding:14px 10px;border-radius:12px;font-size:13px;"
-                        onclick="navigateTo('assignTask')">
-                    <i class="fa-solid fa-list-check"></i> Assign Task
-                </button>
-
-                <button class="qn-pill" style="justify-content:center;padding:14px 10px;border-radius:12px;font-size:13px;"
-                        onclick="navigateTo('schedulemeeting')">
-                    <i class="fa-solid fa-handshake"></i> Schedule Meet
-                </button>
-
-                <button class="qn-pill" style="justify-content:center;padding:14px 10px;border-radius:12px;font-size:13px;"
-                        onclick="navigateTo('performance')">
-                    <i class="fa-solid fa-chart-line"></i> Performance
-                </button>
-
-                <button class="qn-pill" style="justify-content:center;padding:14px 10px;border-radius:12px;font-size:13px;"
-                        onclick="window.parent.openCalendar()">
-                    <i class="fa-solid fa-calendar-days"></i> Calendar
-                </button>
-
-                <button class="qn-pill" style="justify-content:center;padding:14px 10px;border-radius:12px;font-size:13px;background:linear-gradient(135deg,#6366f1,#764ba2);color:#fff;border-color:transparent;"
-                        onclick="exportAttendance()">
-                    <i class="fa-solid fa-file-export"></i> Export
-                </button>
-
-            </div>
-
-            <!-- Team Summary Ribbon -->
-            <hr class="divider" style="margin-top:8px;">
-            <div style="display:flex;gap:18px;flex-wrap:wrap;padding-top:4px;">
-                <div class="ribbon-item">
-                    <span class="ribbon-icon" style="color:#10b981;">✅</span>
-                    <div class="ribbon-info">
-                        <div class="r-val"><%= presentCount %></div>
-                        <div class="r-lbl">Present</div>
-                    </div>
-                </div>
-                <div class="ribbon-item">
-                    <span class="ribbon-icon" style="color:#f59e0b;">⏰</span>
-                    <div class="ribbon-info">
-                        <div class="r-val"><%= lateCount %></div>
-                        <div class="r-lbl">Late</div>
-                    </div>
-                </div>
-                <div class="ribbon-item">
-                    <span class="ribbon-icon" style="color:#ef4444;">❌</span>
-                    <div class="ribbon-info">
-                        <div class="r-val"><%= absentCount %></div>
-                        <div class="r-lbl">Absent</div>
-                    </div>
-                </div>
-                <div class="ribbon-item">
-                    <span class="ribbon-icon" style="color:#6366f1;">📋</span>
-                    <div class="ribbon-info">
-                        <div class="r-val"><%= pendingLeave %></div>
-                        <div class="r-lbl">Leave Pending</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <a href="#" onclick="parent.loadPage(null,'managerPerformance');return false;"
+          style="padding:8px 15px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none"
+          onmouseover="this.style.background='rgba(255,255,255,.28)'" onmouseout="this.style.background='rgba(255,255,255,.18)'">Rate Now →</a>
+      </div>
     </div>
 
-</div><!-- end overview-page -->
+  </div>
+</div>
+</div>
 
 <script>
-/* ─── Live Date ─── */
-(function() {
-    const el = document.getElementById('liveDate');
-    const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
-    el.textContent = new Date().toLocaleDateString('en-IN', opts);
-})();
+Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
+Chart.defaults.font.size   = 12;
+Chart.defaults.color       = '#9aa0b8';
+Chart.defaults.plugins.legend.labels.boxWidth  = 10;
+Chart.defaults.plugins.legend.labels.padding   = 11;
+Chart.defaults.plugins.legend.labels.color     = '#5a6278';
+Chart.defaults.plugins.tooltip.backgroundColor = '#1a1d2e';
+Chart.defaults.plugins.tooltip.titleColor      = '#f0f2ff';
+Chart.defaults.plugins.tooltip.bodyColor       = '#9aa0b8';
+Chart.defaults.plugins.tooltip.borderColor     = '#2e3347';
+Chart.defaults.plugins.tooltip.borderWidth     = 1;
+Chart.defaults.plugins.tooltip.padding         = 10;
+Chart.defaults.plugins.tooltip.cornerRadius    = 8;
+Chart.defaults.scale.grid.color                = '#f0f2f8';
+Chart.defaults.scale.border.display            = false;
+Chart.defaults.scale.ticks.color               = '#9aa0b8';
 
-/* ─── Animate progress bars on load ─── */
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.progress-bar-fill[data-target]').forEach(function(bar) {
-        const target = parseInt(bar.getAttribute('data-target')) || 0;
-        setTimeout(function() { bar.style.width = target + '%'; }, 200);
-    });
+// ── 1. Weekly Attendance Bar ──────────────────────────────────────────
+// Data from DB: attendance.status 'Present'/'Absent', joined via user_email→team_members
+new Chart(document.getElementById('weeklyAtt'), {
+  type: 'bar',
+  data: {
+    labels: [<%=weekLabels%>],
+    datasets: [
+      { label:'Present', data:[<%=weekPresentData%>], backgroundColor:'#4f6ef7', borderRadius:5, borderSkipped:false },
+      { label:'Absent',  data:[<%=weekAbsentData%>],  backgroundColor:'#fca5a5', borderRadius:5, borderSkipped:false }
+    ]
+  },
+  options: {
+    responsive:true,
+    plugins:{ legend:{ position:'top' } },
+    scales:{ x:{ grid:{ display:false } }, y:{ ticks:{ stepSize:1 }, beginAtZero:true } }
+  }
 });
 
-/* ─── Navigate to a section in parent dashboard ─── */
-function navigateTo(section) {
-    try {
-        if (window.parent && window.parent.showSection) {
-            window.parent.showSection(section);
-            // also mark the sidebar button active
-            const btns = window.parent.document.querySelectorAll('.sidebar-btn');
-            const sectionMap = {
-                'selfAttendance': 0,
-                'teamSection':    1,
-                'assignTask':     2,
-                'schedulemeeting':3,
-                'attendance':     4,
-                'leave':          5,
-                'performance':    6
-            };
-            const idx = sectionMap[section];
-            if (idx !== undefined) {
-                btns.forEach(function(b) { b.classList.remove('active'); });
-                if (btns[idx]) btns[idx].classList.add('active');
-            }
-            // For leave, do a full redirect
-            if (section === 'leave') {
-                window.parent.location.href = window.parent.location.pathname + '?tab=leave';
-            }
-        }
-    } catch(e) {
-        console.warn('Navigation error:', e);
-    }
-}
+// ── 2. Task Status Pie ────────────────────────────────────────────────
+// Data from DB: tasks.status exact values 'ASSIGNED'/'COMPLETED'/'SUBMITTED'
+// Overdue = status != 'COMPLETED' AND deadline < CURDATE()
+new Chart(document.getElementById('taskPie'), {
+  type: 'pie',
+  data: {
+    labels: ['Assigned','Completed','Submitted','Overdue'],
+    datasets:[{
+      data: [<%=vTA%>, <%=vTC%>, <%=vTS%>, <%=vTO%>],
+      backgroundColor: ['#4f6ef7','#22c55e','#f59e0b','#ef4444'],
+      borderWidth: 2, borderColor: '#fff', hoverOffset: 6
+    }]
+  },
+  options:{ responsive:true, plugins:{ legend:{ position:'bottom' } } }
+});
 
-/* ─── Smooth scroll to anchor ─── */
-function scrollTo(id) {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+// ── 3. Punch-In Distribution Bar ──────────────────────────────────────
+// Data from DB: HOUR(attendance.punch_in) bucketed, current ISO week
+new Chart(document.getElementById('punchBar'), {
+  type: 'bar',
+  data: {
+    labels: ['Before 8am','8–9am','9–10am','10–11am','After 11am'],
+    datasets:[{
+      label:'Employees',
+      data: [<%=vP0%>, <%=vP1%>, <%=vP2%>, <%=vP3%>, <%=vP4%>],
+      backgroundColor: ['#22c55e','#4f6ef7','#f59e0b','#ef4444','#8b5cf6'],
+      borderRadius: 6, borderSkipped: false
+    }]
+  },
+  options:{
+    responsive:true, plugins:{ legend:{ display:false } },
+    scales:{ x:{ grid:{ display:false } }, y:{ ticks:{ stepSize:1 }, beginAtZero:true } }
+  }
+});
 
-/* ─── Mark notification as read ─── */
-function markRead(id) {
-    fetch('<%=request.getContextPath()%>/markNotificationRead?id=' + id, { method: 'POST' })
-        .then(function(r) {
-            if (r.ok) {
-                const el = document.getElementById('notif-ov-' + id);
-                if (el) {
-                    el.style.transition = 'opacity .3s ease, transform .3s ease';
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateX(20px)';
-                    setTimeout(function() { el.remove(); }, 300);
-                }
-            }
-        })
-        .catch(function(e) { console.error(e); });
-}
+// ── 4. Leave Type Doughnut ────────────────────────────────────────────
+// Data from DB: leave_requests.leave_type keyword-bucketed
+new Chart(document.getElementById('leaveDonut'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Sick','Annual','Personal','Maternity','Other'],
+    datasets:[{
+      data: [<%=vLS%>, <%=vLA%>, <%=vLP%>, <%=vLM%>, <%=vLO%>],
+      backgroundColor: ['#ef4444','#22c55e','#f59e0b','#ec4899','#8b5cf6'],
+      borderWidth: 2, borderColor: '#fff', hoverOffset: 6
+    }]
+  },
+  options:{ responsive:true, cutout:'58%', plugins:{ legend:{ position:'bottom' } } }
+});
 
-/* ─── Export ─── */
-function exportAttendance() {
-    window.parent.location.href = '<%=request.getContextPath()%>/exportTeamAttendance';
-}
+// ── 5. Attendance Donut — sidebar ──────────────────────────────────────
+// Data from DB: attendance.status 'Present'/'Absent'/'On Break', today only
+(function(){
+  var tot = <%=sP%> + <%=sA%> + <%=sB%>;
+  new Chart(document.getElementById('attDonut'), {
+    type: 'doughnut',
+    data:{
+      labels:['Present','Absent','On Break'],
+      datasets:[{
+        data: tot > 0 ? [<%=sP%>, <%=sA%>, <%=sB%>] : [1,0,0],
+        backgroundColor:['#22c55e','#ef4444','#f59e0b'],
+        borderWidth:2, borderColor:'#fff', hoverOffset:5
+      }]
+    },
+    options:{
+      cutout:'70%', responsive:true,
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => ' '+ctx.label+': '+ctx.raw } } }
+    },
+    plugins:[{
+      id:'cx',
+      beforeDraw(c){
+        var {ctx, chartArea:{left,top,right,bottom}} = c;
+        var cx=(left+right)/2, cy=(top+bottom)/2;
+        ctx.save();
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.font = 'bold 20px DM Sans, sans-serif';
+        ctx.fillStyle = '#1a1d2e';
+        ctx.fillText(tot, cx, cy-7);
+        ctx.font = '10px DM Sans, sans-serif';
+        ctx.fillStyle = '#9aa0b8';
+        ctx.fillText('Total', cx, cy+9);
+        ctx.restore();
+      }
+    }]
+  });
+})();
+</script>
+
+<script>
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.onkeydown = e => (e.keyCode===123||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key.toUpperCase())))?false:true;
 </script>
 </body>
 </html>
-    

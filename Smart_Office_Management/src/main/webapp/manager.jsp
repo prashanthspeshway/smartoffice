@@ -243,6 +243,76 @@ body {
 	color: #b91c1c;
 }
 
+/* Manager dashboard: stack + scroll on small screens */
+@media ( max-width : 768px) {
+	body {
+		height: auto;
+		min-height: 100vh;
+		overflow: auto;
+	}
+	.top-bar {
+		padding: 0 12px;
+		height: auto;
+		min-height: 52px;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.top-bar h2 {
+		font-size: 15px;
+		line-height: 1.3;
+		flex: 1;
+		min-width: 0;
+	}
+	.main-container {
+		flex-direction: column;
+		min-height: 0;
+	}
+	.sidebar {
+		width: 100%;
+		min-width: 0;
+		max-height: none;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: stretch;
+		padding: 10px 8px;
+		border-right: none;
+		border-bottom: 1px solid #e2e8f0;
+		box-shadow: none;
+	}
+	.sidebar-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+	.sidebar-btn, .sidebar-logout-btn {
+		flex: 1 1 calc(50% - 6px);
+		min-width: 140px;
+		margin-bottom: 0;
+		font-size: 13px;
+		padding: 10px 12px;
+	}
+	.sidebar-bottom {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 6px;
+		width: 100%;
+		padding-top: 8px;
+		margin-top: 8px;
+		border-top: 1px solid #e2e8f0;
+	}
+	.sidebar-bottom .sidebar-btn, .sidebar-bottom .sidebar-logout-btn {
+		flex: 1 1 calc(50% - 6px);
+	}
+	.content-area {
+		padding: 16px 12px;
+		min-width: 0;
+		overflow-x: auto;
+	}
+}
+
 /* ================= CONTENT ================= */
 .content-area {
 	flex: 1;
@@ -3870,10 +3940,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const error = params.get("error");
 
     var serverTab = "<%=activeTab%>";
-    showSection(serverTab || tab || "attendance");
-
-    /* Sync sidebar active state with shown section */
-    syncSidebarActive(serverTab || tab || "attendance");
+    var initialTab = serverTab || tab || "attendance";
+    if (initialTab === "calendar") {
+        openCalendar();
+        syncSidebarActive("calendarSection");
+    } else {
+        showSection(initialTab);
+        syncSidebarActive(initialTab);
+    }
 
     /* -------- SUCCESS MESSAGES -------- */
     if (success === "Login")
@@ -3907,11 +3981,14 @@ document.addEventListener("DOMContentLoaded", function () {
     else if (error === "accessDenied")
         showToast("Access denied. You do not have permission for that page.", "error");
 
-    /* -------- Clean URL -------- */
+    /* -------- Clean flash params; keep ?tab= -------- */
     if (success || error) {
         setTimeout(() => {
-            const cleanUrl = window.location.pathname + (tab ? "?tab=" + tab : "");
-            window.history.replaceState({}, document.title, cleanUrl);
+            const qs = new URLSearchParams(window.location.search);
+            qs.delete("success");
+            qs.delete("error");
+            const q = qs.toString();
+            window.history.replaceState({}, document.title, window.location.pathname + (q ? "?" + q : ""));
         }, 100);
     }
 
@@ -3951,9 +4028,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /* Sync sidebar button highlight with the currently visible section */
 function syncSidebarActive(sectionId) {
-    document.querySelectorAll('.sidebar-btn').forEach(function(btn) {
+    document.querySelectorAll('.sidebar .sidebar-btn').forEach(function(btn) {
         btn.classList.remove('active');
     });
+    if (sectionId === 'settings') {
+        var sbtn = document.querySelector('.sidebar-bottom .sidebar-btn');
+        if (sbtn) sbtn.classList.add('active');
+        return;
+    }
     var map = {
         'attendance':     0,
         'teamSection':    1,
@@ -3961,6 +4043,7 @@ function syncSidebarActive(sectionId) {
         'schedulemeeting':3,
         'leave':          4,
         'performance':    5,
+        'calendar':       6,
         'calendarSection':6
     };
     var idx = map[sectionId];
@@ -3990,12 +4073,29 @@ function showToast(message, type = "success") {
 
 /* ================= UI FUNCTIONS ================= */
 
+function sectionIdToTab(sec) {
+    if (sec === 'calendarSection') return 'calendar';
+    return sec;
+}
+
+function pushManagerTab(tab) {
+    try {
+        var qs = new URLSearchParams(window.location.search);
+        qs.set('tab', tab);
+        var q = qs.toString();
+        window.history.replaceState({}, document.title, window.location.pathname + (q ? '?' + q : ''));
+    } catch (e) { /* ignore */ }
+}
+
 function showSection(id) {
     document.querySelectorAll(".content-area > .box").forEach(b => {
         if (b.id !== "profileModal") b.style.display = "none";
     });
     var el = document.getElementById(id);
-    if (el) el.style.display = "block";
+    if (el) {
+        el.style.display = "block";
+        pushManagerTab(sectionIdToTab(id));
+    }
 }
 
 function setManagerLeaveTabs(active) {
@@ -4123,6 +4223,7 @@ function openCalendar() {
     document.getElementById("calendarSection").style.display = "block";
     document.getElementById("calendarFrame").src =
         "<%=request.getContextPath()%>/calendar.jsp";
+    pushManagerTab("calendar");
 }
 
 function openNotifications() {

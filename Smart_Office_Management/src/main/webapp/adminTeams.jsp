@@ -466,11 +466,12 @@ body {
 	font-size: 17px;
 }
 
-/* ── Teams grid ── */
+/* ── Teams grid: stretch = equal-height cards per row ── */
 .teams-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 	gap: 18px;
+	align-items: stretch;
 }
 
 /* ── Team card ── */
@@ -483,6 +484,8 @@ body {
 	transition: box-shadow 0.2s, transform 0.2s;
 	display: flex;
 	flex-direction: column;
+	height: 100%;
+	min-height: 0;
 }
 
 .team-card:hover {
@@ -548,7 +551,10 @@ body {
 
 .team-card-body {
 	padding: 16px 20px;
-	flex: 1;
+	flex: 1 1 auto;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
 }
 
 .members-label {
@@ -576,6 +582,9 @@ body {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 6px;
+	flex: 1 1 auto;
+	min-height: 0;
+	align-content: start;
 }
 
 .member-chip {
@@ -623,16 +632,21 @@ body {
 	border: none;
 	cursor: pointer;
 	color: var(--text3);
-	font-size: 10px;
-	display: flex;
+	font-size: 12px;
+	display: inline-flex;
 	align-items: center;
+	justify-content: center;
+	min-width: 28px;
+	min-height: 28px;
 	padding: 0;
 	flex-shrink: 0;
-	transition: color 0.15s;
+	transition: color 0.15s, background 0.15s;
+	border-radius: 6px;
 }
 
 .member-remove:hover {
 	color: var(--danger);
+	background: var(--danger-light);
 }
 
 .no-members {
@@ -668,19 +682,14 @@ body {
 	padding: 12px 20px;
 	border-top: 1px solid var(--border);
 	background: var(--surface2);
+	margin-top: auto;
+	flex-shrink: 0;
 }
 
-.teams-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-	gap: 18px;
-	align-items: start; /* ADD THIS */
-}
-
-.team-card-body {
-	padding: 16px 20px;
-	flex: 1;
-	min-height: 140px; /* ADD THIS — keeps cards uniform */
+.team-card-footer .btn {
+	width: 100%;
+	justify-content: center;
+	box-sizing: border-box;
 }
 
 /* ── Empty state ── */
@@ -760,6 +769,11 @@ to {
 
 .modal-overlay.show {
 	display: flex;
+}
+
+/* Stacked above “all members” modal when both open */
+.modal-overlay--high {
+	z-index: 10050;
 }
 
 .modal-box {
@@ -1044,6 +1058,98 @@ to {
 /* Hidden real select (keeps form working) */
 .dropdown-hidden-select {
 	display: none;
+}
+
+/* ── Responsive (Teams page + modals) ── */
+@media ( max-width : 768px) {
+	.page {
+		padding: 20px 14px;
+		max-width: 100%;
+	}
+	.page-title {
+		font-size: 22px;
+	}
+	.stats-row .stat-card {
+		min-width: calc(50% - 8px);
+		flex: 1 1 140px;
+	}
+	.teams-grid {
+		grid-template-columns: 1fr;
+	}
+	.members-chips {
+		grid-template-columns: 1fr;
+	}
+	.add-member-row {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.add-member-row .btn {
+		width: 100%;
+		justify-content: center;
+	}
+	.toast {
+		left: 12px;
+		right: 12px;
+		max-width: none;
+	}
+	.modal-overlay {
+		padding: 12px;
+		align-items: center;
+	}
+	.modal-box {
+		max-width: 100% !important;
+		width: 100%;
+		border-radius: 16px 16px 0 0;
+		max-height: 92vh;
+		overflow-y: auto;
+	}
+	#membersModal .modal-box {
+		border-radius: 16px;
+		max-height: min(92vh, 640px);
+	}
+}
+
+@media ( max-width : 480px) {
+	.page-header {
+		margin-bottom: 20px;
+	}
+	.stat-num {
+		font-size: 22px;
+	}
+}
+
+/* Members modal row + remove */
+.member-modal-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 12px;
+	background: var(--surface2);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	min-width: 0;
+}
+.member-modal-row .member-modal-info {
+	flex: 1;
+	min-width: 0;
+}
+.member-modal-remove {
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: var(--text3);
+	width: 32px;
+	height: 32px;
+	border-radius: 8px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	transition: color 0.15s, background 0.15s;
+}
+.member-modal-remove:hover {
+	color: var(--danger);
+	background: var(--danger-light);
 }
 </style>
 </head>
@@ -1392,16 +1498,14 @@ to {
 							<span class="member-chip"> <span
 								class="member-chip-avatar"><%=mi%></span> <span
 								class="member-chip-name" title="<%=mn%>"><%=mn%></span>
-								<form action="<%=request.getContextPath()%>/teams" method="post"
-									style="display: inline; margin: 0;">
-									<input type="hidden" name="action" value="removeMember">
-									<input type="hidden" name="teamId" value="<%=t.getId()%>">
-									<input type="hidden" name="username"
-										value="<%=mem.getEmail()%>">
-									<button type="submit" class="member-remove" title="Remove">
+								<button type="button" class="member-remove" title="Remove from team"
+									data-team-id="<%=t.getId()%>"
+									data-team-name="<%=t.getName().replace("&","&amp;").replace("\"","&quot;").replace("<","&lt;")%>"
+									data-member-name="<%=mn.replace("&","&amp;").replace("\"","&quot;").replace("<","&lt;")%>"
+									data-username="<%=mem.getEmail().replace("&","&amp;").replace("\"","&quot;").replace("<","&lt;")%>"
+									onclick="openRemoveMemberModalFromChip(this)">
 										<i class="fa-solid fa-xmark"></i>
-									</button>
-								</form>
+								</button>
 							</span>
 							<%
 							}
@@ -1473,11 +1577,40 @@ to {
 		</div>
 	</div>
 
+	<!-- Remove member (same style as Delete Team) -->
+	<div id="removeMemberModal" class="modal-overlay modal-overlay--high"
+		onclick="if(event.target===this)closeRemoveMemberModal()">
+		<div class="modal-box" onclick="event.stopPropagation()">
+			<div class="modal-icon">
+				<i class="fa-solid fa-user-minus"></i>
+			</div>
+			<div class="modal-title">Remove from Team</div>
+			<p class="modal-subtitle">You are about to remove</p>
+			<p class="modal-teamname" id="removeMemberDisplayName"></p>
+			<p class="modal-subtitle" id="removeMemberTeamLabel" style="margin-top: 4px; margin-bottom: 6px;"></p>
+			<p class="modal-warning" id="removeMemberExtraLine"></p>
+			<div class="modal-actions">
+				<button type="button" onclick="closeRemoveMemberModal()"
+					class="btn btn-ghost">Cancel</button>
+				<form id="removeMemberForm"
+					action="<%=request.getContextPath()%>/teams" method="post"
+					style="display: inline;">
+					<input type="hidden" name="action" value="removeMember">
+					<input type="hidden" name="teamId" id="removeMemberTeamId">
+					<input type="hidden" name="username" id="removeMemberUsername">
+					<button type="submit" class="btn btn-danger">
+						<i class="fa-solid fa-user-minus"></i> Yes, Remove
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
 	<!-- Members View All Modal -->
 	<div id="membersModal" class="modal-overlay"
 		onclick="if(event.target===this)closeMembersModal()">
-		<div class="modal-box"
-			style="max-width: 480px; text-align: left; padding: 28px;"
+		<div class="modal-box members-modal-panel"
+			style="max-width: min(480px, calc(100vw - 24px)); width: 100%; text-align: left; padding: 28px;"
 			onclick="event.stopPropagation()">
 			<div
 				style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
@@ -1531,6 +1664,41 @@ function closeDeleteModal() {
   document.getElementById('deleteTeamModal').classList.remove('show');
 }
 
+function openRemoveMemberModal(teamId, teamName, memberName, username) {
+  document.getElementById('removeMemberTeamId').value = teamId;
+  document.getElementById('removeMemberUsername').value = username;
+  document.getElementById('removeMemberDisplayName').textContent = '"' + memberName + '"';
+  var teamLbl = document.getElementById('removeMemberTeamLabel');
+  if (teamLbl) {
+    if (teamName) {
+      teamLbl.textContent = 'Team: "' + teamName + '"';
+      teamLbl.style.display = 'block';
+    } else {
+      teamLbl.textContent = '';
+      teamLbl.style.display = 'none';
+    }
+  }
+  var extra = document.getElementById('removeMemberExtraLine');
+  if (extra) {
+    extra.textContent = 'This removes them from this team only. Their user account is not deleted.';
+  }
+  document.getElementById('removeMemberModal').classList.add('show');
+}
+
+function closeRemoveMemberModal() {
+  var el = document.getElementById('removeMemberModal');
+  if (el) el.classList.remove('show');
+}
+
+function openRemoveMemberModalFromChip(btn) {
+  if (!btn) return;
+  var teamId = parseInt(btn.getAttribute('data-team-id'), 10);
+  var teamName = btn.getAttribute('data-team-name') || '';
+  var memberName = btn.getAttribute('data-member-name') || '';
+  var username = btn.getAttribute('data-username') || '';
+  openRemoveMemberModal(teamId, teamName, memberName, username);
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   var toast = document.getElementById('toast');
   if (toast) {
@@ -1569,6 +1737,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 var _currentModalTeamId = null;
 var _currentModalMembers = [];
+var _teamsCtx = '<%=request.getContextPath()%>';
+
+function escAttr(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 function openMembersModal(teamId, teamName, members) {
   _currentModalTeamId = teamId;
@@ -1593,17 +1772,34 @@ function filterModalMembers(q) {
 
 function renderModalMembers(members) {
   var list = document.getElementById('membersModalList');
+  var tid = _currentModalTeamId;
+  var teamNameEl = document.getElementById('membersModalTitle');
+  var teamName = teamNameEl ? teamNameEl.textContent : '';
   if (!members.length) {
     list.innerHTML = '<p style="text-align:center;color:var(--text3);font-size:13px;padding:20px 0;">No members found</p>';
     return;
   }
   list.innerHTML = members.map(function(m) {
-    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;">'
-      + '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#818cf8);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + m.initials + '</div>'
-      + '<div style="flex:1;min-width:0;">'
-      + '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + m.name + '</div>'
-      + '<div style="font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + m.email + '</div>'
+    var name = escAttr(m.name);
+    var email = escAttr(m.email);
+    var initials = escAttr(m.initials);
+    var teamNameAttr = escAttr(teamName);
+    var nameAttr = escAttr(m.name);
+    var emailAttr = escAttr(m.email);
+    return '<div class="member-modal-row">'
+      + '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#818cf8);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + initials + '</div>'
+      + '<div class="member-modal-info">'
+      + '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + name + '</div>'
+      + '<div style="font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + email + '</div>'
       + '</div>'
+      + '<button type="button" class="member-modal-remove" title="Remove from team" aria-label="Remove from team"'
+      + ' data-team-id="' + tid + '"'
+      + ' data-team-name="' + teamNameAttr + '"'
+      + ' data-member-name="' + nameAttr + '"'
+      + ' data-username="' + emailAttr + '"'
+      + ' onclick="openRemoveMemberModalFromChip(this)">'
+      + '<i class="fa-solid fa-xmark" style="font-size:14px;"></i>'
+      + '</button>'
       + '</div>';
   }).join('');
 }

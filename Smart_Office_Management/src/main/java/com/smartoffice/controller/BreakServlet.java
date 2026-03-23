@@ -38,12 +38,13 @@ public class BreakServlet extends HttpServlet {
 			throw new ServletException("Error updating break status", e);
 		}
 		
-		// ✅ FIXED: Redirect to modular dashboard pages
+		// Redirect to the same view the form was submitted from (iframe content only).
+		// Never redirect employees to /user here — that loads the full shell (user.jsp) inside
+		// the iframe and causes a duplicated dashboard ("mirroring").
 		if ("manager".equalsIgnoreCase(redirect)) {
-			// ✅ CHANGED: Redirect to managerAttendance instead of manager servlet
 			response.sendRedirect(request.getContextPath() + "/managerAttendance?success=break" + action);
 		} else {
-			response.sendRedirect(request.getContextPath() + "/user?tab=attendance&success=break" + action);
+			response.sendRedirect(request.getContextPath() + "/userAttendance?success=break" + action);
 		}
 	}
 }
