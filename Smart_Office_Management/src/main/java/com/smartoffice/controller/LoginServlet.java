@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
+import com.smartoffice.utils.AuthRedirectUtil;
 import com.smartoffice.utils.DBConnectionUtil;
 import com.smartoffice.utils.PasswordUtil;
 
@@ -39,7 +40,7 @@ public class LoginServlet extends HttpServlet {
         String password = req.getParameter("password");
 
         if (!isStrongPassword(password)) {
-            res.sendRedirect("index.html?error=weakPassword");
+            AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=weakPassword");
             return;
         }
 
@@ -57,12 +58,12 @@ public class LoginServlet extends HttpServlet {
                 String email = rs.getString("email");
 
                 if (!PasswordUtil.checkPassword(password, dbPassword)) {
-                    res.sendRedirect("index.html?error=invalid");
+                    AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=invalid");
                     return;
                 }
 
                 if (!"active".equalsIgnoreCase(status)) {
-                    res.sendRedirect("index.html?error=inactive");
+                    AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=inactive");
                     return;
                 }
 
@@ -111,27 +112,27 @@ public class LoginServlet extends HttpServlet {
                     case "user":
                     case "employee":
                     case "security":
-                        res.sendRedirect("user?success=Login");
+                        AuthRedirectUtil.sendTopWindowRedirect(req, res, "/user?success=Login");
                         break;
                     case "manager":
                         // ✅ CHANGED: Now redirects to managerDashboard.jsp instead of manager servlet
-                        res.sendRedirect("managerDashboard.jsp?success=Login");
+                        AuthRedirectUtil.sendTopWindowRedirect(req, res, "/managerDashboard.jsp?success=Login");
                         break;
                     case "admin":
                         // ✅ CHANGED: Now redirects to adminDashboard.jsp instead of admin.jsp
-                        res.sendRedirect("admin.jsp?success=Login");
+                        AuthRedirectUtil.sendTopWindowRedirect(req, res, "/admin.jsp?success=Login");
                         break;
                     default:
-                        res.sendRedirect("index.html?error=invalidRole");
+                        AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=invalidRole");
                 }
 
             } else {
-                res.sendRedirect("index.html?error=invalid");
+                AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=invalid");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            res.sendRedirect("index.html?error=server");
+            AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=server");
         }
     }
 

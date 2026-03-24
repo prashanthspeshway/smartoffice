@@ -95,7 +95,7 @@ String todayStr = new java.text.SimpleDateFormat("EEEE, MMMM d yyyy").format(new
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Manager Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -109,7 +109,7 @@ String todayStr = new java.text.SimpleDateFormat("EEEE, MMMM d yyyy").format(new
   --r:16px; --r2:10px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body{font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .pg{max-width:1200px;margin:0 auto;padding:32px 20px}
 
 /* HERO */
@@ -118,7 +118,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .hero::after{content:'';position:absolute;bottom:-70px;right:140px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.05);pointer-events:none}
 .hl{position:relative;z-index:1}
 .h-eye{font-size:11px;font-weight:600;opacity:.7;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
-.h-title{font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;margin-bottom:5px;line-height:1.25}
+.h-title{font-family:'Geist',system-ui,sans-serif;font-size:26px;font-weight:600;margin-bottom:5px;line-height:1.25}
 .h-sub{font-size:13px;opacity:.72;display:flex;align-items:center;gap:6px}
 .hdot{width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;box-shadow:0 0 6px #4ade80}
 .hr{position:relative;z-index:1;display:flex;gap:9px;flex-shrink:0}
@@ -157,7 +157,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .ins-fill{height:100%;border-radius:99px;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
 
 /* SECTION */
-.sec{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:600;color:var(--text);margin-bottom:11px;display:flex;align-items:center;gap:8px}
+.sec{font-family:'Geist',system-ui,sans-serif;font-size:15px;font-weight:600;color:var(--text);margin-bottom:11px;display:flex;align-items:center;gap:8px}
 .sec::after{content:'';flex:1;height:1px;background:var(--border)}
 
 /* CARD */
@@ -595,7 +595,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 </div>
 
 <script>
-Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
+Chart.defaults.font.family = "'Geist', system-ui, sans-serif";
 Chart.defaults.font.size   = 12;
 Chart.defaults.color       = '#9aa0b8';
 Chart.defaults.plugins.legend.labels.boxWidth  = 10;
@@ -705,10 +705,10 @@ new Chart(document.getElementById('leaveDonut'), {
         var cx=(left+right)/2, cy=(top+bottom)/2;
         ctx.save();
         ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.font = 'bold 20px DM Sans, sans-serif';
+        ctx.font = 'bold 20px Geist, sans-serif';
         ctx.fillStyle = '#1a1d2e';
         ctx.fillText(tot, cx, cy-7);
-        ctx.font = '10px DM Sans, sans-serif';
+        ctx.font = '10px Geist, sans-serif';
         ctx.fillStyle = '#9aa0b8';
         ctx.fillText('Total', cx, cy+9);
         ctx.restore();

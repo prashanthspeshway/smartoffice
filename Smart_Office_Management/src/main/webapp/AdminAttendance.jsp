@@ -28,6 +28,11 @@ SimpleDateFormat timeFmt = new SimpleDateFormat("hh:mm a");
 SimpleDateFormat headerTimeFmt = new SimpleDateFormat("hh:mm:ss a");
 if (attendanceList == null)
 	attendanceList = java.util.Collections.emptyList();
+
+java.time.LocalDate exportEnd = java.time.LocalDate.now();
+java.time.LocalDate exportStart = exportEnd.withDayOfMonth(1);
+String exportDefaultStart = exportStart.toString();
+String exportDefaultEnd = exportEnd.toString();
 if (designations == null)
 	designations = java.util.Collections.emptyList();
 %>
@@ -43,11 +48,11 @@ if (designations == null)
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link
-	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+	href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
 	rel="stylesheet">
 <style>
 body {
-	font-family: 'Inter', system-ui, sans-serif;
+	font-family: 'Geist', system-ui, sans-serif;
 }
 
 .attendance-card {
@@ -116,6 +121,21 @@ body {
 .badge-punched-in {
 	background: #dcfce7;
 	color: #166534;
+}
+
+.badge-half-day {
+	background: #fef3c7;
+	color: #92400e;
+}
+
+.badge-present {
+	background: #bbf7d0;
+	color: #14532d;
+}
+
+.badge-on-leave {
+	background: #e9d5ff;
+	color: #5b21b6;
 }
 
 .search-input {
@@ -190,6 +210,47 @@ body {
 	background: #f1f5f9;
 	color: #334155;
 }
+
+.export-modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 23, 42, 0.45);
+	backdrop-filter: blur(4px);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	z-index: 10000;
+}
+.export-modal-overlay.show { display: flex; }
+.export-modal {
+	background: #fff;
+	border-radius: 12px;
+	padding: 24px;
+	width: 100%;
+	max-width: 420px;
+	box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+.export-modal h3 { margin: 0 0 8px; font-size: 1.125rem; color: #0f172a; }
+.export-modal p { margin: 0 0 16px; font-size: 0.875rem; color: #64748b; }
+.export-modal label { display: block; font-size: 0.75rem; font-weight: 600; color: #475569; margin-bottom: 6px; }
+.export-modal input[type="date"] {
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	margin-bottom: 14px;
+}
+.export-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+.export-modal-actions button {
+	padding: 10px 18px;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 0.875rem;
+	cursor: pointer;
+	border: none;
+}
+.btn-modal-cancel { background: #f1f5f9; color: #334155; }
+.btn-modal-submit { background: #4f46e5; color: #fff; }
 </style>
 </head>
 <body class="bg-slate-100 min-h-screen p-6">
@@ -204,11 +265,10 @@ body {
 					attendance and breaks.</p>
 			</div>
 			<div class="flex items-center gap-4">
-				<span class="text-sm text-slate-500" id="liveClock"></span> <a
-					href="<%=request.getContextPath()%>/exportTeamAttendance"
-					class="export-btn"> <i class="fa-solid fa-download"></i> Export
-					Report
-				</a>
+				<span class="text-sm text-slate-500" id="liveClock"></span>
+				<button type="button" class="export-btn" id="openExportModal" onclick="document.getElementById('exportModalOverlay').classList.add('show')">
+					<i class="fa-solid fa-download"></i> Export Report
+				</button>
 			</div>
 		</div>
 
@@ -367,11 +427,37 @@ body {
 							class="px-3 py-1 rounded-full text-xs font-semibold <%=badgeClass%>"><%=liveStatus%></span></td>
 						<td>
 							<%
-							String status = (row.getPunchIn() != null) ? "Present" : "Absent";
-							String statusClass = status.equals("Present") ? "badge-punched-in" : "badge-absent";
+							String dbSt = row.getAttendanceStatus();
+							if (dbSt != null) dbSt = dbSt.trim();
+							String statusLabel = "Absent";
+							String statusClass = "badge-absent";
+							if (dbSt != null && !dbSt.isEmpty() && "On Leave".equalsIgnoreCase(dbSt)) {
+								statusLabel = "On Leave";
+								statusClass = "badge-on-leave";
+							} else if (row.getPunchIn() == null) {
+								/* absent */
+							} else if (dbSt != null && "Half Day".equalsIgnoreCase(dbSt)) {
+								statusLabel = "Half Day";
+								statusClass = "badge-half-day";
+							} else if (dbSt != null && "Present".equalsIgnoreCase(dbSt)) {
+								statusLabel = "Present";
+								statusClass = "badge-present";
+							} else if (dbSt != null && "In Progress".equalsIgnoreCase(dbSt)) {
+								statusLabel = "Progress";
+								statusClass = "badge-punched-in";
+							} else if (row.getPunchOut() == null) {
+								statusLabel = "Progress";
+								statusClass = "badge-punched-in";
+							} else if (dbSt != null && "Absent".equalsIgnoreCase(dbSt)) {
+								statusLabel = "Absent";
+								statusClass = "badge-absent";
+							} else {
+								statusLabel = "Present";
+								statusClass = "badge-present";
+							}
 							%> <span
 							class="px-3 py-1 rounded-full text-xs font-semibold <%=statusClass%>">
-								<%=status%>
+								<%=statusLabel%>
 						</span>
 						</td>
 					</tr>
@@ -404,9 +490,60 @@ body {
 		</div>
 	</div>
 
+	<div id="exportModalOverlay" class="export-modal-overlay" onclick="if(event.target===this)this.classList.remove('show')">
+		<div class="export-modal" onclick="event.stopPropagation()">
+			<h3>Export attendance</h3>
+			<p>Choose the date range for the Excel report. Dates after today stay blank (not marked absent).</p>
+			<form method="get" action="<%=request.getContextPath()%>/exportTeamAttendance"
+				onsubmit="return validateExportAttendanceRange(event)">
+				<label for="expStart">From</label>
+				<input type="date" id="expStart" name="start" value="<%=exportDefaultStart%>" required />
+				<label for="expEnd">To</label>
+				<input type="date" id="expEnd" name="end" value="<%=exportDefaultEnd%>" required />
+				<div class="export-modal-actions">
+					<button type="button" class="btn-modal-cancel" onclick="document.getElementById('exportModalOverlay').classList.remove('show')">Cancel</button>
+					<button type="submit" class="btn-modal-submit">Download</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
 	<script>
-	
-	
+	function parseISODateLocal(s) {
+		if (!s) return null;
+		var p = s.split('-');
+		return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+	}
+	function exportDaysInclusive(s, t) {
+		return Math.round((t - s) / 86400000) + 1;
+	}
+	function notifyExportRangeToast(msg) {
+		if (window.parent && typeof window.parent.showToast === 'function') {
+			window.parent.showToast(msg, 'error', 'bottom');
+		} else if (typeof showToast === 'function') {
+			showToast(msg, 'error', 'bottom');
+		} else {
+			alert(msg);
+		}
+	}
+	function validateExportAttendanceRange(ev) {
+		var start = document.getElementById('expStart').value;
+		var end = document.getElementById('expEnd').value;
+		if (!start || !end) return true;
+		var s = parseISODateLocal(start), t = parseISODateLocal(end);
+		if (t < s) {
+			ev.preventDefault();
+			notifyExportRangeToast('From date must be on or before To date.');
+			return false;
+		}
+		if (exportDaysInclusive(s, t) > 400) {
+			ev.preventDefault();
+			notifyExportRangeToast('Date range cannot exceed 400 days.');
+			return false;
+		}
+		return true;
+	}
+
 document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
 	<script>

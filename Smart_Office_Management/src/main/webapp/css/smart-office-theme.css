@@ -1,0 +1,280 @@
+/**
+ * Smart Office — shared UI tokens (login + dashboard shells)
+ * Palette: primary black, white surfaces, gray text, light borders (matches login)
+ */
+:root {
+  --so-black: #000000;
+  --so-black-soft: #111111;
+  --so-text: #555555;
+  --so-text-muted: #888888;
+  --so-text-light: #aaaaaa;
+  --so-border: #e0e0e0;
+  --so-bg: #ffffff;
+  --so-bg-page: #f5f5f5;
+  --so-sidebar-bg: #2d2d2d;
+  --so-sidebar-border: #242424;
+  --so-sidebar-active: rgba(255, 255, 255, 0.14);
+  --so-sidebar-hover: rgba(255, 255, 255, 0.08);
+  --so-sidebar-width: 18rem;
+  --so-font: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --so-font-mono: "Geist Mono", ui-monospace, monospace;
+  /* Inner iframe pages (adminOverview / employee views) */
+  --so-content-bg: #f0f2f8;
+  --so-content-text: #1a1d2e;
+  --so-content-text-muted: #5a6278;
+  --so-content-text-dim: #9aa0b8;
+  --so-content-border: #e4e8f0;
+}
+
+/* Fluid root type — scales between mobile and desktop (all pages using this stylesheet) */
+html {
+  font-size: clamp(14px, 3.75vw, 16px);
+}
+
+/* Shell layout (admin / user / manager dashboard) */
+body.so-shell {
+  font-family: var(--so-font);
+  color: var(--so-text);
+  background: var(--so-bg-page);
+}
+
+.so-header {
+  background: var(--so-bg) !important;
+  border-color: var(--so-border) !important;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  padding: 0.5rem 0.75rem !important;
+  min-height: 0 !important;
+  font-family: var(--so-font);
+}
+
+@media (min-width: 640px) {
+  .so-header {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+.so-header h1 {
+  color: var(--so-black) !important;
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.02em;
+  font-family: var(--so-font);
+}
+
+@media (min-width: 640px) {
+  .so-header h1 {
+    font-size: 1rem !important;
+  }
+}
+
+.so-header .so-welcome,
+.so-header .text-slate-600 {
+  color: var(--so-text) !important;
+  font-size: 0.8125rem !important;
+  font-family: var(--so-font);
+}
+
+.so-header .so-welcome strong,
+.so-header strong.text-slate-800 {
+  color: var(--so-black) !important;
+}
+
+.so-main {
+  background: var(--so-bg-page) !important;
+}
+
+/* Sidebar: soft charcoal (“light black”), compact width */
+.so-sidebar {
+  background: var(--so-sidebar-bg) !important;
+  border-color: var(--so-sidebar-border) !important;
+  box-shadow: none !important;
+  width: var(--so-sidebar-width) !important;
+  min-width: var(--so-sidebar-width) !important;
+  max-width: min(85vw, var(--so-sidebar-width)) !important;
+}
+
+.so-sidebar nav,
+.so-sidebar .border-t,
+.so-sidebar .sidebar-bottom {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Nav buttons: default */
+.so-sidebar .sidebar-btn {
+  color: rgba(255, 255, 255, 0.78) !important;
+  background: transparent !important;
+}
+
+.so-sidebar .sidebar-btn:hover {
+  background: var(--so-sidebar-hover) !important;
+  color: #ffffff !important;
+}
+
+/* Active — JS adds bg-indigo-50 + text-indigo-700 (admin/manager) or .active (user) */
+.so-sidebar .sidebar-btn.bg-indigo-50,
+.so-sidebar .sidebar-btn.text-indigo-700,
+.so-sidebar .sidebar-btn.active {
+  background: var(--so-sidebar-active) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.so-sidebar .sidebar-btn i {
+  color: inherit;
+  opacity: 0.95;
+}
+
+.so-sidebar .sidebar-btn,
+.so-sidebar a[href*="logout"] {
+  font-size: clamp(0.8125rem, 0.2vw + 0.78rem, 0.9375rem) !important;
+  line-height: 1.35 !important;
+}
+
+/* Logout */
+.so-sidebar a[href*="logout"],
+.so-sidebar .so-logout {
+  color: #fca5a5 !important;
+}
+
+.so-sidebar a[href*="logout"]:hover,
+.so-sidebar .so-logout:hover {
+  background: rgba(248, 113, 113, 0.12) !important;
+  color: #fecaca !important;
+}
+
+.so-sidebar .sidebar-logout-btn {
+  color: #fca5a5 !important;
+}
+
+.so-sidebar .sidebar-logout-btn:hover {
+  background: rgba(248, 113, 113, 0.12) !important;
+  color: #fecaca !important;
+}
+
+/* Mobile menu button in header (stays on white bar) */
+.so-menu-btn {
+  border-color: var(--so-border) !important;
+  color: var(--so-text) !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  min-width: 2rem !important;
+  min-height: 2rem !important;
+  border-radius: 0.5rem !important;
+}
+
+.so-menu-btn i {
+  font-size: 0.9375rem !important;
+}
+
+/* Notification bell on white header — compact to match slim navbar */
+.so-header .notif-trigger {
+  border-color: var(--so-border) !important;
+  color: var(--so-text) !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  min-width: 2rem !important;
+  min-height: 2rem !important;
+  border-radius: 0.5rem !important;
+}
+
+.so-header .notif-trigger:hover {
+  background: var(--so-bg-page) !important;
+  color: var(--so-black) !important;
+}
+
+.so-header .notif-trigger i {
+  font-size: 1rem !important;
+}
+
+.notif-badge {
+  border-color: var(--so-bg) !important;
+}
+
+/* manager.jsp — notification bell: primary black, compact */
+body.so-shell .icon-btn {
+  background: var(--so-black) !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  min-width: 2rem !important;
+  border-radius: 0.5rem !important;
+}
+
+body.so-shell .icon-btn:hover {
+  background: var(--so-black-soft) !important;
+}
+
+body.so-shell .icon-btn i {
+  font-size: 0.9375rem !important;
+}
+
+/* manager.jsp monolithic page — top bar (compact, matches shell headers) */
+.so-shell .top-bar,
+body.so-shell .top-bar {
+  background: var(--so-bg) !important;
+  border-bottom: 1px solid var(--so-border) !important;
+  height: 2.75rem !important;
+  min-height: 2.75rem !important;
+  padding: 0 1rem !important;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+.so-shell .top-bar h2 {
+  color: var(--so-black) !important;
+  font-family: var(--so-font);
+  font-size: clamp(0.875rem, 0.35vw + 0.8rem, 1rem) !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.02em;
+}
+
+.so-shell .welcome {
+  color: var(--so-text) !important;
+  font-family: var(--so-font);
+  font-size: clamp(0.75rem, 0.25vw + 0.7rem, 0.875rem) !important;
+}
+
+.so-shell .content-area {
+  background: var(--so-bg-page) !important;
+}
+
+/* manager.jsp dark-theme toggle — keep sidebar dark */
+body.dark-theme .sidebar.so-sidebar {
+  background: #3d3d3d !important;
+}
+body.dark-theme .sidebar-btn.active {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fff !important;
+}
+
+/* ── Iframe content pages (employee / shared views — match adminOverview tokens) ── */
+body.user-iframe-page {
+  font-family: var(--so-font) !important;
+  font-size: clamp(0.875rem, 0.2vw + 0.82rem, 1rem);
+  color: var(--so-content-text);
+  background: var(--so-content-bg) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body.user-iframe-page h1,
+body.user-iframe-page h2,
+body.user-iframe-page h3 {
+  font-family: var(--so-font);
+  letter-spacing: -0.02em;
+}
+
+body.user-iframe-page h1 {
+  font-size: clamp(1.25rem, 2.5vw + 0.5rem, 1.625rem);
+  line-height: 1.2;
+}
+
+body.user-iframe-page h2 {
+  font-size: clamp(1.05rem, 1.8vw + 0.45rem, 1.35rem);
+  line-height: 1.25;
+}
+
+body.user-iframe-page h3 {
+  font-size: clamp(0.95rem, 1.2vw + 0.5rem, 1.125rem);
+}

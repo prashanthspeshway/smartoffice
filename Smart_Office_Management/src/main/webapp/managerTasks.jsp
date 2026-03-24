@@ -12,6 +12,10 @@ if (username == null) {
 }
 
 String errorMessage = (String) request.getAttribute("errorMessage");
+String qError = request.getParameter("error");
+if (errorMessage == null && qError != null && !qError.isEmpty()) {
+	errorMessage = qError;
+}
 List<User> team = (List<User>) request.getAttribute("teamList");
 String assignEmployee = (String) request.getAttribute("assignEmployee");
 String viewEmployee = (String) request.getAttribute("viewEmployee");
@@ -27,10 +31,11 @@ List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
-<style>body{font-family:'DM Sans',system-ui,sans-serif;}</style>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>body{font-family:'Geist',system-ui,sans-serif;}</style>
 </head>
 <body class="bg-slate-100 p-6">
+	<div id="taskToast" class="fixed bottom-6 right-4 z-50 px-5 py-3 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
 	<div class="max-w-7xl mx-auto">
 		<h2 class="text-2xl font-bold text-slate-800 mb-6">Tasks</h2>
 
@@ -171,17 +176,36 @@ List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");
 						<%
 						} else {
 							for (Task t : viewTasks) {
-								String statusColor = t.getStatus().equals("COMPLETED") 
-									? "bg-green-100 text-green-800" 
-									: "bg-yellow-100 text-yellow-800";
+								String rs = t.getStatus() != null ? t.getStatus().trim() : "";
+								String statusLabel = "COMPLETED".equalsIgnoreCase(rs) ? "Completed"
+										: ("PROCESSING".equalsIgnoreCase(rs) || "SUBMITTED".equalsIgnoreCase(rs)) ? "Processing" : "Assigned";
+								boolean isCompleted = "COMPLETED".equalsIgnoreCase(rs);
+								boolean isProcessing = "PROCESSING".equalsIgnoreCase(rs) || "SUBMITTED".equalsIgnoreCase(rs);
 						%>
 						<div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
-							<div class="flex justify-between items-start mb-2">
+							<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-2">
 								<h5 class="font-semibold text-slate-800"><%=t.getTitle() != null ? t.getTitle() : "Task"%></h5>
-								<span class="px-2 py-1 rounded-full text-xs font-semibold <%=statusColor%>">
-									<%=t.getStatus()%>
-								</span>
+								<%if (!isCompleted && viewEmployee != null) {%>
+								<form action="<%=request.getContextPath()%>/managerTasks" method="post" class="flex flex-wrap items-center gap-2 shrink-0">
+									<input type="hidden" name="action" value="updateStatus">
+									<input type="hidden" name="taskId" value="<%=t.getId()%>">
+									<input type="hidden" name="viewEmployee" value="<%=viewEmployee%>">
+									<label class="sr-only" for="decision-<%=t.getId()%>">Manager action</label>
+									<select id="decision-<%=t.getId()%>" name="decision" required
+										class="text-sm px-3 py-2 rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[11rem]">
+										<option value="">Select action</option>
+										<%if (isProcessing) {%>
+										<option value="review">Review</option>
+										<%}%>
+										<option value="completed">Completed</option>
+									</select>
+									<button type="submit" class="text-sm px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition-colors">
+										Apply
+									</button>
+								</form>
+								<%}%>
 							</div>
+							<p class="text-sm text-slate-700 mb-2"><span class="text-slate-500 font-medium">Status:</span> <span class="font-semibold text-slate-900"><%=statusLabel%></span></p>
 							<p class="text-sm text-slate-600 mb-2"><%=t.getDescription()%></p>
 							<div class="flex items-center gap-4 text-xs text-slate-500">
 								<span>
@@ -228,6 +252,35 @@ List<Task> viewTasks = (List<Task>) request.getAttribute("viewTasks");
 	<script>
 	document.addEventListener('contextmenu', e => e.preventDefault());
 	document.onkeydown = e => (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))) ? false : true;
+
+	function showTaskFlash(msg, ok) {
+		var el = document.getElementById('taskToast');
+		if (!el) return;
+		el.className = 'fixed bottom-6 right-4 z-50 px-5 py-3 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)] ' + (ok ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white');
+		el.textContent = msg;
+		el.classList.remove('hidden');
+		setTimeout(function () { el.classList.add('hidden'); }, 3800);
+	}
+	(function () {
+		var p = new URLSearchParams(window.location.search);
+		var flash = p.get('taskFlash');
+		if (flash === 'review') {
+			showTaskFlash('Task returned to employee — they can submit again.', true);
+		} else if (flash === 'completed') {
+			showTaskFlash('Task is completed successfully.', true);
+		} else if (flash === 'alreadyCompleted') {
+			showTaskFlash('This task was already completed.', true);
+		}
+		var err = p.get('error');
+		if (err) showTaskFlash(decodeURIComponent(err.replace(/\+/g, ' ')), false);
+		if (flash || err) {
+			p.delete('taskFlash');
+			p.delete('error');
+			var q = p.toString();
+			var path = window.location.pathname + (q ? '?' + q : '');
+			window.history.replaceState({}, document.title, path);
+		}
+	})();
 	</script>
 </body>
 </html>

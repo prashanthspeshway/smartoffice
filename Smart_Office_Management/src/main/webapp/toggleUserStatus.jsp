@@ -5,6 +5,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Enable / Disable User</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
 * {
@@ -13,7 +16,7 @@
 
 body {
     margin: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: 'Geist', system-ui, sans-serif;
     background: #c3cfe2;
     min-height: 100vh;
     display: flex;
@@ -123,8 +126,9 @@ button:active {
 /* ===== TOAST (SAME STYLE AS DASHBOARD) ===== */
 .toast {
     position: fixed;
-    top: 20px;
+    bottom: 24px;
     right: 25px;
+    top: auto;
     background: #e2ebf0;
     color: black;
     padding: 14px 20px 14px 44px;

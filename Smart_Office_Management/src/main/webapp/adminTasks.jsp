@@ -17,10 +17,10 @@ if (tasks == null)
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link
-	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+	href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
 	rel="stylesheet">
 <style>
-body { font-family: 'Inter', system-ui, sans-serif; }
+body { font-family: 'Geist', system-ui, sans-serif; }
 
 .badge-status {
 	padding: 4px 10px; border-radius: 9999px; font-size: 11px;

@@ -30,8 +30,16 @@ public class ForgotPasswordServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
  
+        res.setContentType("text/plain;charset=UTF-8");
+
         String email = req.getParameter("email");
- 
+        if (email == null || email.isBlank()) {
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            res.getWriter().println("Email is required.");
+            return;
+        }
+        email = email.trim();
+
         // Check if user exists
         User user = UserDao.getUserByEmail(email);
         if (user == null) {
@@ -49,10 +57,18 @@ public class ForgotPasswordServlet extends HttpServlet {
         String baseUrl = req.getRequestURL().toString().replace(req.getServletPath(), "");
         String link = baseUrl + "/resetPassword.jsp?token=" + token;
  
-        // Email credentials from config
+        // Email credentials from config (required for Jakarta Mail)
         String from = ConfigUtil.getProperty("mail.username");
         String password = ConfigUtil.getProperty("mail.password");
- 
+        if (from == null || from.isBlank() || password == null) {
+            res.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            res.getWriter().println(
+                    "Password reset email is not available: mail is not configured. Set mail.username and mail.password in config.properties.");
+            return;
+        }
+        final String mailFrom = from.trim();
+        final String mailPassword = password;
+
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
@@ -61,13 +77,13 @@ public class ForgotPasswordServlet extends HttpServlet {
  
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(from, password);
+                return new PasswordAuthentication(mailFrom, mailPassword);
             }
         });
  
         try {
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(from));
+            message.setFrom(new InternetAddress(mailFrom));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
             message.setSubject("Password Reset Request");
             message.setText("Click the link to reset your password:\n" + link);

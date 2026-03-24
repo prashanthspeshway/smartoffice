@@ -5,25 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Office — Login</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="css/smart-office-theme.css">
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --ink: #1c1c1c;
-  --ink-2: #4a4a4a;
-  --ink-3: #8a8a8a;
-  --ink-4: #b8b8b8;
-  --line: #e4e4e4;
-  --bg: #f5f5f4;
+  --ink: #000000;
+  --ink-2: #555555;
+  --ink-3: #888888;
+  --ink-4: #aaaaaa;
+  --line: #e0e0e0;
+  --bg: #f5f5f5;
   --white: #ffffff;
 }
 
 html, body {
   height: 100%;
-  font-family: 'Geist', system-ui, sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--ink);
   overflow: hidden;
@@ -182,7 +184,7 @@ html, body {
 
 .card-head { margin-bottom: 32px; }
 .card-label {
-  font-family: 'Geist Mono', monospace;
+  font-family: 'Geist', system-ui, sans-serif;
   font-size: .65rem;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -219,7 +221,7 @@ html, body {
   padding: 10px 14px 10px 38px;
   border: 1px solid var(--line);
   border-radius: 7px;
-  font-family: 'Geist', sans-serif;
+  font-family: 'Geist', system-ui, sans-serif;
   font-size: .875rem;
   color: var(--ink);
   background: var(--white);
@@ -229,7 +231,7 @@ html, body {
 .inp-wrap input::placeholder { color: var(--ink-4); }
 .inp-wrap input:focus {
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(28,28,28,.07);
+  box-shadow: 0 0 0 3px rgba(0,0,0,.08);
 }
 .inp-wrap .ico {
   position: absolute;
@@ -259,7 +261,7 @@ html, body {
 }
 .fp-btn {
   background: none; border: none; cursor: pointer;
-  font-family: 'Geist', sans-serif;
+  font-family: 'Geist', system-ui, sans-serif;
   font-size: .76rem; font-weight: 500;
   color: var(--ink-3);
   padding: 0;
@@ -276,7 +278,7 @@ html, body {
   border: none; border-radius: 7px;
   background: var(--ink);
   color: var(--white);
-  font-family: 'Geist', sans-serif;
+  font-family: 'Geist', system-ui, sans-serif;
   font-size: .875rem; font-weight: 500;
   letter-spacing: .01em;
   cursor: pointer;
@@ -289,7 +291,7 @@ html, body {
 .back-btn {
   display: inline-flex; align-items: center; gap: 6px;
   background: none; border: none; cursor: pointer;
-  font-family: 'Geist', sans-serif;
+  font-family: 'Geist', system-ui, sans-serif;
   font-size: .78rem; font-weight: 500;
   color: var(--ink-3);
   padding: 0; margin-top: 14px;
@@ -338,7 +340,7 @@ html, body {
 
 /* Toast */
 #toast {
-  position: fixed; top: 18px; right: 18px;
+  position: fixed; bottom: 18px; right: 18px; top: auto;
   display: none; align-items: center; gap: 10px;
   background: var(--white);
   border: 1px solid var(--line);
@@ -355,8 +357,8 @@ html, body {
 #toast.error i { color: #d63c3c; }
 #toast.success i { color: #2d8a4e; }
 
-@keyframes toastIn  { from{opacity:0;transform:translateY(-8px);} to{opacity:1;transform:translateY(0);} }
-@keyframes toastOut { to{opacity:0;transform:translateY(-8px);} }
+@keyframes toastIn  { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+@keyframes toastOut { to{opacity:0;transform:translateY(8px);} }
 
 @media (max-width: 740px) { .left{display:none;} .right{flex:0 0 100%;} .card{margin:0 24px;} }
 </style>
@@ -481,6 +483,11 @@ html, body {
 <div id="toast"><i id="toastIco"></i><span id="toastMsg"></span></div>
 
 <script>
+(function () {
+  if (window.self !== window.top) {
+    window.top.location.replace(window.location.href);
+  }
+})();
 const frmLogin  = document.getElementById('frmLogin');
 const frmForgot = document.getElementById('frmForgot');
 let busy = false;

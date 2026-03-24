@@ -27,7 +27,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+      font-family: 'Geist', system-ui, sans-serif;
     }
     #empProfileOverlay.show { display: flex; }
 

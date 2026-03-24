@@ -69,10 +69,96 @@ public class TaskDAO {
         return null;
     }
 
+    /** True if the session user (email or username) is the assignee of this task. */
+    public static boolean taskBelongsToAssignee(Task task, String sessionEmailOrUsername) {
+        if (task == null || sessionEmailOrUsername == null) {
+            return false;
+        }
+        try (Connection con = DBConnectionUtil.getConnection()) {
+            String assigned = resolveDbUsername(con, task.getAssignedTo());
+            String sessionU = resolveDbUsername(con, sessionEmailOrUsername);
+            return assigned != null && sessionU != null && assigned.equalsIgnoreCase(sessionU);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /** True if this manager (email or username) created/assigned the task. */
+    public static boolean taskAssignedByManager(Task task, String managerEmailOrUsername) {
+        if (task == null || managerEmailOrUsername == null) {
+            return false;
+        }
+        try (Connection con = DBConnectionUtil.getConnection()) {
+            String dbMgr = resolveDbUsername(con, managerEmailOrUsername);
+            String by = resolveDbUsername(con, task.getAssignedBy());
+            return dbMgr != null && by != null && dbMgr.equalsIgnoreCase(by);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /** Manager sends task back to employee (can submit again). */
+    public static void returnTaskForReview(int taskId) throws Exception {
+        String sql = "UPDATE tasks SET status='ASSIGNED', submitted_at=NULL WHERE id=?";
+        try (Connection con = DBConnectionUtil.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, taskId);
+            ps.executeUpdate();
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────
     // NEW — Update task status + optional comment + optional file
     //        (replaces submitEmployeeWork for the new servlet)
     // ─────────────────────────────────────────────────────────────
+    /**
+     * Employee submits a request (no status pick). Task becomes {@code PROCESSING} until the manager updates it.
+     */
+    public static void submitEmployeeTaskRequest(int taskId, String comment, Part filePart) throws Exception {
+        Task existing = getTaskById(taskId);
+        if (existing == null) {
+            throw new IllegalArgumentException("Task not found");
+        }
+        String st = existing.getStatus();
+        if (st != null) {
+            st = st.trim();
+            if ("COMPLETED".equalsIgnoreCase(st)) {
+                throw new IllegalStateException("Task is already completed");
+            }
+            if ("PROCESSING".equalsIgnoreCase(st) || "SUBMITTED".equalsIgnoreCase(st)) {
+                throw new IllegalStateException("Request is already being processed");
+            }
+        }
+
+        boolean hasFile = filePart != null && filePart.getSize() > 0
+                && filePart.getSubmittedFileName() != null
+                && !filePart.getSubmittedFileName().isEmpty();
+
+        if (hasFile) {
+            String sql = "UPDATE tasks SET status='PROCESSING', employee_comment=?, "
+                    + "employee_attachment_name=?, employee_attachment=?, submitted_at=NOW() "
+                    + "WHERE id=?";
+            try (Connection con = DBConnectionUtil.getConnection();
+                    PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, comment);
+                ps.setString(2, filePart.getSubmittedFileName());
+                ps.setBytes(3, filePart.getInputStream().readAllBytes());
+                ps.setInt(4, taskId);
+                ps.executeUpdate();
+            }
+        } else {
+            String sql = "UPDATE tasks SET status='PROCESSING', employee_comment=?, submitted_at=NOW() WHERE id=?";
+            try (Connection con = DBConnectionUtil.getConnection();
+                    PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, comment);
+                ps.setInt(2, taskId);
+                ps.executeUpdate();
+            }
+        }
+    }
+
     public static void updateTaskStatus(int taskId, String status, String comment, Part filePart)
             throws Exception {
 

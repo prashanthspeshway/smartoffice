@@ -26,6 +26,10 @@ release.properties
 *.log
 local.properties
 
+# Secrets & machine-specific (copy from *.example — never commit real passwords)
+src/main/resources/config.properties
+src/main/resources/db.properties
+
 # OS
 .DS_Store
 Thumbs.db

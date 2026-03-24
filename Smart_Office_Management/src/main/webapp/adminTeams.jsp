@@ -49,7 +49,7 @@ String safeError = (errorMsg != null)
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link
-	href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@0,600;1,400&display=swap"
+	href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
 	rel="stylesheet">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -88,7 +88,7 @@ String safeError = (errorMsg != null)
 }
 
 body {
-	font-family: 'DM Sans', system-ui, sans-serif;
+	font-family: 'Geist', system-ui, sans-serif;
 	background: var(--bg);
 	color: var(--text);
 	min-height: 100vh;
@@ -113,7 +113,7 @@ body {
 }
 
 .page-title {
-	font-family: 'Fraunces', Georgia, serif;
+	font-family: 'Geist', system-ui, sans-serif;
 	font-size: 28px;
 	font-weight: 600;
 	color: var(--text);
@@ -452,7 +452,7 @@ body {
 }
 
 .section-title {
-	font-family: 'Fraunces', Georgia, serif;
+	font-family: 'Geist', system-ui, sans-serif;
 	font-size: 20px;
 	font-weight: 600;
 	color: var(--text);
@@ -720,8 +720,9 @@ body {
 /* ── Toast ── */
 .toast {
 	position: fixed;
-	top: 20px;
+	bottom: 24px;
 	right: 20px;
+	top: auto;
 	padding: 13px 18px;
 	border-radius: 10px;
 	z-index: 9999;

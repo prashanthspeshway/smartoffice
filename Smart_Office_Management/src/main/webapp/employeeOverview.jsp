@@ -78,7 +78,7 @@
 <title>Employee Overview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 
@@ -131,7 +131,7 @@
 }
 
 body {
-    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-family: 'Geist', system-ui, -apple-system, sans-serif;
     font-size: var(--fs-base);
     line-height: 1.5;
     background: var(--bg);
@@ -199,7 +199,7 @@ body {
 .hero-left { position: relative; z-index: 1; }
 
 .hero-left h1 {
-    font-family: 'Fraunces', Georgia, serif;
+    font-family: 'Geist', system-ui, sans-serif;
     font-size: var(--fs-2xl);
     font-weight: 600;
     color: #fff;
@@ -534,7 +534,7 @@ body {
 .ps-val {
     font-weight: 800;
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Geist Mono', monospace;
     font-size: var(--fs-sm);
 }
 
@@ -577,7 +577,7 @@ body {
     justify-content: center;
     gap: 7px;
     transition: transform .15s, box-shadow .15s, opacity .15s;
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Geist', system-ui, sans-serif;
 }
 
 .punch-btn:hover:not(:disabled) {
@@ -685,7 +685,7 @@ body {
     color: #4c1d95;
     letter-spacing: 2px;
     line-height: 1;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Geist Mono', monospace;
     font-variant-numeric: tabular-nums;
     position: relative; z-index: 1;
 }
@@ -717,7 +717,7 @@ body {
     justify-content: center;
     gap: 7px;
     transition: transform .15s, box-shadow .15s, opacity .15s;
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Geist', system-ui, sans-serif;
 }
 .break-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.14); }
 .break-btn:disabled { opacity:.4; cursor:not-allowed; }
@@ -856,7 +856,7 @@ body {
     background: var(--surface);
     color: var(--text);
     transition: border-color .2s;
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Geist', system-ui, sans-serif;
     flex-shrink: 0;
 }
 .task-dropdown:hover { border-color: var(--indigo); }
@@ -1011,7 +1011,7 @@ body {
     font-size:var(--fs-xs); font-weight:700;
     cursor:pointer; flex-shrink:0; align-self:center;
     transition: background .2s;
-    font-family:'DM Sans',system-ui,sans-serif;
+    font-family:'Geist',system-ui,sans-serif;
 }
 .mark-read-btn:hover { background: rgba(102,126,234,.22); }
 
@@ -1040,7 +1040,7 @@ body {
     transition: all .2s ease;
     box-shadow: 0 2px 6px rgba(0,0,0,.04);
     white-space: nowrap;
-    font-family:'DM Sans',system-ui,sans-serif;
+    font-family:'Geist',system-ui,sans-serif;
     line-height: 1;
     text-decoration: none;
 }
@@ -1070,7 +1070,7 @@ body {
     display:flex; align-items:center; gap:8px;
 }
 .rib-emoji { font-size:var(--fs-lg); line-height:1; }
-.rib-val   { font-size:var(--fs-3xl); font-weight:700; font-family:'DM Sans',system-ui,sans-serif; line-height:1.1; }
+.rib-val   { font-size:var(--fs-3xl); font-weight:700; font-family:'Geist',system-ui,sans-serif; line-height:1.1; }
 .rib-lbl   { font-size:var(--fs-xs); color:var(--muted); font-weight:500; line-height:1.2; }
 
 /* ══════════════════════════════════════════════════

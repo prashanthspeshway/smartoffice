@@ -1,0 +1,4 @@
+# Copy to config.properties for mail (config.properties is gitignored).
+# Use an app password for Gmail, not your account password.
+mail.username=your.email@example.com
+mail.password=your-app-password

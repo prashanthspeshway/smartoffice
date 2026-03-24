@@ -14,11 +14,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.smartoffice.dao.DesignationDAO;
 import com.smartoffice.utils.DBConnectionUtil;
+import com.smartoffice.utils.PasswordUtil;
 import com.smartoffice.utils.UserFieldUtil;
 
 @SuppressWarnings("serial")
 @WebServlet("/editUser")
 public class EditUser extends HttpServlet {
+
+    private static boolean isStrongPassword(String password) {
+        if (password == null) {
+            return false;
+        }
+        return password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$");
+    }
 
     // =========================
     // LOAD USER (GET)
@@ -79,6 +87,8 @@ public class EditUser extends HttpServlet {
         }
         String email = req.getParameter("email");
         String joinedDateStr = req.getParameter("joinedDate");
+        String newPassword = req.getParameter("newPassword");
+        String confirmNewPassword = req.getParameter("confirmNewPassword");
 
         Date joinedDate = null;
         if (joinedDateStr != null && !joinedDateStr.isEmpty()) {
@@ -88,24 +98,53 @@ public class EditUser extends HttpServlet {
         // Username = firstname + lastname (fallback to email if empty)
 
         try (Connection con = DBConnectionUtil.getConnection();
-        		PreparedStatement ps = con.prepareStatement(
-        			    "UPDATE users SET role=?, status=?, firstname=?, lastname=?, designation=?, email=?, joinedDate=?, phone=? WHERE id=?")) {
-        	ps.setString(1, role);
-        	ps.setString(2, status);
-        	ps.setString(3, firstname);
-        	ps.setString(4, lastname);
-        	ps.setString(5, designation);
-        	ps.setString(6, email);
-        	ps.setDate(7, joinedDate);
-        	ps.setString(8, phone);
-        	ps.setInt(9, id);
+                PreparedStatement ps = con.prepareStatement(
+                        "UPDATE users SET role=?, status=?, firstname=?, lastname=?, designation=?, email=?, joinedDate=?, phone=? WHERE id=?")) {
+            ps.setString(1, role);
+            ps.setString(2, status);
+            ps.setString(3, firstname);
+            ps.setString(4, lastname);
+            ps.setString(5, designation);
+            ps.setString(6, email);
+            ps.setDate(7, joinedDate);
+            ps.setString(8, phone);
+            ps.setInt(9, id);
 
             ps.executeUpdate();
 
         } catch (Exception e) {
             e.printStackTrace();
+            req.getSession().setAttribute("editUserError", "Could not save employee details.");
+            res.sendRedirect(req.getContextPath() + "/editUser?id=" + id);
+            return;
         }
 
-        res.sendRedirect("viewUser?msg=updated");
+        // Optional: admin sets a new password (employees and managers)
+        if (newPassword != null && !newPassword.isBlank()) {
+            if (confirmNewPassword == null || !newPassword.equals(confirmNewPassword)) {
+                req.getSession().setAttribute("editUserError", "New password and confirmation do not match.");
+                res.sendRedirect(req.getContextPath() + "/editUser?id=" + id);
+                return;
+            }
+            if (!isStrongPassword(newPassword)) {
+                req.getSession().setAttribute("editUserError",
+                        "Password must be at least 8 characters with uppercase, lowercase, number, and symbol (@$!%*?&).");
+                res.sendRedirect(req.getContextPath() + "/editUser?id=" + id);
+                return;
+            }
+            try (Connection con = DBConnectionUtil.getConnection();
+                    PreparedStatement ps = con.prepareStatement("UPDATE users SET password=? WHERE id=?")) {
+                ps.setString(1, PasswordUtil.hashPassword(newPassword));
+                ps.setInt(2, id);
+                ps.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+                req.getSession().setAttribute("editUserError", "Could not update password.");
+                res.sendRedirect(req.getContextPath() + "/editUser?id=" + id);
+                return;
+            }
+        }
+
+        res.sendRedirect(req.getContextPath() + "/viewUser?msg=updated");
     }
 }

@@ -10,24 +10,25 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Tasks</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
-<style>body{font-family:'DM Sans',system-ui,sans-serif;}</style>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
 </head>
-<body class="bg-slate-100 p-6">
+<body class="user-iframe-page p-6">
 
 <div class="max-w-5xl mx-auto space-y-6">
     <div>
         <h2 class="text-2xl font-bold text-slate-800"><i class="fa-solid fa-list-check mr-2 text-indigo-500"></i>Assigned Tasks</h2>
-        <p class="text-slate-500 text-sm mt-1">View and update your assigned tasks.</p>
+        <p class="text-slate-500 text-sm mt-1">Submit a request with an optional comment or file. Your manager will review it.</p>
     </div>
 
     <!-- Toast -->
-    <div id="toast" class="fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg hidden text-sm font-medium"></div>
+    <div id="toast" class="fixed bottom-6 right-4 z-50 px-6 py-3 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
 
     <%if (tasks == null || tasks.isEmpty()) {%>
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-12 text-center">
@@ -35,12 +36,12 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
         <p class="text-slate-400 font-medium">No tasks assigned yet.</p>
     </div>
     <%} else { for (Task t : tasks) {
-        String statusCls = "COMPLETED".equals(t.getStatus()) ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-            : "ERRORS_RAISED".equals(t.getStatus()) ? "bg-red-100 text-red-700 border border-red-200"
-            : "INCOMPLETE".equals(t.getStatus()) ? "bg-amber-100 text-amber-700 border border-amber-200"
-            : "bg-slate-100 text-slate-600 border border-slate-200";
+        String rawSt = t.getStatus() != null ? t.getStatus().trim() : "";
+        boolean isCompleted = "COMPLETED".equalsIgnoreCase(rawSt);
+        boolean isProcessing = "PROCESSING".equalsIgnoreCase(rawSt) || "SUBMITTED".equalsIgnoreCase(rawSt);
         String priorityCls = "HIGH".equalsIgnoreCase(t.getPriority()) ? "text-red-500"
             : "LOW".equalsIgnoreCase(t.getPriority()) ? "text-emerald-500" : "text-amber-500";
+        String statusLabel = isCompleted ? "Completed" : (isProcessing ? "Processing" : "Assigned");
     %>
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6" id="task-card-<%=t.getId()%>">
         <div class="flex flex-col md:flex-row md:items-start gap-6">
@@ -55,13 +56,14 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
                         <p class="text-sm text-slate-500 mt-0.5"><%=t.getDescription()%></p>
                     </div>
                 </div>
-                <div class="flex flex-wrap gap-3 text-xs text-slate-500 ml-13">
+                <div class="flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-500 ml-13">
                     <span><i class="fa-solid fa-calendar mr-1"></i>Deadline: <strong class="text-slate-700"><%=t.getDeadline() != null ? t.getDeadline().toString() : "--"%></strong></span>
                     <span><i class="fa-solid fa-flag mr-1 <%=priorityCls%>"></i>Priority: <strong class="<%=priorityCls%>"><%=t.getPriority() != null ? t.getPriority() : "MEDIUM"%></strong></span>
                     <span><i class="fa-solid fa-user mr-1"></i>By: <strong class="text-slate-700"><%=t.getAssignedBy()%></strong></span>
-                    <%if (t.getStatus() != null) {%>
-                    <span class="px-2 py-0.5 rounded-full text-xs font-semibold <%=statusCls%>"><%=t.getStatus()%></span>
-                    <%}%>
+                </div>
+                <div class="mt-3 ml-13 text-sm">
+                    <span class="text-slate-500">Status:</span>
+                    <span class="font-semibold text-slate-800 ml-1"><%=statusLabel%></span>
                 </div>
                 <%if (t.getAttachmentName() != null && !t.getAttachmentName().isEmpty()) {%>
                 <div class="mt-3 ml-13">
@@ -73,21 +75,26 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
                 <%}%>
             </div>
 
-            <!-- Right: Update Form -->
+            <!-- Right: Request form (hidden when completed; read-only when processing) -->
             <div class="w-full md:w-72 flex-shrink-0 space-y-3">
-                <select id="status-<%=t.getId()%>" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                    <option value="">Update Status</option>
-                    <option value="COMPLETED"            <%="COMPLETED".equals(t.getStatus())?"selected":""%>>Complete</option>
-                    <option value="INCOMPLETE"           <%="INCOMPLETE".equals(t.getStatus())?"selected":""%>>Incomplete</option>
-                    <option value="ERRORS_RAISED"        <%="ERRORS_RAISED".equals(t.getStatus())?"selected":""%>>Errors Raised</option>
-                    <option value="DOCUMENT_VERIFICATION"<%="DOCUMENT_VERIFICATION".equals(t.getStatus())?"selected":""%>>Document Verification</option>
-                </select>
+                <% if (isCompleted) { %>
+                <p class="text-sm text-slate-500 text-center py-2">This task is completed.</p>
+                <% } else if (isProcessing) { %>
+                <p class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-center font-medium">
+                    <i class="fa-solid fa-hourglass-half mr-1"></i>Processing — waiting for your manager
+                </p>
+                <button type="button" disabled
+                    class="w-full py-2 rounded-lg bg-slate-200 text-slate-500 text-sm font-semibold cursor-not-allowed">
+                    <i class="fa-solid fa-spinner mr-1"></i> Processing
+                </button>
+                <% } else { %>
                 <input type="file" id="file-<%=t.getId()%>" accept="*/*" class="w-full text-xs text-slate-500 border border-slate-200 rounded-lg px-3 py-2 bg-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-indigo-50 file:text-indigo-600 file:font-medium cursor-pointer">
                 <textarea id="comment-<%=t.getId()%>" placeholder="Add a comment…" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300" rows="2"></textarea>
-                <button onclick="submitTaskUpdate(<%=t.getId()%>, this)" type="button"
+                <button onclick="submitTaskRequest(<%=t.getId()%>, this)" type="button"
                     class="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors disabled:opacity-50">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Submit Update
+                    <i class="fa-solid fa-paper-plane mr-1"></i> Submit Request
                 </button>
+                <% } %>
             </div>
         </div>
     </div>
@@ -97,7 +104,7 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
 <script>
 function showToast(message, type) {
     const toast = document.getElementById('toast');
-    toast.className = 'fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-sm font-medium';
+    toast.className = 'fixed bottom-6 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)]';
     if (type === 'success') toast.classList.add('bg-emerald-500', 'text-white');
     else toast.classList.add('bg-red-500', 'text-white');
     toast.textContent = message;
@@ -105,33 +112,39 @@ function showToast(message, type) {
     setTimeout(() => toast.classList.add('hidden'), 2500);
 }
 
-function submitTaskUpdate(taskId, btn) {
-    var statusEl  = document.getElementById('status-'  + taskId);
+function submitTaskRequest(taskId, btn) {
     var commentEl = document.getElementById('comment-' + taskId);
     var fileEl    = document.getElementById('file-'    + taskId);
 
-    if (!statusEl.value) { showToast('Please select a status.', 'error'); return; }
-
     var formData = new FormData();
     formData.append('taskId',  taskId);
-    formData.append('status',  statusEl.value);
     formData.append('comment', commentEl ? commentEl.value : '');
     if (fileEl && fileEl.files.length > 0) formData.append('employeeFile', fileEl.files[0]);
 
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Submitting…';
 
-    fetch('<%=request.getContextPath()%>/submitTaskUpdate', { method: 'POST', body: formData })
-    .then(res => {
-        if (res.ok || res.redirected) {
-            showToast('Task updated successfully ✔', 'success');
-            statusEl.value = ''; commentEl.value = ''; fileEl.value = '';
-        } else {
-            return res.text().then(t => showToast('Update failed: ' + t, 'error'));
+    fetch('<%=request.getContextPath()%>/submitTaskUpdate', { method: 'POST', body: formData, credentials: 'same-origin' })
+    .then(function (res) {
+        if (res.ok) {
+            btn.innerHTML = '<i class="fa-solid fa-hourglass-half mr-1"></i> Processing';
+            btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+            btn.classList.add('bg-slate-200', 'text-slate-600', 'cursor-not-allowed');
+            showToast('Request submitted', 'success');
+            setTimeout(function () { window.location.reload(); }, 600);
+            return;
         }
+        return res.text().then(function (t) {
+            showToast(t || ('Request failed (' + res.status + ')'), 'error');
+        });
     })
-    .catch(() => showToast('Network error. Try again.', 'error'))
-    .finally(() => { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i> Submit Update'; });
+    .catch(function () { showToast('Network error. Try again.', 'error'); })
+    .finally(function () {
+        if (!btn.classList.contains('cursor-not-allowed')) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i> Submit Request';
+        }
+    });
 }
 </script>
 </body>

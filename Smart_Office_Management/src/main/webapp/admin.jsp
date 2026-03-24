@@ -22,13 +22,11 @@ try {
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link
-	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-	rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
 <style>
-body {
-	font-family: 'Inter', system-ui, sans-serif;
-}
 /* Notification bell + badge — circle (1–9) vs pill (10+) */
 .notif-trigger { position: relative; }
 .notif-badge {
@@ -69,27 +67,26 @@ body {
 .notif-badge.hidden { display: none !important; }
 </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex flex-col h-screen overflow-hidden">
+<body class="so-shell bg-slate-100 min-h-screen flex flex-col h-screen overflow-hidden">
 
 	<!-- Top Bar -->
 	<header
-		class="bg-white border-b border-slate-200 px-3 sm:px-6 py-3 sm:py-4 flex flex-wrap gap-2 justify-between items-center shadow-sm shrink-0">
+		class="so-header bg-white border-b border-slate-200 flex flex-wrap gap-2 justify-between items-center shadow-sm shrink-0">
 		<div class="flex items-center gap-2 min-w-0 flex-1">
-			<button type="button" id="adminMobileNavToggle" class="md:hidden inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50" aria-label="Open navigation menu" aria-expanded="false" aria-controls="adminSidebar">
+			<button type="button" id="adminMobileNavToggle" class="so-menu-btn md:hidden inline-flex shrink-0 items-center justify-center border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50" aria-label="Open navigation menu" aria-expanded="false" aria-controls="adminSidebar">
 				<i class="fa-solid fa-bars text-lg" aria-hidden="true"></i>
 			</button>
-			<h1 class="text-base sm:text-xl font-semibold text-slate-800 truncate min-w-0">Smart Office •
-				AdminDashboard</h1>
+			<h1 class="truncate min-w-0">AdminDashboard</h1>
 		</div>
 		<div class="flex items-center gap-2 sm:gap-4 shrink-0">
 			<button type="button" onclick="openAdminNotifications()"
-				class="notif-trigger group relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35"
+				class="notif-trigger group relative inline-flex shrink-0 items-center justify-center border border-slate-200/90 bg-white text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/35"
 				title="Notifications" aria-label="Notifications">
 				<i class="fa-regular fa-bell pointer-events-none text-[1.15rem] transition-transform duration-200 group-hover:scale-105" aria-hidden="true"></i>
 				<span id="notifBadge" role="status"
 					class="notif-badge <%= unreadNotifCount > 0 ? "" : "hidden" %> <%= unreadNotifCount > 9 ? "notif-badge--pill" : "" %>"><%= unreadNotifCount > 99 ? "99+" : unreadNotifCount %></span>
 			</button>
-			<span class="text-xs sm:text-sm text-slate-600 truncate max-w-[min(42vw,200px)] sm:max-w-none">Welcome, <strong
+			<span class="so-welcome truncate max-w-[min(42vw,200px)] sm:max-w-none">Welcome, <strong
 				class="text-slate-800">${not empty sessionScope.fullName ? sessionScope.fullName : sessionScope.username}</strong></span>
 		</div>
 	</header>
@@ -100,7 +97,7 @@ body {
 	<div class="flex flex-1 min-h-0 overflow-hidden relative">
 		<!-- Sidebar -->
 		<aside id="adminSidebar"
-			class="fixed md:relative z-50 inset-y-0 left-0 w-64 max-w-[85vw] h-full md:h-auto bg-white border-r border-slate-200 flex flex-col shadow-lg md:shadow-sm transform transition-transform duration-200 ease-out -translate-x-full md:translate-x-0 overflow-hidden">
+			class="so-sidebar fixed md:relative z-50 inset-y-0 left-0 max-w-[min(85vw,var(--so-sidebar-width))] w-full min-w-0 h-full md:h-auto border-r border-slate-200 flex flex-col shadow-lg md:shadow-sm transform transition-transform duration-200 ease-out -translate-x-full md:translate-x-0 overflow-hidden">
 			<nav class="flex-1 py-4 px-3 overflow-y-auto min-h-0">
 				<button type="button" data-admin-view="adminOverview" onclick="loadPage(this,'adminOverview')"
 					class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
@@ -149,7 +146,7 @@ body {
 		</aside>
 
 		<!-- Content Area -->
-		<main class="flex-1 min-h-0 overflow-auto bg-slate-100 flex flex-col w-full min-w-0">
+		<main class="so-main flex-1 min-h-0 overflow-auto bg-slate-100 flex flex-col w-full min-w-0">
 			<iframe id="contentFrame" src="adminOverview"
 				class="w-full flex-1 min-h-[50vh] md:min-h-0 border-0 block" title="Admin content"></iframe>
 		</main>
@@ -157,7 +154,7 @@ body {
 
 	<!-- Toast -->
 	<div id="toast"
-		class="toast fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg hidden text-sm font-medium"></div>
+		class="toast fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
 
 	<script>
 	function closeAdminMobileNav() {
@@ -272,15 +269,16 @@ body {
 		setInterval(updateBadge, 90000);
 	});
 
-	function showToast(message, type) {
+	function showToast(message, type, placement) {
 		const toast = document.getElementById('toast');
-		toast.className = 'toast fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-sm font-medium';
+		var base = 'toast z-[10050] px-5 py-3 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)] fixed bottom-6 right-4';
+		toast.className = base;
 		if (type === 'success') toast.classList.add('bg-emerald-500', 'text-white');
 		else if (type === 'error') toast.classList.add('bg-red-500', 'text-white');
 		else toast.classList.add('bg-indigo-500', 'text-white');
 		toast.textContent = message;
 		toast.classList.remove('hidden');
-		setTimeout(() => toast.classList.add('hidden'), 2500);
+		setTimeout(() => toast.classList.add('hidden'), 3200);
 	}
 
 	document.addEventListener('contextmenu', e => e.preventDefault());

@@ -25,6 +25,10 @@ release.properties
 *.log
 local.properties
 
+# App secrets (module paths — copy from *.example in resources)
+Smart_Office_Management/src/main/resources/config.properties
+Smart_Office_Management/src/main/resources/db.properties
+
 # OS
 .DS_Store
 Thumbs.db

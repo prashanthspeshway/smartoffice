@@ -37,6 +37,7 @@ public class AdminAttendanceServlet extends HttpServlet {
 
         try {
             AttendanceDAO attendanceDAO = new AttendanceDAO();
+            attendanceDAO.updateDailyStatus();
             List<AdminAttendanceRow> rows = attendanceDAO.getAllAttendanceForToday();
             List<AdminAttendanceRow> filteredRows = new java.util.ArrayList<>();
 

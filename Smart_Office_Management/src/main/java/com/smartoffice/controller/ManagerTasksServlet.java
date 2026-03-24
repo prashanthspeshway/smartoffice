@@ -1,6 +1,8 @@
 package com.smartoffice.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -144,10 +146,56 @@ public class ManagerTasksServlet extends HttpServlet {
             }
 
             if ("updateStatus".equals(action)) {
-                int taskId    = Integer.parseInt(request.getParameter("taskId"));
-                String status = request.getParameter("status");
-                TaskDAO.updateStatus(taskId, status);
-                response.sendRedirect(request.getContextPath() + "/managerTasks?success=Status updated");
+                int taskId = Integer.parseInt(request.getParameter("taskId"));
+                String decision = request.getParameter("decision");
+                String viewEmployee = request.getParameter("viewEmployee");
+                String ctx = request.getContextPath();
+                String veParam = (viewEmployee != null && !viewEmployee.isEmpty())
+                        ? "&viewEmployee=" + URLEncoder.encode(viewEmployee, StandardCharsets.UTF_8)
+                        : "";
+
+                Task task = TaskDAO.getTaskById(taskId);
+                if (task == null || !TaskDAO.taskAssignedByManager(task, managerEmail)) {
+                    response.sendRedirect(ctx + "/managerTasks?error=" + URLEncoder.encode("Invalid task", StandardCharsets.UTF_8) + veParam);
+                    return;
+                }
+
+                String st = task.getStatus() != null ? task.getStatus().trim() : "";
+                boolean processing = "PROCESSING".equalsIgnoreCase(st) || "SUBMITTED".equalsIgnoreCase(st);
+
+                if ("review".equalsIgnoreCase(decision)) {
+                    if (!processing) {
+                        response.sendRedirect(ctx + "/managerTasks?error=" + URLEncoder.encode("Review is only for tasks awaiting your review", StandardCharsets.UTF_8) + veParam);
+                        return;
+                    }
+                    TaskDAO.returnTaskForReview(taskId);
+                    String assigneeEmail = resolveAssigneeEmail(task);
+                    if (assigneeEmail != null) {
+                        String title = task.getTitle() != null ? task.getTitle() : task.getDescription();
+                        NotificationService.notify(assigneeEmail, managerEmail, NotificationService.TYPE_TASK,
+                                "↩️ Manager " + managerName + " returned task \"" + title + "\" for you to update and resubmit.");
+                    }
+                    response.sendRedirect(ctx + "/managerTasks?taskFlash=review" + veParam);
+                    return;
+                }
+
+                if ("completed".equalsIgnoreCase(decision)) {
+                    if ("COMPLETED".equalsIgnoreCase(st)) {
+                        response.sendRedirect(ctx + "/managerTasks?taskFlash=alreadyCompleted" + veParam);
+                        return;
+                    }
+                    TaskDAO.markCompleted(taskId);
+                    String assigneeEmail = resolveAssigneeEmail(task);
+                    if (assigneeEmail != null) {
+                        String title = task.getTitle() != null ? task.getTitle() : task.getDescription();
+                        NotificationService.notify(assigneeEmail, managerEmail, NotificationService.TYPE_TASK,
+                                "✅ Manager " + managerName + " marked task \"" + title + "\" as completed.");
+                    }
+                    response.sendRedirect(ctx + "/managerTasks?taskFlash=completed" + veParam);
+                    return;
+                }
+
+                response.sendRedirect(ctx + "/managerTasks?error=" + URLEncoder.encode("Choose Review or Completed", StandardCharsets.UTF_8) + veParam);
                 return;
             }
 
@@ -162,5 +210,28 @@ public class ManagerTasksServlet extends HttpServlet {
     private String getDisplayName(HttpSession session) {
         String fn = (String) session.getAttribute("fullName");
         return (fn != null && !fn.isEmpty()) ? fn : (String) session.getAttribute("username");
+    }
+
+    private static String resolveAssigneeEmail(Task task) {
+        if (task == null) {
+            return null;
+        }
+        String u = task.getAssignedTo();
+        if (u == null || u.trim().isEmpty()) {
+            return null;
+        }
+        u = u.trim();
+        if (u.contains("@")) {
+            return u;
+        }
+        try {
+            User user = UserDao.getUserByUsername(u);
+            if (user != null && user.getEmail() != null) {
+                return user.getEmail();
+            }
+        } catch (Exception e) {
+            System.err.println("[ManagerTasksServlet] resolveAssigneeEmail: " + e.getMessage());
+        }
+        return u;
     }
 }

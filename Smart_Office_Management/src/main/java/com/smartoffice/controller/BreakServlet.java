@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.smartoffice.dao.AttendanceDAO;
 import com.smartoffice.dao.BreakDAO;
+import com.smartoffice.utils.AuthRedirectUtil;
 
 @WebServlet("/break")
 @SuppressWarnings("serial")
@@ -20,7 +21,7 @@ public class BreakServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
-            response.sendRedirect("index.html");
+            AuthRedirectUtil.sendTopWindowRedirect(request, response, "/index.html");
             return;
         }
 

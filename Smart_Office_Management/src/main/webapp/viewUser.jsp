@@ -29,11 +29,11 @@ if (designationOptions == null)
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link
-	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+	href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
 	rel="stylesheet">
 <style>
 body {
-	font-family: 'Inter', system-ui, sans-serif;
+	font-family: 'Geist', system-ui, sans-serif;
 }
 
 .search-input-wrap {
@@ -220,8 +220,9 @@ body {
 
 .toast {
 	position: fixed;
-	top: 20px;
+	bottom: 24px;
 	right: 20px;
+	top: auto;
 	max-width: 350px;
 	z-index: 3000;
 	padding: 14px 20px;

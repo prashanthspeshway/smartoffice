@@ -3,6 +3,8 @@ package com.smartoffice.controller;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,24 +57,51 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
         String role    = (String) session.getAttribute("role");
         AttendanceDAO dao = new AttendanceDAO();
 
+        LocalDate today = LocalDate.now();
+        String startParam = request.getParameter("start");
+        String endParam   = request.getParameter("end");
+
+        LocalDate startDate;
+        LocalDate endDate;
+        try {
+            if (startParam != null && !startParam.isBlank()) {
+                startDate = LocalDate.parse(startParam);
+            } else {
+                startDate = today.withDayOfMonth(1);
+            }
+            if (endParam != null && !endParam.isBlank()) {
+                endDate = LocalDate.parse(endParam);
+            } else {
+                endDate = today;
+            }
+        } catch (DateTimeParseException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date. Use YYYY-MM-DD.");
+            return;
+        }
+
+        if (startDate.isAfter(endDate)) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "Start date must be on or before end date.");
+            return;
+        }
+        if (ChronoUnit.DAYS.between(startDate, endDate) > 400) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Date range cannot exceed 400 days.");
+            return;
+        }
+
         List<TeamAttendance> list;
         try {
-            // Admin sees all employees; manager sees their team
             if ("admin".equalsIgnoreCase(role)) {
-                list = dao.getAllAttendanceForMonth();
+                list = dao.getAllAttendanceForDateRange(startDate, endDate);
             } else {
-                list = dao.getTeamAttendanceForMonth(manager);
+                list = dao.getTeamAttendanceForDateRange(manager, startDate, endDate);
             }
         } catch (Exception e) {
             throw new ServletException(e);
         }
 
-        // ── Month config ───────────────────────────────────────────────────
-        LocalDate startDate = LocalDate.now().withDayOfMonth(1);
-        int DAYS = startDate.lengthOfMonth();
-        String monthLabel = startDate.getMonth().getDisplayName(
-            java.time.format.TextStyle.FULL, java.util.Locale.ENGLISH)
-            + " " + startDate.getYear();
+        int DAYS = (int) ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        String rangeLabel = startDate + " — " + endDate;
 
         // ── Workbook & sheet ───────────────────────────────────────────────
         XSSFWorkbook wb = new XSSFWorkbook();
@@ -87,7 +116,7 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
         Row titleRow = sheet.createRow(0);
         titleRow.setHeightInPoints(28);
         Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("Attendance Report — " + monthLabel);
+        titleCell.setCellValue("Attendance Report — " + rangeLabel);
         titleCell.setCellStyle(sf.title());
         // Merge across all columns: employee + label + days
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, DAYS + 1));
@@ -160,6 +189,17 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
                         || d.getDayOfWeek() == DayOfWeek.SUNDAY);
 
                 TeamAttendance ta = map.get(employee).get(d);
+
+                // Dates after "today" (server clock): leave cells blank — not "Absent"
+                if (d.isAfter(today)) {
+                    Cell bIn  = inRow.createCell(i + 2);
+                    Cell bOut = outRow.createCell(i + 2);
+                    bIn.setCellValue("");
+                    bOut.setCellValue("");
+                    bIn.setCellStyle(sf.neutral());
+                    bOut.setCellStyle(sf.neutral());
+                    continue;
+                }
 
                 if (isWeekend && (ta == null || !"On Leave".equalsIgnoreCase(
                         ta.getStatus()))) {
@@ -240,6 +280,7 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
         legend.setColumnWidth(0, 4000);
         legend.setColumnWidth(1, 8000);
         String[][] items = {
+            { "(blank)",  "Future date — not applicable yet" },
             { "Present",  "Employee punched in ≥ 4 hrs" },
             { "Half Day", "Employee worked < 4 hrs"     },
             { "Absent",   "No attendance record"        },
@@ -248,7 +289,7 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
             { "—",        "Punch-out not recorded yet"  },
         };
         CellStyle[] legendStyles = {
-            sf.presentTime(), sf.halfDay(), sf.absent(), sf.onLeave(), sf.weekend(), sf.presentTime()
+            sf.neutral(), sf.presentTime(), sf.halfDay(), sf.absent(), sf.onLeave(), sf.weekend(), sf.presentTime()
         };
         Row lHeader = legend.createRow(0);
         lHeader.createCell(0).setCellValue("Status");
@@ -268,8 +309,8 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
         // ── Response ───────────────────────────────────────────────────────
         response.setContentType(
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition",
-            "attachment; filename=team_attendance_month.xlsx");
+        String safeName = "team_attendance_" + startDate + "_to_" + endDate + ".xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + safeName + "\"");
         wb.write(response.getOutputStream());
         wb.close();
     }
@@ -403,6 +444,14 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
             XSSFCellStyle s = base();
             fill(s, CLR_LEAVE_BG);
             s.setFont(font(CLR_LEAVE_FG, 9, true));
+            return s;
+        }
+
+        /** Empty / future-day cells */
+        XSSFCellStyle neutral() {
+            XSSFCellStyle s = base();
+            fill(s, "FFF8FAFC");
+            s.setFont(font("FF94A3B8", 9, false));
             return s;
         }
     }

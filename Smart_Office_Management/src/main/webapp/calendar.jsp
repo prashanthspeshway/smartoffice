@@ -15,16 +15,17 @@ boolean isAdmin = role != null && "admin".equalsIgnoreCase(role);
 <title>Company Calendar • Smart Office HRMS</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
 <style>
-body { font-family: 'Inter', system-ui, sans-serif; }
+body.user-iframe-page { min-height: 100vh; }
 .cal-day { min-height: 80px; padding: 8px; }
 .cal-day:hover:not(.holiday-blocked):not(.weekend-blocked):not(.other-month) { background: #f1f5f9; }
 .cal-day.holiday-blocked { background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); color: #1e40af; cursor: default; }
 .cal-day.weekend-blocked { background: linear-gradient(135deg, #ffe4e6 0%, #fff1f2 100%); color: #9f1239; cursor: not-allowed; }
 .cal-day.today { background: #eef2ff; border: 2px solid #6366f1; font-weight: 700; }
 .cal-day.other-month { color: #cbd5e1; }
-.toast { position: fixed; top: 24px; right: 24px; padding: 14px 20px; border-radius: 8px; z-index: 9999; display: none; font-size: 14px; font-weight: 500; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+.toast { position: fixed; bottom: 24px; right: 24px; top: auto; padding: 14px 20px; border-radius: 8px; z-index: 9999; display: none; font-size: 14px; font-weight: 500; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: min(92vw, 24rem); }
 .toast.success { background: #10b981; color: white; }
 .toast.error { background: #ef4444; color: white; }
 
@@ -39,7 +40,7 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 }
 </style>
 </head>
-<body class="bg-slate-100 min-h-screen">
+<body class="user-iframe-page min-h-screen">
 
 <div id="toast" class="toast"></div>
 

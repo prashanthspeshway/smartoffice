@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.smartoffice.utils.AuthRedirectUtil;
 import com.smartoffice.utils.DBConnectionUtil;
 
 /**
@@ -110,15 +111,8 @@ public class SessionAuthFilter implements Filter {
         }
     }
 
-    /** Redirects the top window (fixes iframe: login form no longer appears inside dashboard). */
     private void redirectTopWindow(HttpServletRequest request, HttpServletResponse response, String url) throws IOException {
-        String fullUrl = request.getContextPath() + url;
-        response.setContentType("text/html;charset=UTF-8");
-        response.setStatus(HttpServletResponse.SC_OK);
-        String html = "<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"0;url=" + fullUrl + "\">"
-            + "<script>window.top.location.href='" + fullUrl.replace("'", "\\'") + "';</script></head>"
-            + "<body>Session expired. <a href=\"" + fullUrl + "\">Click here to login</a>.</body></html>";
-        response.getWriter().write(html);
+        AuthRedirectUtil.sendTopWindowRedirect(request, response, url);
     }
 
     @Override

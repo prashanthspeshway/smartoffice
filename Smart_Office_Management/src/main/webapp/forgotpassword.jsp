@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Forgot Password</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -30,7 +30,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Geist', system-ui, sans-serif;
   }
 
   .card {
@@ -112,7 +112,7 @@
     padding: 13px 16px 13px 44px;
     border: 1.5px solid var(--input-border);
     border-radius: 11px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Geist', system-ui, sans-serif;
     font-size: 0.95rem;
     color: var(--text);
     background: #fff;
@@ -135,7 +135,7 @@
     color: #fff;
     border: none;
     border-radius: 11px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Geist', system-ui, sans-serif;
     font-size: 1rem;
     font-weight: 700;
     letter-spacing: 0.02em;

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.smartoffice.dao.TaskDAO;
+import com.smartoffice.utils.AuthRedirectUtil;
 
 @SuppressWarnings("serial")
 @WebServlet("/updateTaskStatus")
@@ -18,7 +19,7 @@ public class UpdateTaskStatusServlet extends HttpServlet {
 
 		HttpSession session = req.getSession(false);
 		if (session == null) {
-			resp.sendRedirect("index.html");
+			AuthRedirectUtil.sendTopWindowRedirect(req, resp, "/index.html");
 			return;
 		}
 
@@ -26,8 +27,8 @@ public class UpdateTaskStatusServlet extends HttpServlet {
 		String status = req.getParameter("status");
 		TaskDAO.updateStatus(taskId, status);
 
-		// user updates → go back to user dashboard
-		resp.sendRedirect("user?tab=tasks");
+		// Full shell lives at /user; iframe must not navigate here via 302 — break out to top
+		AuthRedirectUtil.sendTopWindowRedirect(req, resp, "/user?tab=tasks");
 
 	}
 }

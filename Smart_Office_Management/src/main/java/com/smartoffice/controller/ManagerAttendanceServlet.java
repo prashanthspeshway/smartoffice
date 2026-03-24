@@ -63,9 +63,6 @@ public class ManagerAttendanceServlet extends HttpServlet {
             request.setAttribute("breakTotalSeconds", BreakDAO.getTodayTotalSeconds(username));
             request.setAttribute("breakLogs",         BreakDAO.getTodayBreaks(username));
 
-            System.out.println("[ManagerAttendanceServlet] username=" + username
-                    + " onBreak=" + currentlyOnBreak);
-
             // ── Team Attendance (today) ────────────────────────────────────
             List<TeamAttendance> teamAttendance = attendanceDAO.getTeamAttendanceForToday(username);
             request.setAttribute("teamAttendance", teamAttendance);

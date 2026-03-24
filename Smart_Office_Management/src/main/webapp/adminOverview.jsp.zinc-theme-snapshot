@@ -23,32 +23,28 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link
-	href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+	href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
 	rel="stylesheet">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script
 	src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
 <style>
 :root {
-	--bg: #f0f2f8;
-	--surface: #fff;
-	--surface2: #f7f8fc;
-	--border: #e4e8f0;
-	--text: #1a1d2e;
-	--text2: #5a6278;
-	--text3: #9aa0b8;
-	--blue: #4f6ef7;
-	--green: #22c55e;
-	--violet: #8b5cf6;
-	--amber: #f59e0b;
-	--red: #ef4444;
-	--shadow-sm: 0 1px 3px rgba(0, 0, 0, .06);
-	--shadow: 0 4px 16px rgba(0, 0, 0, .07);
-	--shadow-lg: 0 20px 50px rgba(0, 0, 0, .1);
-	--radius: 16px;
-	--radius-sm: 10px;
+	--bg: #f4f4f5;
+	--surface: #ffffff;
+	--surface-muted: #f4f4f5;
+	--border: #e4e4e7;
+	--text: #18181b;
+	--text2: #52525b;
+	--text3: #a1a1aa;
+	--accent: #27272a;
+	--accent-mid: #52525b;
+	--accent-soft: #e4e4e7;
+	--shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.06);
+	--shadow: 0 4px 20px rgba(24, 24, 27, 0.08);
+	--radius: 12px;
+	--radius-sm: 8px;
 }
 
 *, *::before, *::after {
@@ -65,9 +61,9 @@ body {
 }
 
 .page {
-	max-width: 1200px;
+	max-width: 1160px;
 	margin: 0 auto;
-	padding: clamp(16px, 4vw, 32px) clamp(12px, 4vw, 20px)
+	padding: 28px 22px 40px
 }
 
 .page-header {
@@ -76,8 +72,9 @@ body {
 
 .page-title {
 	font-family: 'Geist', system-ui, sans-serif;
-	font-size: clamp(1.25rem, 2.2vw + 0.4rem, 1.625rem);
+	font-size: 1.375rem;
 	font-weight: 600;
+	letter-spacing: -0.02em;
 	color: var(--text);
 	display: flex;
 	align-items: center;
@@ -85,21 +82,24 @@ body {
 }
 
 .page-title i {
-	color: var(--blue);
-	font-size: 20px
+	color: var(--accent-mid);
+	font-size: 1.125rem;
+	opacity: 0.95
 }
 
 .page-subtitle {
 	color: var(--text3);
-	font-size: 13px;
-	margin-top: 4px
+	font-size: 0.8125rem;
+	margin-top: 6px;
+	line-height: 1.45;
+	max-width: 42rem
 }
 
 .stats-row {
 	display: grid;
 	grid-template-columns: repeat(5, 1fr);
-	gap: 14px;
-	margin-bottom: 24px
+	gap: 12px;
+	margin-bottom: 22px
 }
 
 @media ( max-width :900px) {
@@ -118,9 +118,9 @@ body {
 	background: var(--surface);
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
-	padding: 18px 16px;
+	padding: 16px 14px;
 	box-shadow: var(--shadow-sm);
-	transition: box-shadow .2s, transform .2s;
+	transition: box-shadow .2s ease, border-color .2s ease;
 	position: relative;
 	overflow: hidden
 }
@@ -132,84 +132,44 @@ body {
 	left: 0;
 	right: 0;
 	height: 3px;
-	border-radius: var(--radius) var(--radius) 0 0
+	border-radius: var(--radius) var(--radius) 0 0;
+	background: var(--accent)
 }
 
 .stat-card:hover {
 	box-shadow: var(--shadow);
-	transform: translateY(-2px)
-}
-
-.stat-card.blue::before {
-	background: var(--blue)
-}
-
-.stat-card.green::before {
-	background: var(--green)
-}
-
-.stat-card.violet::before {
-	background: var(--violet)
-}
-
-.stat-card.amber::before {
-	background: var(--amber)
-}
-
-.stat-card.red::before {
-	background: var(--red)
+	border-color: var(--accent-soft)
 }
 
 .stat-icon {
-	width: 38px;
-	height: 38px;
-	border-radius: 10px;
+	width: 36px;
+	height: 36px;
+	border-radius: var(--radius-sm);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 16px;
-	margin-bottom: 12px
-}
-
-.stat-card.blue .stat-icon {
-	background: #eef1fe;
-	color: var(--blue)
-}
-
-.stat-card.green .stat-icon {
-	background: #f0fdf4;
-	color: var(--green)
-}
-
-.stat-card.violet .stat-icon {
-	background: #f5f3ff;
-	color: var(--violet)
-}
-
-.stat-card.amber .stat-icon {
-	background: #fffbeb;
-	color: var(--amber)
-}
-
-.stat-card.red .stat-icon {
-	background: #fef2f2;
-	color: var(--red)
+	font-size: 15px;
+	margin-bottom: 10px;
+	background: var(--surface-muted);
+	color: var(--accent-mid)
 }
 
 .stat-num {
-	font-size: clamp(1.35rem, 3.5vw + 0.35rem, 1.75rem);
+	font-size: 1.625rem;
 	font-weight: 700;
 	line-height: 1;
-	color: var(--text)
+	color: var(--text);
+	letter-spacing: -0.02em;
+	font-variant-numeric: tabular-nums
 }
 
 .stat-label {
-	font-size: clamp(0.65rem, 0.8vw + 0.45rem, 0.75rem);
+	font-size: 11px;
 	color: var(--text3);
-	font-weight: 500;
-	margin-top: 4px;
+	font-weight: 600;
+	margin-top: 6px;
 	text-transform: uppercase;
-	letter-spacing: .5px
+	letter-spacing: 0.06em
 }
 
 .charts-grid {
@@ -270,7 +230,7 @@ body {
 
 .chart-title i {
 	font-size: 13px;
-	color: var(--blue)
+	color: var(--accent-mid)
 }
 
 .chart-subtitle {
@@ -282,10 +242,11 @@ body {
 .chart-badge {
 	font-size: 11px;
 	font-weight: 600;
-	padding: 3px 8px;
+	padding: 3px 9px;
 	border-radius: 99px;
-	background: #eef1fe;
-	color: var(--blue)
+	background: var(--surface-muted);
+	color: var(--accent-mid);
+	border: 1px solid var(--border)
 }
 
 canvas {
@@ -295,7 +256,7 @@ canvas {
 .insight-row {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
-	gap: 14px;
+	gap: 12px;
 	margin-bottom: 20px
 }
 
@@ -317,14 +278,16 @@ canvas {
 }
 
 .insight-icon {
-	width: 42px;
-	height: 42px;
-	border-radius: 12px;
+	width: 40px;
+	height: 40px;
+	border-radius: var(--radius-sm);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 17px;
-	flex-shrink: 0
+	font-size: 16px;
+	flex-shrink: 0;
+	background: var(--surface-muted);
+	color: var(--accent-mid)
 }
 
 .insight-label {
@@ -349,11 +312,12 @@ canvas {
 }
 
 .holiday-card {
-	background: linear-gradient(135deg, #4f6ef7 0%, #8b5cf6 100%);
+	background: linear-gradient(145deg, #3f3f46 0%, #27272a 100%);
 	border-radius: var(--radius);
 	padding: 20px;
-	color: white;
-	box-shadow: var(--shadow)
+	color: #fafafa;
+	box-shadow: var(--shadow-sm);
+	border: 1px solid rgba(255, 255, 255, 0.06)
 }
 
 .holiday-title {
@@ -381,17 +345,15 @@ canvas {
 	margin-bottom: 0
 }
 
-@
-keyframes fadeUp {
-	from {opacity: 0;
-	transform: translateY(14px)
-}
-
-to {
-	opacity: 1;
-	transform: translateY(0)
-}
-
+@keyframes fadeUp {
+	from {
+		opacity: 0;
+		transform: translateY(10px)
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0)
+	}
 }
 .a1 {
 	animation-delay: .05s
@@ -418,7 +380,7 @@ to {
 }
 </style>
 </head>
-<body class="user-iframe-page">
+<body>
 	<div class="page">
 
 		<div class="page-header">
@@ -430,35 +392,35 @@ to {
 		</div>
 
 		<div class="stats-row">
-			<div class="stat-card blue">
+			<div class="stat-card">
 				<div class="stat-icon">
 					<i class="fa-solid fa-user-tie"></i>
 				</div>
 				<div class="stat-num">${managers}</div>
 				<div class="stat-label">Managers</div>
 			</div>
-			<div class="stat-card green">
+			<div class="stat-card">
 				<div class="stat-icon">
 					<i class="fa-solid fa-users"></i>
 				</div>
 				<div class="stat-num">${employees}</div>
 				<div class="stat-label">Employees</div>
 			</div>
-			<div class="stat-card violet">
+			<div class="stat-card">
 				<div class="stat-icon">
 					<i class="fa-solid fa-building-user"></i>
 				</div>
 				<div class="stat-num">${totalStaff}</div>
 				<div class="stat-label">Total Staff</div>
 			</div>
-			<div class="stat-card amber">
+			<div class="stat-card">
 				<div class="stat-icon">
 					<i class="fa-solid fa-circle-check"></i>
 				</div>
 				<div class="stat-num">${presentToday}</div>
 				<div class="stat-label">Present Today</div>
 			</div>
-			<div class="stat-card red">
+			<div class="stat-card">
 				<div class="stat-icon">
 					<i class="fa-solid fa-user-minus"></i>
 				</div>
@@ -469,8 +431,7 @@ to {
 
 		<div class="insight-row">
 			<div class="insight-card">
-				<div class="insight-icon"
-					style="background: #f0fdf4; color: #22c55e">
+				<div class="insight-icon">
 					<i class="fa-solid fa-arrow-trend-up"></i>
 				</div>
 				<div>
@@ -481,8 +442,7 @@ to {
 				</div>
 			</div>
 			<div class="insight-card">
-				<div class="insight-icon"
-					style="background: #eef1fe; color: #4f6ef7">
+				<div class="insight-icon">
 					<i class="fa-solid fa-list-check"></i>
 				</div>
 				<div>
@@ -492,8 +452,7 @@ to {
 				</div>
 			</div>
 			<div class="insight-card">
-				<div class="insight-icon"
-					style="background: #fff7ed; color: #f97316">
+				<div class="insight-icon">
 					<i class="fa-solid fa-umbrella-beach"></i>
 				</div>
 				<div>
@@ -503,8 +462,7 @@ to {
 				</div>
 			</div>
 			<div class="insight-card">
-				<div class="insight-icon"
-					style="background: #fdf4ff; color: #a855f7">
+				<div class="insight-icon">
 					<i class="fa-solid fa-people-group"></i>
 				</div>
 				<div>
@@ -637,8 +595,8 @@ to {
 
 	<script>
 Chart.defaults.font.family = "'Geist', system-ui, sans-serif";
-Chart.defaults.font.size   = 12;
-Chart.defaults.color       = '#9aa0b8';
+Chart.defaults.font.size   = 11;
+Chart.defaults.color       = '#71717a';
 Chart.defaults.plugins.legend.labels.boxWidth = 12;
 Chart.defaults.plugins.legend.labels.padding  = 14;
 
@@ -679,15 +637,15 @@ new Chart(document.getElementById('attendanceBarChart'), {
   data: {
     labels: weekLabels,
     datasets: [
-      { label:'Present', data:weekPresent, backgroundColor:'#4f6ef7', borderRadius:6, borderSkipped:false },
-      { label:'Absent',  data:weekAbsent,  backgroundColor:'#fca5a5', borderRadius:6, borderSkipped:false }
+      { label:'Present', data:weekPresent, backgroundColor:'#3f3f46', borderRadius:6, borderSkipped:false },
+      { label:'Absent',  data:weekAbsent,  backgroundColor:'#d4d4d8', borderRadius:6, borderSkipped:false }
     ]
   },
   options: {
     responsive:true, plugins:{ legend:{ position:'top' } },
     scales:{
       x:{ grid:{ display:false }, border:{ display:false } },
-      y:{ grid:{ color:'#f0f2f8' }, border:{ display:false }, ticks:{ stepSize:5 } }
+      y:{ grid:{ color:'#f4f4f5' }, border:{ display:false }, ticks:{ stepSize:5 } }
     }
   }
 });
@@ -699,7 +657,7 @@ new Chart(document.getElementById('taskPieChart'), {
     labels: ['Completed','Assigned','Document Verification','Errors Raised'],
     datasets: [{
       data:[taskCompleted, taskAssigned, taskDocVerify, taskErrorsRaised],
-      backgroundColor:['#22c55e','#4f6ef7','#f59e0b','#ef4444'],
+      backgroundColor:['#27272a','#52525b','#71717a','#a1a1aa'],
       borderWidth:2,
       borderColor:'#fff'
     }]
@@ -716,13 +674,13 @@ new Chart(document.getElementById('attendanceTrendChart'), {
   type: 'line',
   data: {
     labels: trendLabels,
-    datasets: [{ label:'Attendance %', data:trendData, borderColor:'#4f6ef7', backgroundColor:'rgba(79,110,247,0.08)', borderWidth:2.5, pointRadius:0, pointHoverRadius:5, fill:true, tension:0.4 }]
+    datasets: [{ label:'Attendance %', data:trendData, borderColor:'#27272a', backgroundColor:'rgba(39,39,42,0.06)', borderWidth:2, pointRadius:0, pointHoverRadius:4, fill:true, tension:0.35 }]
   },
   options: {
     responsive:true, plugins:{ legend:{ display:false } },
     scales:{
       x:{ grid:{ display:false }, border:{ display:false }, ticks:{ maxTicksLimit:8 } },
-      y:{ min:50, max:100, grid:{ color:'#f0f2f8' }, border:{ display:false }, ticks:{ callback:function(v){ return v+'%'; } } }
+      y:{ min:50, max:100, grid:{ color:'#f4f4f5' }, border:{ display:false }, ticks:{ callback:function(v){ return v+'%'; } } }
     }
   }
 });
@@ -731,7 +689,7 @@ new Chart(document.getElementById('leaveDoughnutChart'), {
   type: 'doughnut',
   data: {
     labels: ['Sick','Annual','Personal','Maternity','Unpaid'],
-    datasets: [{ data:[leaveSick,leaveAnnual,leavePersonal,leaveMaternity,leaveUnpaid], backgroundColor:['#ef4444','#22c55e','#f59e0b','#ec4899','#8b5cf6'], borderWidth:2, borderColor:'#fff', hoverOffset:6 }]
+    datasets: [{ data:[leaveSick,leaveAnnual,leavePersonal,leaveMaternity,leaveUnpaid], backgroundColor:['#18181b','#3f3f46','#52525b','#71717a','#a1a1aa'], borderWidth:2, borderColor:'#fff', hoverOffset:6 }]
   },
   options: { responsive:true, cutout:'60%', plugins:{ legend:{ position:'bottom' } } }
 });
@@ -740,11 +698,11 @@ new Chart(document.getElementById('taskBarChart'), {
   type: 'bar',
   data: {
     labels: monthLabels,
-    datasets: [{ label:'Tasks Completed', data:taskMonthData, backgroundColor:'rgba(34,197,94,0.85)', borderRadius:6, borderSkipped:false }]
+    datasets: [{ label:'Tasks Completed', data:taskMonthData, backgroundColor:'#52525b', borderRadius:6, borderSkipped:false }]
   },
   options: {
     responsive:true, plugins:{ legend:{ display:false } },
-    scales:{ x:{ grid:{ display:false }, border:{ display:false } }, y:{ grid:{ color:'#f0f2f8' }, border:{ display:false } } }
+    scales:{ x:{ grid:{ display:false }, border:{ display:false } }, y:{ grid:{ color:'#f4f4f5' }, border:{ display:false } } }
   }
 });
 
@@ -752,7 +710,7 @@ new Chart(document.getElementById('staffRolePieChart'), {
   type: 'doughnut',
   data: {
     labels: ['Managers','Employees'],
-    datasets: [{ data:[managers,employees], backgroundColor:['#4f6ef7','#8b5cf6'], borderWidth:2, borderColor:'#fff', hoverOffset:6 }]
+    datasets: [{ data:[managers,employees], backgroundColor:['#3f3f46','#a1a1aa'], borderWidth:2, borderColor:'#fff', hoverOffset:6 }]
   },
   options: { responsive:true, cutout:'55%', plugins:{ legend:{ position:'bottom' } } }
 });
@@ -761,11 +719,11 @@ new Chart(document.getElementById('breakBarChart'), {
   type: 'bar',
   data: {
     labels: weekLabels,
-    datasets: [{ label:'Avg Break (min)', data:breakData, backgroundColor:'rgba(245,158,11,0.85)', borderRadius:6, borderSkipped:false }]
+    datasets: [{ label:'Avg Break (min)', data:breakData, backgroundColor:'#71717a', borderRadius:6, borderSkipped:false }]
   },
   options: {
     responsive:true, plugins:{ legend:{ display:false } },
-    scales:{ x:{ grid:{ display:false }, border:{ display:false } }, y:{ grid:{ color:'#f0f2f8' }, border:{ display:false }, ticks:{ callback:function(v){ return v+'m'; } } } }
+    scales:{ x:{ grid:{ display:false }, border:{ display:false } }, y:{ grid:{ color:'#f4f4f5' }, border:{ display:false }, ticks:{ callback:function(v){ return v+'m'; } } } }
   }
 });
 
@@ -773,11 +731,11 @@ new Chart(document.getElementById('punchInChart'), {
   type: 'bar',
   data: {
     labels: punchLabels,
-    datasets: [{ label:'Employees', data:punchData, backgroundColor:['#22c55e','#4f6ef7','#f59e0b','#ef4444','#8b5cf6'], borderRadius:8, borderSkipped:false }]
+    datasets: [{ label:'Employees', data:punchData, backgroundColor:['#27272a','#3f3f46','#52525b','#71717a','#a1a1aa'], borderRadius:8, borderSkipped:false }]
   },
   options: {
     responsive:true, plugins:{ legend:{ display:false } },
-    scales:{ x:{ grid:{ display:false }, border:{ display:false } }, y:{ grid:{ color:'#f0f2f8' }, border:{ display:false }, ticks:{ stepSize:2 } } }
+    scales:{ x:{ grid:{ display:false }, border:{ display:false } }, y:{ grid:{ color:'#f4f4f5' }, border:{ display:false }, ticks:{ stepSize:2 } } }
   }
 });
 </script>

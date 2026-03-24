@@ -1,10 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.smartoffice.model.User"%>
 <%@ page import="com.smartoffice.dao.NotificationReadsDAO"%>
+<%@ page import="com.smartoffice.utils.AuthRedirectUtil"%>
 <%
 String username = (String) session.getAttribute("username");
 if (username == null) {
-    response.sendRedirect(request.getContextPath() + "/index.html");
+    AuthRedirectUtil.sendTopWindowRedirect(request, response, "/index.html");
     return;
 }
 User userObj = (User) request.getAttribute("user");
@@ -25,12 +26,10 @@ try {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
 <style>
-/* Match admin overview / admin inner pages: DM Sans UI, Fraunces reserved for page titles in iframe */
-body { font-family: 'DM Sans', system-ui, sans-serif; }
 .sidebar-btn { transition: all 0.2s; text-align: left; }
-.sidebar-btn.active { background: #eef2ff; color: #4f46e5; font-weight: 600; }
 .notif-trigger { position: relative; }
 .notif-badge {
 	position: absolute;
@@ -69,22 +68,22 @@ body { font-family: 'DM Sans', system-ui, sans-serif; }
 .notif-badge.hidden { display: none !important; }
 </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex flex-col h-screen overflow-hidden">
+<body class="so-shell bg-slate-100 min-h-screen flex flex-col h-screen overflow-hidden">
 
 <!-- Top Bar -->
-<header class="bg-white border-b border-slate-200 px-3 sm:px-6 py-3 sm:py-4 flex flex-wrap gap-2 justify-between items-center shadow-sm shrink-0">
+<header class="so-header bg-white border-b border-slate-200 flex flex-wrap gap-2 justify-between items-center shadow-sm shrink-0">
     <div class="flex items-center gap-2 min-w-0 flex-1">
-        <button type="button" id="userMobileNavToggle" class="md:hidden inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50" aria-label="Open navigation menu" aria-expanded="false" aria-controls="userSidebar">
+        <button type="button" id="userMobileNavToggle" class="so-menu-btn md:hidden inline-flex shrink-0 items-center justify-center border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50" aria-label="Open navigation menu" aria-expanded="false" aria-controls="userSidebar">
             <i class="fa-solid fa-bars text-lg" aria-hidden="true"></i>
         </button>
-        <h1 class="text-base sm:text-xl font-semibold text-slate-800 truncate min-w-0">Smart Office &bull; Employee Dashboard</h1>
+        <h1 class="truncate min-w-0">Employee Dashboard</h1>
     </div>
     <div class="flex items-center gap-2 sm:gap-4 shrink-0">
-        <button type="button" onclick="openUserNotifications()" class="notif-trigger group relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35" title="Notifications" aria-label="Notifications">
+        <button type="button" onclick="openUserNotifications()" class="notif-trigger group relative inline-flex shrink-0 items-center justify-center border border-slate-200/90 bg-white text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/35" title="Notifications" aria-label="Notifications">
             <i class="fa-regular fa-bell pointer-events-none text-[1.15rem] transition-transform duration-200 group-hover:scale-105" aria-hidden="true"></i>
             <span id="notifBadge" role="status" class="notif-badge <%= unreadNotifCount > 0 ? "" : "hidden" %>"><%= unreadNotifCount > 99 ? "99+" : unreadNotifCount %></span>
         </button>
-        <span class="text-xs sm:text-sm text-slate-600 truncate max-w-[min(42vw,200px)] sm:max-w-none">Welcome, <strong class="text-slate-800">${not empty sessionScope.fullName ? sessionScope.fullName : sessionScope.username}</strong></span>
+        <span class="so-welcome truncate max-w-[min(42vw,200px)] sm:max-w-none">Welcome, <strong class="text-slate-800">${not empty sessionScope.fullName ? sessionScope.fullName : sessionScope.username}</strong></span>
     </div>
 </header>
 
@@ -93,32 +92,32 @@ body { font-family: 'DM Sans', system-ui, sans-serif; }
 <!-- Main Layout -->
 <div class="flex flex-1 min-h-0 overflow-hidden relative">
     <!-- Sidebar -->
-    <aside id="userSidebar" class="fixed md:relative z-50 inset-y-0 left-0 w-64 max-w-[85vw] h-full md:h-auto bg-white border-r border-slate-200 flex flex-col shadow-lg md:shadow-sm transform transition-transform duration-200 ease-out -translate-x-full md:translate-x-0 overflow-hidden">
+    <aside id="userSidebar" class="so-sidebar fixed md:relative z-50 inset-y-0 left-0 max-w-[min(85vw,var(--so-sidebar-width))] w-full min-w-0 h-full md:h-auto border-r border-slate-200 flex flex-col shadow-lg md:shadow-sm transform transition-transform duration-200 ease-out -translate-x-full md:translate-x-0 overflow-hidden">
         <nav class="flex-1 py-4 px-3 overflow-y-auto min-h-0">
-            <button type="button" data-user-view="userOverview" onclick="loadPage(this,'userOverview')" class="sidebar-btn active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 mb-1 font-medium">
+            <button type="button" data-user-view="userOverview" onclick="loadPage(this,'userOverview')" class="sidebar-btn active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-chart-pie w-5"></i> <span>Overview</span>
             </button>
-            <button type="button" data-user-view="userAttendance" onclick="loadPage(this,'userAttendance')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 mb-1 font-medium">
+            <button type="button" data-user-view="userAttendance" onclick="loadPage(this,'userAttendance')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-user-check w-5"></i> <span>My Attendance</span>
             </button>
-            <button type="button" data-user-view="userTasks" onclick="loadPage(this,'userTasks')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 mb-1 font-medium">
+            <button type="button" data-user-view="userTasks" onclick="loadPage(this,'userTasks')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-list-check w-5"></i> <span>Tasks</span>
             </button>
-            <button type="button" data-user-view="userTeam" onclick="loadPage(this,'userTeam')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 mb-1 font-medium">
+            <button type="button" data-user-view="userTeam" onclick="loadPage(this,'userTeam')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-users w-5"></i> <span>My Team</span>
             </button>
-            <button type="button" data-user-view="userLeave" onclick="loadPage(this,'userLeave')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 mb-1 font-medium">
+            <button type="button" data-user-view="userLeave" onclick="loadPage(this,'userLeave')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-calendar-xmark w-5"></i> <span>Apply Leave</span>
             </button>
-            <button type="button" data-user-view="userMeetings" onclick="loadPage(this,'userMeetings')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 mb-1 font-medium">
+            <button type="button" data-user-view="userMeetings" onclick="loadPage(this,'userMeetings')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-handshake w-5"></i> <span>Scheduled Meetings</span>
             </button>
-            <button type="button" data-user-view="calendar.jsp" onclick="loadPage(this,'calendar.jsp')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 mb-1 font-medium">
+            <button type="button" data-user-view="calendar.jsp" onclick="loadPage(this,'calendar.jsp')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-calendar-days w-5"></i> <span>Calendar</span>
             </button>
         </nav>
         <div class="border-t border-slate-200 px-3 py-4">
-            <button type="button" data-user-view="userSettings" onclick="loadPage(this,'userSettings')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 mb-1 font-medium">
+            <button type="button" data-user-view="userSettings" onclick="loadPage(this,'userSettings')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-gear w-5"></i> <span>Settings</span>
             </button>
             <a href="<%=request.getContextPath()%>/logout" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors font-medium">
@@ -128,13 +127,13 @@ body { font-family: 'DM Sans', system-ui, sans-serif; }
     </aside>
 
     <!-- Content Area: default = Overview (must match first sidebar item) -->
-    <main class="flex-1 min-h-0 overflow-auto bg-slate-100 flex flex-col w-full min-w-0">
+    <main class="so-main flex-1 min-h-0 overflow-auto bg-slate-100 flex flex-col w-full min-w-0">
         <iframe id="contentFrame" src="<%= ctxPath %>/userOverview" class="w-full flex-1 min-h-[50vh] md:min-h-0 border-0 block" title="Dashboard content"></iframe>
     </main>
 </div>
 
 <!-- Toast -->
-<div id="toast" class="fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg hidden text-sm font-medium"></div>
+<div id="toast" class="fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
 
 <script>
 (function() {
@@ -240,7 +239,7 @@ window.updateBadge = updateBadge;
 
 function showToast(message, type) {
     const toast = document.getElementById('toast');
-    toast.className = 'fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-sm font-medium';
+    toast.className = 'fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)]';
     if (type === 'success') toast.classList.add('bg-emerald-500', 'text-white');
     else if (type === 'error') toast.classList.add('bg-red-500', 'text-white');
     else toast.classList.add('bg-indigo-500', 'text-white');

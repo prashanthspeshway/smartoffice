@@ -37,40 +37,25 @@ public class SubmitTaskUpdateServlet extends HttpServlet {
         String employeeName  = getDisplayName(session);
 
         try {
-            int    taskId    = Integer.parseInt(request.getParameter("taskId"));
-            String newStatus = request.getParameter("status");
-            String comment   = request.getParameter("comment");
-
-            if (newStatus == null || newStatus.isEmpty()) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Status is required");
-                return;
-            }
+            int    taskId  = Integer.parseInt(request.getParameter("taskId"));
+            String comment = request.getParameter("comment");
 
             // Get task BEFORE updating — needed to find who assigned it
             Task task = TaskDAO.getTaskById(taskId);
+            if (task == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Task not found");
+                return;
+            }
+            if (!TaskDAO.taskBelongsToAssignee(task, employeeEmail)) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Not your task");
+                return;
+            }
 
             // Handle optional file
             Part filePart = null;
             try { filePart = request.getPart("employeeFile"); } catch (Exception ignore) {}
 
-            boolean hasFile = filePart != null
-                    && filePart.getSize() > 0
-                    && filePart.getSubmittedFileName() != null
-                    && !filePart.getSubmittedFileName().isEmpty();
-
-            if (hasFile) {
-                // Update with file
-                TaskDAO.submitEmployeeWork(
-                        taskId,
-                        filePart.getSubmittedFileName(),
-                        filePart.getInputStream().readAllBytes(),
-                        comment);
-                // Also update status to the employee's chosen value
-                TaskDAO.updateStatus(taskId, newStatus);
-            } else {
-                // Status + comment only
-                TaskDAO.updateTaskStatus(taskId, newStatus, comment, null);
-            }
+            TaskDAO.submitEmployeeTaskRequest(taskId, comment, filePart);
 
             // ── NOTIFICATIONS ─────────────────────────────────────────
             if (task != null) {
@@ -85,9 +70,7 @@ public class SubmitTaskUpdateServlet extends HttpServlet {
                 String taskTitle = task.getTitle() != null
                         ? task.getTitle() : task.getDescription();
 
-                String msg = getStatusEmoji(newStatus) + " " + employeeName
-                        + " updated task \"" + taskTitle
-                        + "\" → " + formatStatus(newStatus)
+                String msg = "📨 " + employeeName + " submitted a request for task \"" + taskTitle + "\""
                         + (comment != null && !comment.isEmpty()
                                 ? ". Comment: " + comment : "");
 
@@ -119,6 +102,8 @@ public class SubmitTaskUpdateServlet extends HttpServlet {
 
             response.setStatus(HttpServletResponse.SC_OK);
 
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -163,30 +148,6 @@ public class SubmitTaskUpdateServlet extends HttpServlet {
                     + email + "': " + e.getMessage());
         }
         return null;
-    }
-
-    private String getStatusEmoji(String status) {
-        if (status == null) return "📋";
-        switch (status.toUpperCase()) {
-            case "COMPLETED":             return "✅";
-            case "INCOMPLETE":            return "⏳";
-            case "ERRORS_RAISED":         return "⚠️";
-            case "DOCUMENT_VERIFICATION": return "📄";
-            case "SUBMITTED":             return "📨";
-            default:                      return "📋";
-        }
-    }
-
-    private String formatStatus(String status) {
-        if (status == null) return "";
-        switch (status.toUpperCase()) {
-            case "COMPLETED":             return "Completed";
-            case "INCOMPLETE":            return "Incomplete";
-            case "ERRORS_RAISED":         return "Errors Raised";
-            case "DOCUMENT_VERIFICATION": return "Document Verification";
-            case "SUBMITTED":             return "Submitted";
-            default:                      return status;
-        }
     }
 
     private String getDisplayName(HttpSession session) {

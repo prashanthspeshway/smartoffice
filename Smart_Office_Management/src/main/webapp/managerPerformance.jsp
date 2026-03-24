@@ -21,9 +21,9 @@ if (username == null) {
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-body{font-family:'DM Sans',system-ui,sans-serif;}
+body{font-family:'Geist',system-ui,sans-serif;}
 .step-indicator {
 	display: flex;
 	align-items: center;
@@ -433,7 +433,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;}
 				var toast = document.createElement('div');
 				var bgColor = (type === 'success') ? 'bg-green-500'
 						: 'bg-red-500';
-				toast.className = 'fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 '
+				toast.className = 'fixed bottom-6 right-4 px-6 py-3 rounded-lg shadow-lg z-50 max-w-[min(92vw,24rem)] '
 						+ bgColor + ' text-white';
 				toast.textContent = message;
 				document.body.appendChild(toast);

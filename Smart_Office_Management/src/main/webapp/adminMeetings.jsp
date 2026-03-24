@@ -23,7 +23,7 @@
 <title>Meetings • Smart Office HRMS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root {
@@ -55,7 +55,7 @@
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Geist', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -70,7 +70,7 @@ body {
     margin-bottom: 32px; flex-wrap: wrap;
 }
 .page-title {
-    font-family: 'Fraunces', Georgia, serif;
+    font-family: 'Geist', system-ui, sans-serif;
     font-size: 28px; font-weight: 600; color: var(--text);
     display: flex; align-items: center; gap: 10px; line-height: 1.2;
 }
@@ -202,7 +202,7 @@ body {
     justify-content: space-between; margin-bottom: 20px;
 }
 .section-title {
-    font-family: 'Fraunces', Georgia, serif;
+    font-family: 'Geist', system-ui, sans-serif;
     font-size: 20px; font-weight: 600; color: var(--text);
     display: flex; align-items: center; gap: 8px;
 }
@@ -228,7 +228,7 @@ body {
     background: linear-gradient(135deg, var(--accent-light), #f0f4ff);
     border-radius: 20px 20px 0 0;
 }
-.modal-title { font-family: 'Fraunces', Georgia, serif; font-size: 20px; font-weight: 600; color: var(--text); }
+.modal-title { font-family: 'Geist', system-ui, sans-serif; font-size: 20px; font-weight: 600; color: var(--text); }
 .close-btn {
     background: #fff; border: 1px solid var(--border2);
     border-radius: 8px; width: 32px; height: 32px;
@@ -288,7 +288,7 @@ body {
 
 /* ── Toast ── */
 .toast {
-    position: fixed; top: 20px; right: 20px;
+    position: fixed; bottom: 24px; right: 20px; top: auto;
     padding: 13px 18px; border-radius: 10px; z-index: 9999;
     display: none; font-size: 14px; font-weight: 500;
     box-shadow: var(--shadow-lg); animation: slideIn .25s ease; max-width: 340px;

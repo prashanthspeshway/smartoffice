@@ -14,15 +14,16 @@ String phone    = userObj != null ? userObj.getPhone()    : (String) session.get
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Settings</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
-<style>body{font-family:'DM Sans',system-ui,sans-serif;}</style>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
 </head>
-<body class="bg-slate-100 p-6">
+<body class="user-iframe-page p-6">
 
 <div class="max-w-3xl mx-auto space-y-6">
     <div>
@@ -31,7 +32,7 @@ String phone    = userObj != null ? userObj.getPhone()    : (String) session.get
     </div>
 
     <!-- Toast -->
-    <div id="toast" class="fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg hidden text-sm font-medium"></div>
+    <div id="toast" class="fixed bottom-6 right-4 z-50 px-6 py-3 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
 
     <!-- Inner tabs -->
     <div class="flex gap-1 border-b border-slate-200">
@@ -102,7 +103,7 @@ function showTab(tab) {
 
 function showToast(msg, type) {
     const t = document.getElementById('toast');
-    t.className = 'fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-sm font-medium';
+    t.className = 'fixed bottom-6 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)]';
     t.classList.add(type === 'success' ? 'bg-emerald-500' : 'bg-red-500', 'text-white');
     t.textContent = msg;
     t.classList.remove('hidden');

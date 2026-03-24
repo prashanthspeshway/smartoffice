@@ -49,6 +49,11 @@ if (punchOut != null)
 	status = "Punched Out";
 
 boolean onBreak = Boolean.TRUE.equals(request.getAttribute("onBreak"));
+
+java.time.LocalDate exportEndD = java.time.LocalDate.now();
+java.time.LocalDate exportStartD = exportEndD.withDayOfMonth(1);
+String mgrExportDefaultStart = exportStartD.toString();
+String mgrExportDefaultEnd = exportEndD.toString();
 %>
 <%
 User userObj = (User) request.getAttribute("user");
@@ -64,7 +69,7 @@ User userObj = (User) request.getAttribute("user");
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link
-	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+	href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
 	rel="stylesheet">
 <style>
 /* ================= GLOBAL (Figma / Admin / Employee aligned) ================= */
@@ -80,7 +85,7 @@ body {
 	flex-direction: column;
 	background: #f1f5f9;
 	overflow: hidden;
-	font-family: 'Inter', system-ui, -apple-system, sans-serif;
+	font-family: 'Geist', system-ui, -apple-system, sans-serif;
 	font-size: 14px;
 	color: #1e293b;
 }
@@ -89,29 +94,32 @@ body {
 .top-bar {
 	background: #ffffff;
 	border-bottom: 1px solid #e2e8f0;
-	padding: 0 24px;
-	height: 56px;
+	padding: 0 16px;
+	height: 44px;
+	min-height: 44px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 	flex-shrink: 0;
 }
 
 .top-bar h2 {
-	font-size: 20px;
+	font-size: 15px;
 	font-weight: 600;
 	color: #1e293b;
 	letter-spacing: -0.02em;
+	font-family: 'Geist', system-ui, -apple-system, sans-serif;
 }
 
 .user-area {
 	display: flex;
 	align-items: center;
-	gap: 12px;
-	color: #64748b;
-	font-size: 14px;
+	gap: 10px;
+	color: #555555;
+	font-size: 13px;
 	font-weight: 500;
+	font-family: 'Geist', system-ui, -apple-system, sans-serif;
 }
 
 .user-area .welcome {
@@ -154,8 +162,8 @@ body {
 
 /* ================= SIDEBAR ================= */
 .sidebar {
-	width: 256px;
-	min-width: 256px;
+	width: var(--so-sidebar-width, 18rem);
+	min-width: var(--so-sidebar-width, 18rem);
 	background: #ffffff;
 	border-right: 1px solid #e2e8f0;
 	padding: 16px 12px;
@@ -185,7 +193,7 @@ body {
 	background: transparent;
 	border-radius: 8px;
 	cursor: pointer;
-	font-size: 14px;
+	font-size: clamp(13px, 0.25vw + 12px, 15px);
 	font-weight: 500;
 	display: flex;
 	align-items: center;
@@ -221,7 +229,7 @@ body {
 	background: transparent;
 	border-radius: 8px;
 	cursor: pointer;
-	font-size: 14px;
+	font-size: clamp(13px, 0.25vw + 12px, 15px);
 	font-weight: 500;
 	display: flex;
 	align-items: center;
@@ -253,7 +261,7 @@ body {
 	.top-bar {
 		padding: 0 12px;
 		height: auto;
-		min-height: 52px;
+		min-height: 44px;
 		flex-wrap: wrap;
 		gap: 8px;
 	}
@@ -1377,7 +1385,7 @@ to {
 	border-radius: 12px;
 	transition: right 0.3s ease-in-out;
 	z-index: 1000;
-	font-family: 'Inter', system-ui, sans-serif;
+	font-family: 'Geist', system-ui, sans-serif;
 }
 
 .notification-panel.show {
@@ -2367,8 +2375,9 @@ to {
 /* ================= TOAST ================= */
 .toast {
 	position: fixed;
-	top: 80px;
-	right: 30px;
+	bottom: 24px;
+	right: 24px;
+	top: auto;
 	background: #e2ebf0;
 	color: black;
 	padding: 14px 20px 14px 44px;
@@ -2412,6 +2421,22 @@ to {
 
 .toast.error::before {
 	content: "✖";
+}
+
+/* Export validation uses same bottom-right as default */
+.toast.toast--bottom {
+	top: auto !important;
+	bottom: 24px;
+	right: 24px;
+	left: auto;
+	transform: none;
+	max-width: min(420px, 92vw);
+	text-align: left;
+	padding-left: 44px;
+}
+
+.toast.toast--bottom::before {
+	display: block;
 }
 
 @
@@ -2572,9 +2597,10 @@ body.dark-theme .perf-selected-emp, body.dark-theme .perf-selected-banner
 	border-color: #4f46e5 !important;
 }
 </style>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
 </head>
 
-<body>
+<body class="so-shell">
 
 	<div id="overlay" onclick="closeAll()" style="display: none;"></div>
 
@@ -2608,9 +2634,35 @@ body.dark-theme .perf-selected-emp, body.dark-theme .perf-selected-banner
 		</div>
 	</div>
 
+	<!-- EXPORT TEAM ATTENDANCE MODAL -->
+	<div id="exportAttendanceModal" class="modal">
+		<div class="modal-content" style="width: 420px; max-width: 92%;">
+			<div class="modal-header">
+				<h3 style="margin:0;font-size:17px;">Export team attendance</h3>
+				<span onclick="closeExportAttendanceModal()" style="cursor: pointer;">✕</span>
+			</div>
+			<div class="modal-body" style="text-align: left;">
+				<p style="margin:0 0 14px;color:#64748b;font-size:14px;">Pick a date range. Days after today stay blank in the file (not absent).</p>
+				<form method="get" action="<%=request.getContextPath()%>/exportTeamAttendance" id="exportAttendanceForm"
+					onsubmit="return validateManagerExportRange(event)">
+					<label style="display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:6px;">From</label>
+					<input type="date" name="start" value="<%=mgrExportDefaultStart%>" required
+						style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:12px;box-sizing:border-box;" />
+					<label style="display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:6px;">To</label>
+					<input type="date" name="end" value="<%=mgrExportDefaultEnd%>" required
+						style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:16px;box-sizing:border-box;" />
+					<div style="display:flex;gap:10px;justify-content:flex-end;">
+						<button type="button" onclick="closeExportAttendanceModal()" style="padding:10px 18px;border-radius:8px;border:none;background:#f1f5f9;color:#334155;font-weight:600;cursor:pointer;">Cancel</button>
+						<button type="submit" style="padding:10px 18px;border-radius:8px;border:none;background:#4f46e5;color:#fff;font-weight:600;cursor:pointer;">Download</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
 	<!-- TOP BAR -->
 	<div class="top-bar">
-		<h2>Smart Office • Manager Dashboard</h2>
+		<h2>Manager Dashboard</h2>
 		<div class="user-area">
 			<button class="icon-btn" onclick="openNotifications()">
 				<i class="fa-solid fa-bell"></i>
@@ -2621,7 +2673,7 @@ body.dark-theme .perf-selected-emp, body.dark-theme .perf-selected-banner
 
 	<!-- MAIN -->
 	<div class="main-container">
-		<div class="sidebar">
+		<div class="sidebar so-sidebar">
 
 			<!-- Nav buttons -->
 			<div class="sidebar-nav">
@@ -3185,12 +3237,9 @@ body.dark-theme .perf-selected-emp, body.dark-theme .perf-selected-banner
 
 					<div class="team-attendance-toolbar">
 						<div class="export-actions">
-							<form action="<%=request.getContextPath()%>/exportTeamAttendance"
-								method="get" style="display: inline;">
-								<button type="submit" class="export-btn">
-									<i class="fa-solid fa-file-export"></i> Export Attendance
-								</button>
-							</form>
+							<button type="button" class="export-btn" onclick="openExportAttendanceModal()">
+								<i class="fa-solid fa-file-export"></i> Export Attendance
+							</button>
 							<form
 								action="<%=request.getContextPath()%>/exportTeamPerformance"
 								method="get" style="display: inline; margin-left: 8px;">
@@ -3727,7 +3776,7 @@ body.dark-theme .perf-selected-emp, body.dark-theme .perf-selected-banner
 	<!-- ===== NOTIFICATION PANEL ===== -->
 	<div id="notificationPanel" class="notification-panel">
 		<div class="notification-header">
-			<span>🔔 Smart Office Notifications</span>
+			<span>🔔 Notifications</span>
 			<button onclick="closeNotifications()">✕</button>
 		</div>
 		<div class="notification-list" id="notificationList">
@@ -4054,10 +4103,10 @@ function syncSidebarActive(sectionId) {
 }
 
 /* ================= TOAST FUNCTION ================= */
-function showToast(message, type = "success") {
+function showToast(message, type = "success", placement) {
     const toast = document.getElementById("toast");
     toast.style.display = "none";
-    toast.className = "toast";
+    toast.className = "toast" + (placement === "bottom" ? " toast--bottom" : "");
     toast.offsetHeight;
     toast.classList.add(type);
     toast.textContent = message;
@@ -4068,7 +4117,33 @@ function showToast(message, type = "success") {
             toast.style.display = "none";
             toast.className = "toast";
         }, 400);
-    }, 2500);
+    }, 3200);
+}
+
+function parseISODateLocalMgr(s) {
+    if (!s) return null;
+    var p = s.split("-");
+    return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+}
+function validateManagerExportRange(ev) {
+    var f = document.getElementById("exportAttendanceForm");
+    if (!f) return true;
+    var start = f.querySelector('input[name="start"]');
+    var end = f.querySelector('input[name="end"]');
+    if (!start || !end || !start.value || !end.value) return true;
+    var s = parseISODateLocalMgr(start.value), t = parseISODateLocalMgr(end.value);
+    if (t < s) {
+        ev.preventDefault();
+        showToast("From date must be on or before To date.", "error", "bottom");
+        return false;
+    }
+    var days = Math.round((t - s) / 86400000) + 1;
+    if (days > 400) {
+        ev.preventDefault();
+        showToast("Date range cannot exceed 400 days.", "error", "bottom");
+        return false;
+    }
+    return true;
 }
 
 /* ================= UI FUNCTIONS ================= */
@@ -4165,10 +4240,19 @@ function closeChangePassword() {
     document.getElementById("passwordModal").classList.remove("show");
 }
 
+function openExportAttendanceModal() {
+    document.getElementById("exportAttendanceModal").classList.add("show");
+}
+
+function closeExportAttendanceModal() {
+    document.getElementById("exportAttendanceModal").classList.remove("show");
+}
+
 function closeAll() {
     closeSettings();
     closeProfile();
     closeChangePassword();
+    closeExportAttendanceModal();
     closeAllMeetings();
 }
 

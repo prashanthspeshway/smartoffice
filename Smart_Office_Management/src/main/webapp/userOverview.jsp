@@ -72,7 +72,8 @@ String displayName = session.getAttribute("fullName") != null ? (String) session
 <title>Overview • Employee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -84,16 +85,16 @@ String displayName = session.getAttribute("fullName") != null ? (String) session
   --r:16px; --r2:10px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-.pg{max-width:1200px;margin:0 auto;padding:28px 20px}
+body.user-iframe-page{min-height:100vh}
+.pg{max-width:1200px;margin:0 auto;padding:clamp(16px,4vw,28px) clamp(12px,4vw,20px)}
 
 /* Hero — welcome only (no Teams / Upcoming / Unread) */
-.hero{background:linear-gradient(135deg,#4f6ef7 0%,#6366f1 50%,#8b5cf6 100%);border-radius:20px;padding:26px 30px;color:#fff;margin-bottom:18px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(79,110,247,.28)}
+.hero{background:linear-gradient(135deg,#4f6ef7 0%,#6366f1 50%,#8b5cf6 100%);border-radius:20px;padding:clamp(18px,3vw,26px) clamp(16px,4vw,30px);color:#fff;margin-bottom:18px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(79,110,247,.28)}
 .hero::before{content:'';position:absolute;top:-50px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none}
-/* Main title only — same role as adminOverview .page-title */
-.hero h1{font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;margin-bottom:6px;position:relative;z-index:1;line-height:1.25}
-.hero .sub{opacity:.92;font-size:.95rem;position:relative;z-index:1}
-.hero .date{font-size:.8rem;opacity:.85;margin-top:10px;display:flex;align-items:center;gap:8px;position:relative;z-index:1}
+/* Main title — scales on small screens */
+.hero h1{font-family:'Geist',system-ui,sans-serif;font-size:clamp(1.2rem,2.8vw + 0.35rem,1.6rem);font-weight:600;margin-bottom:6px;position:relative;z-index:1;line-height:1.25}
+.hero .sub{opacity:.92;font-size:clamp(0.85rem,1.2vw + 0.65rem,0.95rem);position:relative;z-index:1}
+.hero .date{font-size:clamp(0.72rem,1vw + 0.55rem,0.8rem);opacity:.85;margin-top:10px;display:flex;align-items:center;gap:8px;position:relative;z-index:1}
 .hero .date i{opacity:.7}
 
 .krow{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:22px}
@@ -103,8 +104,8 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .kpi .ico.am{background:#fffbeb;color:var(--amber)}
 .kpi .ico.gr{background:#ecfdf5;color:var(--green)}
 .kpi .ico.vi{background:#f5f3ff;color:var(--violet)}
-.kpi .num{font-size:28px;font-weight:700;line-height:1;color:var(--text)}
-.kpi .lbl{font-size:12px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.kpi .num{font-size:clamp(1.35rem,3.5vw + 0.4rem,1.75rem);font-weight:700;line-height:1;color:var(--text)}
+.kpi .lbl{font-size:clamp(0.65rem,0.8vw + 0.5rem,0.75rem);color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
 
 /* Insight strip — manager-style */
 .irow{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:18px}
@@ -112,11 +113,11 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .ins{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 17px;display:flex;align-items:center;gap:13px;box-shadow:var(--shadow-sm)}
 .ins-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .ins-lbl{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
-.ins-val{font-size:20px;font-weight:700;color:var(--text);line-height:1.1;margin:2px 0}
+.ins-val{font-size:clamp(1.05rem,2vw + 0.45rem,1.25rem);font-weight:700;color:var(--text);line-height:1.1;margin:2px 0}
 .ins-bar{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:5px}
 .ins-fill{height:100%;border-radius:99px;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
 
-.sec{font-family:'DM Sans',system-ui,sans-serif;font-size:15px;font-weight:600;color:var(--text);margin-bottom:11px;display:flex;align-items:center;gap:8px}
+.sec{font-family:'Geist',system-ui,sans-serif;font-size:15px;font-weight:600;color:var(--text);margin-bottom:11px;display:flex;align-items:center;gap:8px}
 .sec::after{content:'';flex:1;height:1px;background:var(--border)}
 
 .cr2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px}
@@ -138,7 +139,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 @media (max-width:900px){.twocol{grid-template-columns:1fr}}
 
 /* Match adminOverview .chart-title */
-.card h2{font-family:'DM Sans',system-ui,sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:10px;color:var(--text)}
+.card h2{font-family:'Geist',system-ui,sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:10px;color:var(--text)}
 .card h2 i{color:var(--violet);font-size:13px}
 
 .status-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border-radius:99px;font-size:.9rem;font-weight:600;color:var(--text2);margin-bottom:12px}
@@ -160,7 +161,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .empty i{font-size:1.6rem;display:block;margin-bottom:8px;opacity:.4}
 </style>
 </head>
-<body>
+<body class="user-iframe-page">
 <div class="pg">
 
   <div class="hero">
@@ -326,7 +327,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 </div>
 
 <script>
-Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
+Chart.defaults.font.family = "'Geist', system-ui, sans-serif";
 Chart.defaults.font.size = 12;
 Chart.defaults.color = '#9aa0b8';
 Chart.defaults.plugins.legend.labels.boxWidth = 10;

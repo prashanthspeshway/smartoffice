@@ -29,6 +29,7 @@ import com.smartoffice.model.LeaveRequest;
 import com.smartoffice.model.Meeting;
 import com.smartoffice.model.Task;
 import com.smartoffice.model.User;
+import com.smartoffice.utils.AuthRedirectUtil;
 import com.smartoffice.utils.DBConnectionUtil;
 
 @SuppressWarnings("serial")
@@ -51,7 +52,7 @@ public class UserDashboardServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
-            response.sendRedirect("index.html");
+            AuthRedirectUtil.sendTopWindowRedirect(request, response, "/index.html");
             return;
         }
 
@@ -117,7 +118,7 @@ public class UserDashboardServlet extends HttpServlet {
                     break;
 
                 default:
-                    response.sendRedirect("user");
+                    response.sendRedirect(request.getContextPath() + "/userOverview");
             }
 
         } catch (Exception e) {

@@ -14,6 +14,8 @@ public class AdminAttendanceRow {
 	private Timestamp punchOut;
 	private String breakDurationFormatted; // e.g. "45m", "1h 10m"
 	private String liveStatus;             // ON BREAK, PUNCHED IN, PUNCHED OUT, ABSENT
+	/** Raw attendance.status from DB: Present, Half Day, In Progress, Absent, On Leave, etc. */
+	private String attendanceStatus;
 
 	public String getEmail() { return email; }
 	public void setEmail(String email) { this.email = email; }
@@ -35,4 +37,7 @@ public class AdminAttendanceRow {
 
 	public String getLiveStatus() { return liveStatus; }
 	public void setLiveStatus(String liveStatus) { this.liveStatus = liveStatus; }
+
+	public String getAttendanceStatus() { return attendanceStatus; }
+	public void setAttendanceStatus(String attendanceStatus) { this.attendanceStatus = attendanceStatus; }
 }

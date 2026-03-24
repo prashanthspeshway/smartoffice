@@ -21,8 +21,8 @@ User userObj = (User) request.getAttribute("user");
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
-<style>body{font-family:'DM Sans',system-ui,sans-serif;}</style>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>body{font-family:'Geist',system-ui,sans-serif;}</style>
 </head>
 <body class="bg-slate-100 p-6">
 	<div class="max-w-4xl mx-auto">
@@ -133,7 +133,7 @@ User userObj = (User) request.getAttribute("user");
 
 	<!-- Toast Notification -->
 	<div id="toast" 
-		class="fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg hidden transform transition-all duration-300">
+		class="fixed bottom-6 right-4 px-6 py-4 rounded-lg shadow-lg hidden transform transition-all duration-300 max-w-[min(92vw,24rem)]">
 	</div>
 
 	<script>
@@ -162,7 +162,7 @@ User userObj = (User) request.getAttribute("user");
 
 	function showToast(message, type = 'success') {
 		const toast = document.getElementById('toast');
-		toast.className = 'fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg transform transition-all duration-300';
+		toast.className = 'fixed bottom-6 right-4 px-6 py-4 rounded-lg shadow-lg transform transition-all duration-300 max-w-[min(92vw,24rem)]';
 		
 		if (type === 'success') {
 			toast.classList.add('bg-emerald-500', 'text-white');

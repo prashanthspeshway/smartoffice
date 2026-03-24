@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +55,31 @@ public class AttendanceDAO {
         return email;
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // ✅ NEW: Check if the user has an APPROVED leave covering a specific date.
+    //    Matches by both username AND email columns in leave_requests to be safe.
+    // ─────────────────────────────────────────────────────────────────────────
+    public boolean isOnApprovedLeaveOn(String sessionValue, Date date) throws Exception {
+        // leave_requests.username stores the plain username (e.g. "prasad nani")
+        // We check both the raw sessionValue (email) and resolved username
+        String usernameVal = getUsernameFromEmail(sessionValue);
+
+        String sql = "SELECT COUNT(*) FROM leave_requests "
+                + "WHERE username IN (?, ?) "
+                + "  AND status = 'APPROVED' "
+                + "  AND ? BETWEEN from_date AND to_date";
+
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, sessionValue);   // try email match
+            ps.setString(2, usernameVal);    // try username match
+            ps.setDate(3, new java.sql.Date(date.getTime()));
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1) > 0;
+        }
+        return false;
+    }
+
     public boolean hasPunchedIn(String sessionValue, Date date) throws Exception {
         String id  = resolveForAttendance(sessionValue);
         String col = getAttendanceUserColumn();
@@ -97,9 +123,41 @@ public class AttendanceDAO {
         return false;
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // ✅ NEW: Returns a user-friendly reason why today is blocked, or null if
+    //    the user is free to punch in/out.
+    // ─────────────────────────────────────────────────────────────────────────
+    public String getBlockReason(String sessionValue, Date date) throws Exception {
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.setTime(date);
+        int dayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK);
+        if (dayOfWeek == java.util.Calendar.SATURDAY || dayOfWeek == java.util.Calendar.SUNDAY) {
+            return "Today is a Weekend. Attendance is not available.";
+        }
+        String holidaySql = "SELECT holiday_name FROM holidays WHERE holiday_date=?";
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(holidaySql)) {
+            ps.setDate(1, new java.sql.Date(date.getTime()));
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String name = rs.getString("holiday_name");
+                return "Today is a Holiday" + (name != null && !name.isEmpty() ? " (" + name + ")" : "") + ". Attendance is not available.";
+            }
+        }
+        if (isOnApprovedLeaveOn(sessionValue, date)) {
+            return "You are on Approved Leave today. Attendance is not available.";
+        }
+        return null; // no block — punch in/out is allowed
+    }
+
     public void punchIn(String sessionValue) throws Exception {
         Date today = new Date(System.currentTimeMillis());
-        if (isHoliday(today)) throw new Exception("Cannot punch in on a holiday");
+
+        // ✅ FIXED: Check weekend/holiday/approved-leave — all with clear messages
+        String blockReason = getBlockReason(sessionValue, today);
+        if (blockReason != null) {
+            throw new Exception(blockReason);
+        }
 
         List<String> userCols = new ArrayList<>();
         if (hasAttendanceColumn("username"))   userCols.add("username");
@@ -128,7 +186,12 @@ public class AttendanceDAO {
 
     public void punchOut(String sessionValue) throws Exception {
         Date today = new Date(System.currentTimeMillis());
-        if (isHoliday(today)) throw new Exception("Cannot punch out on a holiday");
+
+        // ✅ FIXED: Check weekend/holiday/approved-leave — all with clear messages
+        String blockReason = getBlockReason(sessionValue, today);
+        if (blockReason != null) {
+            throw new Exception(blockReason);
+        }
 
         String id  = resolveForAttendance(sessionValue);
         String col = getAttendanceUserColumn();
@@ -159,7 +222,7 @@ public class AttendanceDAO {
             ps.setTimestamp(1, punchOutTime);
             ps.setTimestamp(2, punchOutTime);
             ps.setString(3, id);
-            int rows = ps.executeUpdate();
+            ps.executeUpdate();
         }
     }
 
@@ -167,7 +230,7 @@ public class AttendanceDAO {
         String sql = "UPDATE attendance SET status = CASE "
                 + "WHEN punch_in IS NOT NULL AND punch_out IS NOT NULL AND TIMESTAMPDIFF(HOUR, punch_in, punch_out) >= 4 THEN 'Present' "
                 + "WHEN punch_in IS NOT NULL AND punch_out IS NOT NULL AND TIMESTAMPDIFF(HOUR, punch_in, punch_out) < 4  THEN 'Half Day' "
-                + "WHEN punch_in IS NOT NULL AND punch_out IS NULL THEN 'Half Day' "
+                + "WHEN punch_in IS NOT NULL AND punch_out IS NULL THEN 'In Progress' "
                 + "ELSE 'Absent' END "
                 + "WHERE punch_date = CURDATE() AND status NOT IN ('On Leave')";
         try (Connection con = DBConnectionUtil.getConnection();
@@ -237,20 +300,30 @@ public class AttendanceDAO {
     }
 
     public List<TeamAttendance> getTeamAttendanceForMonth(String managerUsername) throws Exception {
+        LocalDate now = LocalDate.now();
+        return getTeamAttendanceForDateRange(managerUsername,
+                now.withDayOfMonth(1), now.withDayOfMonth(now.lengthOfMonth()));
+    }
+
+    /** Attendance rows for a manager's team between {@code start} and {@code end} (inclusive). */
+    public List<TeamAttendance> getTeamAttendanceForDateRange(String managerUsername, LocalDate start, LocalDate end)
+            throws Exception {
         List<TeamAttendance> list = new ArrayList<>();
         String aCol   = getAttendanceUserColumn();
         String joinOn = "username".equals(aCol) ? "a.username = u.username" : "a." + aCol + " = u.email";
         String sql = "SELECT u.email, TRIM(CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,''))) AS fullname, "
-                + "a.punch_date, a.punch_in, a.punch_out "
+                + "a.punch_date, a.punch_in, a.punch_out, a.status "
                 + "FROM (SELECT DISTINCT tm.username FROM team_members tm "
                 + "      JOIN teams t ON t.id = tm.team_id AND t.manager_username = ?) team_users "
                 + "JOIN users u ON u.email = team_users.username "
                 + "LEFT JOIN attendance a ON " + joinOn
-                + " AND MONTH(a.punch_date) = MONTH(CURDATE()) AND YEAR(a.punch_date) = YEAR(CURDATE()) "
+                + " AND a.punch_date BETWEEN ? AND ? "
                 + "ORDER BY fullname, a.punch_date";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, managerUsername);
+            ps.setDate(2, Date.valueOf(start));
+            ps.setDate(3, Date.valueOf(end));
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 TeamAttendance ta = new TeamAttendance();
@@ -259,6 +332,7 @@ public class AttendanceDAO {
                 ta.setAttendanceDate(rs.getDate("punch_date"));
                 ta.setPunchIn(rs.getTimestamp("punch_in"));
                 ta.setPunchOut(rs.getTimestamp("punch_out"));
+                try { ta.setStatus(rs.getString("status")); } catch (Exception ignored) {}
                 list.add(ta);
             }
         }
@@ -287,6 +361,7 @@ public class AttendanceDAO {
                 row.setPunchOut(rs.getTimestamp("punch_out"));
                 row.setBreakDurationFormatted("--");
                 String dbSt = rs.getString("status");
+                row.setAttendanceStatus(dbSt);
                 if ("On Leave".equalsIgnoreCase(dbSt)) {
                     row.setLiveStatus("ON LEAVE");
                 } else {
@@ -316,6 +391,7 @@ public class AttendanceDAO {
                         row.setPunchOut(rs.getTimestamp("punch_out"));
                         row.setBreakDurationFormatted("--");
                         String dbSt = rs.getString("status");
+                        row.setAttendanceStatus(dbSt);
                         if ("On Leave".equalsIgnoreCase(dbSt)) {
                             row.setLiveStatus("ON LEAVE");
                         } else {
@@ -424,8 +500,6 @@ public class AttendanceDAO {
     }
 
     public void autoCloseMissedPunchOuts() throws Exception {
-        java.time.LocalDate today = java.time.LocalDate.now();
-
         // Step 1: Close missed punch-outs for PAST days only — never today
         String closeSql = "UPDATE attendance "
                 + "SET punch_out = TIMESTAMP(punch_date, '19:30:00'), status = 'Present' "
@@ -435,7 +509,7 @@ public class AttendanceDAO {
                 + "  AND status NOT IN ('On Leave')";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(closeSql)) {
-            int rows = ps.executeUpdate();
+            ps.executeUpdate();
         }
 
         // Step 2: Mark Half Day if worked < 4 hours — PAST days only
@@ -448,7 +522,7 @@ public class AttendanceDAO {
                 + "  AND TIMESTAMPDIFF(HOUR, punch_in, punch_out) < 4";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(halfDaySql)) {
-            int rows = ps.executeUpdate();
+            ps.executeUpdate();
         }
     }
 
@@ -499,6 +573,12 @@ public class AttendanceDAO {
     }
 
     public List<TeamAttendance> getAllAttendanceForMonth() throws Exception {
+        LocalDate now = LocalDate.now();
+        return getAllAttendanceForDateRange(now.withDayOfMonth(1), now.withDayOfMonth(now.lengthOfMonth()));
+    }
+
+    /** All non-admin employees' attendance between {@code start} and {@code end} (inclusive). */
+    public List<TeamAttendance> getAllAttendanceForDateRange(LocalDate start, LocalDate end) throws Exception {
         List<TeamAttendance> list = new ArrayList<>();
         String aCol   = getAttendanceUserColumn();
         String joinOn = "username".equals(aCol) ? "a.username = u.username" : "a." + aCol + " = u.email";
@@ -507,12 +587,13 @@ public class AttendanceDAO {
                 + "a.punch_date, a.punch_in, a.punch_out, a.status "
                 + "FROM users u "
                 + "LEFT JOIN attendance a ON " + joinOn
-                + " AND MONTH(a.punch_date) = MONTH(CURDATE()) "
-                + " AND YEAR(a.punch_date)  = YEAR(CURDATE()) "
+                + " AND a.punch_date BETWEEN ? AND ? "
                 + "WHERE LOWER(TRIM(COALESCE(u.role,''))) != 'admin' "
                 + "ORDER BY fullname, a.punch_date";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDate(1, Date.valueOf(start));
+            ps.setDate(2, Date.valueOf(end));
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 TeamAttendance ta = new TeamAttendance();

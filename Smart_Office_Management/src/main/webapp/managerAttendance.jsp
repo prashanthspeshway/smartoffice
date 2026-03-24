@@ -64,6 +64,11 @@ int sbH = (int) (totalBreakSec / 3600), sbM = (int) ((totalBreakSec % 3600) / 60
 
 String todayStr = isoFmt.format(new java.util.Date());
 
+java.time.LocalDate exportEndD = java.time.LocalDate.now();
+java.time.LocalDate exportStartD = exportEndD.withDayOfMonth(1);
+String exportDefaultStart = exportStartD.toString();
+String exportDefaultEnd = exportEndD.toString();
+
 java.util.List<BreakLog> breakLogs = (java.util.List<BreakLog>) request.getAttribute("breakLogs");
 %>
 <!DOCTYPE html>
@@ -75,9 +80,9 @@ java.util.List<BreakLog> breakLogs = (java.util.List<BreakLog>) request.getAttri
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-body{font-family:'DM Sans',system-ui,sans-serif;}
+body{font-family:'Geist',system-ui,sans-serif;}
 .filter-pill {
 	display: inline-flex;
 	align-items: center;
@@ -137,6 +142,67 @@ to {
 	transform: translateY(0);
 }
 }
+
+.export-modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 23, 42, 0.45);
+	backdrop-filter: blur(4px);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	z-index: 10000;
+}
+.export-modal-overlay.show { display: flex; }
+.export-modal {
+	background: #fff;
+	border-radius: 12px;
+	padding: 24px;
+	width: 100%;
+	max-width: 420px;
+	box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+.export-modal h3 { margin: 0 0 8px; font-size: 1.125rem; color: #0f172a; }
+.export-modal p { margin: 0 0 16px; font-size: 0.875rem; color: #64748b; }
+.export-modal label { display: block; font-size: 0.75rem; font-weight: 600; color: #475569; margin-bottom: 6px; }
+.export-modal input[type="date"] {
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	margin-bottom: 14px;
+}
+.export-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+.export-modal-actions button {
+	padding: 10px 18px;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 0.875rem;
+	cursor: pointer;
+	border: none;
+}
+.btn-modal-cancel { background: #f1f5f9; color: #334155; }
+.btn-modal-submit { background: #4f46e5; color: #fff; }
+
+#exportRangeToast {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10001;
+	max-width: min(420px, 92vw);
+	padding: 12px 18px;
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 600;
+	color: #fff;
+	background: #dc2626;
+	box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+	display: none;
+	text-align: center;
+}
+#exportRangeToast.show { display: block; animation: fadeUp .25s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 </style>
 </head>
 <body class="bg-slate-100 p-6">
@@ -495,13 +561,11 @@ to {
 					Attendance (Today)
 				</h3>
 				<div class="flex gap-3">
-					<form action="<%=request.getContextPath()%>/exportTeamAttendance"
-						method="get">
-						<button type="submit"
-							class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 text-sm">
-							<i class="fa-solid fa-file-export"></i> Export Attendance
-						</button>
-					</form>
+					<button type="button"
+						class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 text-sm"
+						onclick="document.getElementById('exportAttendanceOverlay').classList.add('show')">
+						<i class="fa-solid fa-file-export"></i> Export Attendance
+					</button>
 					<form action="<%=request.getContextPath()%>/exportTeamPerformance"
 						method="get">
 						<button type="submit"
@@ -631,6 +695,63 @@ document.getElementById('filterForm').addEventListener('submit', function (e) {
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.onkeydown = e => (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))) ? false : true;
+</script>
+
+<div id="exportAttendanceOverlay" class="export-modal-overlay" onclick="if(event.target===this)this.classList.remove('show')">
+	<div class="export-modal" onclick="event.stopPropagation()">
+		<h3>Export team attendance</h3>
+		<p>Select the date range. Days after today appear blank in the spreadsheet (not absent).</p>
+		<form method="get" action="<%=request.getContextPath()%>/exportTeamAttendance"
+			onsubmit="return validateMgrExportRange(event)">
+			<label for="mgrExpStart">From</label>
+			<input type="date" id="mgrExpStart" name="start" value="<%=exportDefaultStart%>" required />
+			<label for="mgrExpEnd">To</label>
+			<input type="date" id="mgrExpEnd" name="end" value="<%=exportDefaultEnd%>" required />
+			<div class="export-modal-actions">
+				<button type="button" class="btn-modal-cancel" onclick="document.getElementById('exportAttendanceOverlay').classList.remove('show')">Cancel</button>
+				<button type="submit" class="btn-modal-submit">Download</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div id="exportRangeToast" role="status" aria-live="polite"></div>
+
+<script>
+function parseISODateLocal(s) {
+	if (!s) return null;
+	var p = s.split('-');
+	return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+}
+function showMgrExportToast(msg) {
+	if (window.parent && window.parent !== window && typeof window.parent.showToast === 'function') {
+		window.parent.showToast(msg, 'error', 'bottom');
+		return;
+	}
+	var el = document.getElementById('exportRangeToast');
+	if (!el) { alert(msg); return; }
+	el.textContent = msg;
+	el.classList.add('show');
+	clearTimeout(window.__mgrExportToastT);
+	window.__mgrExportToastT = setTimeout(function() { el.classList.remove('show'); }, 3200);
+}
+function validateMgrExportRange(ev) {
+	var start = document.getElementById('mgrExpStart').value;
+	var end = document.getElementById('mgrExpEnd').value;
+	if (!start || !end) return true;
+	var s = parseISODateLocal(start), t = parseISODateLocal(end);
+	if (t < s) {
+		ev.preventDefault();
+		showMgrExportToast('From date must be on or before To date.');
+		return false;
+	}
+	if (Math.round((t - s) / 86400000) + 1 > 400) {
+		ev.preventDefault();
+		showMgrExportToast('Date range cannot exceed 400 days.');
+		return false;
+	}
+	return true;
+}
 </script>
 </body>
 </html>
