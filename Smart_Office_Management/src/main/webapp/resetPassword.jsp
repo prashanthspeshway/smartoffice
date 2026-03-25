@@ -62,7 +62,7 @@
 
   .icon-wrap {
     width: 58px; height: 58px;
-    background: var(--purple-icon-bg);
+    background: #1c1c1c;
     border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 14px;
@@ -183,7 +183,7 @@
   .btn {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, var(--purple-start) 0%, var(--purple-end) 100%);
+    background: #1c1c1c;
     color: #fff;
     border: none;
     border-radius: 11px;
@@ -208,11 +208,12 @@
   }
   .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
 
+
   .back-link {
     display: flex; align-items: center; justify-content: center; gap: 6px;
     margin-top: 14px;
     font-size: 0.87rem; font-weight: 600;
-    color: var(--link); text-decoration: none;
+    color:#1c1c1c; text-decoration: none;
     transition: color 0.2s, gap 0.2s;
   }
   .back-link svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.2; transition: transform 0.2s; }

@@ -175,8 +175,14 @@ html, body {
 
 .card {
   width: 100%;
-  max-width: 380px;
-  margin: 0 40px;
+  max-width: 400px;
+  margin: 0 32px;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 
+              0 8px 10px -6px rgb(0 0 0 / 0.1);
+  padding: 48px 40px;
+  position: relative;
 }
 
 .frm { width: 100%; }
@@ -360,7 +366,15 @@ html, body {
 @keyframes toastIn  { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
 @keyframes toastOut { to{opacity:0;transform:translateY(8px);} }
 
-@media (max-width: 740px) { .left{display:none;} .right{flex:0 0 100%;} .card{margin:0 24px;} }
+@media (max-width: 768px) {
+  .left { display: none; }
+  .right { flex: 0 0 100%; }
+  .card {
+    margin: 24px 20px;
+    padding: 40px 28px;
+    max-width: none;
+  }
+}
 </style>
 </head>
 <body>
@@ -389,7 +403,7 @@ html, body {
         <li>Attendance &amp; Leave Tracking</li>
         <li>Analytics &amp; Admin Overview</li>
       </ul>
-      <div class="ver">v2.0 · HRMS Platform</div>
+<!--       <div class="ver">v2.0 · HRMS Platform</div> -->
     </div>
   </div>
 
@@ -443,7 +457,7 @@ html, body {
       <div class="frm" id="frmForgot">
         <div class="card-head">
           <div class="card-label">Account recovery</div>
-          <div class="card-title">Reset password</div>
+          <div class="card-title">Forget password</div>
           <div class="card-sub">We'll send you a secure link</div>
         </div>
 
@@ -465,7 +479,7 @@ html, body {
 
         <button type="button" class="back-btn" id="btnShowLogin">
           <i class="fa-solid fa-arrow-left" style="font-size:9px"></i>
-          Back to sign in
+          Back to Login
         </button>
 
 <!--         <div class="divider"></div> -->
