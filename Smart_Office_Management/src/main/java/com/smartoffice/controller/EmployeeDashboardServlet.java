@@ -19,7 +19,13 @@ public class EmployeeDashboardServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		String username = (String) req.getSession().getAttribute("username");
-		List<Task> tasks = TaskDAO.getTasksForEmployee(username);
+		List<Task> tasks = null;
+		try {
+			tasks = TaskDAO.getTasksForEmployee(username);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		req.setAttribute("tasks", tasks);

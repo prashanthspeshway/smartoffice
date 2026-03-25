@@ -1,6 +1,8 @@
 package com.smartoffice.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -19,8 +21,8 @@ import com.smartoffice.service.NotificationService;
  *   - managerTasks.jsp  (form action="/assignTask")
  *   - admin forms       (if they also use /assignTask)
  *
- * This is the REAL servlet your JSP forms post to.
- * Notifications are fired here after every successful assignment.
+ * Supports assigning the same task to MULTIPLE employees at once.
+ * Notifications are fired for each assigned employee after every successful assignment.
  */
 @SuppressWarnings("serial")
 @WebServlet("/assignTask")
@@ -41,33 +43,48 @@ public class AssignTaskServlet extends HttpServlet {
         String assignerName  = getDisplayName(session);
         String role          = (String) session.getAttribute("role");
         boolean isAdmin      = "admin".equalsIgnoreCase(role);
+        String redirectUrl   = isAdmin ? "/adminTasks" : "/managerTasks";
 
         try {
-            // Read form fields — support both param names used in your JSPs
-            // managerTasks.jsp uses "employeeUsername", adminTasks might use "assignedTo"
-            String assignedTo = request.getParameter("employeeUsername");
-            if (assignedTo == null || assignedTo.isEmpty())
-                assignedTo = request.getParameter("assignedTo");
+            // ── Read selected employees (supports MULTIPLE checkboxes) ──
+            // managerTasks.jsp sends name="employeeUsername" for each checked box
+            // admin forms may send name="assignedTo"
+            String[] assignedToList = request.getParameterValues("employeeUsername");
+            if (assignedToList == null || assignedToList.length == 0) {
+                // fallback: try single-value admin param
+                String single = request.getParameter("assignedTo");
+                if (single != null && !single.isEmpty()) {
+                    assignedToList = new String[]{ single };
+                }
+            }
 
-            String title       = request.getParameter("title");
-            // managerTasks.jsp uses "taskDesc", admin might use "description"
+            // Validate: must have at least one employee
+            if (assignedToList == null || assignedToList.length == 0) {
+                response.sendRedirect(request.getContextPath() + redirectUrl
+                        + "?error=" + URLEncoder.encode("Please select at least one employee.", StandardCharsets.UTF_8));
+                return;
+            }
+
+            // ── Read other form fields ──────────────────────────────────
+            String title = request.getParameter("title");
+
+            // managerTasks.jsp uses "taskDesc"; admin forms may use "description"
             String description = request.getParameter("taskDesc");
             if (description == null || description.isEmpty())
                 description = request.getParameter("description");
 
-            String deadline  = request.getParameter("deadline");
-            String priority  = request.getParameter("priority");
+            String deadline = request.getParameter("deadline");
+            String priority = request.getParameter("priority");
             if (priority == null || priority.isEmpty()) priority = "MEDIUM";
 
             // Validate required fields
-            if (assignedTo == null || assignedTo.isEmpty() ||
-                title == null || title.isEmpty()) {
-                String redirectUrl = isAdmin ? "/adminTasks" : "/managerTasks";
-                response.sendRedirect(request.getContextPath() + redirectUrl + "?error=MissingFields");
+            if (title == null || title.isEmpty()) {
+                response.sendRedirect(request.getContextPath() + redirectUrl
+                        + "?error=" + URLEncoder.encode("Task title is required.", StandardCharsets.UTF_8));
                 return;
             }
 
-            // Handle optional attachment
+            // ── Read attachment ONCE — reused for every employee ────────
             String attachmentName  = null;
             byte[] attachmentBytes = null;
             try {
@@ -86,54 +103,61 @@ public class AssignTaskServlet extends HttpServlet {
                 catch (Exception ignore) {}
             }
 
-            // Assign the task using the existing TaskDAO signature
-            TaskDAO.assignTask(
-                assignedTo,
-                assignerEmail,
-                title,
-                description,
-                deadlineDate,
-                priority,
-                attachmentName,
-                attachmentBytes
-            );
-
-            // ── NOTIFICATIONS ─────────────────────────────────────────
+            // ── Loop: assign task to every selected employee ────────────
             String roleLabel = isAdmin ? "Admin" : "Manager";
-            String empMsg = "📋 New task assigned by " + roleLabel + " " + assignerName +
-                            ": \"" + title + "\"" +
-                            (deadline != null && !deadline.isEmpty() ? ". Deadline: " + deadline : "") +
-                            " | Priority: " + priority;
 
-            // 1. Notify the employee who received the task
-            NotificationService.notify(
-                    assignedTo, assignerEmail,
-                    NotificationService.TYPE_TASK, empMsg);
+            for (String assignedTo : assignedToList) {
+                if (assignedTo == null || assignedTo.trim().isEmpty()) continue;
 
-            if (isAdmin) {
-                // 2. Admin assigned → notify the employee's manager too
-                NotificationService.notifyManagerOf(
-                        assignedTo, assignerEmail,
-                        NotificationService.TYPE_TASK,
-                        "📋 Admin " + assignerName + " assigned task \"" + title +
-                        "\" to " + assignedTo);
-            } else {
-                // 3. Manager assigned → notify all admins
+                // Insert one task row per employee
+                TaskDAO.assignTask(
+                    assignedTo.trim(),
+                    assignerEmail,
+                    title,
+                    description,
+                    deadlineDate,
+                    priority,
+                    attachmentName,
+                    attachmentBytes
+                );
+
+                // Notify this employee individually
+                String empMsg = "📋 New task assigned by " + roleLabel + " " + assignerName +
+                                ": \"" + title + "\"" +
+                                (deadline != null && !deadline.isEmpty() ? ". Deadline: " + deadline : "") +
+                                " | Priority: " + priority;
+
+                NotificationService.notify(
+                        assignedTo.trim(), assignerEmail,
+                        NotificationService.TYPE_TASK, empMsg);
+
+                if (isAdmin) {
+                    // Admin assigned → notify the employee's manager too
+                    NotificationService.notifyManagerOf(
+                            assignedTo.trim(), assignerEmail,
+                            NotificationService.TYPE_TASK,
+                            "📋 Admin " + assignerName + " assigned task \"" + title +
+                            "\" to " + assignedTo.trim());
+                }
+            }
+
+            // Single admin notification summarising the bulk assign (manager only)
+            if (!isAdmin) {
                 NotificationService.notifyAllAdmins(
                         assignerEmail,
                         NotificationService.TYPE_TASK,
                         "📋 Manager " + assignerName + " assigned task \"" + title +
-                        "\" to " + assignedTo);
+                        "\" to " + assignedToList.length + " employee(s)");
             }
-            // ─────────────────────────────────────────────────────────
 
-            String redirectUrl = isAdmin ? "/adminTasks" : "/managerTasks";
             response.sendRedirect(request.getContextPath() + redirectUrl + "?success=TaskAssigned");
 
         } catch (Exception e) {
             e.printStackTrace();
-            String redirectUrl = isAdmin ? "/adminTasks" : "/managerTasks";
-            response.sendRedirect(request.getContextPath() + redirectUrl + "?error=" + e.getMessage());
+            response.sendRedirect(request.getContextPath() + redirectUrl
+                    + "?error=" + URLEncoder.encode(
+                            e.getMessage() != null ? e.getMessage() : "Unexpected error",
+                            StandardCharsets.UTF_8));
         }
     }
 

@@ -47,7 +47,12 @@ public class ManagerDashboardServlet extends HttpServlet {
 		}
 		request.setAttribute("tab", tab);
 
-		TaskDAO.deleteOldCompletedTasks();
+		try {
+			TaskDAO.deleteOldCompletedTasks();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		try {
 			AttendanceDAO attendanceDAO = new AttendanceDAO();

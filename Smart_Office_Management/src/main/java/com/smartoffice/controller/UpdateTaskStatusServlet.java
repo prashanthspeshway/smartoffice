@@ -25,7 +25,12 @@ public class UpdateTaskStatusServlet extends HttpServlet {
 
 		int taskId = Integer.parseInt(req.getParameter("taskId"));
 		String status = req.getParameter("status");
-		TaskDAO.updateStatus(taskId, status);
+		try {
+			TaskDAO.updateStatus(taskId, status);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// Full shell lives at /user; iframe must not navigate here via 302 — break out to top
 		AuthRedirectUtil.sendTopWindowRedirect(req, resp, "/user?tab=tasks");

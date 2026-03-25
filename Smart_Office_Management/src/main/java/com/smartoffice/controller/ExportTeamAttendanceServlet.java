@@ -28,25 +28,25 @@ import com.smartoffice.model.TeamAttendance;
 public class ExportTeamAttendanceServlet extends HttpServlet {
 
     // ── Colour palette (ARGB hex) ──────────────────────────────────────────
-    private static final String CLR_HEADER_BG   = "FF3F51B5"; // deep indigo
-    private static final String CLR_HEADER_FG   = "FFFFFFFF"; // white
-    private static final String CLR_EMP_BG      = "FFE8EAF6"; // soft indigo tint
-    private static final String CLR_PRESENT_BG  = "FFE8F5E9"; // light green
-    private static final String CLR_PRESENT_FG  = "FF1B5E20";
-    private static final String CLR_ABSENT_BG   = "FFFCE4EC"; // light red
-    private static final String CLR_ABSENT_FG   = "FFB71C1C";
-    private static final String CLR_WEEKEND_BG  = "FFECEFF1"; // light grey
-    private static final String CLR_WEEKEND_FG  = "FF546E7A";
-    private static final String CLR_LEAVE_BG    = "FFFFF9C4"; // light yellow
-    private static final String CLR_LEAVE_FG    = "FFF57F17";
-    private static final String CLR_HALFDAY_BG  = "FFFFF3E0"; // light orange
-    private static final String CLR_HALFDAY_FG  = "FFE65100";
-    private static final String CLR_TIME_FG     = "FF1A237E"; // dark indigo for times
+    private static final String CLR_HEADER_BG  = "FF3F51B5";
+    private static final String CLR_HEADER_FG  = "FFFFFFFF";
+    private static final String CLR_EMP_BG     = "FFE8EAF6";
+    private static final String CLR_PRESENT_BG = "FFE8F5E9";
+    private static final String CLR_PRESENT_FG = "FF1B5E20";
+    private static final String CLR_ABSENT_BG  = "FFFCE4EC";
+    private static final String CLR_ABSENT_FG  = "FFB71C1C";
+    private static final String CLR_WEEKEND_BG = "FFECEFF1";
+    private static final String CLR_WEEKEND_FG = "FF546E7A";
+    private static final String CLR_LEAVE_BG   = "FFFFF9C4";
+    private static final String CLR_LEAVE_FG   = "FFF57F17";
+    private static final String CLR_HALFDAY_BG = "FFFFF3E0";
+    private static final String CLR_HALFDAY_FG = "FFE65100";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // ── Auth check ─────────────────────────────────────────────────────
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
             response.sendRedirect("index.html");
@@ -57,6 +57,7 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
         String role    = (String) session.getAttribute("role");
         AttendanceDAO dao = new AttendanceDAO();
 
+        // ── Date range ─────────────────────────────────────────────────────
         LocalDate today = LocalDate.now();
         String startParam = request.getParameter("start");
         String endParam   = request.getParameter("end");
@@ -64,16 +65,10 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
         LocalDate startDate;
         LocalDate endDate;
         try {
-            if (startParam != null && !startParam.isBlank()) {
-                startDate = LocalDate.parse(startParam);
-            } else {
-                startDate = today.withDayOfMonth(1);
-            }
-            if (endParam != null && !endParam.isBlank()) {
-                endDate = LocalDate.parse(endParam);
-            } else {
-                endDate = today;
-            }
+            startDate = (startParam != null && !startParam.isBlank())
+                    ? LocalDate.parse(startParam) : today.withDayOfMonth(1);
+            endDate = (endParam != null && !endParam.isBlank())
+                    ? LocalDate.parse(endParam) : today;
         } catch (DateTimeParseException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date. Use YYYY-MM-DD.");
             return;
@@ -85,13 +80,31 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
             return;
         }
         if (ChronoUnit.DAYS.between(startDate, endDate) > 400) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Date range cannot exceed 400 days.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "Date range cannot exceed 400 days.");
             return;
         }
 
+        // ── Optional single-employee filter ────────────────────────────────
+        String employeeIdParam = request.getParameter("employeeId");
+        Integer singleEmployeeId = null;
+        if (employeeIdParam != null && !employeeIdParam.isBlank()) {
+            try {
+                singleEmployeeId = Integer.parseInt(employeeIdParam.trim());
+            } catch (NumberFormatException e) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        "Invalid employeeId parameter.");
+                return;
+            }
+        }
+
+        // ── Fetch data ─────────────────────────────────────────────────────
         List<TeamAttendance> list;
         try {
-            if ("admin".equalsIgnoreCase(role)) {
+            if (singleEmployeeId != null) {
+                list = dao.getAttendanceForEmployeeAndDateRange(
+                        singleEmployeeId, startDate, endDate);
+            } else if ("admin".equalsIgnoreCase(role)) {
                 list = dao.getAllAttendanceForDateRange(startDate, endDate);
             } else {
                 list = dao.getTeamAttendanceForDateRange(manager, startDate, endDate);
@@ -101,24 +114,29 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
         }
 
         int DAYS = (int) ChronoUnit.DAYS.between(startDate, endDate) + 1;
-        String rangeLabel = startDate + " — " + endDate;
+        String rangeLabel = startDate + " \u2014 " + endDate;
 
         // ── Workbook & sheet ───────────────────────────────────────────────
-        XSSFWorkbook wb = new XSSFWorkbook();
-        XSSFSheet sheet  = wb.createSheet("Team Attendance");
+        XSSFWorkbook wb    = new XSSFWorkbook();
+        XSSFSheet    sheet = wb.createSheet("Team Attendance");
         sheet.setDefaultColumnWidth(14);
-        sheet.createFreezePane(2, 2); // freeze employee + label columns, header row
+        sheet.createFreezePane(2, 2);
 
-        // ── Style factory ──────────────────────────────────────────────────
         StyleFactory sf = new StyleFactory(wb);
 
         // ── Title row (row 0) ──────────────────────────────────────────────
-        Row titleRow = sheet.createRow(0);
+        Row  titleRow  = sheet.createRow(0);
         titleRow.setHeightInPoints(28);
         Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("Attendance Report — " + rangeLabel);
+
+        String titleText = "Attendance Report \u2014 " + rangeLabel;
+        if (singleEmployeeId != null && !list.isEmpty()
+                && list.get(0).getFullName() != null) {
+            titleText = list.get(0).getFullName()
+                    + " \u2014 Attendance Report \u2014 " + rangeLabel;
+        }
+        titleCell.setCellValue(titleText);
         titleCell.setCellStyle(sf.title());
-        // Merge across all columns: employee + label + days
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, DAYS + 1));
 
         // ── Header row (row 1) ─────────────────────────────────────────────
@@ -134,27 +152,27 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
         hLabel.setCellStyle(sf.colHeader());
 
         for (int i = 0; i < DAYS; i++) {
-            LocalDate d = startDate.plusDays(i);
+            LocalDate d    = startDate.plusDays(i);
+            boolean   wknd = (d.getDayOfWeek() == DayOfWeek.SATURDAY
+                    || d.getDayOfWeek() == DayOfWeek.SUNDAY);
             Cell c = header.createCell(i + 2);
             c.setCellValue(d.toString());
-            // Weekend dates get a slightly different header shade
-            boolean wknd = (d.getDayOfWeek() == DayOfWeek.SATURDAY || d.getDayOfWeek() == DayOfWeek.SUNDAY);
             c.setCellStyle(wknd ? sf.weekendHeader() : sf.colHeader());
         }
 
         // ── Group by employee ──────────────────────────────────────────────
-        // Map: fullName → (date → TeamAttendance)
         Map<String, Map<LocalDate, TeamAttendance>> map = new LinkedHashMap<>();
         for (TeamAttendance ta : list) {
             map.putIfAbsent(ta.getFullName(), new LinkedHashMap<>());
             if (ta.getAttendanceDate() != null) {
-                map.get(ta.getFullName()).put(ta.getAttendanceDate().toLocalDate(), ta);
+                map.get(ta.getFullName())
+                   .put(ta.getAttendanceDate().toLocalDate(), ta);
             }
         }
 
         // ── Data rows ──────────────────────────────────────────────────────
-        int rowNum = 2;
-        boolean shade = false; // alternating employee band
+        int     rowNum = 2;
+        boolean shade  = false;
 
         for (String employee : map.keySet()) {
             shade = !shade;
@@ -164,16 +182,13 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
             inRow.setHeightInPoints(18);
             outRow.setHeightInPoints(18);
 
-            // Employee name cell — spans two rows via content (no merge needed)
             Cell empCell = inRow.createCell(0);
             empCell.setCellValue(employee);
             empCell.setCellStyle(sf.empName(shade));
 
-            // Blank below employee name
             Cell empCell2 = outRow.createCell(0);
             empCell2.setCellStyle(sf.empName(shade));
 
-            // Label cells
             Cell inLabel = inRow.createCell(1);
             inLabel.setCellValue("Punch In");
             inLabel.setCellStyle(sf.labelIn());
@@ -182,15 +197,14 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
             outLabel.setCellValue("Punch Out");
             outLabel.setCellStyle(sf.labelOut());
 
-            // Fill each day
             for (int i = 0; i < DAYS; i++) {
-                LocalDate d = startDate.plusDays(i);
-                boolean isWeekend = (d.getDayOfWeek() == DayOfWeek.SATURDAY
+                LocalDate d         = startDate.plusDays(i);
+                boolean   isWeekend = (d.getDayOfWeek() == DayOfWeek.SATURDAY
                         || d.getDayOfWeek() == DayOfWeek.SUNDAY);
 
                 TeamAttendance ta = map.get(employee).get(d);
 
-                // Dates after "today" (server clock): leave cells blank — not "Absent"
+                // Future dates — leave blank
                 if (d.isAfter(today)) {
                     Cell bIn  = inRow.createCell(i + 2);
                     Cell bOut = outRow.createCell(i + 2);
@@ -201,9 +215,9 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
                     continue;
                 }
 
-                if (isWeekend && (ta == null || !"On Leave".equalsIgnoreCase(
-                        ta.getStatus()))) {
-                    // Weekend — no data expected
+                // Weekend (unless on leave)
+                if (isWeekend && (ta == null
+                        || !"On Leave".equalsIgnoreCase(ta.getStatus()))) {
                     Cell wIn  = inRow.createCell(i + 2);
                     Cell wOut = outRow.createCell(i + 2);
                     wIn.setCellValue("Weekend");
@@ -213,8 +227,8 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
                     continue;
                 }
 
+                // No record → Absent
                 if (ta == null) {
-                    // Absent — no record
                     Cell aIn  = inRow.createCell(i + 2);
                     Cell aOut = outRow.createCell(i + 2);
                     aIn.setCellValue("Absent");
@@ -236,8 +250,8 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
                     continue;
                 }
 
+                // Record exists but no punch-in → Absent
                 if (ta.getPunchIn() == null) {
-                    // Has a record but no punch — treat as Absent
                     Cell aIn  = inRow.createCell(i + 2);
                     Cell aOut = outRow.createCell(i + 2);
                     aIn.setCellValue("Absent");
@@ -247,49 +261,47 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
                     continue;
                 }
 
-                // Present or Half Day
-                boolean halfDay = "Half Day".equalsIgnoreCase(status);
-                CellStyle presentInStyle  = halfDay ? sf.halfDay() : sf.presentTime();
-                CellStyle presentOutStyle = halfDay ? sf.halfDay() : sf.presentTime();
+                // Present / Half Day
+                boolean   halfDay   = "Half Day".equalsIgnoreCase(status);
+                CellStyle timeStyle = halfDay ? sf.halfDay() : sf.presentTime();
 
-                String inTime  = ta.getPunchIn()  != null
-                        ? ta.getPunchIn().toLocalDateTime().toLocalTime()
-                                .toString().substring(0, 5) : "";
+                String inTime = ta.getPunchIn().toLocalDateTime()
+                        .toLocalTime().toString().substring(0, 5);
                 String outTime = ta.getPunchOut() != null
-                        ? ta.getPunchOut().toLocalDateTime().toLocalTime()
-                                .toString().substring(0, 5) : "—";
+                        ? ta.getPunchOut().toLocalDateTime()
+                                .toLocalTime().toString().substring(0, 5)
+                        : (halfDay ? "Half Day" : "\u2014");
 
                 Cell cIn  = inRow.createCell(i + 2);
                 Cell cOut = outRow.createCell(i + 2);
                 cIn.setCellValue(inTime);
-                cOut.setCellValue(ta.getPunchOut() != null ? outTime : (halfDay ? "Half Day" : "—"));
-                cIn.setCellStyle(presentInStyle);
-                cOut.setCellStyle(presentOutStyle);
+                cOut.setCellValue(outTime);
+                cIn.setCellStyle(timeStyle);
+                cOut.setCellStyle(timeStyle);
             }
         }
 
         // ── Column widths ──────────────────────────────────────────────────
-        sheet.setColumnWidth(0, 6000); // Employee name
-        sheet.setColumnWidth(1, 3200); // Label
-        for (int i = 0; i < DAYS; i++) {
-            sheet.setColumnWidth(i + 2, 2800);
-        }
+        sheet.setColumnWidth(0, 6000);
+        sheet.setColumnWidth(1, 3200);
+        for (int i = 0; i < DAYS; i++) sheet.setColumnWidth(i + 2, 2800);
 
         // ── Legend sheet ───────────────────────────────────────────────────
         XSSFSheet legend = wb.createSheet("Legend");
         legend.setColumnWidth(0, 4000);
         legend.setColumnWidth(1, 8000);
         String[][] items = {
-            { "(blank)",  "Future date — not applicable yet" },
-            { "Present",  "Employee punched in ≥ 4 hrs" },
-            { "Half Day", "Employee worked < 4 hrs"     },
-            { "Absent",   "No attendance record"        },
-            { "On Leave", "Approved leave"              },
-            { "Weekend",  "Saturday or Sunday"          },
-            { "—",        "Punch-out not recorded yet"  },
+            { "(blank)",  "Future date \u2014 not applicable yet" },
+            { "Present",  "Employee punched in \u2265 4 hrs"     },
+            { "Half Day", "Employee worked < 4 hrs"              },
+            { "Absent",   "No attendance record"                 },
+            { "On Leave", "Approved leave"                       },
+            { "Weekend",  "Saturday or Sunday"                   },
+            { "\u2014",   "Punch-out not recorded yet"           },
         };
         CellStyle[] legendStyles = {
-            sf.neutral(), sf.presentTime(), sf.halfDay(), sf.absent(), sf.onLeave(), sf.weekend(), sf.presentTime()
+            sf.neutral(), sf.presentTime(), sf.halfDay(),
+            sf.absent(),  sf.onLeave(),     sf.weekend(), sf.presentTime()
         };
         Row lHeader = legend.createRow(0);
         lHeader.createCell(0).setCellValue("Status");
@@ -302,29 +314,38 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
             Cell lc = lr.createCell(0);
             lc.setCellValue(items[i][0]);
             lc.setCellStyle(legendStyles[i]);
-            Cell lm = lr.createCell(1);
-            lm.setCellValue(items[i][1]);
+            lr.createCell(1).setCellValue(items[i][1]);
         }
 
-        // ── Response ───────────────────────────────────────────────────────
+        // ── HTTP response ──────────────────────────────────────────────────
         response.setContentType(
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        String safeName = "team_attendance_" + startDate + "_to_" + endDate + ".xlsx";
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + safeName + "\"");
+
+        String safeName;
+        if (singleEmployeeId != null && !list.isEmpty()
+                && list.get(0).getFullName() != null) {
+            String empName = list.get(0).getFullName()
+                    .replaceAll("[^a-zA-Z0-9_\\-]", "_");
+            safeName = empName + "_attendance_"
+                    + startDate + "_to_" + endDate + ".xlsx";
+        } else {
+            safeName = "team_attendance_" + startDate + "_to_" + endDate + ".xlsx";
+        }
+        response.setHeader("Content-Disposition",
+                "attachment; filename=\"" + safeName + "\"");
+
         wb.write(response.getOutputStream());
         wb.close();
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // Inner style factory — keeps all POI style creation in one place
+    // Inner style factory
     // ══════════════════════════════════════════════════════════════════════
     private static class StyleFactory {
 
         private final XSSFWorkbook wb;
-
         StyleFactory(XSSFWorkbook wb) { this.wb = wb; }
 
-        // ── Helpers ───────────────────────────────────────────────────────
         private XSSFColor rgb(String argb) {
             return new XSSFColor(
                 new java.awt.Color(
@@ -364,15 +385,12 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
             s.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         }
 
-        // ── Public styles ─────────────────────────────────────────────────
-
         XSSFCellStyle title() {
             XSSFCellStyle s = wb.createCellStyle();
             fill(s, CLR_HEADER_BG);
             s.setAlignment(HorizontalAlignment.CENTER);
             s.setVerticalAlignment(VerticalAlignment.CENTER);
-            XSSFFont f = font(CLR_HEADER_FG, 14, true);
-            s.setFont(f);
+            s.setFont(font(CLR_HEADER_FG, 14, true));
             return s;
         }
 
@@ -385,7 +403,7 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
 
         XSSFCellStyle weekendHeader() {
             XSSFCellStyle s = base();
-            fill(s, "FF90A4AE"); // steel blue-grey
+            fill(s, "FF90A4AE");
             s.setFont(font("FFFFFFFF", 10, true));
             return s;
         }
@@ -447,7 +465,6 @@ public class ExportTeamAttendanceServlet extends HttpServlet {
             return s;
         }
 
-        /** Empty / future-day cells */
         XSSFCellStyle neutral() {
             XSSFCellStyle s = base();
             fill(s, "FFF8FAFC");

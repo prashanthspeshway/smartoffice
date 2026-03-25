@@ -45,18 +45,17 @@ public class TaskDAO {
         task.setAssignedBy(rs.getString("assigned_by"));
         task.setStatus(rs.getString("status"));
         task.setAssignedDate(rs.getTimestamp("assigned_date"));
-        try { task.setDeadline(rs.getDate("deadline")); }           catch (Exception ignore) {}
-        try { task.setPriority(rs.getString("priority")); }         catch (Exception ignore) {}
-        try { task.setAttachmentName(rs.getString("attachment_name")); } catch (Exception ignore) {}
+        try { task.setDeadline(rs.getDate("deadline")); }                            catch (Exception ignore) {}
+        try { task.setPriority(rs.getString("priority")); }                          catch (Exception ignore) {}
+        try { task.setAttachmentName(rs.getString("attachment_name")); }             catch (Exception ignore) {}
         try { task.setEmployeeAttachmentName(rs.getString("employee_attachment_name")); } catch (Exception ignore) {}
-        try { task.setEmployeeComment(rs.getString("employee_comment")); } catch (Exception ignore) {}
-        try { task.setSubmittedAt(rs.getTimestamp("submitted_at")); } catch (Exception ignore) {}
+        try { task.setEmployeeComment(rs.getString("employee_comment")); }           catch (Exception ignore) {}
+        try { task.setSubmittedAt(rs.getTimestamp("submitted_at")); }                catch (Exception ignore) {}
         return task;
     }
 
     // ─────────────────────────────────────────────────────────────
-    // NEW — Get a single task by ID (used by SubmitTaskUpdateServlet
-    //        to find assignedBy for notification routing)
+    // Get a single task by ID
     // ─────────────────────────────────────────────────────────────
     public static Task getTaskById(int taskId) {
         String sql = "SELECT * FROM tasks WHERE id = ?";
@@ -69,11 +68,13 @@ public class TaskDAO {
         return null;
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // Ownership checks
+    // ─────────────────────────────────────────────────────────────
+
     /** True if the session user (email or username) is the assignee of this task. */
     public static boolean taskBelongsToAssignee(Task task, String sessionEmailOrUsername) {
-        if (task == null || sessionEmailOrUsername == null) {
-            return false;
-        }
+        if (task == null || sessionEmailOrUsername == null) return false;
         try (Connection con = DBConnectionUtil.getConnection()) {
             String assigned = resolveDbUsername(con, task.getAssignedTo());
             String sessionU = resolveDbUsername(con, sessionEmailOrUsername);
@@ -86,12 +87,10 @@ public class TaskDAO {
 
     /** True if this manager (email or username) created/assigned the task. */
     public static boolean taskAssignedByManager(Task task, String managerEmailOrUsername) {
-        if (task == null || managerEmailOrUsername == null) {
-            return false;
-        }
+        if (task == null || managerEmailOrUsername == null) return false;
         try (Connection con = DBConnectionUtil.getConnection()) {
             String dbMgr = resolveDbUsername(con, managerEmailOrUsername);
-            String by = resolveDbUsername(con, task.getAssignedBy());
+            String by    = resolveDbUsername(con, task.getAssignedBy());
             return dbMgr != null && by != null && dbMgr.equalsIgnoreCase(by);
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,37 +98,32 @@ public class TaskDAO {
         }
     }
 
-    /** Manager sends task back to employee (can submit again). */
+    // ─────────────────────────────────────────────────────────────
+    // Manager sends task back to employee (can submit again)
+    // ─────────────────────────────────────────────────────────────
     public static void returnTaskForReview(int taskId) throws Exception {
         String sql = "UPDATE tasks SET status='ASSIGNED', submitted_at=NULL WHERE id=?";
         try (Connection con = DBConnectionUtil.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, taskId);
             ps.executeUpdate();
         }
     }
 
     // ─────────────────────────────────────────────────────────────
-    // NEW — Update task status + optional comment + optional file
-    //        (replaces submitEmployeeWork for the new servlet)
+    // Employee submits a request — task becomes PROCESSING
     // ─────────────────────────────────────────────────────────────
-    /**
-     * Employee submits a request (no status pick). Task becomes {@code PROCESSING} until the manager updates it.
-     */
     public static void submitEmployeeTaskRequest(int taskId, String comment, Part filePart) throws Exception {
         Task existing = getTaskById(taskId);
-        if (existing == null) {
-            throw new IllegalArgumentException("Task not found");
-        }
+        if (existing == null) throw new IllegalArgumentException("Task not found");
+
         String st = existing.getStatus();
         if (st != null) {
             st = st.trim();
-            if ("COMPLETED".equalsIgnoreCase(st)) {
+            if ("COMPLETED".equalsIgnoreCase(st))
                 throw new IllegalStateException("Task is already completed");
-            }
-            if ("PROCESSING".equalsIgnoreCase(st) || "SUBMITTED".equalsIgnoreCase(st)) {
+            if ("PROCESSING".equalsIgnoreCase(st) || "SUBMITTED".equalsIgnoreCase(st))
                 throw new IllegalStateException("Request is already being processed");
-            }
         }
 
         boolean hasFile = filePart != null && filePart.getSize() > 0
@@ -138,10 +132,9 @@ public class TaskDAO {
 
         if (hasFile) {
             String sql = "UPDATE tasks SET status='PROCESSING', employee_comment=?, "
-                    + "employee_attachment_name=?, employee_attachment=?, submitted_at=NOW() "
-                    + "WHERE id=?";
+                    + "employee_attachment_name=?, employee_attachment=?, submitted_at=NOW() WHERE id=?";
             try (Connection con = DBConnectionUtil.getConnection();
-                    PreparedStatement ps = con.prepareStatement(sql)) {
+                 PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setString(1, comment);
                 ps.setString(2, filePart.getSubmittedFileName());
                 ps.setBytes(3, filePart.getInputStream().readAllBytes());
@@ -151,7 +144,7 @@ public class TaskDAO {
         } else {
             String sql = "UPDATE tasks SET status='PROCESSING', employee_comment=?, submitted_at=NOW() WHERE id=?";
             try (Connection con = DBConnectionUtil.getConnection();
-                    PreparedStatement ps = con.prepareStatement(sql)) {
+                 PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setString(1, comment);
                 ps.setInt(2, taskId);
                 ps.executeUpdate();
@@ -159,6 +152,9 @@ public class TaskDAO {
         }
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // Update task status + optional comment + optional file
+    // ─────────────────────────────────────────────────────────────
     public static void updateTaskStatus(int taskId, String status, String comment, Part filePart)
             throws Exception {
 
@@ -167,10 +163,8 @@ public class TaskDAO {
                 && !filePart.getSubmittedFileName().isEmpty();
 
         if (hasFile) {
-            // Update status + comment + employee file
-            String sql = "UPDATE tasks SET status=?, employee_comment=?, " +
-                         "employee_attachment_name=?, employee_attachment=?, submitted_at=NOW() " +
-                         "WHERE id=?";
+            String sql = "UPDATE tasks SET status=?, employee_comment=?, "
+                    + "employee_attachment_name=?, employee_attachment=?, submitted_at=NOW() WHERE id=?";
             try (Connection con = DBConnectionUtil.getConnection();
                  PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setString(1, status);
@@ -181,7 +175,6 @@ public class TaskDAO {
                 ps.executeUpdate();
             }
         } else {
-            // Update status + comment only
             String sql = "UPDATE tasks SET status=?, employee_comment=? WHERE id=?";
             try (Connection con = DBConnectionUtil.getConnection();
                  PreparedStatement ps = con.prepareStatement(sql)) {
@@ -194,11 +187,15 @@ public class TaskDAO {
     }
 
     // ─────────────────────────────────────────────────────────────
-    // ASSIGN TASK — updated to also accept Task object
+    // ASSIGN TASK
     // ─────────────────────────────────────────────────────────────
 
-    /** Convenience overload — accepts a Task model object */
-    public static void assignTask(Task task) {
+    /**
+     * FIX: Convenience overload now correctly passes attachmentName from the
+     * Task model instead of hardcoding null. attachmentBytes are not stored
+     * on the model so they remain null (no regression).
+     */
+    public static void assignTask(Task task) throws Exception {
         assignTask(
             task.getAssignedTo(),
             task.getAssignedBy(),
@@ -206,55 +203,64 @@ public class TaskDAO {
             task.getDescription(),
             task.getDeadline(),
             task.getPriority(),
-            null,   // no attachment name
-            null    // no attachment bytes
+            task.getAttachmentName(), // FIX: was hardcoded null
+            null                      // bytes not held on model
         );
     }
 
-    /** Original full signature (used by existing JSP forms) */
+    /**
+     * FIX: PreparedStatement is now inside try-with-resources so it is always
+     * closed and the connection is never leaked.
+     * FIX: Exception is rethrown so the servlet can surface it to the user
+     * instead of silently swallowing it.
+     */
     public static void assignTask(String emp, String manager, String title, String desc,
                                   Date deadline, String priority,
-                                  String attachmentName, byte[] attachmentBytes) {
+                                  String attachmentName, byte[] attachmentBytes) throws Exception {
         try (Connection con = DBConnectionUtil.getConnection()) {
             String assignedToDb = resolveDbUsername(con, emp);
             String assignedByDb = resolveDbUsername(con, manager);
-            String sql = "INSERT INTO tasks (title, description, attachment_name, attachment, " +
-                         "assigned_to, assigned_by, status, deadline, priority) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, 'ASSIGNED', ?, ?)";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, title);
-            ps.setString(2, desc);
-            ps.setString(3, attachmentName);
-            if (attachmentBytes != null) ps.setBytes(4, attachmentBytes);
-            else ps.setNull(4, java.sql.Types.BLOB);
-            ps.setString(5, assignedToDb);
-            ps.setString(6, assignedByDb);
-            if (deadline != null) ps.setDate(7, deadline);
-            else ps.setNull(7, java.sql.Types.DATE);
-            ps.setString(8, priority);
-            ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+            String sql = "INSERT INTO tasks (title, description, attachment_name, attachment, "
+                    + "assigned_to, assigned_by, status, deadline, priority) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, 'ASSIGNED', ?, ?)";
+            // FIX: PreparedStatement is now in try-with-resources — no more resource leak
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, title);
+                ps.setString(2, desc);
+                ps.setString(3, attachmentName);
+                if (attachmentBytes != null) ps.setBytes(4, attachmentBytes);
+                else ps.setNull(4, java.sql.Types.BLOB);
+                ps.setString(5, assignedToDb);
+                ps.setString(6, assignedByDb);
+                if (deadline != null) ps.setDate(7, deadline);
+                else ps.setNull(7, java.sql.Types.DATE);
+                ps.setString(8, priority);
+                ps.executeUpdate();
+            }
+        }
+        // FIX: No catch block — exception propagates to servlet which handles
+        // it properly (logs it and redirects with an error message to the user).
     }
 
     // ─────────────────────────────────────────────────────────────
     // DELETE TASK
     // ─────────────────────────────────────────────────────────────
-    public static void deleteTask(int taskId) {
+    public static void deleteTask(int taskId) throws Exception {
         String sql = "DELETE FROM tasks WHERE id = ?";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, taskId);
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        }
     }
 
     // ─────────────────────────────────────────────────────────────
     // EMPLOYEE UPLOAD DOCUMENT (original method — kept intact)
     // ─────────────────────────────────────────────────────────────
     public static void submitEmployeeWork(int taskId, String attachmentName,
-                                          byte[] attachmentBytes, String comment) {
-        String sql = "UPDATE tasks SET employee_attachment_name=?, employee_attachment=?, " +
-                     "employee_comment=?, status='SUBMITTED' WHERE id=?";
+                                          byte[] attachmentBytes, String comment) throws Exception {
+        String sql = "UPDATE tasks SET employee_attachment_name=?, employee_attachment=?, "
+                + "employee_comment=?, status='SUBMITTED' WHERE id=?";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, attachmentName);
@@ -263,27 +269,27 @@ public class TaskDAO {
             ps.setString(3, comment);
             ps.setInt(4, taskId);
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        }
     }
 
     // ─────────────────────────────────────────────────────────────
     // ADMIN — get all tasks
     // ─────────────────────────────────────────────────────────────
-    public static List<Task> getAllTasks() {
+    public static List<Task> getAllTasks() throws Exception {
         List<Task> list = new ArrayList<>();
         String sql = "SELECT * FROM tasks ORDER BY id DESC";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(mapFullRow(rs));
-        } catch (Exception e) { e.printStackTrace(); }
+        }
         return list;
     }
 
     // ─────────────────────────────────────────────────────────────
     // EMPLOYEE — get own tasks
     // ─────────────────────────────────────────────────────────────
-    public static List<Task> getTasksForEmployee(String username) {
+    public static List<Task> getTasksForEmployee(String username) throws Exception {
         List<Task> list = new ArrayList<>();
         String sql = "SELECT * FROM tasks WHERE assigned_to=? ORDER BY id DESC";
         try (Connection con = DBConnectionUtil.getConnection();
@@ -291,14 +297,14 @@ public class TaskDAO {
             ps.setString(1, resolveDbUsername(con, username));
             ResultSet rs = ps.executeQuery();
             while (rs.next()) list.add(mapFullRow(rs));
-        } catch (Exception e) { e.printStackTrace(); }
+        }
         return list;
     }
 
     // ─────────────────────────────────────────────────────────────
     // MANAGER — get tasks they assigned to a specific employee
     // ─────────────────────────────────────────────────────────────
-    public static List<Task> getTasksAssignedByManager(String manager, String employee) {
+    public static List<Task> getTasksAssignedByManager(String manager, String employee) throws Exception {
         List<Task> list = new ArrayList<>();
         String sql = "SELECT * FROM tasks WHERE assigned_by=? AND assigned_to=? ORDER BY id DESC";
         try (Connection con = DBConnectionUtil.getConnection();
@@ -307,44 +313,47 @@ public class TaskDAO {
             ps.setString(2, resolveDbUsername(con, employee));
             ResultSet rs = ps.executeQuery();
             while (rs.next()) list.add(mapFullRow(rs));
-        } catch (Exception e) { e.printStackTrace(); }
+        }
         return list;
     }
 
     // ─────────────────────────────────────────────────────────────
     // UPDATE STATUS only
     // ─────────────────────────────────────────────────────────────
-    public static void updateStatus(int taskId, String status) {
+    public static void updateStatus(int taskId, String status) throws Exception {
         String sql = "UPDATE tasks SET status=? WHERE id=?";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, taskId);
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        }
     }
 
     // ─────────────────────────────────────────────────────────────
     // MARK COMPLETED
     // ─────────────────────────────────────────────────────────────
-    public static void markCompleted(int taskId) {
+    public static void markCompleted(int taskId) throws Exception {
         String sql = "UPDATE tasks SET status='COMPLETED' WHERE id=?";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, taskId);
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        }
     }
 
     // ─────────────────────────────────────────────────────────────
     // DELETE OLD COMPLETED TASKS
+    // FIX: Was deleting ALL completed tasks from any previous day.
+    //      Now uses a 30-day retention window so recent completions are kept.
     // ─────────────────────────────────────────────────────────────
-    public static void deleteOldCompletedTasks() {
-        String sql = "DELETE FROM tasks WHERE status='COMPLETED' AND assigned_date < CURDATE()";
+    public static void deleteOldCompletedTasks() throws Exception {
+        String sql = "DELETE FROM tasks WHERE status='COMPLETED' "
+                + "AND assigned_date < DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        }
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -366,9 +375,9 @@ public class TaskDAO {
     // CHECK IF EMPLOYEE BELONGS TO MANAGER
     // ─────────────────────────────────────────────────────────────
     public static boolean isEmployeeUnderManager(String employee, String manager) {
-        String sql = "SELECT 1 FROM teams t " +
-                     "JOIN team_members tm ON tm.team_id = t.id " +
-                     "WHERE t.manager_username=? AND tm.username=? LIMIT 1";
+        String sql = "SELECT 1 FROM teams t "
+                + "JOIN team_members tm ON tm.team_id = t.id "
+                + "WHERE t.manager_username=? AND tm.username=? LIMIT 1";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, manager);
@@ -381,12 +390,12 @@ public class TaskDAO {
     // ─────────────────────────────────────────────────────────────
     // GET EMPLOYEES UNDER MANAGER
     // ─────────────────────────────────────────────────────────────
-    public static List<User> getEmployeesUnderManager(String managerUsername) {
+    public static List<User> getEmployeesUnderManager(String managerUsername) throws Exception {
         List<User> list = new ArrayList<>();
-        String sql = "SELECT DISTINCT u.email, u.firstname, u.lastname, u.phone, u.status " +
-                     "FROM users u " +
-                     "JOIN team_members tm ON tm.username = u.email " +
-                     "JOIN teams t ON t.id = tm.team_id AND t.manager_username=?";
+        String sql = "SELECT DISTINCT u.email, u.firstname, u.lastname, u.phone, u.status "
+                + "FROM users u "
+                + "JOIN team_members tm ON tm.username = u.email "
+                + "JOIN teams t ON t.id = tm.team_id AND t.manager_username=?";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, managerUsername);
@@ -400,7 +409,7 @@ public class TaskDAO {
                 u.setStatus(rs.getString("status"));
                 list.add(u);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        }
         return list;
     }
 }
