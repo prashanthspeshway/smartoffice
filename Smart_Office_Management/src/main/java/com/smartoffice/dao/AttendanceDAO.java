@@ -59,8 +59,6 @@ public class AttendanceDAO {
 
     // ─────────────────────────────────────────────────────────────────────────
     // Fetch all APPROVED leave dates for a user.
-    // UPPER(status) makes this case-insensitive — works whether DB stores
-    // 'APPROVED', 'Approved', or 'approved'.
     // ─────────────────────────────────────────────────────────────────────────
     private List<LocalDate> getApprovedLeaveDates(String sessionValue) throws Exception {
         String usernameVal = getUsernameFromEmail(sessionValue);
@@ -84,9 +82,21 @@ public class AttendanceDAO {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // Check if a given date is a holiday in the DB.
+    // ─────────────────────────────────────────────────────────────────────────
+    private boolean isHolidayDate(LocalDate d) throws Exception {
+        String sql = "SELECT COUNT(*) FROM holidays WHERE holiday_date = ?";
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDate(1, java.sql.Date.valueOf(d));
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1) > 0;
+        }
+        return false;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Fill missing "On Leave" entries into an attendance log list.
-    // Any approved leave date not already in the list gets a synthetic entry.
-    // List is re-sorted descending by date afterward.
     // ─────────────────────────────────────────────────────────────────────────
     private void fillMissingLeaveDates(List<AttendanceLogEntry> list,
                                         String sessionValue) throws Exception {
@@ -130,6 +140,85 @@ public class AttendanceDAO {
                 list.add(e);
                 existing.add(leaveDate);
             }
+        }
+        sortDescending(list);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Fill missing "Absent" entries for working days that have no DB row.
+    // Skips: weekends, holidays, approved leave dates, and today/future.
+    // Looks back 60 days by default.
+    // ─────────────────────────────────────────────────────────────────────────
+    private void fillMissingAbsentDays(List<AttendanceLogEntry> list,
+                                        String sessionValue) throws Exception {
+        Set<LocalDate> existing = new HashSet<>();
+        for (AttendanceLogEntry e : list) {
+            if (e.getAttendanceDate() != null)
+                existing.add(e.getAttendanceDate().toLocalDate());
+        }
+
+        Set<LocalDate> leaveSet = new HashSet<>(getApprovedLeaveDates(sessionValue));
+
+        LocalDate today  = LocalDate.now();
+        LocalDate cutoff = today.minusDays(60);
+
+        for (LocalDate d = today.minusDays(1); !d.isBefore(cutoff); d = d.minusDays(1)) {
+            if (existing.contains(d)) continue;
+            if (leaveSet.contains(d)) continue;
+
+            // Skip weekends
+            java.time.DayOfWeek dow = d.getDayOfWeek();
+            if (dow == java.time.DayOfWeek.SATURDAY || dow == java.time.DayOfWeek.SUNDAY) continue;
+
+            // Skip holidays
+            if (isHolidayDate(d)) continue;
+
+            // It's a working day with no record — mark Absent
+            AttendanceLogEntry e = new AttendanceLogEntry();
+            e.setAttendanceDate(java.sql.Date.valueOf(d));
+            e.setPunchIn(null);
+            e.setPunchOut(null);
+            e.setStatus("Absent");
+            list.add(e);
+            existing.add(d);
+        }
+        sortDescending(list);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Same as fillMissingAbsentDays but restricted to [rangeStart, rangeEnd].
+    // ─────────────────────────────────────────────────────────────────────────
+    private void fillMissingAbsentDaysInRange(List<AttendanceLogEntry> list,
+                                               String sessionValue,
+                                               LocalDate rangeStart,
+                                               LocalDate rangeEnd) throws Exception {
+        Set<LocalDate> existing = new HashSet<>();
+        for (AttendanceLogEntry e : list) {
+            if (e.getAttendanceDate() != null)
+                existing.add(e.getAttendanceDate().toLocalDate());
+        }
+
+        Set<LocalDate> leaveSet = new HashSet<>(getApprovedLeaveDates(sessionValue));
+        LocalDate today = LocalDate.now();
+
+        for (LocalDate d = rangeStart; !d.isAfter(rangeEnd); d = d.plusDays(1)) {
+            // Don't mark today or future as absent
+            if (!d.isBefore(today)) continue;
+            if (existing.contains(d)) continue;
+            if (leaveSet.contains(d)) continue;
+
+            java.time.DayOfWeek dow = d.getDayOfWeek();
+            if (dow == java.time.DayOfWeek.SATURDAY || dow == java.time.DayOfWeek.SUNDAY) continue;
+
+            if (isHolidayDate(d)) continue;
+
+            AttendanceLogEntry e = new AttendanceLogEntry();
+            e.setAttendanceDate(java.sql.Date.valueOf(d));
+            e.setPunchIn(null);
+            e.setPunchOut(null);
+            e.setStatus("Absent");
+            list.add(e);
+            existing.add(d);
         }
         sortDescending(list);
     }
@@ -232,7 +321,7 @@ public class AttendanceDAO {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Punch In — status starts as "In Progress" until punch-out.
+    // Punch In
     // ─────────────────────────────────────────────────────────────────────────
     public void punchIn(String sessionValue) throws Exception {
         Date today = new Date(System.currentTimeMillis());
@@ -265,7 +354,7 @@ public class AttendanceDAO {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Punch Out — sets Present (>= 4 hrs) or Half Day (< 4 hrs).
+    // Punch Out
     // ─────────────────────────────────────────────────────────────────────────
     public void punchOut(String sessionValue) throws Exception {
         Date today = new Date(System.currentTimeMillis());
@@ -301,16 +390,6 @@ public class AttendanceDAO {
 
     // ─────────────────────────────────────────────────────────────────────────
     // END-OF-DAY SCHEDULED JOB
-    // Call this once daily (e.g. 11:59 PM via a Quartz/Timer servlet).
-    //
-    // 1. Auto-close any sessions still open from previous days.
-    // 2. Write "On Leave" rows for all users with an approved leave for yesterday.
-    // 3. Write "Absent" rows for every non-admin who has no row for yesterday,
-    //    is not on leave, and yesterday was not a weekend/holiday.
-    // 4. Recalculate Half Day / Present for yesterday's closed rows.
-    //
-    // After this runs every working day the attendance table has a row for
-    // every employee every working day — no silent gaps.
     // ─────────────────────────────────────────────────────────────────────────
     public void runEndOfDayJob() throws Exception {
         autoCloseMissedPunchOuts();
@@ -319,10 +398,6 @@ public class AttendanceDAO {
         recalculatePreviousDayStatuses();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Insert "On Leave" rows for every user whose approved leave covers
-    // yesterday and who has no attendance row yet for yesterday.
-    // ─────────────────────────────────────────────────────────────────────────
     public void markYesterdayApprovedLeaves() throws Exception {
         String aCol    = getAttendanceUserColumn();
         String userCol = "username".equals(aCol) ? "username" : "email";
@@ -348,19 +423,13 @@ public class AttendanceDAO {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Insert "Absent" for every non-admin who has no row for yesterday,
-    // is not on an approved leave, and yesterday was a working day.
-    // ─────────────────────────────────────────────────────────────────────────
     public void markDailyAbsentees() throws Exception {
-        // Skip weekends
         java.time.LocalDate yesterday = java.time.LocalDate.now().minusDays(1);
         java.time.DayOfWeek dow = yesterday.getDayOfWeek();
         if (dow == java.time.DayOfWeek.SATURDAY || dow == java.time.DayOfWeek.SUNDAY) {
             System.out.println("[AttendanceDAO] markDailyAbsentees: skipped (weekend).");
             return;
         }
-        // Skip public holidays
         String holidayCheck = "SELECT COUNT(*) FROM holidays WHERE holiday_date = CURDATE() - INTERVAL 1 DAY";
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(holidayCheck)) {
@@ -385,8 +454,8 @@ public class AttendanceDAO {
                 + " AND UPPER(lr.status) = 'APPROVED' "
                 + " AND (CURDATE() - INTERVAL 1 DAY) BETWEEN lr.from_date AND lr.to_date "
                 + "WHERE LOWER(TRIM(COALESCE(u.role,''))) != 'admin' "
-                + "  AND a.id IS NULL "     // no attendance row
-                + "  AND lr.id IS NULL "    // not on approved leave
+                + "  AND a.id IS NULL "
+                + "  AND lr.id IS NULL "
                 + "ON DUPLICATE KEY UPDATE "
                 + "  status = IF(status IS NULL OR status = '', 'Absent', status)";
 
@@ -397,10 +466,6 @@ public class AttendanceDAO {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Recalculate statuses for yesterday's rows that have both punch_in and
-    // punch_out recorded (Half Day < 4 hrs, Present >= 4 hrs).
-    // ─────────────────────────────────────────────────────────────────────────
     public void recalculatePreviousDayStatuses() throws Exception {
         String sql = "UPDATE attendance SET status = CASE "
                 + "WHEN punch_in IS NOT NULL AND punch_out IS NOT NULL "
@@ -596,12 +661,11 @@ public class AttendanceDAO {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Activity log — fills in missing "On Leave" dates from leave_requests.
+    // Activity log — fills in missing "On Leave" AND "Absent" dates.
     // ─────────────────────────────────────────────────────────────────────────
     public List<AttendanceLogEntry> getRecentAttendance(String sessionValue, int limit) throws Exception {
         String id  = resolveForAttendance(sessionValue);
         String col = getAttendanceUserColumn();
-        // No SQL LIMIT — apply after merging leave dates so nothing is clipped prematurely
         String sql = "SELECT punch_date, punch_in, punch_out, status FROM attendance WHERE "
                 + col + "=? ORDER BY punch_date DESC";
         List<AttendanceLogEntry> list = new ArrayList<>();
@@ -612,6 +676,7 @@ public class AttendanceDAO {
             while (rs.next()) list.add(buildLogEntry(rs));
         }
         fillMissingLeaveDates(list, sessionValue);
+        fillMissingAbsentDays(list, sessionValue);   // ← fills missing Absent days
         int maxRows = limit <= 0 ? 14 : limit;
         return list.size() > maxRows ? list.subList(0, maxRows) : list;
     }
@@ -634,6 +699,8 @@ public class AttendanceDAO {
         }
         fillMissingLeaveDatesInRange(list, sessionValue,
                 LocalDate.parse(fromDate), LocalDate.parse(toDate));
+        fillMissingAbsentDaysInRange(list, sessionValue,   // ← fills missing Absent days in range
+                LocalDate.parse(fromDate), LocalDate.parse(toDate));
         return list;
     }
 
@@ -650,6 +717,7 @@ public class AttendanceDAO {
             while (rs.next()) list.add(buildLogEntry(rs));
         }
         fillMissingLeaveDates(list, sessionValue);
+        fillMissingAbsentDays(list, sessionValue);   // ← fills missing Absent days
         return list;
     }
 
@@ -680,7 +748,6 @@ public class AttendanceDAO {
     }
 
     public void autoCloseMissedPunchOuts() throws Exception {
-        // Close open sessions from previous days; recalculate Half Day / Present
         String closeSql = "UPDATE attendance "
                 + "SET punch_out = TIMESTAMP(punch_date, '19:30:00'), "
                 + "    status    = CASE "
@@ -739,7 +806,6 @@ public class AttendanceDAO {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return "On Leave".equalsIgnoreCase(rs.getString("status"));
         }
-        // Also check live leave_requests (handles the case where the row doesn't exist yet)
         return isOnApprovedLeaveOn(sessionValue, new java.sql.Date(System.currentTimeMillis()));
     }
 

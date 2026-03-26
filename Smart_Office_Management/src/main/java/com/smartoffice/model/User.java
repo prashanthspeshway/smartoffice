@@ -7,6 +7,7 @@ public class User {
 	private String email;
 	private String firstname;
 	private String lastname;
+	private String teamName;
 	private String role;
 	private String status;
 	private String phone;
@@ -23,6 +24,14 @@ public class User {
 
 	public java.sql.Date getJoinedDate() {
 		return joinedDate;
+	}
+
+	public String getTeamName() {
+		return teamName;
+	}
+
+	public void setTeamName(String teamName) {
+		this.teamName = teamName;
 	}
 
 	public void setJoinedDate(java.sql.Date joinedDate) {
