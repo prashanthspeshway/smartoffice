@@ -8,12 +8,12 @@ import javax.servlet.http.*;
 import java.io.IOException;
 
 /*
- * POST /markNotificationRead?id={id}  -> mark single notification as read
- * POST /markNotificationRead?id=all   -> mark all notifications as read
+ * POST /deleteNotification?id={id}  -> delete single notification
+ * POST /deleteNotification?id=all   -> delete all READ notifications
  */
 
-@WebServlet("/markNotificationRead")
-public class MarkNotificationReadServlet extends HttpServlet {
+@WebServlet("/deleteNotification")
+public class DeleteNotificationServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
@@ -47,35 +47,34 @@ public class MarkNotificationReadServlet extends HttpServlet {
             return;
         }
 
-        /* ───── Get Notification ID ───── */
+        /* ───── Get Request Parameter ───── */
         String idParam = request.getParameter("id");
 
         if (idParam == null || idParam.trim().isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("Notification id required");
+            response.getWriter().write("Notification id is required");
             return;
         }
 
         try {
 
-            /* ───── Mark Read Logic ───── */
+            /* ───── Delete Logic ───── */
 
             if ("all".equalsIgnoreCase(idParam)) {
 
-                // Mark all notifications as read
-                dao.markAllAsRead(email);
+                // Delete all read notifications
+                dao.deleteAllReadNotifications(email);
 
             } else {
 
+                // Delete single notification
                 int notificationId = Integer.parseInt(idParam);
-
-                // Mark single notification as read
-                dao.markAsRead(notificationId, email);
+                dao.deleteNotification(notificationId, email);
 
             }
 
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("Notification marked as read");
+            response.getWriter().write("Notification deleted successfully");
 
         } catch (NumberFormatException e) {
 
@@ -85,9 +84,8 @@ public class MarkNotificationReadServlet extends HttpServlet {
         } catch (Exception e) {
 
             e.printStackTrace();
-
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("Server error");
+            response.getWriter().write("Error deleting notification");
 
         }
     }
