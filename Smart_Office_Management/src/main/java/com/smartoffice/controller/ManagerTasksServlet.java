@@ -3,6 +3,7 @@ package com.smartoffice.controller;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -39,26 +40,36 @@ public class ManagerTasksServlet extends HttpServlet {
             return;
         }
 
-        String username = (String) session.getAttribute("username");
+        String managerEmail = (String) session.getAttribute("username");
+
         try {
-            TaskDAO.deleteOldCompletedTasks();
-            List<User> teamList = UserDao.getUsersByManager(username);
+            // ── Load team members for the Assign form dropdown ──────────
+            List<User> teamList = UserDao.getUsersByManager(managerEmail);
             request.setAttribute("teamList", teamList);
 
-            String viewEmployee = request.getParameter("viewEmployee");
-            if (viewEmployee != null && !viewEmployee.isEmpty()) {
-                request.setAttribute("viewEmployee", viewEmployee);
-                request.setAttribute("viewTasks",
-                        TaskDAO.getTasksAssignedByManager(username, viewEmployee));
+            // ── Load ALL tasks assigned by this manager ──────────────────
+            // FIX: Try by session username (email) first; if empty, also try
+            //      by fullName session attribute so display-name stored tasks
+            //      are found even when the session stores an email address.
+            List<Task> allManagerTasks = TaskDAO.getAllTasksAssignedByManager(managerEmail);
+
+            if (allManagerTasks == null || allManagerTasks.isEmpty()) {
+                String fullName = (String) session.getAttribute("fullName");
+                if (fullName != null && !fullName.trim().isEmpty()) {
+                    List<Task> byName = TaskDAO.getAllTasksAssignedByManager(fullName.trim());
+                    if (byName != null && !byName.isEmpty()) {
+                        allManagerTasks = byName;
+                    }
+                }
             }
 
-            String assignEmployee = request.getParameter("assignEmployee");
-            if (assignEmployee != null && !assignEmployee.isEmpty()) {
-                request.setAttribute("assignEmployee", assignEmployee);
-            }
+            if (allManagerTasks == null) allManagerTasks = new ArrayList<>();
+            request.setAttribute("allManagerTasks", allManagerTasks);
+
         } catch (Exception e) {
             throw new ServletException("Error loading tasks data", e);
         }
+
         request.getRequestDispatcher("managerTasks.jsp").forward(request, response);
     }
 
@@ -82,47 +93,31 @@ public class ManagerTasksServlet extends HttpServlet {
 
         try {
 
-            // ── ASSIGN TASK — supports multiple employees ──────────────────
+            // ── ASSIGN TASK ────────────────────────────────────────────
             if ("assign".equals(action)) {
-
                 String[] assignedToList = request.getParameterValues("employeeUsername");
-
-                String title = request.getParameter("title");
-
-                // FIX: JSP textarea uses name="taskDesc" — reads correctly here
+                String title       = request.getParameter("title");
                 String description = request.getParameter("taskDesc");
-
-                String deadline  = request.getParameter("deadline");
-                String priority  = request.getParameter("priority");
+                String deadline    = request.getParameter("deadline");
+                String priority    = request.getParameter("priority");
                 if (priority == null || priority.isEmpty()) priority = "MEDIUM";
 
-                // Validate: at least one employee must be selected
                 if (assignedToList == null || assignedToList.length == 0) {
-                    response.sendRedirect(request.getContextPath()
-                            + "/managerTasks?error="
+                    response.sendRedirect(request.getContextPath() + "/managerTasks?error="
                             + URLEncoder.encode("Please select at least one employee.", StandardCharsets.UTF_8));
                     return;
                 }
-
-                // Validate title (mandatory)
                 if (title == null || title.trim().isEmpty()) {
-                    response.sendRedirect(request.getContextPath()
-                            + "/managerTasks?error="
+                    response.sendRedirect(request.getContextPath() + "/managerTasks?error="
                             + URLEncoder.encode("Task title is required.", StandardCharsets.UTF_8));
                     return;
                 }
-
-                // Validate description (mandatory)
-                // FIX: This guard now correctly runs before the DAO call,
-                //      so a null description never reaches the INSERT statement.
                 if (description == null || description.trim().isEmpty()) {
-                    response.sendRedirect(request.getContextPath()
-                            + "/managerTasks?error="
+                    response.sendRedirect(request.getContextPath() + "/managerTasks?error="
                             + URLEncoder.encode("Task description is required.", StandardCharsets.UTF_8));
                     return;
                 }
 
-                // Read attachment bytes ONCE — same bytes reused for every employee row
                 String attachmentName  = null;
                 byte[] attachmentBytes = null;
                 try {
@@ -137,51 +132,32 @@ public class ManagerTasksServlet extends HttpServlet {
 
                 java.sql.Date deadlineDate = null;
                 if (deadline != null && !deadline.isEmpty()) {
-                    try { deadlineDate = java.sql.Date.valueOf(deadline); }
-                    catch (Exception ignore) {}
+                    try { deadlineDate = java.sql.Date.valueOf(deadline); } catch (Exception ignore) {}
                 }
 
-                // ── Loop: one INSERT per selected employee ─────────────────
                 for (String assignedTo : assignedToList) {
                     if (assignedTo == null || assignedTo.trim().isEmpty()) continue;
+                    TaskDAO.assignTask(assignedTo.trim(), managerEmail, title.trim(),
+                            description.trim(), deadlineDate, priority,
+                            attachmentName, attachmentBytes);
 
-                    // FIX: assignTask now throws Exception (no more silent swallowing),
-                    //      so any DB error is caught by the outer try/catch and the
-                    //      manager sees a proper error message instead of a blank failure.
-                    TaskDAO.assignTask(
-                        assignedTo.trim(),
-                        managerEmail,
-                        title.trim(),
-                        description.trim(),
-                        deadlineDate,
-                        priority,
-                        attachmentName,
-                        attachmentBytes
-                    );
-
-                    // Notify each employee individually
-                    String empMsg = "New task from Manager " + managerName
-                            + ": \"" + title + "\""
+                    String empMsg = "New task from Manager " + managerName + ": \"" + title + "\""
                             + (deadline != null && !deadline.isEmpty() ? ". Deadline: " + deadline : "")
                             + " | Priority: " + priority;
-
                     NotificationService.notify(assignedTo.trim(), managerEmail,
                             NotificationService.TYPE_TASK, empMsg);
                 }
 
-                // Single admin notification summarising the bulk assign
-                NotificationService.notifyAllAdmins(managerEmail,
-                        NotificationService.TYPE_TASK,
+                NotificationService.notifyAllAdmins(managerEmail, NotificationService.TYPE_TASK,
                         "Manager " + managerName + " assigned task \"" + title
                         + "\" to " + assignedToList.length + " employee(s)");
 
-                response.sendRedirect(request.getContextPath()
-                        + "/managerTasks?success=Task+assigned+to+"
+                response.sendRedirect(request.getContextPath() + "/managerTasks?success=Task+assigned+to+"
                         + assignedToList.length + "+employee(s)");
                 return;
             }
 
-            // ── DELETE TASK ────────────────────────────────────────────────
+            // ── DELETE TASK ────────────────────────────────────────────
             if ("delete".equals(action)) {
                 int taskId = Integer.parseInt(request.getParameter("taskId"));
                 TaskDAO.deleteTask(taskId);
@@ -189,20 +165,16 @@ public class ManagerTasksServlet extends HttpServlet {
                 return;
             }
 
-            // ── UPDATE STATUS (review / completed) ────────────────────────
+            // ── UPDATE STATUS ──────────────────────────────────────────
             if ("updateStatus".equals(action)) {
-                int    taskId      = Integer.parseInt(request.getParameter("taskId"));
-                String decision    = request.getParameter("decision");
-                String viewEmployee = request.getParameter("viewEmployee");
-                String ctx         = request.getContextPath();
-                String veParam     = (viewEmployee != null && !viewEmployee.isEmpty())
-                        ? "&viewEmployee=" + URLEncoder.encode(viewEmployee, StandardCharsets.UTF_8)
-                        : "";
+                int    taskId   = Integer.parseInt(request.getParameter("taskId"));
+                String decision = request.getParameter("decision");
+                String ctx      = request.getContextPath();
 
                 Task task = TaskDAO.getTaskById(taskId);
                 if (task == null || !TaskDAO.taskAssignedByManager(task, managerEmail)) {
                     response.sendRedirect(ctx + "/managerTasks?error="
-                            + URLEncoder.encode("Invalid task", StandardCharsets.UTF_8) + veParam);
+                            + URLEncoder.encode("Invalid task", StandardCharsets.UTF_8));
                     return;
                 }
 
@@ -212,42 +184,40 @@ public class ManagerTasksServlet extends HttpServlet {
                 if ("review".equalsIgnoreCase(decision)) {
                     if (!processing) {
                         response.sendRedirect(ctx + "/managerTasks?error="
-                                + URLEncoder.encode("Review is only for tasks awaiting your review",
-                                        StandardCharsets.UTF_8) + veParam);
+                                + URLEncoder.encode("Review is only for tasks awaiting your review.", StandardCharsets.UTF_8));
                         return;
                     }
                     TaskDAO.returnTaskForReview(taskId);
                     String assigneeEmail = resolveAssigneeEmail(task);
                     if (assigneeEmail != null) {
-                        String title = task.getTitle() != null ? task.getTitle() : task.getDescription();
+                        String t2 = task.getTitle() != null ? task.getTitle() : task.getDescription();
                         NotificationService.notify(assigneeEmail, managerEmail,
                                 NotificationService.TYPE_TASK,
-                                "Manager " + managerName + " returned task \"" + title
-                                + "\" for you to update and resubmit.");
+                                "Manager " + managerName + " returned task \"" + t2 + "\" — please update and resubmit.");
                     }
-                    response.sendRedirect(ctx + "/managerTasks?taskFlash=review" + veParam);
+                    response.sendRedirect(ctx + "/managerTasks?taskFlash=review");
                     return;
                 }
 
                 if ("completed".equalsIgnoreCase(decision)) {
                     if ("COMPLETED".equalsIgnoreCase(st)) {
-                        response.sendRedirect(ctx + "/managerTasks?taskFlash=alreadyCompleted" + veParam);
+                        response.sendRedirect(ctx + "/managerTasks?taskFlash=alreadyCompleted");
                         return;
                     }
                     TaskDAO.markCompleted(taskId);
                     String assigneeEmail = resolveAssigneeEmail(task);
                     if (assigneeEmail != null) {
-                        String title = task.getTitle() != null ? task.getTitle() : task.getDescription();
+                        String t2 = task.getTitle() != null ? task.getTitle() : task.getDescription();
                         NotificationService.notify(assigneeEmail, managerEmail,
                                 NotificationService.TYPE_TASK,
-                                "Manager " + managerName + " marked task \"" + title + "\" as completed.");
+                                "Manager " + managerName + " marked task \"" + t2 + "\" as completed.");
                     }
-                    response.sendRedirect(ctx + "/managerTasks?taskFlash=completed" + veParam);
+                    response.sendRedirect(ctx + "/managerTasks?taskFlash=completed");
                     return;
                 }
 
                 response.sendRedirect(ctx + "/managerTasks?error="
-                        + URLEncoder.encode("Choose Review or Completed", StandardCharsets.UTF_8) + veParam);
+                        + URLEncoder.encode("Choose an action (Return / Completed).", StandardCharsets.UTF_8));
                 return;
             }
 

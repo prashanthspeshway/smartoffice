@@ -13,7 +13,9 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import com.smartoffice.dao.TaskDAO;
+import com.smartoffice.dao.TeamDAO;
 import com.smartoffice.model.Task;
+import com.smartoffice.model.Team;
 import com.smartoffice.service.NotificationService;
 
 @SuppressWarnings("serial")
@@ -36,10 +38,17 @@ public class AdminTasksServlet extends HttpServlet {
         }
 
         try {
+            // Pass ALL tasks (used by the JSP data island)
             List<Task> tasks = TaskDAO.getAllTasks();
             request.setAttribute("tasks", tasks);
+
+            // ── NEW: pass all teams with their members ──────────────
+            List<Team> teams = TeamDAO.getAllTeams();   // already loads members inside
+            request.setAttribute("teams", teams);
+            // ────────────────────────────────────────────────────────
+
         } catch (Exception e) {
-            throw new ServletException("Unable to load tasks", e);
+            throw new ServletException("Unable to load tasks / teams", e);
         }
         request.getRequestDispatcher("adminTasks.jsp").forward(request, response);
     }
@@ -66,7 +75,6 @@ public class AdminTasksServlet extends HttpServlet {
                 String deadline    = request.getParameter("deadline");
                 String priority    = request.getParameter("priority");
 
-                // Handle optional file attachment
                 String attachmentName  = null;
                 byte[] attachmentBytes = null;
                 try {
@@ -84,19 +92,11 @@ public class AdminTasksServlet extends HttpServlet {
                     deadlineDate = java.sql.Date.valueOf(deadline);
                 }
 
-                // Use the existing TaskDAO.assignTask signature exactly
                 TaskDAO.assignTask(
-                    assignedTo,
-                    adminEmail,
-                    title,
-                    description,
-                    deadlineDate,
-                    priority,
-                    attachmentName,
-                    attachmentBytes
+                    assignedTo, adminEmail, title, description,
+                    deadlineDate, priority, attachmentName, attachmentBytes
                 );
 
-                // ── NOTIFICATION: Notify the assigned employee ────────
                 String msg = "📋 New task assigned by Admin " + adminName +
                              ": \"" + title + "\"" +
                              (deadline != null && !deadline.isEmpty() ? ". Deadline: " + deadline : "") +
@@ -105,12 +105,10 @@ public class AdminTasksServlet extends HttpServlet {
                 NotificationService.notify(assignedTo, adminEmail,
                         NotificationService.TYPE_TASK, msg);
 
-                // Also notify the employee's direct manager
                 NotificationService.notifyManagerOf(assignedTo, adminEmail,
                         NotificationService.TYPE_TASK,
                         "📋 Admin " + adminName + " assigned task \"" + title +
                         "\" to " + assignedTo);
-                // ─────────────────────────────────────────────────────
 
                 response.sendRedirect(request.getContextPath() + "/adminTasks?success=Task assigned");
                 return;

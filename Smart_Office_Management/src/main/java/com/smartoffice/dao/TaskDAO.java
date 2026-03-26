@@ -91,7 +91,10 @@ public class TaskDAO {
         try (Connection con = DBConnectionUtil.getConnection()) {
             String dbMgr = resolveDbUsername(con, managerEmailOrUsername);
             String by    = resolveDbUsername(con, task.getAssignedBy());
-            return dbMgr != null && by != null && dbMgr.equalsIgnoreCase(by);
+            // FIX: also check raw value so email vs username mismatch is handled
+            return (dbMgr != null && by != null && dbMgr.equalsIgnoreCase(by))
+                || (managerEmailOrUsername.trim().equalsIgnoreCase(
+                        task.getAssignedBy() != null ? task.getAssignedBy().trim() : ""));
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -189,12 +192,6 @@ public class TaskDAO {
     // ─────────────────────────────────────────────────────────────
     // ASSIGN TASK
     // ─────────────────────────────────────────────────────────────
-
-    /**
-     * FIX: Convenience overload now correctly passes attachmentName from the
-     * Task model instead of hardcoding null. attachmentBytes are not stored
-     * on the model so they remain null (no regression).
-     */
     public static void assignTask(Task task) throws Exception {
         assignTask(
             task.getAssignedTo(),
@@ -203,17 +200,11 @@ public class TaskDAO {
             task.getDescription(),
             task.getDeadline(),
             task.getPriority(),
-            task.getAttachmentName(), // FIX: was hardcoded null
-            null                      // bytes not held on model
+            task.getAttachmentName(),
+            null
         );
     }
 
-    /**
-     * FIX: PreparedStatement is now inside try-with-resources so it is always
-     * closed and the connection is never leaked.
-     * FIX: Exception is rethrown so the servlet can surface it to the user
-     * instead of silently swallowing it.
-     */
     public static void assignTask(String emp, String manager, String title, String desc,
                                   Date deadline, String priority,
                                   String attachmentName, byte[] attachmentBytes) throws Exception {
@@ -223,7 +214,6 @@ public class TaskDAO {
             String sql = "INSERT INTO tasks (title, description, attachment_name, attachment, "
                     + "assigned_to, assigned_by, status, deadline, priority) "
                     + "VALUES (?, ?, ?, ?, ?, ?, 'ASSIGNED', ?, ?)";
-            // FIX: PreparedStatement is now in try-with-resources — no more resource leak
             try (PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setString(1, title);
                 ps.setString(2, desc);
@@ -238,8 +228,6 @@ public class TaskDAO {
                 ps.executeUpdate();
             }
         }
-        // FIX: No catch block — exception propagates to servlet which handles
-        // it properly (logs it and redirects with an error message to the user).
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -255,7 +243,7 @@ public class TaskDAO {
     }
 
     // ─────────────────────────────────────────────────────────────
-    // EMPLOYEE UPLOAD DOCUMENT (original method — kept intact)
+    // EMPLOYEE UPLOAD DOCUMENT
     // ─────────────────────────────────────────────────────────────
     public static void submitEmployeeWork(int taskId, String attachmentName,
                                           byte[] attachmentBytes, String comment) throws Exception {
@@ -343,9 +331,7 @@ public class TaskDAO {
     }
 
     // ─────────────────────────────────────────────────────────────
-    // DELETE OLD COMPLETED TASKS
-    // FIX: Was deleting ALL completed tasks from any previous day.
-    //      Now uses a 30-day retention window so recent completions are kept.
+    // DELETE OLD COMPLETED TASKS (30-day retention)
     // ─────────────────────────────────────────────────────────────
     public static void deleteOldCompletedTasks() throws Exception {
         String sql = "DELETE FROM tasks WHERE status='COMPLETED' "
@@ -409,6 +395,60 @@ public class TaskDAO {
                 u.setStatus(rs.getString("status"));
                 list.add(u);
             }
+        }
+        return list;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // GET ALL TASKS ASSIGNED BY MANAGER
+    // Returns ALL tasks (all time) assigned by this manager.
+    // Queries by BOTH raw session value AND resolved username so
+    // tasks are found regardless of which format was stored.
+    // Tasks assigned THIS WEEK always appear at the top, then the
+    // rest ordered by pending-review first, then newest first.
+    // ─────────────────────────────────────────────────────────────
+    public static List<Task> getAllTasksAssignedByManager(String managerEmailOrUsername) throws Exception {
+        List<Task> list = new ArrayList<>();
+        String sql = "SELECT * FROM tasks "
+                + "WHERE (assigned_by = ? OR assigned_by = ?) "
+                + "ORDER BY "
+                // This week's tasks always float to the top
+                + "  CASE WHEN assigned_date >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) THEN 0 ELSE 1 END ASC, "
+                // Within same week-group: pending review first
+                + "  CASE WHEN status IN ('PROCESSING','SUBMITTED') THEN 0 ELSE 1 END ASC, "
+                // Then newest first
+                + "  id DESC";
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            String resolved = resolveDbUsername(con, managerEmailOrUsername);
+            ps.setString(1, managerEmailOrUsername); // raw value (email as stored in session)
+            ps.setString(2, resolved);               // resolved username from users table
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapFullRow(rs));
+        }
+        return list;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // GET THIS WEEK'S TASKS ASSIGNED BY MANAGER
+    // Returns only tasks assigned_date >= start of current week
+    // (Monday). Used for the "This Week" filter tab.
+    // ─────────────────────────────────────────────────────────────
+    public static List<Task> getThisWeekTasksAssignedByManager(String managerEmailOrUsername) throws Exception {
+        List<Task> list = new ArrayList<>();
+        String sql = "SELECT * FROM tasks "
+                + "WHERE (assigned_by = ? OR assigned_by = ?) "
+                + "  AND assigned_date >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) "
+                + "ORDER BY "
+                + "  CASE WHEN status IN ('PROCESSING','SUBMITTED') THEN 0 ELSE 1 END ASC, "
+                + "  id DESC";
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            String resolved = resolveDbUsername(con, managerEmailOrUsername);
+            ps.setString(1, managerEmailOrUsername);
+            ps.setString(2, resolved);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapFullRow(rs));
         }
         return list;
     }
