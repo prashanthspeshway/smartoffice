@@ -72,7 +72,7 @@ public class AddUser extends HttpServlet {
             try {
                 joinedDate = Date.valueOf(joinedDateStr.trim());
             } catch (IllegalArgumentException ignored) {
-                // Invalid date format - leave as null
+               
             }
         }
 
@@ -95,7 +95,6 @@ public class AddUser extends HttpServlet {
             String roleNormalized = UserFieldUtil.normalizeRole(role);
             String designationVal = (roleNormalized != null && roleNormalized.equalsIgnoreCase("employee")) ? (designation != null && !designation.trim().isEmpty() ? designation.trim() : null) : null;
 
-            // Username = firstname + lastname (fallback to email if empty)
             String username = ((firstname != null ? firstname : "") + " " + (lastname != null ? lastname : "")).trim();
             if (username.isEmpty()) username = email;
 

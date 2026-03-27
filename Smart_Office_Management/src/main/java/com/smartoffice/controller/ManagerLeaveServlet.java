@@ -37,8 +37,7 @@ public class ManagerLeaveServlet extends HttpServlet {
 
 		try {
 			LeaveRequestDAO leaveDao = new LeaveRequestDAO();
-			
-			// Get manager's own leave requests (applied to admin)
+
 			List<LeaveRequest> myLeaves = leaveDao.getLeavesByUsername(username);
 			request.setAttribute("myLeaves", myLeaves);
 

@@ -13,79 +13,65 @@ import com.smartoffice.dao.PerformanceDAO;
 @SuppressWarnings("serial")
 @WebServlet("/submitPerformance")
 public class PerformanceServlet extends HttpServlet {
-	
+
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
-			throws ServletException, IOException {
-		
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
 		HttpSession session = req.getSession(false);
 		if (session == null || session.getAttribute("username") == null) {
 			resp.sendRedirect("index.html");
 			return;
 		}
-		
+
 		String manager = (String) session.getAttribute("username");
 		String role = (String) session.getAttribute("role");
-		
-		// Verify manager role
+
 		if (!"Manager".equalsIgnoreCase(role)) {
 			resp.sendRedirect("index.html?error=accessDenied");
 			return;
 		}
-		
-		// Get form parameters
+
 		String employee = req.getParameter("employee");
 		String rating = req.getParameter("rating");
-		
-		// Validation
-		if (employee == null || employee.trim().isEmpty() || 
-		    rating == null || rating.trim().isEmpty() || 
-		    manager == null) {
+
+		if (employee == null || employee.trim().isEmpty() || rating == null || rating.trim().isEmpty()
+				|| manager == null) {
 			resp.sendRedirect(req.getContextPath() + "/managerPerformance?error=Invalid");
 			return;
 		}
-		
-		// Validate rating values
-		if (!rating.equals("EXCELLENCE") && 
-		    !rating.equals("GOOD") && 
-		    !rating.equals("AVERAGE") && 
-		    !rating.equals("BELOW_AVERAGE")) {
+
+		if (!rating.equals("EXCELLENCE") && !rating.equals("GOOD") && !rating.equals("AVERAGE")
+				&& !rating.equals("BELOW_AVERAGE")) {
 			resp.sendRedirect(req.getContextPath() + "/managerPerformance?error=InvalidRating");
 			return;
 		}
-		
+
 		try {
-			// First day of current month
-			java.sql.Date performanceMonth = java.sql.Date.valueOf(
-				java.time.LocalDate.now().withDayOfMonth(1)
-			);
-			
+			java.sql.Date performanceMonth = java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1));
+
 			PerformanceDAO dao = new PerformanceDAO();
-			
-			// Check if performance already exists for this month
+
 			if (dao.performanceExists(employee, performanceMonth)) {
 				resp.sendRedirect(req.getContextPath() + "/managerPerformance?error=AlreadyRated");
 				return;
 			}
-			
-			// Save performance
+
 			boolean saved = dao.savePerformance(employee, manager, rating, performanceMonth);
-			
+
 			if (saved) {
 				resp.sendRedirect(req.getContextPath() + "/managerPerformance?success=PerformanceSaved");
 			} else {
 				resp.sendRedirect(req.getContextPath() + "/managerPerformance?error=SaveFailed");
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			resp.sendRedirect(req.getContextPath() + "/managerPerformance?error=SaveFailed");
 		}
 	}
-	
+
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
-			throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		doPost(req, resp);
 	}
 }

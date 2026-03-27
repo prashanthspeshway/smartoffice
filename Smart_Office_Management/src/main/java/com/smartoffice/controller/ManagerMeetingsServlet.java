@@ -42,15 +42,12 @@ public class ManagerMeetingsServlet extends HttpServlet {
 		try {
 			MeetingDao meetingDao = new MeetingDao();
 
-			// Get today's meetings
 			List<Meeting> todayMeetings = MeetingDao.getTodayMeetings(username);
 			request.setAttribute("todayMeetings", todayMeetings);
 
-			// Get all meetings for the manager
 			List<Meeting> allMeetings = meetingDao.getAllMeetingsForManager(username);
 			request.setAttribute("allMeetings", allMeetings);
 
-			// Get participants lists for scheduling meetings
 			List<User> employees = UserDao.getUsersByRole("employee");
 			List<User> managers = UserDao.getUsersByRole("manager");
 			List<User> users = UserDao.getAllUsers();

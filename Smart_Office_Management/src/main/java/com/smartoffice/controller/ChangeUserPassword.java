@@ -91,11 +91,11 @@ public class ChangeUserPassword extends HttpServlet {
         if (password == null) return false;
 
         return password.matches(
-                "^(?=.*[a-z])" +      // at least one lowercase
-                "(?=.*[A-Z])" +       // at least one uppercase
-                "(?=.*\\d)" +         // at least one number
-                "(?=.*[@$!%*?&])" +   // at least one special character
-                ".{8,}$"              // minimum 8 characters
+                "^(?=.*[a-z])" +      
+                "(?=.*[A-Z])" +       
+                "(?=.*\\d)" +        
+                "(?=.*[@$!%*?&])" +  
+                ".{8,}$"              
         );
     }
 }

@@ -62,20 +62,16 @@ public class AdminLeaveServlet extends HttpServlet {
                 int leaveId      = Integer.parseInt(request.getParameter("leaveId"));
                 String newStatus = "approve".equals(action) ? "APPROVED" : "REJECTED";
 
-                // Read optional rejection reason (only relevant for reject)
                 String rejectionReason = request.getParameter("rejectionReason");
                 if (rejectionReason != null) rejectionReason = rejectionReason.trim();
                 if ("approve".equals(action)) rejectionReason = null;
 
                 LeaveRequestDAO dao = new LeaveRequestDAO();
 
-                // Fetch leave BEFORE updating
                 LeaveRequest lr = dao.getLeaveById(leaveId);
 
-                // Update status + rejection reason in DB
                 dao.updateLeaveStatus(leaveId, newStatus, rejectionReason);
 
-                // ✅ If approved, mark attendance as 'On Leave' for each day in the range
                 if ("APPROVED".equals(newStatus) && lr != null
                         && lr.getFromDate() != null && lr.getToDate() != null) {
                     try {
@@ -87,7 +83,7 @@ public class AdminLeaveServlet extends HttpServlet {
                     }
                 }
 
-                // ── NOTIFICATION ──────────────────────────────────────
+                // NOTIFICATION 
                 if (lr != null) {
                     String empEmail = lr.getAppliedBy();
                     String emoji    = "APPROVED".equals(newStatus) ? "✅" : "❌";

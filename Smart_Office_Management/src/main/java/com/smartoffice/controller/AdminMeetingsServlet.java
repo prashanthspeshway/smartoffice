@@ -45,7 +45,6 @@ public class AdminMeetingsServlet extends HttpServlet {
         MeetingDao meetingDao = new MeetingDao();
 
         try {
-            // ✅ NEW: JSON endpoint for participants — called by fetch() in JSP
             if ("participants".equals(action)) {
                 resp.setContentType("application/json; charset=UTF-8");
                 int meetingId = Integer.parseInt(req.getParameter("id"));
@@ -66,12 +65,10 @@ public class AdminMeetingsServlet extends HttpServlet {
                 return;
             }
 
-            // Always load base data for the page
             List<Meeting> meetings = MeetingDao.getTodayMeetings(adminEmail);
             List<User>    users    = UserDao.getAllUsers();
             List<Team>    teams    = TeamDAO.getAllTeams();
 
-            // Patch participant count since getTodayMeetings() doesn't include it
             for (Meeting m : meetings) {
                 List<MeetingParticipant> mp = meetingDao.getMeetingParticipants(m.getId());
                 m.setParticipantCount(mp.size());
@@ -216,7 +213,6 @@ public class AdminMeetingsServlet extends HttpServlet {
         } catch (Exception e) { return dt != null ? dt : ""; }
     }
 
-    // ✅ NEW: Escapes special characters for safe JSON string output
     private String escapeJson(String s) {
         if (s == null) return "";
         return s.replace("\\", "\\\\")

@@ -46,7 +46,6 @@ public class AdminAttendanceServlet extends HttpServlet {
             int lateArrivals = 0;
             int absentCount  = 0;
 
-            // ✅ FIX: Zero out milliseconds to avoid threshold comparison errors
             Calendar lateCal = Calendar.getInstance();
             lateCal.set(Calendar.HOUR_OF_DAY, 11);
             lateCal.set(Calendar.MINUTE,       0);
@@ -70,27 +69,24 @@ public class AdminAttendanceServlet extends HttpServlet {
                 int secs = 0;
                 try {
                     secs = BreakDAO.getTodayTotalSeconds(email);
-                } catch (Exception e) { /* ignore */ }
+                } catch (Exception e) { }
                 row.setBreakDurationFormatted(formatBreakDuration(secs));
 
-                // ✅ FIX: Count attendance FIRST, independently of break status
                 if (row.getPunchIn() == null) {
                     absentCount++;
                 } else {
                     totalPresent++;
-                    // Late arrival check — not affected by break status
                     if (row.getPunchIn().getTime() > lateThresholdMs) {
                         lateArrivals++;
                     }
                 }
 
-                // ✅ FIX: ON BREAK check is separate — does not skip late arrival
                 try {
                     if (BreakDAO.isCurrentlyOnBreak(email)) {
                         row.setLiveStatus("ON BREAK");
                         onBreakCount++;
                     }
-                } catch (Exception e) { /* ignore */ }
+                } catch (Exception e) {  }
 
                 filteredRows.add(row);
             }

@@ -28,9 +28,7 @@ public class EditUser extends HttpServlet {
         return password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$");
     }
 
-    // =========================
-    // LOAD USER (GET)
-    // =========================
+   
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
@@ -67,9 +65,7 @@ public class EditUser extends HttpServlet {
         req.getRequestDispatcher("editUser.jsp").forward(req, res);
     }
 
-    // =========================
-    // UPDATE USER (POST)
-    // =========================
+   
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws IOException {
@@ -95,8 +91,7 @@ public class EditUser extends HttpServlet {
             joinedDate = Date.valueOf(joinedDateStr);
         }
 
-        // Username = firstname + lastname (fallback to email if empty)
-
+     
         try (Connection con = DBConnectionUtil.getConnection();
                 PreparedStatement ps = con.prepareStatement(
                         "UPDATE users SET role=?, status=?, firstname=?, lastname=?, designation=?, email=?, joinedDate=?, phone=? WHERE id=?")) {
@@ -119,7 +114,6 @@ public class EditUser extends HttpServlet {
             return;
         }
 
-        // Optional: admin sets a new password (employees and managers)
         if (newPassword != null && !newPassword.isBlank()) {
             if (confirmNewPassword == null || !newPassword.equals(confirmNewPassword)) {
                 req.getSession().setAttribute("editUserError", "New password and confirmation do not match.");

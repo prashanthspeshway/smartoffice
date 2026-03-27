@@ -15,19 +15,16 @@ import com.smartoffice.model.Task;
 @SuppressWarnings("serial")
 @WebServlet("/employeeDashboard")
 public class EmployeeDashboardServlet extends HttpServlet {
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 		String username = (String) req.getSession().getAttribute("username");
 		List<Task> tasks = null;
 		try {
 			tasks = TaskDAO.getTasksForEmployee(username);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
 		req.setAttribute("tasks", tasks);
 		req.getRequestDispatcher("user.jsp").forward(req, resp);
 	}

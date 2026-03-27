@@ -12,96 +12,69 @@ import javax.servlet.http.HttpSession;
 import com.smartoffice.dao.LeaveRequestDAO;
 import com.smartoffice.service.NotificationService;
 
-/**
- * Handles /applyLeave POST from:
- *   - userLeave.jsp   (employee applying)
- *   - managerLeave.jsp (manager applying their own leave)
- *
- * Fires notifications to manager + admins after successful submission.
- */
 @SuppressWarnings("serial")
 @WebServlet("/applyLeave")
 public class ApplyLeaveServlet extends HttpServlet {
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("username") == null) {
-            response.sendRedirect(request.getContextPath() + "/index.html");
-            return;
-        }
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("username") == null) {
+			response.sendRedirect(request.getContextPath() + "/index.html");
+			return;
+		}
 
-        // "username" session attribute holds the email in your app
-        String applicantEmail = (String) session.getAttribute("username");
-        String applicantName  = getDisplayName(session);
-        String role           = (String) session.getAttribute("role");
-        boolean isManager     = "Manager".equalsIgnoreCase(role);
+		String applicantEmail = (String) session.getAttribute("username");
+		String applicantName = getDisplayName(session);
+		String role = (String) session.getAttribute("role");
+		boolean isManager = "Manager".equalsIgnoreCase(role);
 
-        String leaveType = request.getParameter("leaveType");
-        String fromDate  = request.getParameter("fromDate");
-        String toDate    = request.getParameter("toDate");
-        String reason    = request.getParameter("reason");
+		String leaveType = request.getParameter("leaveType");
+		String fromDate = request.getParameter("fromDate");
+		String toDate = request.getParameter("toDate");
+		String reason = request.getParameter("reason");
 
-        // Determine redirect target based on role
-        String successRedirect = isManager
-                ? request.getContextPath() + "/managerLeave?success=LeaveApplied"
-                : request.getContextPath() + "/userLeave?success=LeaveApplied";
-        String errorRedirect = isManager
-                ? request.getContextPath() + "/managerLeave?error=MissingFields"
-                : request.getContextPath() + "/userLeave?error=MissingFields";
+		String successRedirect = isManager ? request.getContextPath() + "/managerLeave?success=LeaveApplied"
+				: request.getContextPath() + "/userLeave?success=LeaveApplied";
+		String errorRedirect = isManager ? request.getContextPath() + "/managerLeave?error=MissingFields"
+				: request.getContextPath() + "/userLeave?error=MissingFields";
 
-        if (leaveType == null || leaveType.isEmpty() ||
-            fromDate == null  || fromDate.isEmpty()  ||
-            toDate == null    || toDate.isEmpty()) {
-            response.sendRedirect(errorRedirect);
-            return;
-        }
+		if (leaveType == null || leaveType.isEmpty() || fromDate == null || fromDate.isEmpty() || toDate == null
+				|| toDate.isEmpty()) {
+			response.sendRedirect(errorRedirect);
+			return;
+		}
 
-        try {
-            // Save using existing DAO method signature exactly
-            new LeaveRequestDAO().applyLeave(
-                applicantEmail,
-                leaveType,
-                java.sql.Date.valueOf(fromDate),
-                java.sql.Date.valueOf(toDate),
-                reason
-            );
+		try {
+			new LeaveRequestDAO().applyLeave(applicantEmail, leaveType, java.sql.Date.valueOf(fromDate),
+					java.sql.Date.valueOf(toDate), reason);
 
-            // ── NOTIFICATIONS ─────────────────────────────────────────
-            String msg = "🏖️ " + applicantName + " applied for " + leaveType +
-                         " from " + fromDate + " to " + toDate +
-                         (reason != null && !reason.isEmpty() ? ". Reason: " + reason : "");
+			// ── NOTIFICATIONS ─
+			String msg = "🏖️ " + applicantName + " applied for " + leaveType + " from " + fromDate + " to " + toDate
+					+ (reason != null && !reason.isEmpty() ? ". Reason: " + reason : "");
 
-            if (isManager) {
-                // Manager applying → notify only admins
-                NotificationService.notifyAllAdmins(
-                        applicantEmail, NotificationService.TYPE_LEAVE, msg);
-            } else {
-                // Employee applying → notify their direct manager
-                NotificationService.notifyManagerOf(
-                        applicantEmail, applicantEmail,
-                        NotificationService.TYPE_LEAVE, msg);
+			if (isManager) {
+				NotificationService.notifyAllAdmins(applicantEmail, NotificationService.TYPE_LEAVE, msg);
+			} else {
+				NotificationService.notifyManagerOf(applicantEmail, applicantEmail, NotificationService.TYPE_LEAVE,
+						msg);
 
-                // Also notify all admins
-                NotificationService.notifyAllAdmins(
-                        applicantEmail, NotificationService.TYPE_LEAVE, msg);
-            }
-            // ─────────────────────────────────────────────────────────
+				NotificationService.notifyAllAdmins(applicantEmail, NotificationService.TYPE_LEAVE, msg);
+			}
+			
+			response.sendRedirect(successRedirect);
 
-            response.sendRedirect(successRedirect);
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.sendRedirect(isManager ? request.getContextPath() + "/managerLeave?error=ServerError"
+					: request.getContextPath() + "/userLeave?error=ServerError");
+		}
+	}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect(isManager
-                    ? request.getContextPath() + "/managerLeave?error=ServerError"
-                    : request.getContextPath() + "/userLeave?error=ServerError");
-        }
-    }
-
-    private String getDisplayName(HttpSession session) {
-        String fn = (String) session.getAttribute("fullName");
-        return (fn != null && !fn.isEmpty()) ? fn : (String) session.getAttribute("username");
-    }
+	private String getDisplayName(HttpSession session) {
+		String fn = (String) session.getAttribute("fullName");
+		return (fn != null && !fn.isEmpty()) ? fn : (String) session.getAttribute("username");
+	}
 }

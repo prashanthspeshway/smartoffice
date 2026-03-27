@@ -38,7 +38,7 @@ public class DeleteUser extends HttpServlet {
             e.printStackTrace();
         }
 
-        // 🔔 Redirect with toaster message flag
+        //  Redirect with toaster message flag
         if (success) {
             res.sendRedirect("viewUser?msg=deleted");
         } else {

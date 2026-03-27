@@ -38,15 +38,12 @@ public class AdminTasksServlet extends HttpServlet {
         }
 
         try {
-            // Pass ALL tasks (used by the JSP data island)
             List<Task> tasks = TaskDAO.getAllTasks();
             request.setAttribute("tasks", tasks);
 
-            // ── NEW: pass all teams with their members ──────────────
             List<Team> teams = TeamDAO.getAllTeams();   // already loads members inside
             request.setAttribute("teams", teams);
-            // ────────────────────────────────────────────────────────
-
+           
         } catch (Exception e) {
             throw new ServletException("Unable to load tasks / teams", e);
         }

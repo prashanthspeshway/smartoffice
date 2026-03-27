@@ -32,14 +32,12 @@ public class BreakServlet extends HttpServlet {
         try {
             AttendanceDAO attendanceDAO = new AttendanceDAO();
 
-            // ✅ GUARD 1: Block ALL break actions on holidays
             java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
             if (attendanceDAO.isHoliday(today)) {
                 redirectTo(response, request.getContextPath(), redirect, "error=HolidayBreak");
                 return;
             }
 
-            // ✅ GUARD 2: Block ALL break actions if employee is on leave
             if (attendanceDAO.isOnLeaveToday(email)) {
                 redirectTo(response, request.getContextPath(), redirect, "error=OnLeave");
                 return;
@@ -47,20 +45,17 @@ public class BreakServlet extends HttpServlet {
 
             if ("start".equalsIgnoreCase(action)) {
 
-                // ✅ GUARD 3: Cannot start a break if not punched in
                 java.sql.Date todayDate = new java.sql.Date(System.currentTimeMillis());
                 if (!attendanceDAO.hasPunchedIn(email, todayDate)) {
                     redirectTo(response, request.getContextPath(), redirect, "error=NotPunchedIn");
                     return;
                 }
 
-                // ✅ GUARD 4: Cannot start a break if already punched out
                 if (attendanceDAO.hasPunchedOut(email, todayDate)) {
                     redirectTo(response, request.getContextPath(), redirect, "error=AlreadyPunchedOut");
                     return;
                 }
 
-                // ✅ GUARD 5: Cannot start a break if already on break
                 if (BreakDAO.isCurrentlyOnBreak(email)) {
                     redirectTo(response, request.getContextPath(), redirect, "error=AlreadyOnBreak");
                     return;
@@ -70,7 +65,6 @@ public class BreakServlet extends HttpServlet {
 
             } else if ("end".equalsIgnoreCase(action)) {
 
-                // ✅ GUARD 6: Cannot end a break if not currently on break
                 if (!BreakDAO.isCurrentlyOnBreak(email)) {
                     redirectTo(response, request.getContextPath(), redirect, "error=NotOnBreak");
                     return;
@@ -83,7 +77,6 @@ public class BreakServlet extends HttpServlet {
             throw new ServletException("Error updating break status", e);
         }
 
-        // ✅ Redirect to attendance fragment only — never to full dashboard shell
         redirectTo(response, request.getContextPath(), redirect, "success=break" + action);
     }
 

@@ -34,11 +34,9 @@ public class ManagerSettingsServlet extends HttpServlet {
 		String username = (String) session.getAttribute("username");
 		
 		try {
-			// Get user profile information
 			User user = UserDao.getUserByEmail(username);
 			request.setAttribute("user", user);
 			
-			// Update session fullName if available
 			String fullName = user != null ? user.getFullname() : null;
 			if (fullName != null && !fullName.isEmpty()) {
 				session.setAttribute("fullName", fullName);

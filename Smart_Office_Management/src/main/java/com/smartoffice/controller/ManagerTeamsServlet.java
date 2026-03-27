@@ -36,7 +36,6 @@ public class ManagerTeamsServlet extends HttpServlet {
 		String username = (String) session.getAttribute("username");
 
 		try {
-			// Get teams assigned to this manager
 			List<Team> myTeams = TeamDAO.getTeamsByManager(username);
 			request.setAttribute("myTeams", myTeams);
 

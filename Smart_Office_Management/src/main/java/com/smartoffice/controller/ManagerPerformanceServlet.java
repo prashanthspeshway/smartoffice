@@ -36,7 +36,6 @@ public class ManagerPerformanceServlet extends HttpServlet {
 		String username = (String) session.getAttribute("username");
 
 		try {
-			// Get teams for performance matrix (3-step: Team → Member → Rate)
 			List<Team> myTeams = TeamDAO.getTeamsByManager(username);
 			request.setAttribute("myTeams", myTeams);
 

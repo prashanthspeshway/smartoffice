@@ -40,7 +40,7 @@ public class ManagerDashboardServlet extends HttpServlet {
 
 		String username = (String) session.getAttribute("username");
 
-		// ================= TAB HANDLING =================
+		// TAB HANDLING
 		String tab = request.getParameter("tab");
 		if (tab == null || tab.isEmpty()) {
 			tab = "attendance";
@@ -50,33 +50,32 @@ public class ManagerDashboardServlet extends HttpServlet {
 		try {
 			TaskDAO.deleteOldCompletedTasks();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		try {
 			AttendanceDAO attendanceDAO = new AttendanceDAO();
 
-			// ================= SELF ATTENDANCE =================
+			// SELF ATTENDANCE
 			ResultSet rs = attendanceDAO.getTodayAttendance(username);
 			if (rs != null && rs.next()) {
 				request.setAttribute("punchIn", rs.getTimestamp("punch_in"));
 				request.setAttribute("punchOut", rs.getTimestamp("punch_out"));
 			}
 
-			// ================= BREAK TIME =================
+			// BREAK TIME
 			request.setAttribute("breakTotalSeconds", BreakDAO.getTodayTotalSeconds(username));
 			request.setAttribute("breakLogs", BreakDAO.getTodayBreaks(username));
 			request.setAttribute("onBreak", BreakDAO.isCurrentlyOnBreak(username));
 
-			// ================= TODAY MEETINGS =================
+			// TODAY MEETINGS
 			List<Meeting> todayMeetings = MeetingDao.getTodayMeetings(username);
 			request.setAttribute("todayMeetings", todayMeetings);
 
 			List<User> teamList = UserDao.getUsersByManager(username);
 			request.setAttribute("teamList", teamList);
-			
-			// ================= PARTICIPANTS FOR SCHEDULE MEETING =================
+
+			// PARTICIPANTS FOR SCHEDULE MEETING
 
 			List<User> employees = UserDao.getUsersByRole("employee");
 			List<User> managers = UserDao.getUsersByRole("manager");
@@ -88,19 +87,16 @@ public class ManagerDashboardServlet extends HttpServlet {
 			request.setAttribute("users", users);
 			request.setAttribute("teams", teams);
 
-
-			// ================= TEAM ATTENDANCE =================
+			// TEAM ATTENDANCE
 			request.setAttribute("teamAttendance", attendanceDAO.getTeamAttendanceForToday(username));
 
-			// ================= LEAVE (manager's own leaves - apply to admin) =================
+			// LEAVE manager to admin and employee to manager
 			LeaveRequestDAO leaveDao = new LeaveRequestDAO();
 			request.setAttribute("myLeaves", leaveDao.getLeavesByUsername(username));
 
-			// ================= TEAMS (assigned to this manager) =================
 			List<Team> myTeams = TeamDAO.getTeamsByManager(username);
 			request.setAttribute("myTeams", myTeams);
 
-			// ================= ASSIGN / VIEW TASK =================
 			if ("assignTask".equals(tab)) {
 
 				String viewEmployee = request.getParameter("viewEmployee");
@@ -116,18 +112,16 @@ public class ManagerDashboardServlet extends HttpServlet {
 					request.setAttribute("assignTasks", TaskDAO.getTasksAssignedByManager(username, assignEmployee));
 				}
 			}
-			// ================= SELF PROFILE =================
 			User user = UserDao.getUserByEmail(username);
 			request.setAttribute("user", user);
 			String fn = user != null ? user.getFullname() : null;
-			if (fn != null && !fn.isEmpty()) request.getSession().setAttribute("fullName", fn);
+			if (fn != null && !fn.isEmpty())
+				request.getSession().setAttribute("fullName", fn);
 
-
-			/* ================= NOTIFICATIONS ================= */
 			NotificationReadsDAO nrDAO = new NotificationReadsDAO();
 			List<Notification> notifications = nrDAO.getUnreadNotifications(username);
 			request.setAttribute("notifications", notifications);
-			
+
 			MeetingDao dao = new MeetingDao();
 			String email = (String) session.getAttribute("username");
 

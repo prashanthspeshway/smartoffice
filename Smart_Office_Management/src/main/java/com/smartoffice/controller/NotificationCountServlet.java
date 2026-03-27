@@ -12,39 +12,36 @@ import javax.servlet.http.HttpSession;
 
 import com.smartoffice.dao.NotificationReadsDAO;
 
-/**
- * JSON unread count for dashboard notification badges (all roles).
- */
 @WebServlet("/notificationCount")
 @SuppressWarnings("serial")
 public class NotificationCountServlet extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        response.setContentType("application/json;charset=UTF-8");
-        response.setHeader("Cache-Control", "no-store");
+		HttpSession session = request.getSession(false);
+		response.setContentType("application/json;charset=UTF-8");
+		response.setHeader("Cache-Control", "no-store");
 
-        if (session == null || session.getAttribute("username") == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            try (PrintWriter w = response.getWriter()) {
-                w.write("{\"count\":0}");
-            }
-            return;
-        }
+		if (session == null || session.getAttribute("username") == null) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			try (PrintWriter w = response.getWriter()) {
+				w.write("{\"count\":0}");
+			}
+			return;
+		}
 
-        String email = (String) session.getAttribute("username");
-        int count = 0;
-        try {
-            count = new NotificationReadsDAO().getUnreadCount(email);
-        } catch (Exception e) {
-            // keep count 0
-        }
+		String email = (String) session.getAttribute("username");
+		int count = 0;
+		try {
+			count = new NotificationReadsDAO().getUnreadCount(email);
+		} catch (Exception e) {
 
-        try (PrintWriter w = response.getWriter()) {
-            w.write("{\"count\":" + count + "}");
-        }
-    }
+		}
+
+		try (PrintWriter w = response.getWriter()) {
+			w.write("{\"count\":" + count + "}");
+		}
+	}
 }

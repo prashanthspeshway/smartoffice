@@ -20,125 +20,124 @@ import com.smartoffice.utils.PasswordUtil;
 @WebServlet("/Login")
 public class LoginServlet extends HttpServlet {
 
-    private static String generateRememberToken() {
-        SecureRandom sr = new SecureRandom();
-        byte[] bytes = new byte[32];
-        sr.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
+	private static String generateRememberToken() {
+		SecureRandom sr = new SecureRandom();
+		byte[] bytes = new byte[32];
+		sr.nextBytes(bytes);
+		return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+	}
 
-    static boolean isStrongPassword(String password) {
-        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$";
-        return password != null && password.matches(regex);
-    }
+	static boolean isStrongPassword(String password) {
+		String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$";
+		return password != null && password.matches(regex);
+	}
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
-        String emailOrUsername = req.getParameter("email");
-        String password = req.getParameter("password");
+		String emailOrUsername = req.getParameter("email");
+		String password = req.getParameter("password");
 
-        if (!isStrongPassword(password)) {
-            AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=weakPassword");
-            return;
-        }
+		if (!isStrongPassword(password)) {
+			AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=weakPassword");
+			return;
+		}
 
-        try (Connection con = DBConnectionUtil.getConnection()) {
+		try (Connection con = DBConnectionUtil.getConnection()) {
 
-            String sql = "SELECT email,password,role,status,firstname,lastname FROM users WHERE email=?";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, emailOrUsername);
-            ResultSet rs = ps.executeQuery();
+			String sql = "SELECT email,password,role,status,firstname,lastname FROM users WHERE email=?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setString(1, emailOrUsername);
+			ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                String dbPassword = rs.getString("password");
-                String role = rs.getString("role");
-                String status = rs.getString("status");
-                String email = rs.getString("email");
+			if (rs.next()) {
+				String dbPassword = rs.getString("password");
+				String role = rs.getString("role");
+				String status = rs.getString("status");
+				String email = rs.getString("email");
 
-                if (!PasswordUtil.checkPassword(password, dbPassword)) {
-                    AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=invalid");
-                    return;
-                }
+				if (!PasswordUtil.checkPassword(password, dbPassword)) {
+					AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=invalid");
+					return;
+				}
 
-                if (!"active".equalsIgnoreCase(status)) {
-                    AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=inactive");
-                    return;
-                }
+				if (!"active".equalsIgnoreCase(status)) {
+					AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=inactive");
+					return;
+				}
 
-                String first = rs.getString("firstname");
-                String last = rs.getString("lastname");
-                String fullName = ((first != null ? first.trim() : "") + " " + (last != null ? last.trim() : "")).trim();
-                if (fullName.isEmpty()) fullName = email;
+				String first = rs.getString("firstname");
+				String last = rs.getString("lastname");
+				String fullName = ((first != null ? first.trim() : "") + " " + (last != null ? last.trim() : ""))
+						.trim();
+				if (fullName.isEmpty())
+					fullName = email;
 
-                // Invalidate any existing session so only one login is active per browser
-                HttpSession existingSession = req.getSession(false);
-                if (existingSession != null) {
-                    existingSession.invalidate();
-                }
+				// Invalidate any existing session so only one login is active per browser
+				HttpSession existingSession = req.getSession(false);
+				if (existingSession != null) {
+					existingSession.invalidate();
+				}
 
-                HttpSession session = req.getSession(true);
-                session.setAttribute("username", email);
-                session.setAttribute("email", email);
-                session.setAttribute("fullName", fullName);
-                session.setAttribute("role", role);
-                session.setAttribute("sessionToken", UUID.randomUUID().toString());
+				HttpSession session = req.getSession(true);
+				session.setAttribute("username", email);
+				session.setAttribute("email", email);
+				session.setAttribute("fullName", fullName);
+				session.setAttribute("role", role);
+				session.setAttribute("sessionToken", UUID.randomUUID().toString());
 
-                // Remember me: set cookie for persistent login (survives server restarts)
-                if ("on".equalsIgnoreCase(req.getParameter("remember")) || "true".equalsIgnoreCase(req.getParameter("remember"))) {
-                    try {
-                        String token = generateRememberToken();
-                        long expiresMs = System.currentTimeMillis() + (7L * 24 * 60 * 60 * 1000); // 7 days
-                        java.sql.Timestamp expiresAt = new java.sql.Timestamp(expiresMs);
-                        try (PreparedStatement ins = con.prepareStatement("INSERT INTO remember_tokens (token, email, expires_at) VALUES (?, ?, ?)")) {
-                            ins.setString(1, token);
-                            ins.setString(2, email);
-                            ins.setTimestamp(3, expiresAt);
-                            ins.executeUpdate();
-                        }
-                        Cookie c = new Cookie("remember_token", token);
-                        c.setMaxAge(7 * 24 * 60 * 60); // 7 days
-                        c.setPath(req.getContextPath().isEmpty() ? "/" : req.getContextPath());
-                        c.setHttpOnly(true);
-                        res.addCookie(c);
-                    } catch (Exception e) {
-                        e.printStackTrace(); // remember_tokens table may not exist; continue without
-                    }
-                }
+				// Remember me: set cookie for persistent login (survives server restarts)
+				if ("on".equalsIgnoreCase(req.getParameter("remember"))
+						|| "true".equalsIgnoreCase(req.getParameter("remember"))) {
+					try {
+						String token = generateRememberToken();
+						long expiresMs = System.currentTimeMillis() + (7L * 24 * 60 * 60 * 1000); // 7 days
+						java.sql.Timestamp expiresAt = new java.sql.Timestamp(expiresMs);
+						try (PreparedStatement ins = con.prepareStatement(
+								"INSERT INTO remember_tokens (token, email, expires_at) VALUES (?, ?, ?)")) {
+							ins.setString(1, token);
+							ins.setString(2, email);
+							ins.setTimestamp(3, expiresAt);
+							ins.executeUpdate();
+						}
+						Cookie c = new Cookie("remember_token", token);
+						c.setMaxAge(7 * 24 * 60 * 60); // 7 days
+						c.setPath(req.getContextPath().isEmpty() ? "/" : req.getContextPath());
+						c.setHttpOnly(true);
+						res.addCookie(c);
+					} catch (Exception e) {
+						e.printStackTrace(); // remember_tokens table may not exist; continue without
+					}
+				}
 
-                // ✅ FIXED: Updated routing to new dashboard files
-                switch (role.toLowerCase()) {
-                    case "user":
-                    case "employee":
-                    case "security":
-                        AuthRedirectUtil.sendTopWindowRedirect(req, res, "/user?success=Login");
-                        break;
-                    case "manager":
-                        // ✅ CHANGED: Now redirects to managerDashboard.jsp instead of manager servlet
-                        AuthRedirectUtil.sendTopWindowRedirect(req, res, "/managerDashboard.jsp?success=Login");
-                        break;
-                    case "admin":
-                        // ✅ CHANGED: Now redirects to adminDashboard.jsp instead of admin.jsp
-                        AuthRedirectUtil.sendTopWindowRedirect(req, res, "/admin.jsp?success=Login");
-                        break;
-                    default:
-                        AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=invalidRole");
-                }
+				switch (role.toLowerCase()) {
+				case "user":
+				case "employee":
+				case "security":
+					AuthRedirectUtil.sendTopWindowRedirect(req, res, "/user?success=Login");
+					break;
+				case "manager":
+					AuthRedirectUtil.sendTopWindowRedirect(req, res, "/managerDashboard.jsp?success=Login");
+					break;
+				case "admin":
+					AuthRedirectUtil.sendTopWindowRedirect(req, res, "/admin.jsp?success=Login");
+					break;
+				default:
+					AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=invalidRole");
+				}
 
-            } else {
-                AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=invalid");
-            }
+			} else {
+				AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=invalid");
+			}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=server");
-        }
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			AuthRedirectUtil.sendTopWindowRedirect(req, res, "/index.html?error=server");
+		}
+	}
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
-        doPost(req, res);
-    }
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		doPost(req, res);
+	}
 }
