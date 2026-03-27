@@ -5,18 +5,10 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Redirects that must apply to the top-level window (e.g. after login POST or when
- * the login page was shown inside a dashboard iframe).
- */
 public final class AuthRedirectUtil {
 
     private AuthRedirectUtil() {}
 
-    /**
-     * @param pathWithOptionalQuery path under the webapp root, e.g. {@code /index.html} or
-     *                              {@code /user?success=Login}
-     */
     public static void sendTopWindowRedirect(HttpServletRequest request, HttpServletResponse response,
             String pathWithOptionalQuery) throws IOException {
         String ctx = request.getContextPath();

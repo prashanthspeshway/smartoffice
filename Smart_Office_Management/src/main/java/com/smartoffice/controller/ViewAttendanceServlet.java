@@ -22,14 +22,6 @@ import javax.servlet.http.HttpSession;
 import com.smartoffice.dao.AttendanceDAO;
 import com.smartoffice.model.TeamAttendance;
 
-/**
- * Opens an attendance report as a styled HTML page in the browser.
- *
- * URL patterns
- * ─────────────────────────────────────────────────────────
- *  All employees  : GET /viewAttendance?start=YYYY-MM-DD&end=YYYY-MM-DD
- *  Single employee: GET /viewAttendance?start=…&end=…&employeeId=42
- */
 @SuppressWarnings("serial")
 @WebServlet("/viewAttendance")
 public class ViewAttendanceServlet extends HttpServlet {
@@ -38,7 +30,6 @@ public class ViewAttendanceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        /* ── Auth ───────────────────────────────────────────────────────── */
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
             response.sendRedirect(request.getContextPath() + "/index.html");
@@ -48,7 +39,6 @@ public class ViewAttendanceServlet extends HttpServlet {
         String manager = (String) session.getAttribute("username");
         String role    = (String) session.getAttribute("role");
 
-        /* ── Date range ─────────────────────────────────────────────────── */
         LocalDate today = LocalDate.now();
         String startParam = request.getParameter("start");
         String endParam   = request.getParameter("end");
@@ -76,7 +66,6 @@ public class ViewAttendanceServlet extends HttpServlet {
             return;
         }
 
-        /* ── Optional single-employee filter ────────────────────────────── */
         String empIdParam = request.getParameter("employeeId");
         Integer singleEmpId = null;
         if (empIdParam != null && !empIdParam.isBlank()) {
@@ -88,7 +77,6 @@ public class ViewAttendanceServlet extends HttpServlet {
             }
         }
 
-        /* ── Fetch data ──────────────────────────────────────────────────── */
         AttendanceDAO dao = new AttendanceDAO();
         List<TeamAttendance> list;
         try {
@@ -105,8 +93,6 @@ public class ViewAttendanceServlet extends HttpServlet {
 
         int totalDays = (int) ChronoUnit.DAYS.between(startDate, endDate) + 1;
 
-        /* ── Group rows by employee name ────────────────────────────────── */
-        // employee name → ( date → record )
         Map<String, Map<LocalDate, TeamAttendance>> byEmployee = new LinkedHashMap<>();
         for (TeamAttendance ta : list) {
             String emp = ta.getFullName() != null ? ta.getFullName() : "(Unknown)";
@@ -116,7 +102,6 @@ public class ViewAttendanceServlet extends HttpServlet {
             }
         }
 
-        /* ── Page title ─────────────────────────────────────────────────── */
         String pageTitle;
         if (singleEmpId != null && !byEmployee.isEmpty()) {
             pageTitle = byEmployee.keySet().iterator().next()
@@ -126,10 +111,7 @@ public class ViewAttendanceServlet extends HttpServlet {
         }
         String rangeLabel = startDate + " — " + endDate;
 
-        /* ── Compute per-employee summary stats ─────────────────────────── */
-        // We'll compute inside the HTML loop; just need the structure.
 
-        /* ── Write HTML ─────────────────────────────────────────────────── */
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
@@ -149,7 +131,6 @@ public class ViewAttendanceServlet extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
 
-        /* ── Top bar ── */
         out.println("<div class='topbar'>");
         out.println("  <div class='topbar-inner'>");
         out.println("    <div class='topbar-left'>");
@@ -158,7 +139,6 @@ public class ViewAttendanceServlet extends HttpServlet {
         out.println("      <span class='range-badge'><i class='fa-regular fa-calendar'></i> " + esc(rangeLabel) + "</span>");
         out.println("    </div>");
         out.println("    <div class='topbar-right'>");
-        // Build download URL for same params
         String dlParams = "start=" + startDate + "&end=" + endDate
                 + (singleEmpId != null ? "&employeeId=" + singleEmpId : "");
         out.println("      <a href='" + request.getContextPath() + "/exportTeamAttendance?" + dlParams
@@ -178,7 +158,6 @@ public class ViewAttendanceServlet extends HttpServlet {
             out.println("</div>");
         } else {
 
-            /* ── Legend ── */
             out.println("<div class='legend'>");
             out.println("  <span class='leg-title'>Legend:</span>");
             out.println("  <span class='leg present'>Present</span>");
@@ -189,12 +168,10 @@ public class ViewAttendanceServlet extends HttpServlet {
             out.println("  <span class='leg future'>Future</span>");
             out.println("</div>");
 
-            /* ── One card per employee ── */
             for (Map.Entry<String, Map<LocalDate, TeamAttendance>> empEntry : byEmployee.entrySet()) {
                 String empName     = empEntry.getKey();
                 Map<LocalDate, TeamAttendance> dayMap = empEntry.getValue();
 
-                // Compute summary
                 int presentDays = 0, halfDays = 0, absentDays = 0,
                     leaveDays = 0, weekendDays = 0;
 
@@ -220,7 +197,6 @@ public class ViewAttendanceServlet extends HttpServlet {
                     }
                 }
 
-                // Initials
                 String[] nameParts = empName.trim().split("\\s+");
                 String initials;
                 if (nameParts.length >= 2) {
@@ -234,7 +210,6 @@ public class ViewAttendanceServlet extends HttpServlet {
 
                 out.println("<div class='emp-card'>");
 
-                /* Card header */
                 out.println("  <div class='card-header'>");
                 out.println("    <div class='avatar'>" + esc(initials) + "</div>");
                 out.println("    <div class='card-header-info'>");
@@ -248,7 +223,6 @@ public class ViewAttendanceServlet extends HttpServlet {
                 out.println("    </div>");
                 out.println("  </div>"); // .card-header
 
-                /* Calendar grid */
                 out.println("  <div class='cal-grid'>");
 
                 for (int i = 0; i < totalDays; i++) {
@@ -262,7 +236,6 @@ public class ViewAttendanceServlet extends HttpServlet {
                     String status = (ta != null && ta.getStatus() != null)
                             ? ta.getStatus().trim() : "";
 
-                    // Determine cell class
                     String cellClass;
                     String inTime  = null;
                     String outTime = null;
@@ -312,17 +285,16 @@ public class ViewAttendanceServlet extends HttpServlet {
                         out.println("      <div class='day-label'>" + esc(label) + "</div>");
                     }
 
-                    out.println("    </div>"); // .day-cell
+                    out.println("    </div>");
                 }
 
-                out.println("  </div>"); // .cal-grid
-                out.println("</div>"); // .emp-card
+                out.println("  </div>");
+                out.println("</div>"); 
             }
         }
 
-        out.println("</div>"); // .page-wrap
+        out.println("</div>");
 
-        /* ── Footer ── */
         out.println("<div class='footer'>Generated by Smart Office HRMS &nbsp;•&nbsp; "
                 + java.time.LocalDateTime.now().toString().replace("T", " ").substring(0, 16)
                 + "</div>");
@@ -330,7 +302,6 @@ public class ViewAttendanceServlet extends HttpServlet {
         out.println("</body></html>");
     }
 
-    /* ── HTML escaping helper ── */
     private static String esc(String s) {
         if (s == null) return "";
         return s.replace("&", "&amp;")
@@ -339,15 +310,11 @@ public class ViewAttendanceServlet extends HttpServlet {
                 .replace("\"", "&quot;");
     }
 
-    /* ══════════════════════════════════════════════════════════════════════
-       Embedded CSS
-    ════════════════════════════════════════════════════════════════════════ */
     private static final String CSS =
         "*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }" +
         "body { font-family: 'Geist', system-ui, sans-serif;" +
         "       background: #f1f5f9; color: #334155; min-height: 100vh; }" +
 
-        /* ── Top bar ── */
         ".topbar { background: #3f51b5; color: #fff; padding: 0;" +
         "          box-shadow: 0 2px 8px rgba(0,0,0,.2); position: sticky; top:0; z-index:100; }" +
         ".topbar-inner { max-width: 1400px; margin: 0 auto;" +
@@ -369,10 +336,8 @@ public class ViewAttendanceServlet extends HttpServlet {
         ".btn-print { background: rgba(255,255,255,.18); color: #fff; }" +
         ".btn-dl:hover, .btn-print:hover { opacity: .85; }" +
 
-        /* ── Page wrap ── */
         ".page-wrap { max-width: 1400px; margin: 0 auto; padding: 24px; }" +
 
-        /* ── Legend ── */
         ".legend { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;" +
         "          margin-bottom: 20px; background: #fff; padding: 12px 18px;" +
         "          border-radius: 10px; border: 1px solid #e2e8f0;" +
@@ -387,7 +352,6 @@ public class ViewAttendanceServlet extends HttpServlet {
         ".leg.weekend  { background: #e2e8f0; color: #475569; }" +
         ".leg.future   { background: #f8fafc; color: #94a3b8; border: 1px dashed #cbd5e1; }" +
 
-        /* ── Employee card ── */
         ".emp-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;" +
         "            box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 24px;" +
         "            overflow: hidden; }" +
@@ -411,7 +375,6 @@ public class ViewAttendanceServlet extends HttpServlet {
         ".c-absent  { background: #fee2e2; color: #991b1b; }" +
         ".c-leave   { background: #e9d5ff; color: #5b21b6; }" +
 
-        /* ── Calendar grid ── */
         ".cal-grid { display: flex; flex-wrap: wrap; gap: 6px; padding: 18px 22px; }" +
 
         ".day-cell { width: 76px; min-height: 90px; border-radius: 10px;" +
@@ -447,15 +410,12 @@ public class ViewAttendanceServlet extends HttpServlet {
         ".punch.in  { color: #166534; }" +
         ".punch.out { color: #1e40af; }" +
 
-        /* ── Empty state ── */
         ".empty-state { text-align: center; padding: 80px 20px; color: #94a3b8; }" +
         ".empty-state i { font-size: 3rem; margin-bottom: 16px; display: block; }" +
         ".empty-state p { font-size: 1rem; }" +
 
-        /* ── Footer ── */
         ".footer { text-align: center; padding: 20px; font-size: .75rem; color: #94a3b8; }" +
 
-        /* ── Print ── */
         "@media print {" +
         "  .topbar { position: static; }" +
         "  .btn-dl, .btn-print { display: none; }" +

@@ -11,11 +11,10 @@ public class Notification implements Serializable {
     private String recipientEmail;
     private String message;
     private String createdBy;
-    private String type;      // TASK, MEETING, LEAVE, GENERAL
-    private boolean read;     // renamed from isRead
+    private String type;
+    private boolean read;
     private Timestamp createdAt;
 
-    // ── Constructors ─────────────────────────────
 
     public Notification() {}
 
@@ -31,7 +30,6 @@ public class Notification implements Serializable {
         this.createdAt = createdAt;
     }
 
-    // ── Getters & Setters ─────────────────────────
 
     public int getId() {
         return id;
@@ -88,8 +86,6 @@ public class Notification implements Serializable {
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
-
-    // ── Debug Helper ──────────────────────────────
 
     @Override
     public String toString() {

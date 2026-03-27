@@ -26,7 +26,6 @@ public class ViewMeetingsServlet extends HttpServlet {
 
 		List<Meeting> meetings = new ArrayList<>();
 
-		// logged-in employee username
 		String username = (String) request.getSession().getAttribute("username");
 
 		if (username == null) {
@@ -34,7 +33,6 @@ public class ViewMeetingsServlet extends HttpServlet {
 			return;
 		}
 
-		// Get meetings created by this employee's team manager(s)
 		String sql = """
 				SELECT *
 				FROM meetings

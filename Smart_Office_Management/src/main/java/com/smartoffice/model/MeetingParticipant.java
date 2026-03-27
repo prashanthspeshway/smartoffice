@@ -9,6 +9,7 @@ public class MeetingParticipant {
 	private String designation;
 
 	public MeetingParticipant() {
+
 	}
 
 	public int getId() {

@@ -32,7 +32,6 @@ public class UpdateTaskStatusServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		// Full shell lives at /user; iframe must not navigate here via 302 — break out to top
 		AuthRedirectUtil.sendTopWindowRedirect(req, resp, "/user?tab=tasks");
 
 	}

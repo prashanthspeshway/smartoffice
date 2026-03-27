@@ -12,15 +12,11 @@ public class Meeting {
 	private String createdBy;
 	private Timestamp createdAt;
 	private int participantCount;
-	
-	// ADD THESE NEW FIELDS
 	private String creatorName;
 	private String creatorRole;
 
 	public Meeting() {
 	}
-
-	// ... existing getters and setters ...
 
 	public int getId() {
 		return id;
@@ -94,7 +90,6 @@ public class Meeting {
 		this.participantCount = participantCount;
 	}
 
-	// ADD THESE NEW GETTERS AND SETTERS
 	public String getCreatorName() {
 		return creatorName;
 	}

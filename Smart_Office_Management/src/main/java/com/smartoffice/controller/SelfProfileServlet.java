@@ -20,7 +20,6 @@ public class SelfProfileServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		// Get existing session (do NOT create new one)
 		HttpSession session = request.getSession(false);
 
 		if (session == null) {
@@ -35,7 +34,6 @@ public class SelfProfileServlet extends HttpServlet {
 			return;
 		}
 
-		// Fetch logged-in user details
 		User user = UserDao.getUserByEmail(username);
 
 		if (user == null) {

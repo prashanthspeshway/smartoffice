@@ -30,7 +30,7 @@ public class TodayMeetingsServlet extends HttpServlet {
 		List<Meeting> meetings = MeetingDao.getTodayMeetings(manager);
 
 		req.setAttribute("todayMeetings", meetings);
-		req.setAttribute("tab", "schedulemeeting"); // auto-open tab
+		req.setAttribute("tab", "schedulemeeting");
 
 		req.getRequestDispatcher("/manager.jsp").forward(req, resp);
 	}

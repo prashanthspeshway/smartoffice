@@ -11,10 +11,6 @@ import com.smartoffice.utils.DBConnectionUtil;
 
 public class PerformanceDAO {
 	
-	/**
-	 * Converts email to username for database operations
-	 * The system uses email in sessions/forms but username (full name) in database foreign keys
-	 */
 	private String getUsernameFromEmail(String email) {
 		String sql = "SELECT username FROM users WHERE email = ?";
 		
@@ -36,20 +32,11 @@ public class PerformanceDAO {
 		}
 	}
 	
-	/**
-	 * Save performance rating for an employee
-	 * @param employeeEmail - Employee's email address
-	 * @param managerEmail - Manager's email address
-	 * @param rating - Performance rating (EXCELLENCE, GOOD, AVERAGE, BELOW_AVERAGE)
-	 * @param month - Performance month (first day of month)
-	 * @return true if saved successfully, false otherwise
-	 */
 	public boolean savePerformance(String employeeEmail,
 	                               String managerEmail,
 	                               String rating,
 	                               Date month) {
 		
-		// Convert emails to usernames for database storage
 		String employeeUsername = getUsernameFromEmail(employeeEmail);
 		String managerUsername = getUsernameFromEmail(managerEmail);
 		
@@ -70,7 +57,6 @@ public class PerformanceDAO {
 			return rowsAffected > 0;
 			
 		} catch (SQLIntegrityConstraintViolationException e) {
-			// Duplicate employee + month
 			return false;
 			
 		} catch (SQLException e) {
@@ -79,14 +65,7 @@ public class PerformanceDAO {
 		}
 	}
 	
-	/**
-	 * Check if performance rating already exists for employee in given month
-	 * @param employeeEmail - Employee's email address
-	 * @param month - Performance month
-	 * @return true if exists, false otherwise
-	 */
 	public boolean performanceExists(String employeeEmail, Date month) {
-		// Convert email to username
 		String employeeUsername = getUsernameFromEmail(employeeEmail);
 		
 		String sql =
@@ -104,7 +83,7 @@ public class PerformanceDAO {
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false; // Don't block insert on error
+			return false;
 		}
 	}
 }

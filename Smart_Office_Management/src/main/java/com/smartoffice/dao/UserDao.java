@@ -12,9 +12,6 @@ import com.smartoffice.utils.DBConnectionUtil;
 
 public class UserDao {
 
-	/*
-	 * ========================= Get all users (Admin) =========================
-	 */
 	public static List<User> getAllUsers() {
 
 		List<User> users = new ArrayList<>();
@@ -66,12 +63,6 @@ public class UserDao {
 	    return null;
 	}
 
-	/*
-	 * ========================= Get users in teams managed by manager
-	 * FIX: Now also fetches designation so the assign-task form can
-	 *      filter employees by designation.
-	 * =========================
-	 */
 	public static List<User> getUsersByManager(String managerUsername) {
 	    List<User> users = new ArrayList<>();
 	    String sql = "SELECT DISTINCT u.id, u.email, u.firstname, u.lastname, u.role, u.status, u.phone, u.designation, t.name AS team_name "
@@ -130,10 +121,6 @@ public class UserDao {
 		return list;
 	}
 
-	/*
-	 * ========================= Get logged-in user profile (USED FOR SELF PROFILE)
-	 * =========================
-	 */
 	public static User getUserByEmail(String email) {
 		User user = null;
 		String sql = "SELECT id, email, firstname, lastname, role, status, phone FROM users WHERE email = ?";

@@ -22,136 +22,107 @@ import com.smartoffice.service.NotificationService;
 @MultipartConfig(maxFileSize = 10 * 1024 * 1024)
 public class SubmitTaskUpdateServlet extends HttpServlet {
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("username") == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("username") == null) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
 
-        // "username" attribute holds the email
-        String employeeEmail = (String) session.getAttribute("username");
-        String employeeName  = getDisplayName(session);
+		String employeeEmail = (String) session.getAttribute("username");
+		String employeeName = getDisplayName(session);
 
-        try {
-            int    taskId  = Integer.parseInt(request.getParameter("taskId"));
-            String comment = request.getParameter("comment");
+		try {
+			int taskId = Integer.parseInt(request.getParameter("taskId"));
+			String comment = request.getParameter("comment");
 
-            // Get task BEFORE updating — needed to find who assigned it
-            Task task = TaskDAO.getTaskById(taskId);
-            if (task == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Task not found");
-                return;
-            }
-            if (!TaskDAO.taskBelongsToAssignee(task, employeeEmail)) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Not your task");
-                return;
-            }
+			Task task = TaskDAO.getTaskById(taskId);
+			if (task == null) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Task not found");
+				return;
+			}
+			if (!TaskDAO.taskBelongsToAssignee(task, employeeEmail)) {
+				response.sendError(HttpServletResponse.SC_FORBIDDEN, "Not your task");
+				return;
+			}
 
-            // Handle optional file
-            Part filePart = null;
-            try { filePart = request.getPart("employeeFile"); } catch (Exception ignore) {}
+			Part filePart = null;
+			try {
+				filePart = request.getPart("employeeFile");
+			} catch (Exception ignore) {
+			}
 
-            TaskDAO.submitEmployeeTaskRequest(taskId, comment, filePart);
+			TaskDAO.submitEmployeeTaskRequest(taskId, comment, filePart);
 
-            // ── NOTIFICATIONS ─────────────────────────────────────────
-            if (task != null) {
-                /*
-                 * BUG FIX: task.getAssignedBy() stores the DB username which may NOT
-                 * be the email. NotificationService inserts into recipient_email, so
-                 * we must resolve the username → email first.
-                 */
-                String assignedByRaw   = task.getAssignedBy();
-                String assignedByEmail = resolveToEmail(assignedByRaw);
+			if (task != null) {
 
-                String taskTitle = task.getTitle() != null
-                        ? task.getTitle() : task.getDescription();
+				String assignedByRaw = task.getAssignedBy();
+				String assignedByEmail = resolveToEmail(assignedByRaw);
 
-                String msg = "📨 " + employeeName + " submitted a request for task \"" + taskTitle + "\""
-                        + (comment != null && !comment.isEmpty()
-                                ? ". Comment: " + comment : "");
+				String taskTitle = task.getTitle() != null ? task.getTitle() : task.getDescription();
 
-                // Notify whoever assigned the task (manager OR admin)
-                if (assignedByEmail != null && !assignedByEmail.isEmpty()
-                        && !assignedByEmail.equalsIgnoreCase(employeeEmail)) {
-                    NotificationService.notify(
-                            assignedByEmail, employeeEmail,
-                            NotificationService.TYPE_TASK, msg);
-                }
+				String msg = "📨 " + employeeName + " submitted a request for task \"" + taskTitle + "\""
+						+ (comment != null && !comment.isEmpty() ? ". Comment: " + comment : "");
 
-                /*
-                 * BUG FIX: If the task was assigned by an admin (not the manager),
-                 * the manager was never notified. We check the assigner's role and
-                 * additionally ping the employee's direct manager in that case.
-                 */
-                String assignerRole = getRoleOf(assignedByEmail);
-                if ("admin".equalsIgnoreCase(assignerRole)) {
-                    NotificationService.notifyManagerOf(
-                            employeeEmail, employeeEmail,
-                            NotificationService.TYPE_TASK, msg);
-                }
+				if (assignedByEmail != null && !assignedByEmail.isEmpty()
+						&& !assignedByEmail.equalsIgnoreCase(employeeEmail)) {
+					NotificationService.notify(assignedByEmail, employeeEmail, NotificationService.TYPE_TASK, msg);
+				}
 
-                // Always also notify all admins
-                NotificationService.notifyAllAdmins(
-                        employeeEmail, NotificationService.TYPE_TASK, msg);
-            }
-            // ─────────────────────────────────────────────────────────
+				String assignerRole = getRoleOf(assignedByEmail);
+				if ("admin".equalsIgnoreCase(assignerRole)) {
+					NotificationService.notifyManagerOf(employeeEmail, employeeEmail, NotificationService.TYPE_TASK,
+							msg);
+				}
 
-            response.setStatus(HttpServletResponse.SC_OK);
+				NotificationService.notifyAllAdmins(employeeEmail, NotificationService.TYPE_TASK, msg);
+			}
+			// ─────────────────────────────────────────────────────────
 
-        } catch (IllegalStateException | IllegalArgumentException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Task update failed: " + e.getMessage());
-        }
-    }
+			response.setStatus(HttpServletResponse.SC_OK);
 
-    /**
-     * Resolves a DB username or email to an email address.
-     * If the value already contains '@' it is returned as-is.
-     * Otherwise UserDao.getUserByUsername() is called to look up the email.
-     *
-     * NOTE: If UserDao does not yet have getUserByUsername(), add:
-     *   public static User getUserByUsername(String username) {
-     *       String sql = "SELECT * FROM users WHERE username = ? LIMIT 1";
-     *       // ... standard query ...
-     *   }
-     */
-    private String resolveToEmail(String usernameOrEmail) {
-        if (usernameOrEmail == null || usernameOrEmail.trim().isEmpty()) return null;
-        String val = usernameOrEmail.trim();
-        if (val.contains("@")) return val; // already an email
+		} catch (IllegalStateException | IllegalArgumentException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Task update failed: " + e.getMessage());
+		}
+	}
 
-        try {
-            User user = UserDao.getUserByUsername(val);
-            if (user != null && user.getEmail() != null) return user.getEmail();
-        } catch (Exception e) {
-            System.err.println("[SubmitTaskUpdateServlet] resolveToEmail error for '"
-                    + val + "': " + e.getMessage());
-        }
-        return val; // fall back to raw value
-    }
+	private String resolveToEmail(String usernameOrEmail) {
+		if (usernameOrEmail == null || usernameOrEmail.trim().isEmpty())
+			return null;
+		String val = usernameOrEmail.trim();
+		if (val.contains("@"))
+			return val;
 
-    /** Returns the role stored in the users table for the given email. */
-    private String getRoleOf(String email) {
-        if (email == null || email.isEmpty()) return null;
-        try {
-            User user = UserDao.getUserByEmail(email);
-            return user != null ? user.getRole() : null;
-        } catch (Exception e) {
-            System.err.println("[SubmitTaskUpdateServlet] getRoleOf error for '"
-                    + email + "': " + e.getMessage());
-        }
-        return null;
-    }
+		try {
+			User user = UserDao.getUserByUsername(val);
+			if (user != null && user.getEmail() != null)
+				return user.getEmail();
+		} catch (Exception e) {
+			System.err.println("[SubmitTaskUpdateServlet] resolveToEmail error for '" + val + "': " + e.getMessage());
+		}
+		return val;
+	}
 
-    private String getDisplayName(HttpSession session) {
-        String fn = (String) session.getAttribute("fullName");
-        return (fn != null && !fn.isEmpty()) ? fn : (String) session.getAttribute("username");
-    }
+	private String getRoleOf(String email) {
+		if (email == null || email.isEmpty())
+			return null;
+		try {
+			User user = UserDao.getUserByEmail(email);
+			return user != null ? user.getRole() : null;
+		} catch (Exception e) {
+			System.err.println("[SubmitTaskUpdateServlet] getRoleOf error for '" + email + "': " + e.getMessage());
+		}
+		return null;
+	}
+
+	private String getDisplayName(HttpSession session) {
+		String fn = (String) session.getAttribute("fullName");
+		return (fn != null && !fn.isEmpty()) ? fn : (String) session.getAttribute("username");
+	}
 }

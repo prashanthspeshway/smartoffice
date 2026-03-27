@@ -17,39 +17,35 @@ import com.smartoffice.utils.DBConnectionUtil;
 @WebServlet("/UserCheck")
 public class UserCheck extends HttpServlet {
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
-        String email = req.getParameter("email");
-        if (email == null) email = req.getParameter("username"); // fallback for old forms
+		String email = req.getParameter("email");
+		if (email == null)
+			email = req.getParameter("username");
 
-        boolean userExists = false;
+		boolean userExists = false;
 
-        try (
-            Connection con = DBConnectionUtil.getConnection();
-            PreparedStatement ps = con.prepareStatement(
-                "SELECT 1 FROM users WHERE email = ?"
-            );
-        ) {
-            ps.setString(1, email);
+		try (Connection con = DBConnectionUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement("SELECT 1 FROM users WHERE email = ?");) {
+			ps.setString(1, email);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    userExists = true;
-                }
-            }
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					userExists = true;
+				}
+			}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        // Redirect logic
-        if (userExists) {
-            res.sendRedirect("editUserDetails.jsp?email=" + java.net.URLEncoder.encode(email, java.nio.charset.StandardCharsets.UTF_8));
-        } else {
-            res.sendRedirect("editUserDetails.jsp?error=UserNotFound");
-            System.out.println("User not found: " + email);
-        }
-    }
+		if (userExists) {
+			res.sendRedirect("editUserDetails.jsp?email="
+					+ java.net.URLEncoder.encode(email, java.nio.charset.StandardCharsets.UTF_8));
+		} else {
+			res.sendRedirect("editUserDetails.jsp?error=UserNotFound");
+			System.out.println("User not found: " + email);
+		}
+	}
 }

@@ -26,8 +26,7 @@ public class TaskAttachmentServlet extends HttpServlet {
 		String trimmed = emailOrUsername.trim();
 
 		String sql = "SELECT username FROM users WHERE email = ? LIMIT 1";
-		try (Connection con = DBConnectionUtil.getConnection();
-		     PreparedStatement ps = con.prepareStatement(sql)) {
+		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setString(1, trimmed);
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
@@ -38,7 +37,6 @@ public class TaskAttachmentServlet extends HttpServlet {
 				}
 			}
 		} catch (Exception e) {
-			// if mapping fails, just fall back to original
 			e.printStackTrace();
 		}
 		return trimmed;
@@ -73,8 +71,7 @@ public class TaskAttachmentServlet extends HttpServlet {
 
 		String sql = "SELECT attachment, attachment_name, assigned_to, assigned_by FROM tasks WHERE id = ?";
 
-		try (Connection con = DBConnectionUtil.getConnection();
-		     PreparedStatement ps = con.prepareStatement(sql)) {
+		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
 			ps.setInt(1, taskId);
 			try (ResultSet rs = ps.executeQuery()) {
@@ -93,19 +90,13 @@ public class TaskAttachmentServlet extends HttpServlet {
 					return;
 				}
 
-				// Allow admin to download anything, others only their own tasks.
-				// Session "username" is the email; tasks.assigned_to/by may store the DB username.
 				boolean isAdmin = "admin".equalsIgnoreCase(role);
 				String dbUsername = resolveDbUsername(username);
 
-				boolean isOwner = username != null && (
-						username.equalsIgnoreCase(assignedTo) ||
-						username.equalsIgnoreCase(assignedBy) ||
-						(dbUsername != null && (
-								dbUsername.equalsIgnoreCase(assignedTo) ||
-								dbUsername.equalsIgnoreCase(assignedBy)
-						))
-				);
+				boolean isOwner = username != null
+						&& (username.equalsIgnoreCase(assignedTo) || username.equalsIgnoreCase(assignedBy)
+								|| (dbUsername != null && (dbUsername.equalsIgnoreCase(assignedTo)
+										|| dbUsername.equalsIgnoreCase(assignedBy))));
 
 				if (!isAdmin && !isOwner) {
 					response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not allowed to view this attachment");
@@ -126,4 +117,3 @@ public class TaskAttachmentServlet extends HttpServlet {
 		}
 	}
 }
-

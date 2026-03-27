@@ -3,7 +3,7 @@ package com.smartoffice.model;
 public class User {
 
 	private int id;
-	private String username; // email used as username
+	private String username;
 	private String email;
 	private String firstname;
 	private String lastname;
@@ -38,7 +38,6 @@ public class User {
 		this.joinedDate = joinedDate;
 	}
 
-	// getters & setters
 	public int getId() {
 		return id;
 	}
@@ -47,7 +46,6 @@ public class User {
 		this.id = id;
 	}
 
-	/** Returns email (session stores it as "username" for compatibility). */
 	public String getUsername() {
 		return username;
 	}
@@ -64,7 +62,6 @@ public class User {
 	}
 
 	public void setFullname(String fullname) {
-		// Kept for compatibility; value is derived from firstname+lastname
 	}
 
 	public String getFirstname() {

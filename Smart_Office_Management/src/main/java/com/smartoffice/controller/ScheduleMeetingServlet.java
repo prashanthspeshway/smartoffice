@@ -17,10 +17,6 @@ import javax.servlet.http.HttpSession;
 import com.smartoffice.dao.MeetingDao;
 import com.smartoffice.service.NotificationService;
 
-/**
- * Handles /schedulemeeting — the URL that managerMeetings.jsp form posts to.
- * Saves the meeting and fires notifications to all participants + admins.
- */
 @SuppressWarnings("serial")
 @WebServlet("/schedulemeeting")
 public class ScheduleMeetingServlet extends HttpServlet {
@@ -49,7 +45,6 @@ public class ScheduleMeetingServlet extends HttpServlet {
             String endStr      = request.getParameter("endTime");
             String meetingLink = request.getParameter("meetingLink");
 
-            // Validate
             if (title == null || title.isEmpty() ||
                 startStr == null || startStr.isEmpty() ||
                 endStr == null || endStr.isEmpty()) {
@@ -65,7 +60,6 @@ public class ScheduleMeetingServlet extends HttpServlet {
                 return;
             }
 
-            // Build meeting object
             com.smartoffice.model.Meeting meeting = new com.smartoffice.model.Meeting();
             meeting.setTitle(title);
             meeting.setDescription(description);
@@ -77,8 +71,6 @@ public class ScheduleMeetingServlet extends HttpServlet {
             MeetingDao meetingDao = new MeetingDao();
             int meetingId = meetingDao.createMeeting(meeting);
 
-            // Collect participants — supports both "participants" checkboxes
-            // and the participantType radio pattern
             List<String> participantEmails = new ArrayList<>();
             String participantType = request.getParameter("participantType");
 
@@ -101,23 +93,19 @@ public class ScheduleMeetingServlet extends HttpServlet {
                         participantEmails.addAll(meetingDao.getAllEmployeeEmails()); break;
                 }
             } else {
-                // managerMeetings.jsp uses plain "participants" checkboxes
                 String[] sel = request.getParameterValues("participants");
                 if (sel != null) participantEmails.addAll(Arrays.asList(sel));
             }
 
-            // Deduplicate
             List<String> unique = new ArrayList<>();
             for (String e : participantEmails)
                 if (!unique.contains(e)) unique.add(e);
 
             if (!unique.isEmpty()) meetingDao.addParticipants(meetingId, unique);
 
-            // ── NOTIFICATIONS ───────────────────────────────────────
             String startFmt = formatDateTime(startStr);
             String roleLabel = "Manager".equalsIgnoreCase(role) ? "Manager" : "User";
 
-            // Notify all participants
             if (!unique.isEmpty()) {
                 String participantMsg = "📅 Meeting scheduled by " + roleLabel + " " + managerName +
                                        ": \"" + title + "\" on " + startFmt;
@@ -126,13 +114,11 @@ public class ScheduleMeetingServlet extends HttpServlet {
                         NotificationService.TYPE_MEETING, participantMsg);
             }
 
-            // Notify all admins about the new meeting
             NotificationService.notifyAllAdmins(
                     managerEmail,
                     NotificationService.TYPE_MEETING,
                     "📅 " + roleLabel + " " + managerName +
                     " scheduled meeting: \"" + title + "\" on " + startFmt);
-            // ────────────────────────────────────────────────────────
 
             response.sendRedirect(request.getContextPath() + "/managerMeetings?success=MeetingScheduled");
 

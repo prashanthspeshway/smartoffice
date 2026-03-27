@@ -49,7 +49,6 @@ public class TeamDAO {
         return list;
     }
 
-    // Teams where a given user is a member (used for employee "My Team")
     public static List<Team> getTeamsForMember(String username) {
         List<Team> list = new ArrayList<>();
         String sql = "SELECT DISTINCT t.id, t.name, t.manager_username, t.created_by, t.created_at, " +
@@ -112,14 +111,12 @@ public class TeamDAO {
 
         try (Connection con = DBConnectionUtil.getConnection()) {
 
-            // Step 1: Add member
             try (PreparedStatement ps = con.prepareStatement(insertSql)) {
                 ps.setInt(1, teamId);
                 ps.setString(2, username);
                 ps.executeUpdate();
             }
 
-            // Step 2: Get manager of that team
             String managerEmail = null;
             try (PreparedStatement ps = con.prepareStatement(managerSql)) {
                 ps.setInt(1, teamId);
@@ -129,7 +126,6 @@ public class TeamDAO {
                 }
             }
 
-            // Step 3: Update user's manager
             if (managerEmail != null) {
                 try (PreparedStatement ps = con.prepareStatement(updateUserSql)) {
                     ps.setString(1, managerEmail);
@@ -153,14 +149,12 @@ public class TeamDAO {
 
         try (Connection con = DBConnectionUtil.getConnection()) {
 
-            // Remove from team
             try (PreparedStatement ps = con.prepareStatement(deleteSql)) {
                 ps.setInt(1, teamId);
                 ps.setString(2, username);
                 ps.executeUpdate();
             }
 
-            // Clear manager
             try (PreparedStatement ps = con.prepareStatement(clearManagerSql)) {
                 ps.setString(1, username);
                 ps.executeUpdate();
@@ -183,14 +177,12 @@ public class TeamDAO {
 
         try (Connection con = DBConnectionUtil.getConnection()) {
 
-            // Step 1: Update team
             try (PreparedStatement ps = con.prepareStatement(updateTeamSql)) {
                 ps.setString(1, managerUsername);
                 ps.setInt(2, teamId);
                 ps.executeUpdate();
             }
 
-            // Step 2: Update all members
             try (PreparedStatement ps = con.prepareStatement(updateUsersSql)) {
                 ps.setString(1, managerUsername);
                 ps.setInt(2, teamId);

@@ -3,16 +3,12 @@ package com.smartoffice.model;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-/**
- * One row for the employee "Recent Activity Log" (date, punch in/out, break,
- * total, status).
- */
 public class AttendanceLogEntry {
 	private Date attendanceDate;
 	private Timestamp punchIn;
 	private Timestamp punchOut;
 	private int breakSeconds;
-	private String status; // Present, Absent
+	private String status; 
 
 	public Date getAttendanceDate() {
 		return attendanceDate;

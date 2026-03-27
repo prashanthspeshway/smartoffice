@@ -64,10 +64,11 @@ public class Team {
 	}
 
 	public String getDescription() {
-	    return description;
+		return description;
 	}
+
 	public void setDescription(String description) {
-	    this.description = description;
+		this.description = description;
 	}
 
 	public List<User> getMembers() {

@@ -71,7 +71,6 @@ public class ViewUser extends HttpServlet {
 		if (sortOrder == null || sortOrder.isEmpty())
 			sortOrder = "asc";
 
-		// Validate sort column
 		String orderColumn = "firstname";
 		switch (sortBy.toLowerCase()) {
 		case "role":
@@ -106,7 +105,6 @@ public class ViewUser extends HttpServlet {
 			StringBuilder countWhere = new StringBuilder(" WHERE LOWER(role) != 'admin' ");
 			int paramIdx = 1;
 
-			// Role filter (employee = user+employee for backward compat)
 			if (roleFilter != null && !roleFilter.trim().isEmpty()) {
 				String r = roleFilter.trim().toLowerCase();
 				if ("employee".equals(r) || "user".equals(r)) {
@@ -118,7 +116,6 @@ public class ViewUser extends HttpServlet {
 				}
 			}
 
-			// Status filter
 			if (statusFilter != null && !statusFilter.trim().isEmpty()) {
 				String s = statusFilter.trim().toLowerCase();
 				if ("active".equals(s)) {
@@ -130,13 +127,11 @@ public class ViewUser extends HttpServlet {
 				}
 			}
 
-			// Designation filter (employees only)
 			if (designationFilter != null && !designationFilter.trim().isEmpty()) {
 				where.append(" AND LOWER(COALESCE(designation,'')) = LOWER(?) ");
 				countWhere.append(" AND LOWER(COALESCE(designation,'')) = LOWER(?) ");
 			}
 
-			// Search (name, email, role, status, joined date)
 			if (search != null && !search.trim().isEmpty()) {
 				String term = "%" + search.trim() + "%";
 				where.append(" AND (LOWER(CONCAT(COALESCE(firstname,''), ' ', COALESCE(lastname,''))) LIKE LOWER(?) ")
@@ -148,7 +143,6 @@ public class ViewUser extends HttpServlet {
 						.append(" OR DATE_FORMAT(joinedDate, '%Y-%m-%d') LIKE ? OR DATE_FORMAT(joinedDate, '%d-%m-%Y') LIKE ?) ");
 			}
 
-			// Date range filter (only add when valid date)
 			java.sql.Date dateFromVal = null, dateToVal = null;
 			if (dateFrom != null && !dateFrom.trim().isEmpty()) {
 				try {
@@ -248,40 +242,42 @@ public class ViewUser extends HttpServlet {
 					java.sql.Date joinedDate = rs.getDate("joinedDate");
 					String joinedStr = joinedDate != null ? joinedDate.toString() : "";
 
-					// Table row: Full Name | Role | Status | First Name | Last Name | Email |
-					// Joined Date | Actions
-					// Table row: Full Name | Role | Status | Designation | Email | Actions
 					String designation = nullToEmpty(rs.getString("designation"));
 
 					rows.append("<tr class=\"border-b border-slate-200 hover:bg-slate-50\" ")
-				    .append("data-profile-email=\"").append(escapeHtml(email)).append("\">")
-				    .append("<td class=\"px-4 py-3 text-sm font-medium text-slate-700 cursor-pointer hover:text-indigo-600\">")
-				    .append(escapeHtml(fullName)).append("</td>")
-				    .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(roleDisplay)).append("</td>")
-				    .append("<td class=\"px-4 py-3\"><span class=\"badge ").append(statusClass).append("\">").append(escapeHtml(statusText)).append("</span></td>")
-				    .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(designation.isEmpty() ? "-" : escapeHtml(designation)).append("</td>")
-				    .append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(email)).append("</td>")
-				    .append("<td class=\"px-4 py-3\" onclick=\"event.stopPropagation()\">")
-				    .append("<a href=\"editUser?id=").append(userId).append("\" class=\"icon-btn edit\"><i class=\"fa-solid fa-pen\"></i></a>")
-				    .append("<a href=\"#\" class=\"icon-btn delete\" onclick=\"openDeleteModal(").append(userId).append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a>")
-				    .append("</td>")
-				    .append("</tr>");
+							.append("data-profile-email=\"").append(escapeHtml(email)).append("\">")
+							.append("<td class=\"px-4 py-3 text-sm font-medium text-slate-700 cursor-pointer hover:text-indigo-600\">")
+							.append(escapeHtml(fullName)).append("</td>")
+							.append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(roleDisplay))
+							.append("</td>").append("<td class=\"px-4 py-3\"><span class=\"badge ").append(statusClass)
+							.append("\">").append(escapeHtml(statusText)).append("</span></td>")
+							.append("<td class=\"px-4 py-3 text-sm text-slate-700\">")
+							.append(designation.isEmpty() ? "-" : escapeHtml(designation)).append("</td>")
+							.append("<td class=\"px-4 py-3 text-sm text-slate-700\">").append(escapeHtml(email))
+							.append("</td>").append("<td class=\"px-4 py-3\" onclick=\"event.stopPropagation()\">")
+							.append("<a href=\"editUser?id=").append(userId)
+							.append("\" class=\"icon-btn edit\"><i class=\"fa-solid fa-pen\"></i></a>")
+							.append("<a href=\"#\" class=\"icon-btn delete\" onclick=\"openDeleteModal(").append(userId)
+							.append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a>").append("</td>")
+							.append("</tr>");
 
-					// Grid card: Full Name, Role, Status, First Name, Last Name, Email, Joined
-					// Date, Actions
-					// Grid card: Full Name, Role, Status, Designation, Email, Actions
 					gridRows.append("<div class=\"grid-card bg-white rounded-xl border border-slate-200 p-4\" ")
-				    .append("data-profile-email=\"").append(escapeHtml(email)).append("\">")
-				    .append("<div class=\"font-medium text-slate-800 mb-1 cursor-pointer hover:text-indigo-600\">").append(escapeHtml(fullName)).append("</div>")
-				    .append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Role:</span> ").append(escapeHtml(roleDisplay)).append("</div>")
-				    .append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Status:</span> <span class=\"badge ").append(statusClass).append("\">").append(escapeHtml(statusText)).append("</span></div>")
-				    .append("<div class=\"text-sm text-slate-600 mb-3\"><span class=\"font-medium\">Designation:</span> ").append(designation.isEmpty() ? "-" : escapeHtml(designation)).append("</div>")
-				    .append("<div class=\"text-sm text-slate-500 mb-3\">").append(escapeHtml(email)).append("</div>")
-				    .append("<div onclick=\"event.stopPropagation()\">")
-				    .append("<a href=\"editUser?id=").append(userId).append("\" class=\"icon-btn edit inline-block\"><i class=\"fa-solid fa-pen\"></i></a>")
-				    .append("<a href=\"#\" class=\"icon-btn delete inline-block\" onclick=\"openDeleteModal(").append(userId).append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a>")
-				    .append("</div>")
-				    .append("</div>");
+							.append("data-profile-email=\"").append(escapeHtml(email)).append("\">")
+							.append("<div class=\"font-medium text-slate-800 mb-1 cursor-pointer hover:text-indigo-600\">")
+							.append(escapeHtml(fullName)).append("</div>")
+							.append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Role:</span> ")
+							.append(escapeHtml(roleDisplay)).append("</div>")
+							.append("<div class=\"text-sm text-slate-600 mb-1\"><span class=\"font-medium\">Status:</span> <span class=\"badge ")
+							.append(statusClass).append("\">").append(escapeHtml(statusText)).append("</span></div>")
+							.append("<div class=\"text-sm text-slate-600 mb-3\"><span class=\"font-medium\">Designation:</span> ")
+							.append(designation.isEmpty() ? "-" : escapeHtml(designation)).append("</div>")
+							.append("<div class=\"text-sm text-slate-500 mb-3\">").append(escapeHtml(email))
+							.append("</div>").append("<div onclick=\"event.stopPropagation()\">")
+							.append("<a href=\"editUser?id=").append(userId)
+							.append("\" class=\"icon-btn edit inline-block\"><i class=\"fa-solid fa-pen\"></i></a>")
+							.append("<a href=\"#\" class=\"icon-btn delete inline-block\" onclick=\"openDeleteModal(")
+							.append(userId).append("); return false;\"><i class=\"fa-solid fa-trash\"></i></a>")
+							.append("</div>").append("</div>");
 				}
 			}
 

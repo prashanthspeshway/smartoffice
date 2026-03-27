@@ -11,28 +11,6 @@ import javax.servlet.annotation.WebListener;
 
 import com.smartoffice.dao.AttendanceDAO;
 
-/**
- * AttendanceScheduler
- *
- * Runs once automatically every day at 11:59 PM by listening to the
- * ServletContext lifecycle (starts when the app deploys, stops when it undeploys).
- *
- * What it does at 11:59 PM every night:
- *   1. Auto-closes any punch-ins that were never punched out (sets 19:30 as punch-out).
- *   2. Writes "On Leave" rows for every employee with an approved leave for today.
- *   3. Writes "Absent" rows for every non-admin who had no attendance today
- *      and was not on leave and today was not a weekend/holiday.
- *   4. Recalculates Half Day / Present for all of today's closed rows.
- *
- * To register this listener, add it to web.xml:
- *
- *   <listener>
- *       <listener-class>com.smartoffice.scheduler.AttendanceScheduler</listener-class>
- *   </listener>
- *
- * Or the @WebListener annotation (already present) handles it automatically
- * if your project uses annotation scanning.
- */
 @WebListener
 public class AttendanceScheduler implements ServletContextListener {
 
@@ -42,7 +20,6 @@ public class AttendanceScheduler implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         timer = new Timer("AttendanceScheduler", true);
 
-        // Schedule: every 24 hours starting at the next 23:59:00
         Date firstRun = nextRunTime(23, 59, 0);
         long period   = 24 * 60 * 60 * 1000L; // 24 hours in ms
 
@@ -71,10 +48,6 @@ public class AttendanceScheduler implements ServletContextListener {
         }
     }
 
-    /**
-     * Calculate the next occurrence of hh:mm:ss today (or tomorrow if that
-     * time has already passed today).
-     */
     private Date nextRunTime(int hour, int minute, int second) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, hour);

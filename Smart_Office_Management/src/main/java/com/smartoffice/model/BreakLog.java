@@ -41,4 +41,3 @@ public class BreakLog {
 		this.durationSeconds = durationSeconds;
 	}
 }
-

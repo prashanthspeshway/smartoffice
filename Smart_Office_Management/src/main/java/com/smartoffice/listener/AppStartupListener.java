@@ -11,11 +11,6 @@ public class AppStartupListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
 
-        // ── Step 1: Auto-close missed punch-outs from PAST days ─────────────────
-        // Runs unconditionally on every startup — past days are always safe to fix.
-        // The SQL in autoCloseMissedPunchOuts() uses punch_date < CURDATE() so it
-        // NEVER touches today's still-open records.
-        // Today's 19:30 auto-close is handled by the MySQL scheduled event.
         try {
             new AttendanceDAO().autoCloseMissedPunchOuts();
             System.out.println("[Startup] Missed punch-out cleanup done (past days).");
@@ -23,7 +18,6 @@ public class AppStartupListener implements ServletContextListener {
             System.err.println("[Startup] Auto punch-out cleanup failed: " + e.getMessage());
         }
 
-        // ── Step 2: Auto-close orphaned breaks from PAST days ───────────────────
         try {
             closeOrphanedBreaksFromPastDays();
             System.out.println("[Startup] Orphaned break cleanup done.");
@@ -31,8 +25,6 @@ public class AppStartupListener implements ServletContextListener {
             System.err.println("[Startup] Orphaned break cleanup failed: " + e.getMessage());
         }
 
-        // ── Step 3: Ensure MySQL scheduled event exists ─────────────────────────
-        // Creates the event if it was never set up — idempotent, safe to run every time.
         try {
             ensureMySQLScheduledEvent();
             System.out.println("[Startup] MySQL scheduled event verified/created.");
@@ -41,11 +33,6 @@ public class AppStartupListener implements ServletContextListener {
         }
     }
 
-    /**
-     * Closes any break_logs rows from PAST days that were never ended.
-     * Sets end_time = 19:30 of that break_date.
-     * Never touches today's records.
-     */
     private void closeOrphanedBreaksFromPastDays() throws Exception {
         String sql = "UPDATE break_logs "
                 + "SET end_time = TIMESTAMP(break_date, '19:30:00'), "
@@ -61,17 +48,7 @@ public class AppStartupListener implements ServletContextListener {
         }
     }
 
-    /**
-     * Creates (or replaces) a MySQL EVENT that fires every day at 19:30 to:
-     *  1. Auto punch-out anyone still punched in today
-     *  2. Mark Half Day if they worked < 4 hours
-     *  3. Close any open breaks at punch-out time
-     *
-     * Requires the DB user to have EVENT privilege.
-     * If you prefer to manage this in MySQL Workbench manually, you can remove this method.
-     */
     private void ensureMySQLScheduledEvent() throws Exception {
-        // First enable the event scheduler (safe no-op if already on)
         String enableScheduler = "SET GLOBAL event_scheduler = ON";
 
         String createEvent =
