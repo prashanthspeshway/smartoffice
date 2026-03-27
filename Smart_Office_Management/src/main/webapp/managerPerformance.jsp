@@ -456,7 +456,7 @@ body{font-family:'Geist',system-ui,sans-serif;}
 			var errorMessages = {
 				'Invalid' : 'Invalid input. Please try again.',
 				'InvalidRating' : 'Invalid rating selected.',
-				'AlreadyRated' : 'Performance already rated for this employee this month.',
+				'AlreadyRated' : 'Performance already rated for this employee this week.',
 				'SaveFailed' : 'Failed to save performance rating. Please try again.'
 			};
 			showToast(errorMessages[error] || 'An error occurred.', 'error');

@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import com.smartoffice.dao.PerformanceDAO;
 
 @SuppressWarnings("serial")
@@ -15,7 +14,8 @@ import com.smartoffice.dao.PerformanceDAO;
 public class PerformanceServlet extends HttpServlet {
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+	        throws ServletException, IOException {
 
 		HttpSession session = req.getSession(false);
 		if (session == null || session.getAttribute("username") == null) {
@@ -24,40 +24,44 @@ public class PerformanceServlet extends HttpServlet {
 		}
 
 		String manager = (String) session.getAttribute("username");
-		String role = (String) session.getAttribute("role");
-
+		String role    = (String) session.getAttribute("role");
 		if (!"Manager".equalsIgnoreCase(role)) {
 			resp.sendRedirect("index.html?error=accessDenied");
 			return;
 		}
 
 		String employee = req.getParameter("employee");
-		String rating = req.getParameter("rating");
+		String rating   = req.getParameter("rating");
 
-		if (employee == null || employee.trim().isEmpty() || rating == null || rating.trim().isEmpty()
+		if (employee == null || employee.trim().isEmpty()
+				|| rating == null || rating.trim().isEmpty()
 				|| manager == null) {
 			resp.sendRedirect(req.getContextPath() + "/managerPerformance?error=Invalid");
 			return;
 		}
 
-		if (!rating.equals("EXCELLENCE") && !rating.equals("GOOD") && !rating.equals("AVERAGE")
-				&& !rating.equals("BELOW_AVERAGE")) {
+		if (!rating.equals("EXCELLENCE") && !rating.equals("GOOD")
+				&& !rating.equals("AVERAGE") && !rating.equals("BELOW_AVERAGE")) {
 			resp.sendRedirect(req.getContextPath() + "/managerPerformance?error=InvalidRating");
 			return;
 		}
 
 		try {
-			java.sql.Date performanceMonth = java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1));
+			// Calculate the Monday of the current ISO week
+			java.time.LocalDate today    = java.time.LocalDate.now();
+			java.time.LocalDate monday   = today.with(
+			        java.time.temporal.TemporalAdjusters.previousOrSame(
+			                java.time.DayOfWeek.MONDAY));
+			java.sql.Date weekStart = java.sql.Date.valueOf(monday);
 
 			PerformanceDAO dao = new PerformanceDAO();
 
-			if (dao.performanceExists(employee, performanceMonth)) {
+			if (dao.performanceExists(employee, weekStart)) {
 				resp.sendRedirect(req.getContextPath() + "/managerPerformance?error=AlreadyRated");
 				return;
 			}
 
-			boolean saved = dao.savePerformance(employee, manager, rating, performanceMonth);
-
+			boolean saved = dao.savePerformance(employee, manager, rating, weekStart);
 			if (saved) {
 				resp.sendRedirect(req.getContextPath() + "/managerPerformance?success=PerformanceSaved");
 			} else {
@@ -71,7 +75,8 @@ public class PerformanceServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+	        throws ServletException, IOException {
 		doPost(req, resp);
 	}
 }

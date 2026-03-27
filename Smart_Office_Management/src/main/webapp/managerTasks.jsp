@@ -21,7 +21,6 @@ List<User> team     = (List<User>) request.getAttribute("teamList");
 List<Task> allTasks = (List<Task>) request.getAttribute("allManagerTasks");
 if (allTasks == null) allTasks = java.util.Collections.emptyList();
 
-// Collect unique team names AND designations from team list
 TreeSet<String> teams        = new TreeSet<>();
 TreeSet<String> designations = new TreeSet<>();
 if (team != null) {
@@ -33,7 +32,6 @@ if (team != null) {
     }
 }
 
-// Compute start-of-current-week (Monday)
 Calendar cal = Calendar.getInstance();
 cal.set(Calendar.HOUR_OF_DAY, 0); cal.set(Calendar.MINUTE, 0);
 cal.set(Calendar.SECOND, 0);      cal.set(Calendar.MILLISECOND, 0);
@@ -41,6 +39,9 @@ int dow = cal.get(Calendar.DAY_OF_WEEK);
 int daysToMon = (dow == Calendar.SUNDAY) ? 6 : dow - Calendar.MONDAY;
 cal.add(Calendar.DAY_OF_MONTH, -daysToMon);
 Date weekStart = cal.getTime();
+
+java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+String todayStr = sdf.format(new java.util.Date());
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,46 +56,97 @@ Date weekStart = cal.getTime();
   body { font-family: 'DM Sans', system-ui, sans-serif; }
 
   .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:9999px; font-size:11px; font-weight:600; }
-  .badge-assigned    { background:#e0f2fe; color:#0369a1; }
-  .badge-processing  { background:#fef3c7; color:#92400e; }
-  .badge-submitted   { background:#fef3c7; color:#92400e; }
-  .badge-completed   { background:#dcfce7; color:#166534; }
-  .badge-incomplete  { background:#fee2e2; color:#b91c1c; }
-  .badge-docverify   { background:#ede9fe; color:#6d28d9; }
+  .badge-assigned   { background:#e0f2fe; color:#0369a1; }
+  .badge-processing { background:#fef3c7; color:#92400e; }
+  .badge-submitted  { background:#fef3c7; color:#92400e; }
+  .badge-completed  { background:#dcfce7; color:#166534; }
+  .badge-incomplete { background:#fee2e2; color:#b91c1c; }
+  .badge-docverify  { background:#ede9fe; color:#6d28d9; }
 
   .ftab { padding:5px 14px; border-radius:9999px; font-size:12px; font-weight:500; cursor:pointer;
           border:1.5px solid #e2e8f0; background:white; color:#64748b; transition:all .15s;
-          display:inline-flex; align-items:center; gap:5px; }
-  .ftab:hover         { border-color:#6366f1; color:#6366f1; }
-  .ftab.f-all         { background:#6366f1; color:white; border-color:#6366f1; }
-  .ftab.f-week        { background:#f0fdf4; color:#15803d; border-color:#86efac; }
-  .ftab.f-assigned    { background:#e0f2fe; color:#0369a1; border-color:#7dd3fc; }
-  .ftab.f-processing  { background:#fef3c7; color:#92400e; border-color:#fcd34d; }
-  .ftab.f-completed   { background:#dcfce7; color:#166534; border-color:#86efac; }
+          display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+  .ftab:hover        { border-color:#6366f1; color:#6366f1; }
+  .ftab.f-all        { background:#6366f1; color:white; border-color:#6366f1; }
+  .ftab.f-today      { background:#0ea5e9; color:white; border-color:#0ea5e9; }
+  .ftab.f-week       { background:#f0fdf4; color:#15803d; border-color:#86efac; }
+  .ftab.f-assigned   { background:#e0f2fe; color:#0369a1; border-color:#7dd3fc; }
+  .ftab.f-processing { background:#fef3c7; color:#92400e; border-color:#fcd34d; }
+  .ftab.f-completed  { background:#dcfce7; color:#166534; border-color:#86efac; }
   .cpill { background:rgba(0,0,0,.12); border-radius:9999px; padding:0 7px; font-size:10px; font-weight:700; }
+
+  /* Date picker pill */
+  .date-pill { padding:5px 14px; border-radius:9999px; font-size:12px; font-weight:500; cursor:pointer;
+               border:1.5px solid #e2e8f0; background:white; color:#64748b; transition:all .15s;
+               display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+  .date-pill:hover  { border-color:#6366f1; color:#6366f1; }
+  .date-pill.active { background:#f5f3ff; color:#6d28d9; border-color:#c4b5fd; }
+
+  /* ── Custom Calendar Dropdown ── */
+  .cal-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  #customCalendar {
+    position: absolute;
+    z-index: 9999;
+    background: white;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.14);
+    padding: 14px 16px 12px;
+    width: 272px;
+    display: none;
+    top: calc(100% + 8px);
+    left: 0;
+  }
+  #customCalendar.open { display: block; }
+  .cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .cal-header span { font-size:13px; font-weight:600; color:#1e293b; }
+  .cal-nav { background:none; border:none; cursor:pointer; color:#64748b; padding:4px 8px;
+             border-radius:6px; font-size:13px; line-height:1; }
+  .cal-nav:hover { background:#f1f5f9; color:#6366f1; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .cal-dow  { text-align:center; font-size:10px; font-weight:700; color:#94a3b8;
+              padding:4px 0 6px; text-transform:uppercase; }
+  .cal-day  { text-align:center; font-size:12px; padding:6px 0; border-radius:7px;
+              cursor:pointer; color:#374151; transition:background .12s, color .12s; line-height:1.2; }
+  .cal-day:hover:not(.cal-empty):not(.cal-disabled) { background:#eef2ff; color:#6366f1; }
+  .cal-day.cal-today    { font-weight:700; color:#6366f1; }
+  .cal-day.cal-selected { background:#6366f1 !important; color:white !important; font-weight:700; border-radius:7px; }
+  .cal-day.cal-disabled { color:#d1d5db; cursor:default; }
+  .cal-day.cal-empty    { cursor:default; }
+  .cal-footer { display:flex; justify-content:space-between; margin-top:10px; padding-top:10px;
+                border-top:1px solid #f1f5f9; }
+  .cal-footer button { font-size:11px; font-weight:600; padding:4px 14px; border-radius:7px;
+                       border:none; cursor:pointer; transition:background .12s; }
+  .cal-clear      { background:#f1f5f9; color:#64748b; }
+  .cal-clear:hover { background:#e2e8f0; }
+  .cal-jump-today { background:#eef2ff; color:#6366f1; }
+  .cal-jump-today:hover { background:#e0e7ff; }
 
   .task-card { background:white; border:1.5px solid #e2e8f0; border-radius:14px; padding:16px 18px;
                transition:box-shadow .15s, border-color .15s; }
   .task-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.08); border-color:#c7d2fe; }
-  .task-card.needs-review { border-left:4px solid #f59e0b; }
-  .task-card.completed    { border-left:4px solid #22c55e; opacity:.85; }
-  .task-card.this-week-card { box-shadow: 0 0 0 1.5px #bbf7d0; }
+  .task-card.needs-review  { border-left:4px solid #f59e0b; }
+  .task-card.completed     { border-left:4px solid #22c55e; opacity:.85; }
+  .task-card.this-week-card{ box-shadow: 0 0 0 1.5px #bbf7d0; }
 
-  .week-pill { display:inline-flex; align-items:center; gap:4px;
-               background:#f0fdf4; color:#15803d; border:1px solid #86efac;
-               border-radius:9999px; font-size:10px; font-weight:600; padding:2px 8px; }
+  .week-pill  { display:inline-flex; align-items:center; gap:4px;
+                background:#f0fdf4; color:#15803d; border:1px solid #86efac;
+                border-radius:9999px; font-size:10px; font-weight:600; padding:2px 8px; }
+  .today-pill { display:inline-flex; align-items:center; gap:4px;
+                background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc;
+                border-radius:9999px; font-size:10px; font-weight:600; padding:2px 8px; }
 
-  /* Team tag shown inside each employee row */
-  .team-tag  { display:inline-flex; align-items:center; gap:3px;
-               background:#eef2ff; color:#4338ca; border:1px solid #c7d2fe;
-               border-radius:9999px; font-size:10px; font-weight:500; padding:1px 7px; margin-top:2px; }
+  .team-tag  { display:inline-flex; align-items:center; gap:3px; background:#eef2ff; color:#4338ca;
+               border:1px solid #c7d2fe; border-radius:9999px; font-size:10px; font-weight:500;
+               padding:1px 7px; margin-top:2px; }
+  .desig-tag { display:inline-flex; align-items:center; gap:3px; background:#f1f5f9; color:#475569;
+               border:1px solid #e2e8f0; border-radius:9999px; font-size:10px; font-weight:500;
+               padding:1px 7px; margin-top:2px; }
 
-  /* Designation tag shown inside each employee row */
-  .desig-tag { display:inline-flex; align-items:center; gap:3px;
-               background:#f1f5f9; color:#475569; border:1px solid #e2e8f0;
-               border-radius:9999px; font-size:10px; font-weight:500; padding:1px 7px; margin-top:2px; }
-
-  /* Team filter pills */
   .team-btn { font-size:12px; padding:4px 14px; border-radius:9999px; cursor:pointer;
               border:1.5px solid #e2e8f0; background:white; color:#64748b;
               transition:all .15s; display:inline-flex; align-items:center; gap:4px; }
@@ -107,10 +159,18 @@ Date weekStart = cal.getTime();
   .prio-MEDIUM { color:#f59e0b; font-weight:600; }
   .prio-LOW    { color:#22c55e; font-weight:600; }
 
-  .feed-scroll { max-height: calc(100vh - 220px); overflow-y:auto; padding-right:4px; }
-  .feed-scroll::-webkit-scrollbar { width:5px; }
-  .feed-scroll::-webkit-scrollbar-track { background:#f1f5f9; border-radius:9999px; }
-  .feed-scroll::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:9999px; }
+  .panel-left,
+  .panel-right {
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+  }
+
+  .panel-left::-webkit-scrollbar,
+  .panel-right::-webkit-scrollbar  { width: 5px; }
+  .panel-left::-webkit-scrollbar-track,
+  .panel-right::-webkit-scrollbar-track { background:#f1f5f9; border-radius:9999px; }
+  .panel-left::-webkit-scrollbar-thumb,
+  .panel-right::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:9999px; }
 
   .pulse-dot { width:8px; height:8px; border-radius:50%; background:#f59e0b;
                box-shadow:0 0 0 0 rgba(245,158,11,.5);
@@ -134,7 +194,7 @@ Date weekStart = cal.getTime();
   <div class="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-6 items-start">
 
     <!-- ══════════════ LEFT: Assign Task ══════════════ -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sticky top-6">
+    <div class="panel-left bg-white rounded-xl shadow-sm border border-slate-200 p-6">
       <div class="flex items-center gap-3 mb-5">
         <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center">
           <i class="fa-solid fa-paper-plane text-indigo-600"></i>
@@ -152,20 +212,17 @@ Date weekStart = cal.getTime();
             enctype="multipart/form-data" class="space-y-4" id="assignTaskForm">
         <input type="hidden" name="action" value="assign">
 
-        <!-- ── Filter by Team ── -->
         <%if (!teams.isEmpty()) {%>
         <div>
           <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
             <i class="fa-solid fa-people-group mr-1"></i>Filter by Team
           </label>
           <div class="flex flex-wrap gap-1.5" id="teamFilterRow">
-            <button type="button" class="team-btn active" data-team="all"
-                    onclick="filterByTeam('all', this)">
+            <button type="button" class="team-btn active" data-team="all" onclick="filterByTeam('all',this)">
               <i class="fa-solid fa-users text-xs"></i> All Teams
             </button>
             <%for (String tm : teams) {%>
-            <button type="button" class="team-btn" data-team="<%=tm%>"
-                    onclick="filterByTeam('<%=tm%>', this)">
+            <button type="button" class="team-btn" data-team="<%=tm%>" onclick="filterByTeam('<%=tm%>',this)">
               <i class="fa-solid fa-people-group text-xs"></i> <%=tm%>
             </button>
             <%}%>
@@ -173,7 +230,6 @@ Date weekStart = cal.getTime();
         </div>
         <%}%>
 
-        <!-- ── Assign to ── -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1.5">
             Assign to <span class="text-red-500">*</span>
@@ -216,21 +272,18 @@ Date weekStart = cal.getTime();
           <input type="text" id="empValidation" class="sr-only" required tabindex="-1" aria-hidden="true" autocomplete="off">
         </div>
 
-        <!-- Title -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1.5">Title <span class="text-red-500">*</span></label>
           <input type="text" name="title" placeholder="E.g. Submit weekly report" required
             class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
 
-        <!-- Description -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1.5">Description <span class="text-red-500">*</span></label>
           <textarea name="taskDesc" rows="3" placeholder="Add clear instructions and details" required
             class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
         </div>
 
-        <!-- Deadline + Priority -->
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Deadline <span class="text-red-500">*</span></label>
@@ -248,7 +301,6 @@ Date weekStart = cal.getTime();
           </div>
         </div>
 
-        <!-- Attachment -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1.5">Attachment <span class="text-slate-400 font-normal">(optional)</span></label>
           <input type="file" name="attachment" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg"
@@ -263,7 +315,8 @@ Date weekStart = cal.getTime();
     </div>
 
     <!-- ══════════════ RIGHT: Task Feed ══════════════ -->
-    <div>
+    <div class="panel-right bg-transparent rounded-xl flex flex-col gap-0">
+
       <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div class="flex items-center gap-2">
           <h3 class="text-base font-semibold text-slate-800">Team Task Feed</h3>
@@ -285,15 +338,66 @@ Date weekStart = cal.getTime();
         </button>
       </div>
 
-      <div class="flex flex-wrap gap-2 mb-4">
-        <button class="ftab"                     onclick="filterFeed('all',this)">       <i class="fa-solid fa-border-all text-xs"></i>    All          <span class="cpill" id="fc-all">0</span></button>
-        <button class="ftab f-week" id="tabWeek" onclick="filterFeed('WEEK',this)">      <i class="fa-solid fa-calendar-week text-xs"></i> This Week    <span class="cpill" id="fc-week">0</span></button>
-        <button class="ftab"                     onclick="filterFeed('ASSIGNED',this)">  <i class="fa-solid fa-clock text-xs"></i>         Assigned     <span class="cpill" id="fc-assigned">0</span></button>
-        <button class="ftab"                     onclick="filterFeed('REVIEW',this)">    <span class="pulse-dot"></span>                  Needs Review <span class="cpill" id="fc-review">0</span></button>
-        <button class="ftab"                     onclick="filterFeed('COMPLETED',this)"> <i class="fa-solid fa-circle-check text-xs"></i>  Completed    <span class="cpill" id="fc-completed">0</span></button>
+      <!-- Filter tabs -->
+      <div class="flex flex-wrap gap-2 mb-4 items-center">
+        <button class="ftab" id="tabAll"   onclick="filterFeed('all',this)">
+          <i class="fa-solid fa-border-all text-xs"></i> All
+          <span class="cpill" id="fc-all">0</span>
+        </button>
+        <button class="ftab" id="tabToday" onclick="filterFeed('TODAY',this)">
+          <i class="fa-solid fa-sun text-xs"></i> Today
+          <span class="cpill" id="fc-today">0</span>
+        </button>
+        <button class="ftab" id="tabWeek"  onclick="filterFeed('WEEK',this)">
+          <i class="fa-solid fa-calendar-week text-xs"></i> This Week
+          <span class="cpill" id="fc-week">0</span>
+        </button>
+        <button class="ftab" onclick="filterFeed('ASSIGNED',this)">
+          <i class="fa-solid fa-clock text-xs"></i> Assigned
+          <span class="cpill" id="fc-assigned">0</span>
+        </button>
+        <button class="ftab" onclick="filterFeed('REVIEW',this)">
+          <span class="pulse-dot"></span> Needs Review
+          <span class="cpill" id="fc-review">0</span>
+        </button>
+        <button class="ftab" onclick="filterFeed('COMPLETED',this)">
+          <i class="fa-solid fa-circle-check text-xs"></i> Completed
+          <span class="cpill" id="fc-completed">0</span>
+        </button>
+
+        <!-- Custom calendar date picker pill (anchored dropdown) -->
+        <div class="cal-wrapper" id="calWrapper">
+          <button class="date-pill" id="datePillBtn" onclick="toggleCalendar(event)">
+            <i class="fa-solid fa-calendar-days text-xs"></i>
+            <span id="datePillLabel">Pick a Date</span>
+          </button>
+
+          <!-- Custom calendar dropdown -->
+          <div id="customCalendar">
+            <div class="cal-header">
+              <button class="cal-nav" onclick="calNav(-1)" type="button">&#8249;</button>
+              <span id="calMonthYear"></span>
+              <button class="cal-nav" onclick="calNav(1)" type="button">&#8250;</button>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="cal-footer">
+              <button class="cal-clear" onclick="clearDateFilter()" type="button">Clear</button>
+              <button class="cal-jump-today" onclick="calJumpToday()" type="button">Today</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clear date (hidden until a date is picked) -->
+        <button id="clearDateBtn" onclick="clearDateFilter()"
+          class="hidden text-xs text-slate-500 hover:text-red-500 border border-slate-200
+                 hover:border-red-300 bg-white rounded-full px-3 py-1.5 transition-colors
+                 inline-flex items-center gap-1" type="button">
+          <i class="fa-solid fa-xmark text-xs"></i> Clear date
+        </button>
       </div>
 
-      <div class="feed-scroll space-y-3" id="taskFeed">
+      <!-- Task cards -->
+      <div class="space-y-3" id="taskFeed">
         <%if (allTasks.isEmpty()) {%>
         <div class="bg-white rounded-xl border border-slate-200 px-6 py-12 text-center">
           <i class="fa-solid fa-inbox text-slate-300 text-4xl mb-3"></i>
@@ -306,6 +410,13 @@ Date weekStart = cal.getTime();
             boolean isCompleted  = rawStatus.equals("COMPLETED");
             boolean needsReview  = isProcessing;
             boolean isThisWeek   = t.getAssignedDate() != null && !t.getAssignedDate().before(weekStart);
+
+            String assignedDateStr = "";
+            boolean isToday = false;
+            if (t.getAssignedDate() != null) {
+                assignedDateStr = sdf.format(t.getAssignedDate());
+                isToday = assignedDateStr.equals(todayStr);
+            }
 
             String badgeCls, badgeLabel, filterKey;
             switch (rawStatus) {
@@ -328,7 +439,12 @@ Date weekStart = cal.getTime();
             String title       = t.getTitle()  != null ? t.getTitle() : "Untitled";
             String desc        = t.getDescription() != null ? t.getDescription() : "";
         %>
-        <div class="task-card <%=cardExtra.trim()%>" data-filter="<%=filterKey%>" data-week="<%=isThisWeek?"1":"0"%>">
+        <div class="task-card <%=cardExtra.trim()%>"
+             data-filter="<%=filterKey%>"
+             data-week="<%=isThisWeek?"1":"0"%>"
+             data-today="<%=isToday?"1":"0"%>"
+             data-assigned-date="<%=assignedDateStr%>">
+
           <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
             <div class="flex items-start gap-2 flex-1 min-w-0">
               <%if (needsReview) {%><span class="pulse-dot mt-1.5 shrink-0"></span><%}%>
@@ -338,7 +454,9 @@ Date weekStart = cal.getTime();
               </div>
             </div>
             <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-              <%if (isThisWeek) {%>
+              <%if (isToday) {%>
+              <span class="today-pill"><i class="fa-solid fa-sun text-xs"></i> Today</span>
+              <%} else if (isThisWeek) {%>
               <span class="week-pill"><i class="fa-solid fa-calendar-week text-xs"></i> This Week</span>
               <%}%>
               <span class="badge <%=badgeCls%>"><%=badgeLabel%></span>
@@ -398,19 +516,133 @@ Date weekStart = cal.getTime();
         </div>
         <%}}%>
       </div>
-    </div>
+    </div><!-- /panel-right -->
 
   </div>
 </div>
 
 <script>
+var TODAY_STR = '<%=todayStr%>';
+
+// ── Custom Calendar State ────────────────────────────────────────
+var calViewYear, calViewMonth, calSelectedDate = null;
+
+(function initCalView() {
+  var d = new Date();
+  calViewYear  = d.getFullYear();
+  calViewMonth = d.getMonth(); // 0-based
+})();
+
+function toggleCalendar(e) {
+  e.stopPropagation();
+  var cal = document.getElementById('customCalendar');
+  var isOpen = cal.classList.contains('open');
+  if (!isOpen) {
+    renderCalendar();
+    cal.classList.add('open');
+  } else {
+    cal.classList.remove('open');
+  }
+}
+
+function closeCalendar() {
+  document.getElementById('customCalendar').classList.remove('open');
+}
+
+function calNav(dir) {
+  calViewMonth += dir;
+  if (calViewMonth < 0)  { calViewMonth = 11; calViewYear--; }
+  if (calViewMonth > 11) { calViewMonth = 0;  calViewYear++; }
+  renderCalendar();
+}
+
+function calJumpToday() {
+  var d = new Date();
+  calViewYear  = d.getFullYear();
+  calViewMonth = d.getMonth();
+  renderCalendar();
+}
+
+function renderCalendar() {
+  var months = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+  document.getElementById('calMonthYear').textContent = months[calViewMonth] + ' ' + calViewYear;
+
+  var grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  // Day-of-week headers (Mon first)
+  ['Mo','Tu','We','Th','Fr','Sa','Su'].forEach(function(d) {
+    var el = document.createElement('div');
+    el.className = 'cal-dow';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  var firstDay = new Date(calViewYear, calViewMonth, 1).getDay(); // 0=Sun
+  var offset   = (firstDay === 0) ? 6 : firstDay - 1; // shift to Mon-start
+  var daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+
+  var todayParts = TODAY_STR.split('-');
+  var todayY = parseInt(todayParts[0]);
+  var todayM = parseInt(todayParts[1]) - 1;
+  var todayD = parseInt(todayParts[2]);
+
+  // Empty cells before first day
+  for (var i = 0; i < offset; i++) {
+    var empty = document.createElement('div');
+    empty.className = 'cal-day cal-empty';
+    grid.appendChild(empty);
+  }
+
+  for (var day = 1; day <= daysInMonth; day++) {
+    var el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = day;
+
+    var isToday    = (calViewYear === todayY && calViewMonth === todayM && day === todayD);
+    var isFuture   = new Date(calViewYear, calViewMonth, day) > new Date(todayY, todayM, todayD);
+    var dateVal    = calViewYear + '-'
+                   + String(calViewMonth + 1).padStart(2,'0') + '-'
+                   + String(day).padStart(2,'0');
+    var isSelected = (calSelectedDate === dateVal);
+
+    if (isFuture)   el.classList.add('cal-disabled');
+    if (isToday)    el.classList.add('cal-today');
+    if (isSelected) el.classList.add('cal-selected');
+
+    if (!isFuture) {
+      (function(dv) {
+        el.addEventListener('click', function() {
+          calSelectedDate = dv;
+          closeCalendar();
+          onDateSelected(dv);
+        });
+      })(dateVal);
+    }
+
+    grid.appendChild(el);
+  }
+}
+
+function onDateSelected(dateVal) {
+  var parts  = dateVal.split('-');
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var label  = months[parseInt(parts[1]) - 1] + ' ' + parseInt(parts[2]) + ', ' + parts[0];
+  if (dateVal === TODAY_STR) label = 'Today (' + label + ')';
+
+  document.getElementById('datePillLabel').textContent = label;
+  document.getElementById('datePillBtn').classList.add('active');
+  document.getElementById('clearDateBtn').classList.remove('hidden');
+
+  document.querySelectorAll('.ftab').forEach(function(t) { t.className = 'ftab'; });
+  applyFilter('DATE', dateVal);
+}
+
 // ── Team filter ─────────────────────────────────────────────────
 function filterByTeam(team, btn) {
-  document.querySelectorAll('.team-btn').forEach(function(b) {
-    b.classList.remove('active');
-  });
+  document.querySelectorAll('.team-btn').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
-
   var rows = document.querySelectorAll('.emp-row');
   var visible = 0;
   rows.forEach(function(row) {
@@ -418,73 +650,116 @@ function filterByTeam(team, btn) {
     row.classList.toggle('hidden-by-team', !match);
     if (match) visible++;
   });
-
-  // Update count label
   var label = document.getElementById('empCountLabel');
-  if (label) {
-    label.textContent = team === 'all'
-      ? '(' + visible + ' employees)'
-      : '(' + visible + ' in ' + team + ' team)';
-  }
-
-  // Uncheck hidden employees so they are not accidentally submitted
-  document.querySelectorAll('.emp-row.hidden-by-team .emp-checkbox:checked').forEach(function(cb) {
-    cb.checked = false;
-  });
+  if (label) label.textContent = team === 'all'
+    ? '(' + visible + ' employees)'
+    : '(' + visible + ' in ' + team + ' team)';
+  document.querySelectorAll('.emp-row.hidden-by-team .emp-checkbox:checked').forEach(function(cb) { cb.checked = false; });
   updateEmpLabel();
 }
 
-// ── Feed filter ─────────────────────────────────────────────────
-var TAB_CLS = { all:'f-all', WEEK:'f-week', ASSIGNED:'f-assigned', REVIEW:'f-processing', COMPLETED:'f-completed' };
+// ── Tab style map ────────────────────────────────────────────────
+var TAB_CLS = { all:'f-all', TODAY:'f-today', WEEK:'f-week', ASSIGNED:'f-assigned', REVIEW:'f-processing', COMPLETED:'f-completed' };
 
+// ── Feed filter (tabs) ───────────────────────────────────────────
 function filterFeed(key, btn) {
-  document.querySelectorAll('.ftab').forEach(function(t){ t.className = 'ftab'; });
-  btn.classList.add(TAB_CLS[key] || 'f-all');
-  var cards = document.querySelectorAll('.task-card');
+  calSelectedDate = null;
+  document.getElementById('datePillLabel').textContent = 'Pick a Date';
+  document.getElementById('datePillBtn').classList.remove('active');
+  document.getElementById('clearDateBtn').classList.add('hidden');
+  closeCalendar();
+
+  document.querySelectorAll('.ftab').forEach(function(t) { t.className = 'ftab'; });
+  if (btn) btn.classList.add(TAB_CLS[key] || 'f-all');
+  applyFilter(key, null);
+}
+
+// ── Clear date ───────────────────────────────────────────────────
+function clearDateFilter() {
+  calSelectedDate = null;
+  document.getElementById('datePillLabel').textContent = 'Pick a Date';
+  document.getElementById('datePillBtn').classList.remove('active');
+  document.getElementById('clearDateBtn').classList.add('hidden');
+  closeCalendar();
+
+  document.querySelectorAll('.ftab').forEach(function(t) { t.className = 'ftab'; });
+  document.getElementById('tabToday').classList.add('f-today');
+  applyFilter('TODAY', null);
+}
+
+// ── Core filter logic ────────────────────────────────────────────
+function applyFilter(key, dateVal) {
+  var cards   = document.querySelectorAll('.task-card');
   var visible = 0;
   cards.forEach(function(c) {
-    var show = key === 'all' ? true : key === 'WEEK' ? c.dataset.week === '1' : c.dataset.filter === key;
+    var show;
+    switch (key) {
+      case 'all':      show = true; break;
+      case 'TODAY':    show = c.dataset.today === '1'; break;
+      case 'WEEK':     show = c.dataset.week  === '1'; break;
+      case 'DATE':     show = c.dataset.assignedDate === dateVal; break;
+      default:         show = c.dataset.filter === key; break;
+    }
     c.style.display = show ? '' : 'none';
     if (show) visible++;
   });
-  var feed = document.getElementById('taskFeed');
+
+  var feed  = document.getElementById('taskFeed');
   var empty = document.getElementById('feedEmpty');
   if (visible === 0 && !empty) {
     var el = document.createElement('div');
     el.id = 'feedEmpty';
     el.className = 'bg-white rounded-xl border border-slate-200 px-6 py-10 text-center text-slate-400 text-sm';
-    el.innerHTML = '<i class="fa-solid fa-filter-circle-xmark text-3xl mb-2 block"></i>No tasks match this filter.';
+    var msg = key === 'TODAY' ? 'No tasks assigned today.'
+            : key === 'DATE'  ? 'No tasks found for the selected date.'
+            : 'No tasks match this filter.';
+    el.innerHTML = '<i class="fa-solid fa-filter-circle-xmark text-3xl mb-2 block"></i>' + msg;
     feed.appendChild(el);
-  } else if (visible > 0 && empty) { empty.remove(); }
+  } else if (visible > 0 && empty) {
+    empty.remove();
+  }
 }
 
-// ── Count pills ─────────────────────────────────────────────────
+// ── Count pills + default tab ────────────────────────────────────
 (function initCounts() {
-  var counts = { all:0, WEEK:0, ASSIGNED:0, REVIEW:0, COMPLETED:0 };
+  var counts = { all:0, TODAY:0, WEEK:0, ASSIGNED:0, REVIEW:0, COMPLETED:0 };
   document.querySelectorAll('.task-card').forEach(function(c) {
     counts.all++;
-    if (c.dataset.week === '1') counts.WEEK++;
+    if (c.dataset.today === '1') counts.TODAY++;
+    if (c.dataset.week  === '1') counts.WEEK++;
     var k = c.dataset.filter;
     if (counts[k] != null) counts[k]++;
   });
   document.getElementById('fc-all').textContent       = counts.all;
+  document.getElementById('fc-today').textContent     = counts.TODAY;
   document.getElementById('fc-week').textContent      = counts.WEEK;
   document.getElementById('fc-assigned').textContent  = counts.ASSIGNED;
   document.getElementById('fc-review').textContent    = counts.REVIEW;
   document.getElementById('fc-completed').textContent = counts.COMPLETED;
 
-  // Set initial employee count label
   var label = document.getElementById('empCountLabel');
   if (label) {
     var total = document.querySelectorAll('.emp-row').length;
     if (total > 0) label.textContent = '(' + total + ' employees)';
   }
 
-  // Default: This Week tab
-  filterFeed('WEEK', document.getElementById('tabWeek'));
+  document.getElementById('tabToday').classList.add('f-today');
+  applyFilter('TODAY', null);
 })();
 
-// ── Employee dropdown ───────────────────────────────────────────
+// ── Close calendar on outside click ─────────────────────────────
+document.addEventListener('click', function(e) {
+  var wrapper = document.getElementById('calWrapper');
+  if (wrapper && !wrapper.contains(e.target)) closeCalendar();
+
+  var empW = document.getElementById('empDropdownWrapper');
+  if (empW && !empW.contains(e.target)) {
+    document.getElementById('empDropdownPanel').classList.add('hidden');
+    document.getElementById('empChevron').style.transform = 'rotate(0deg)';
+  }
+});
+
+// ── Employee dropdown ────────────────────────────────────────────
 function toggleEmpDropdown() {
   var panel   = document.getElementById('empDropdownPanel');
   var chevron = document.getElementById('empChevron');
@@ -492,13 +767,7 @@ function toggleEmpDropdown() {
   panel.classList.toggle('hidden', open);
   chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
 }
-document.addEventListener('click', function(e) {
-  var w = document.getElementById('empDropdownWrapper');
-  if (w && !w.contains(e.target)) {
-    document.getElementById('empDropdownPanel').classList.add('hidden');
-    document.getElementById('empChevron').style.transform = 'rotate(0deg)';
-  }
-});
+
 function updateEmpLabel() {
   var checked = document.querySelectorAll('.emp-checkbox:checked');
   var label   = document.getElementById('empDropdownLabel');
@@ -525,7 +794,7 @@ document.getElementById('assignTaskForm').addEventListener('submit', function(e)
   }
 });
 
-// ── Toast ───────────────────────────────────────────────────────
+// ── Toast ────────────────────────────────────────────────────────
 function showToast(msg, ok) {
   var el = document.getElementById('toast');
   el.className = 'fixed bottom-6 right-4 z-50 px-5 py-3 rounded-lg shadow-lg text-sm font-medium max-w-xs '

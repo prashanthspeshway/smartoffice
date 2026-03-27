@@ -1,5 +1,6 @@
 package com.smartoffice.model;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Performance {
@@ -8,6 +9,7 @@ public class Performance {
 	private String employeeUsername;
 	private String managerUsername;
 	private String rating;
+	private Date performanceMonth;
 	private Timestamp createdAt;
 
 	public int getId() {
@@ -40,6 +42,14 @@ public class Performance {
 
 	public void setRating(String rating) {
 		this.rating = rating;
+	}
+
+	public Date getPerformanceMonth() {
+		return performanceMonth;
+	}
+
+	public void setPerformanceMonth(Date performanceMonth) {
+		this.performanceMonth = performanceMonth;
 	}
 
 	public Timestamp getCreatedAt() {

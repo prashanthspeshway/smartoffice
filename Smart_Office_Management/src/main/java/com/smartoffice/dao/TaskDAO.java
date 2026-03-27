@@ -293,14 +293,6 @@ public class TaskDAO {
 		}
 	}
 
-	public static void deleteOldCompletedTasks() throws Exception {
-		String sql = "DELETE FROM tasks WHERE status='COMPLETED' "
-				+ "AND assigned_date < DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-			ps.executeUpdate();
-		}
-	}
-
 	public List<Task> getTasksByStatus(String status) throws Exception {
 		List<Task> list = new ArrayList<>();
 		String sql = "SELECT * FROM tasks WHERE status=?";

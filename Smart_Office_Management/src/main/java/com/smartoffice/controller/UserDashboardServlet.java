@@ -75,12 +75,6 @@ public class UserDashboardServlet extends HttpServlet {
 				request.getRequestDispatcher("userAttendance.jsp").forward(request, response);
 				break;
 
-			case "/userTasks":
-				TaskDAO.deleteOldCompletedTasks();
-				request.setAttribute("tasks", TaskDAO.getTasksForEmployee(username));
-				request.getRequestDispatcher("userTasks.jsp").forward(request, response);
-				break;
-
 			case "/userTeam":
 				request.setAttribute("myTeams", TeamDAO.getTeamsForMember(username));
 				request.getRequestDispatcher("userTeam.jsp").forward(request, response);
@@ -116,7 +110,6 @@ public class UserDashboardServlet extends HttpServlet {
 
 	private void loadAll(HttpServletRequest request, String username) throws Exception {
 		loadAttendance(request, username);
-		TaskDAO.deleteOldCompletedTasks();
 		request.setAttribute("tasks", TaskDAO.getTasksForEmployee(username));
 		request.setAttribute("myLeaves", new LeaveRequestDAO().getLeavesByUsername(username));
 		request.setAttribute("meetings", loadMeetings(username));
@@ -145,7 +138,6 @@ public class UserDashboardServlet extends HttpServlet {
 	private void loadOverviewStats(HttpServletRequest request, String username) throws Exception {
 		java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
 
-		TaskDAO.deleteOldCompletedTasks();
 		List<Task> tasks = TaskDAO.getTasksForEmployee(username);
 		int taskAssigned = 0;
 		int taskCompleted = 0;

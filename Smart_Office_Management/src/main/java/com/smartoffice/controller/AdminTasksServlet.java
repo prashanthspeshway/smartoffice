@@ -12,8 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+import com.smartoffice.dao.PerformanceDAO;
 import com.smartoffice.dao.TaskDAO;
 import com.smartoffice.dao.TeamDAO;
+import com.smartoffice.model.Performance;
 import com.smartoffice.model.Task;
 import com.smartoffice.model.Team;
 import com.smartoffice.service.NotificationService;
@@ -41,11 +43,16 @@ public class AdminTasksServlet extends HttpServlet {
             List<Task> tasks = TaskDAO.getAllTasks();
             request.setAttribute("tasks", tasks);
 
-            List<Team> teams = TeamDAO.getAllTeams();   // already loads members inside
+            List<Team> teams = TeamDAO.getAllTeams(); // already loads members inside
             request.setAttribute("teams", teams);
-           
+
+            // FIX: Load all performance records and pass them to the JSP
+            PerformanceDAO perfDAO = new PerformanceDAO();
+            List<Performance> perfs = perfDAO.getAllPerformances();
+            request.setAttribute("perfs", perfs);
+
         } catch (Exception e) {
-            throw new ServletException("Unable to load tasks / teams", e);
+            throw new ServletException("Unable to load tasks / teams / performances", e);
         }
         request.getRequestDispatcher("adminTasks.jsp").forward(request, response);
     }
