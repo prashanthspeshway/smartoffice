@@ -74,6 +74,11 @@ public class UserDashboardServlet extends HttpServlet {
 				loadAttendance(request, username);
 				request.getRequestDispatcher("userAttendance.jsp").forward(request, response);
 				break;
+				
+			case "/userTasks":
+			    request.setAttribute("tasks", TaskDAO.getTasksForEmployee(username));
+			    request.getRequestDispatcher("userTasks.jsp").forward(request, response);
+			    break;
 
 			case "/userTeam":
 				request.setAttribute("myTeams", TeamDAO.getTeamsForMember(username));

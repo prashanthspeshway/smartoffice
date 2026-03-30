@@ -112,6 +112,61 @@ if (perfs == null) perfs = java.util.Collections.emptyList();
   .filter-tab.ft-error          { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
   .cpill { background: rgba(0,0,0,.1); border-radius: 9999px; padding: 0 7px; font-size: 11px; font-weight: 600; }
 
+  /* ── Date Filter Bar ── */
+  .date-filter-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    background: white; border: 1.5px solid #e2e8f0; border-radius: 12px;
+    padding: 10px 16px; margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .date-filter-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: #94a3b8;
+    display: flex; align-items: center; gap: 6px;
+    white-space: nowrap;
+  }
+  .date-filter-bar input[type="date"] {
+    font-size: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+    padding: 5px 10px; color: #374151; background: #f8fafc;
+    outline: none; font-family: 'DM Sans', sans-serif;
+    transition: border-color .15s, box-shadow .15s;
+    cursor: pointer;
+  }
+  .date-filter-bar input[type="date"]:focus {
+    border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+    background: white;
+  }
+  .date-filter-bar .df-divider {
+    color: #cbd5e1; font-size: 13px; font-weight: 500;
+  }
+  .btn-df-apply {
+    font-size: 12px; font-weight: 600; padding: 6px 14px;
+    background: #6366f1; color: white; border: none; border-radius: 8px;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    transition: background .15s, transform .1s;
+  }
+  .btn-df-apply:hover { background: #4f46e5; transform: translateY(-1px); }
+  .btn-df-apply:active { transform: translateY(0); }
+  .btn-df-clear {
+    font-size: 12px; font-weight: 600; padding: 6px 14px;
+    background: #f1f5f9; color: #64748b; border: 1.5px solid #e2e8f0;
+    border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    transition: all .15s;
+  }
+  .btn-df-clear:hover { background: #e2e8f0; color: #374151; }
+  .date-active-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe;
+    border-radius: 9999px; padding: 3px 12px; font-size: 11px; font-weight: 700;
+    animation: badgePop .2s ease;
+  }
+  @keyframes badgePop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .date-active-badge .badge-x {
+    cursor: pointer; color: #818cf8; font-size: 12px; margin-left: 2px;
+    transition: color .12s;
+  }
+  .date-active-badge .badge-x:hover { color: #4f46e5; }
+
   /* ── Panels ── */
   .panel { animation: fadeSlide .22s ease; }
   @keyframes fadeSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -163,7 +218,6 @@ if (perfs == null) perfs = java.util.Collections.emptyList();
      PERFORMANCE TAB — Monthly Reviews
   ════════════════════════════════════════ */
 
-  /* Summary stat row */
   .pm-summary-grid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;
   }
@@ -174,7 +228,6 @@ if (perfs == null) perfs = java.util.Collections.emptyList();
   .pm-s-val { font-size: 22px; font-weight: 700; color: #1e293b; line-height: 1.2; min-height: 32px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .pm-s-lbl { font-size: 11px; color: #94a3b8; margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
 
-  /* Charts row */
   .pm-charts-row {
     display: grid; grid-template-columns: 1fr 190px; gap: 16px; align-items: start; margin-bottom: 16px;
   }
@@ -190,7 +243,6 @@ if (perfs == null) perfs = java.util.Collections.emptyList();
     display: flex; flex-direction: column; align-items: center;
   }
 
-  /* Month history list */
   .pm-history-card {
     background: white; border: 1.5px solid #e2e8f0; border-radius: 14px;
     padding: 16px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.04);
@@ -209,17 +261,14 @@ if (perfs == null) perfs = java.util.Collections.emptyList();
   .pm-badge      { font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 9999px; white-space: nowrap; }
   .pm-mgr-chip   { font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 4px; min-width: 90px; justify-content: flex-end; white-space: nowrap; }
 
-  /* Ring legend */
   .pm-ring-legend { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 8px; }
   .pm-ring-item   { display: flex; align-items: center; gap: 4px; font-size: 10.5px; color: #64748b; }
   .pm-ring-dot    { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-  /* Trend arrows */
   .pm-trend-up   { color: #16a34a; font-weight: 700; }
   .pm-trend-down { color: #dc2626; font-weight: 700; }
   .pm-trend-flat { color: #f59e0b; font-weight: 700; }
 
-  /* No-perf empty */
   .pm-empty {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 8px; padding: 52px 24px;
@@ -315,7 +364,6 @@ for (Performance p : perfs) {
   String empUsr  = p.getEmployeeUsername() != null ? p.getEmployeeUsername() : "";
   String mgrUsr  = p.getManagerUsername()  != null ? p.getManagerUsername()  : "";
   String rating  = p.getRating()           != null ? p.getRating()           : "";
-  // Use createdAt to derive the month string (YYYY-MM-01) for monthly grouping
   String monthStr = "";
   if (p.getCreatedAt() != null) {
     java.time.LocalDate ld = p.getCreatedAt().toLocalDateTime().toLocalDate();
@@ -412,12 +460,56 @@ for (Performance p : perfs) {
     <div class="tab-content" id="tab-content-2">
 
       <!-- Status filter pills -->
-      <div class="flex flex-wrap gap-2 mb-4">
+      <div class="flex flex-wrap gap-2 mb-3">
         <button class="filter-tab ft-all"  onclick="filterTasks('all', this)"><i class="fa-solid fa-border-all text-xs"></i> All <span class="cpill" id="cnt-all">0</span></button>
         <button class="filter-tab"         onclick="filterTasks('COMPLETED', this)"><i class="fa-solid fa-circle-check text-xs"></i> Completed <span class="cpill" id="cnt-completed">0</span></button>
         <button class="filter-tab"         onclick="filterTasks('INCOMPLETE', this)"><i class="fa-solid fa-clock text-xs"></i> Incomplete <span class="cpill" id="cnt-incomplete">0</span></button>
         <button class="filter-tab"         onclick="filterTasks('DOCUMENT_VERIFICATION', this)"><i class="fa-solid fa-file-circle-check text-xs"></i> Doc Verification <span class="cpill" id="cnt-docverify">0</span></button>
         <button class="filter-tab"         onclick="filterTasks('ERRORS_RAISED', this)"><i class="fa-solid fa-triangle-exclamation text-xs"></i> Errors Raised <span class="cpill" id="cnt-error">0</span></button>
+      </div>
+
+      <!-- ── Date Filter Bar ── -->
+      <div class="date-filter-bar">
+        <span class="date-filter-label">
+          <i class="fa-solid fa-calendar-days" style="color:#6366f1;"></i>
+          Filter by Date
+        </span>
+
+        <div style="display:flex;align-items:center;gap:6px;">
+          <label style="font-size:11px;color:#94a3b8;font-weight:600;">Assigned From</label>
+          <input type="date" id="df-assigned-from" title="Assigned date from">
+        </div>
+        <span class="df-divider">→</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <label style="font-size:11px;color:#94a3b8;font-weight:600;">To</label>
+          <input type="date" id="df-assigned-to" title="Assigned date to">
+        </div>
+
+        <div style="width:1px;height:22px;background:#e2e8f0;margin:0 2px;"></div>
+
+        <div style="display:flex;align-items:center;gap:6px;">
+          <label style="font-size:11px;color:#94a3b8;font-weight:600;">Deadline From</label>
+          <input type="date" id="df-deadline-from" title="Deadline from">
+        </div>
+        <span class="df-divider">→</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <label style="font-size:11px;color:#94a3b8;font-weight:600;">To</label>
+          <input type="date" id="df-deadline-to" title="Deadline to">
+        </div>
+
+        <button class="btn-df-apply" onclick="applyDateFilter()">
+          <i class="fa-solid fa-magnifying-glass"></i> Apply
+        </button>
+        <button class="btn-df-clear" onclick="clearDateFilter()">
+          <i class="fa-solid fa-xmark"></i> Clear
+        </button>
+
+        <!-- Active filter badge -->
+        <span id="df-active-badge" class="date-active-badge" style="display:none;">
+          <i class="fa-solid fa-filter" style="font-size:10px;"></i>
+          <span id="df-badge-text"></span>
+          <span class="badge-x" onclick="clearDateFilter()" title="Remove date filter">✕</span>
+        </span>
       </div>
 
       <!-- Empty: no tasks at all -->
@@ -431,7 +523,7 @@ for (Performance p : perfs) {
       <div id="empty-filter-msg" class="hidden empty-state mb-4">
         <div class="empty-icon"><i class="fa-solid fa-filter-circle-xmark"></i></div>
         <div class="empty-title">No tasks match this filter</div>
-        <div class="empty-sub">Try selecting a different status.</div>
+        <div class="empty-sub">Try selecting a different status or date range.</div>
       </div>
 
       <!-- Task table -->
@@ -457,16 +549,12 @@ for (Performance p : perfs) {
     <!-- ── Tab 3 Content: Performance ── -->
     <div class="tab-content" id="tab-content-3">
 
-      <!-- ════ SECTION A: Task-based performance (original) ════ -->
+      <!-- ════ SECTION A: Task-based performance ════ -->
       <div id="task-perf-section">
 
-        <!-- Summary stat cards -->
         <div id="perf-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6"></div>
 
-        <!-- Progress breakdown -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-          <!-- Completion rate -->
           <div class="perf-stat">
             <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Task Completion Rate</div>
             <div class="flex items-end gap-2 mb-1">
@@ -479,7 +567,6 @@ for (Performance p : perfs) {
             <div id="perf-rate-label" class="text-xs text-slate-400 mt-2"></div>
           </div>
 
-          <!-- On-time delivery -->
           <div class="perf-stat">
             <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">On-Time Delivery</div>
             <div class="flex items-end gap-2 mb-1">
@@ -492,21 +579,18 @@ for (Performance p : perfs) {
             <div id="perf-ontime-label" class="text-xs text-slate-400 mt-2">Based on tasks with deadlines</div>
           </div>
 
-          <!-- Status breakdown -->
           <div class="perf-stat md:col-span-2">
             <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">Status Breakdown</div>
             <div id="perf-breakdown" class="flex flex-col gap-3"></div>
           </div>
-
         </div>
 
-        <!-- Priority breakdown -->
         <div class="perf-stat mt-4">
           <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">Priority Distribution</div>
           <div id="perf-priority" class="flex flex-wrap gap-3"></div>
         </div>
 
-      </div><!-- /task-perf-section -->
+      </div>
 
       <!-- ════ DIVIDER ════ -->
       <div style="display:flex;align-items:center;gap:12px;margin:28px 0 20px;">
@@ -519,18 +603,13 @@ for (Performance p : perfs) {
 
       <!-- ════ SECTION B: Monthly manager performance ════ -->
       <div id="pm-section">
-
-        <!-- No reviews empty state -->
         <div id="pm-empty" class="pm-empty" style="display:none;">
           <div class="pm-empty-icon"><i class="fa-regular fa-star"></i></div>
           <div class="pm-empty-title">No performance reviews yet</div>
           <div class="pm-empty-sub">Reviews given by the manager will appear here once added.</div>
         </div>
 
-        <!-- Content (shown when reviews exist) -->
         <div id="pm-content">
-
-          <!-- Summary cards -->
           <div class="pm-summary-grid">
             <div class="pm-s-card">
               <div class="pm-s-val" id="pm-avg-val">—</div>
@@ -546,35 +625,26 @@ for (Performance p : perfs) {
             </div>
           </div>
 
-          <!-- Charts row -->
           <div class="pm-charts-row">
-
-            <!-- Bar chart (trend) -->
             <div class="pm-chart-card">
               <div class="section-label" style="margin-bottom:12px;">Rating trend by month</div>
               <div style="position:relative;width:100%;height:190px;">
                 <canvas id="pm-bar-canvas"></canvas>
               </div>
             </div>
-
-            <!-- Donut (distribution) -->
             <div class="pm-donut-card">
               <div class="section-label" style="margin-bottom:10px;text-align:center;">Distribution</div>
               <canvas id="pm-donut-canvas" width="140" height="140" style="display:block;"></canvas>
               <div class="pm-ring-legend" id="pm-ring-legend"></div>
             </div>
-
           </div>
 
-          <!-- Monthly history list -->
           <div class="pm-history-card">
             <div class="section-label" style="margin-bottom:10px;">Monthly history</div>
             <div id="pm-history-list"></div>
           </div>
-
-        </div><!-- /pm-content -->
-
-      </div><!-- /pm-section -->
+        </div>
+      </div>
 
     </div><!-- /tab3 -->
 
@@ -593,7 +663,6 @@ const TEAMS = JSON.parse(document.getElementById('teams-data').textContent);
 const TASKS = JSON.parse(document.getElementById('tasks-data').textContent);
 const PERFS = JSON.parse(document.getElementById('perfs-data').textContent);
 
-// Index tasks by assignee (email or name, lowercased)
 const tasksByKey = {};
 TASKS.forEach(function(t) {
   var k = (t.assignedTo || '').trim().toLowerCase();
@@ -613,7 +682,6 @@ function getTasksForMember(m) {
   return merged;
 }
 
-// ── FIX: Match perfs by email, display name, OR username ──
 function getPerfsForMember(m) {
   var email    = (m.email    || '').trim().toLowerCase();
   var name     = (m.name     || '').trim().toLowerCase();
@@ -632,7 +700,12 @@ let selectedMember = null;
 let currentTab     = 1;
 let activeFilter   = 'all';
 
-// Chart instances (keep references to destroy on re-render)
+// Date filter state
+let dfAssignedFrom = null;
+let dfAssignedTo   = null;
+let dfDeadlineFrom = null;
+let dfDeadlineTo   = null;
+
 let _pmBarChart   = null;
 let _pmDonutChart = null;
 
@@ -651,7 +724,6 @@ function hide(id) {
   el.classList.add('hidden');
   el.style.display = 'none';
 }
-
 function esc(str) {
   if (!str) return '';
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -680,13 +752,11 @@ function prioDot(p) {
   }
 }
 
-// ── FIX: Rating keys now match exact DB values (EXCELLENCE, GOOD, AVERAGE, BELOW_AVERAGE) ──
 const RATING_META = {
   'EXCELLENCE':        { bg:'#dcfce7', text:'#166534', bar:'#22c55e', score:5 },
   'GOOD':              { bg:'#dbeafe', text:'#1e40af', bar:'#3b82f6', score:4 },
   'AVERAGE':           { bg:'#fef9c3', text:'#854d0e', bar:'#eab308', score:3 },
   'BELOW_AVERAGE':     { bg:'#ffedd5', text:'#9a3412', bar:'#f97316', score:2 },
-  // Kept as fallbacks in case other values appear
   'Excellent':         { bg:'#dcfce7', text:'#166534', bar:'#22c55e', score:5 },
   'Good':              { bg:'#dbeafe', text:'#1e40af', bar:'#3b82f6', score:4 },
   'Average':           { bg:'#fef9c3', text:'#854d0e', bar:'#eab308', score:3 },
@@ -694,12 +764,9 @@ const RATING_META = {
   'Poor':              { bg:'#fee2e2', text:'#991b1b', bar:'#ef4444', score:1 },
   'Needs Improvement': { bg:'#ede9fe', text:'#5b21b6', bar:'#8b5cf6', score:2 }
 };
-
 function ratingMeta(r) {
   return RATING_META[r] || { bg:'#f1f5f9', text:'#64748b', bar:'#94a3b8', score:3 };
 }
-
-// ── Friendly display labels for DB rating values ──
 function ratingLabel(r) {
   const labels = {
     'EXCELLENCE':    'Excellence',
@@ -709,7 +776,6 @@ function ratingLabel(r) {
   };
   return labels[r] || r;
 }
-
 function formatMonth(dateStr) {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
@@ -855,6 +921,17 @@ function setTabState(n, state) {
 // TAB 2 — Task Status
 // ══════════════════════════════════════════════════
 function renderTaskStatus(member) {
+  // Reset date filter state when switching employees
+  dfAssignedFrom = null;
+  dfAssignedTo   = null;
+  dfDeadlineFrom = null;
+  dfDeadlineTo   = null;
+  document.getElementById('df-assigned-from').value = '';
+  document.getElementById('df-assigned-to').value   = '';
+  document.getElementById('df-deadline-from').value = '';
+  document.getElementById('df-deadline-to').value   = '';
+  document.getElementById('df-active-badge').style.display = 'none';
+
   const memberTasks = getTasksForMember(member);
   hide('empty-member-tasks');
   hide('empty-filter-msg');
@@ -875,6 +952,7 @@ function renderTaskStatus(member) {
   t2c.textContent = counts.all;
   show('tab2-count');
 
+  // Reset status filter to "all"
   activeFilter = 'all';
   document.querySelectorAll('.filter-tab').forEach(t => t.className = 'filter-tab');
   document.querySelector('.filter-tab').className = 'filter-tab ft-all';
@@ -892,22 +970,24 @@ function renderTaskStatus(member) {
       ? '<a href="' + t.taskUrl + '" class="text-indigo-600 hover:underline text-xs" target="_blank">' + esc(t.attachment) + '</a>'
       : '<span class="text-slate-300 text-xs italic">—</span>';
     const tr = document.createElement('tr');
-    tr.className  = 'task-row border-b border-slate-100 hover:bg-slate-50 text-sm';
-    tr.dataset.status = t.status;
+    tr.className       = 'task-row border-b border-slate-100 hover:bg-slate-50 text-sm';
+    tr.dataset.status   = t.status;
+    tr.dataset.assigned = t.date     || '';   // ← for date filtering
+    tr.dataset.deadline = t.deadline || '';   // ← for date filtering
     tr.innerHTML =
       '<td class="px-4 py-3 text-slate-400 text-xs row-num">' + (i+1) + '</td>' +
       '<td class="px-4 py-3 text-slate-800 font-medium max-w-xs truncate">' + esc(t.title) + '</td>' +
       '<td class="px-4 py-3"><span class="badge-status ' + stClass + '">' + stText + '</span></td>' +
       '<td class="px-4 py-3 text-xs ' + prioIcon.cls + '">' + prioIcon.icon + ' ' + esc(t.priority) + '</td>' +
-      '<td class="px-4 py-3 text-slate-500 text-xs">' + t.date + '</td>' +
-      '<td class="px-4 py-3 text-slate-500 text-xs">' + t.deadline + '</td>' +
+      '<td class="px-4 py-3 text-slate-500 text-xs">' + (t.date || '—') + '</td>' +
+      '<td class="px-4 py-3 text-slate-500 text-xs">' + (t.deadline || '—') + '</td>' +
       '<td class="px-4 py-3">' + attCell + '</td>' +
       '<td class="px-4 py-3 text-slate-500 text-xs">' + esc(t.assignedBy) + '</td>';
     tbody.appendChild(tr);
   });
 }
 
-// ── Task filter pills ──
+// ── Status filter pills ──
 const TAB_CLS = {
   'all':'ft-all','COMPLETED':'ft-completed','INCOMPLETE':'ft-incomplete',
   'DOCUMENT_VERIFICATION':'ft-docverify','ERRORS_RAISED':'ft-error'
@@ -916,16 +996,127 @@ function filterTasks(status, btn) {
   activeFilter = status;
   document.querySelectorAll('.filter-tab').forEach(t => t.className = 'filter-tab');
   btn.classList.add(TAB_CLS[status]);
-  let visible = 0;
-  document.querySelectorAll('.task-row').forEach((row, i) => {
-    const match = status === 'all' || row.dataset.status === status;
-    row.style.display = match ? '' : 'none';
-    if (match) { visible++; row.querySelector('.row-num').textContent = visible; }
-  });
-  if (visible === 0) {
-    hide('table-wrap'); hide('empty-member-tasks'); show('empty-filter-msg');
+  applyAllFilters();
+}
+
+// ══════════════════════════════════════════════════
+// DATE FILTER
+// ══════════════════════════════════════════════════
+function parseDate(val) {
+  if (!val) return null;
+  const d = new Date(val);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function applyDateFilter() {
+  dfAssignedFrom = parseDate(document.getElementById('df-assigned-from').value);
+  dfAssignedTo   = parseDate(document.getElementById('df-assigned-to').value);
+  dfDeadlineFrom = parseDate(document.getElementById('df-deadline-from').value);
+  dfDeadlineTo   = parseDate(document.getElementById('df-deadline-to').value);
+
+  // Set end-of-day for "to" dates so the selected date is inclusive
+  if (dfAssignedTo)   dfAssignedTo.setHours(23, 59, 59, 999);
+  if (dfDeadlineTo)   dfDeadlineTo.setHours(23, 59, 59, 999);
+
+  const hasFilter = dfAssignedFrom || dfAssignedTo || dfDeadlineFrom || dfDeadlineTo;
+  const badge = document.getElementById('df-active-badge');
+
+  if (hasFilter) {
+    const parts = [];
+    if (dfAssignedFrom || dfAssignedTo) {
+      const f = dfAssignedFrom ? dfAssignedFrom.toLocaleDateString('en-GB') : '...';
+      const t = dfAssignedTo   ? dfDeadlineTo  ? dfAssignedTo.toLocaleDateString('en-GB') : dfAssignedTo.toLocaleDateString('en-GB') : '...';
+      // Rebuild properly
+      const af = document.getElementById('df-assigned-from').value;
+      const at = document.getElementById('df-assigned-to').value;
+      if (af || at) parts.push('Assigned: ' + (af||'any') + ' → ' + (at||'any'));
+    }
+    if (dfDeadlineFrom || dfDeadlineTo) {
+      const df2 = document.getElementById('df-deadline-from').value;
+      const dt  = document.getElementById('df-deadline-to').value;
+      if (df2 || dt) parts.push('Deadline: ' + (df2||'any') + ' → ' + (dt||'any'));
+    }
+    document.getElementById('df-badge-text').textContent = parts.join('  |  ');
+    badge.style.display = 'inline-flex';
   } else {
-    show('table-wrap'); hide('empty-member-tasks'); hide('empty-filter-msg');
+    badge.style.display = 'none';
+  }
+
+  applyAllFilters();
+}
+
+function clearDateFilter() {
+  dfAssignedFrom = null;
+  dfAssignedTo   = null;
+  dfDeadlineFrom = null;
+  dfDeadlineTo   = null;
+  document.getElementById('df-assigned-from').value = '';
+  document.getElementById('df-assigned-to').value   = '';
+  document.getElementById('df-deadline-from').value = '';
+  document.getElementById('df-deadline-to').value   = '';
+  document.getElementById('df-active-badge').style.display = 'none';
+  applyAllFilters();
+}
+
+function dateInRange(dateStr, from, to) {
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return false;
+  if (from && d < from) return false;
+  if (to   && d > to)   return false;
+  return true;
+}
+
+// Master filter: combines status + date filters
+function applyAllFilters() {
+  const hasAssignedFilter  = dfAssignedFrom || dfAssignedTo;
+  const hasDeadlineFilter  = dfDeadlineFrom || dfDeadlineTo;
+  const hasAnyDateFilter   = hasAssignedFilter || hasDeadlineFilter;
+
+  let visible = 0;
+  document.querySelectorAll('.task-row').forEach(function(row) {
+    // Status check
+    const statusMatch = activeFilter === 'all' || row.dataset.status === activeFilter;
+
+    // Date check
+    let dateMatch = true;
+    if (hasAnyDateFilter) {
+      let assignedOk = true;
+      let deadlineOk = true;
+
+      if (hasAssignedFilter) {
+        assignedOk = dateInRange(row.dataset.assigned, dfAssignedFrom, dfAssignedTo);
+      }
+      if (hasDeadlineFilter) {
+        deadlineOk = dateInRange(row.dataset.deadline, dfDeadlineFrom, dfDeadlineTo);
+      }
+
+      // Both conditions must pass if both filters are set; otherwise whichever is set
+      if (hasAssignedFilter && hasDeadlineFilter) {
+        dateMatch = assignedOk && deadlineOk;
+      } else if (hasAssignedFilter) {
+        dateMatch = assignedOk;
+      } else {
+        dateMatch = deadlineOk;
+      }
+    }
+
+    const shouldShow = statusMatch && dateMatch;
+    row.style.display = shouldShow ? '' : 'none';
+    if (shouldShow) {
+      visible++;
+      row.querySelector('.row-num').textContent = visible;
+    }
+  });
+
+  if (visible === 0) {
+    hide('table-wrap');
+    hide('empty-member-tasks');
+    show('empty-filter-msg');
+  } else {
+    show('table-wrap');
+    hide('empty-member-tasks');
+    hide('empty-filter-msg');
   }
 }
 
@@ -937,7 +1128,6 @@ function renderPerformance(member) {
   renderMonthlyPerf(member);
 }
 
-// ── Part A: Task-based performance (original logic) ──
 function renderTaskPerf(member) {
   const memberTasks = getTasksForMember(member);
   const total = memberTasks.length;
@@ -962,7 +1152,6 @@ function renderTaskPerf(member) {
   const completionPct = total > 0 ? Math.round((counts.COMPLETED / total) * 100) : 0;
   const onTimePct     = withDeadline > 0 ? Math.round((onTimeCount / withDeadline) * 100) : null;
 
-  // Stat cards
   const perfGrid = document.getElementById('perf-grid');
   perfGrid.innerHTML = '';
   const stats = [
@@ -991,12 +1180,10 @@ function renderTaskPerf(member) {
     perfGrid.appendChild(div);
   });
 
-  // Completion rate bar
   document.getElementById('perf-rate-pct').textContent  = completionPct + '%';
   document.getElementById('perf-rate-bar').style.width  = completionPct + '%';
   document.getElementById('perf-rate-label').textContent = counts.COMPLETED + ' of ' + total + ' tasks completed';
 
-  // On-time bar
   const otEl  = document.getElementById('perf-ontime-pct');
   const otBar = document.getElementById('perf-ontime-bar');
   if (onTimePct !== null) {
@@ -1009,7 +1196,6 @@ function renderTaskPerf(member) {
     document.getElementById('perf-ontime-label').textContent = 'No deadline data available';
   }
 
-  // Status breakdown bars
   const breakdown = document.getElementById('perf-breakdown');
   breakdown.innerHTML = '';
   const statusDefs = [
@@ -1033,7 +1219,6 @@ function renderTaskPerf(member) {
     breakdown.appendChild(row);
   });
 
-  // Priority distribution pills
   const prioEl = document.getElementById('perf-priority');
   prioEl.innerHTML = '';
   const prioDefs = [
@@ -1058,18 +1243,15 @@ function renderTaskPerf(member) {
   }
 }
 
-// ── Part B: Monthly manager performance reviews ──
 function renderMonthlyPerf(member) {
   const records = getPerfsForMember(member);
   const sorted  = [...records].sort((a,b) => new Date(a.performance_month) - new Date(b.performance_month));
   const total   = sorted.length;
 
-  // Update tab-3 badge
   const t3c = document.getElementById('tab3-count');
   if (total > 0) { t3c.textContent = total; show('tab3-count'); }
   else           { hide('tab3-count'); }
 
-  // No reviews
   if (!total) {
     document.getElementById('pm-empty').style.display   = '';
     document.getElementById('pm-content').style.display = 'none';
@@ -1081,7 +1263,6 @@ function renderMonthlyPerf(member) {
   document.getElementById('pm-empty').style.display   = 'none';
   document.getElementById('pm-content').style.display = '';
 
-  // ── Summary cards ──
   const avgScore  = sorted.reduce((s,r) => s + ratingMeta(r.rating).score, 0) / total;
   const latest    = sorted[sorted.length - 1];
   const prev      = sorted.length > 1 ? sorted[sorted.length - 2] : null;
@@ -1089,7 +1270,6 @@ function renderMonthlyPerf(member) {
   const trendIcon = trendDiff > 0 ? '↑' : trendDiff < 0 ? '↓' : '—';
   const trendCls  = trendDiff > 0 ? 'pm-trend-up' : trendDiff < 0 ? 'pm-trend-down' : 'pm-trend-flat';
 
-  // Map avgScore to nearest rating label
   const avgLabel = Object.entries(RATING_META).reduce((best, [k, v]) =>
     Math.abs(v.score - avgScore) < Math.abs(ratingMeta(best).score - avgScore) ? k : best,
     Object.keys(RATING_META)[0]
@@ -1099,14 +1279,11 @@ function renderMonthlyPerf(member) {
 
   document.getElementById('pm-avg-val').innerHTML =
     '<span style="background:' + am.bg + ';color:' + am.text + ';padding:3px 12px;border-radius:9999px;font-size:13px;font-weight:700;">' + esc(ratingLabel(avgLabel)) + '</span>';
-
   document.getElementById('pm-total-val').textContent = total;
-
   document.getElementById('pm-latest-val').innerHTML =
     '<span style="background:' + lm.bg + ';color:' + lm.text + ';padding:3px 12px;border-radius:9999px;font-size:13px;font-weight:700;">' + esc(ratingLabel(latest.rating)) + '</span>' +
     '<span class="' + trendCls + '" style="font-size:16px;">' + trendIcon + '</span>';
 
-  // ── Bar chart (rating trend) ──
   const barLabels = sorted.map(r => formatMonth(r.performance_month));
   const barScores = sorted.map(r => ratingMeta(r.rating).score);
   const barColors = sorted.map(r => ratingMeta(r.rating).bar);
@@ -1160,7 +1337,6 @@ function renderMonthlyPerf(member) {
     }
   });
 
-  // ── Donut chart (distribution) ──
   var dist = {};
   sorted.forEach(function(r) { dist[r.rating] = (dist[r.rating] || 0) + 1; });
   var distKeys   = Object.keys(dist);
@@ -1194,7 +1370,6 @@ function renderMonthlyPerf(member) {
     }
   });
 
-  // Ring legend
   const leg = document.getElementById('pm-ring-legend');
   leg.innerHTML = '';
   distKeys.forEach(function(k) {
@@ -1206,7 +1381,6 @@ function renderMonthlyPerf(member) {
       '</div>';
   });
 
-  // ── Monthly history list ──
   const list = document.getElementById('pm-history-list');
   list.innerHTML = '';
   [...sorted].reverse().forEach(function(rec) {

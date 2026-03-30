@@ -32,38 +32,38 @@ try {
 .sidebar-btn { transition: all 0.2s; text-align: left; }
 .notif-trigger { position: relative; }
 .notif-badge {
-	position: absolute;
-	top: -2px;
-	right: -2px;
-	z-index: 2;
-	box-sizing: border-box;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 1.25rem;
-	height: 1.25rem;
-	min-width: 1.25rem;
-	min-height: 1.25rem;
-	padding: 0;
-	font-size: 0.6875rem;
-	font-weight: 800;
-	letter-spacing: 0;
-	line-height: 0;
-	color: #fff;
-	background: linear-gradient(180deg, #f87171 0%, #ef4444 45%, #dc2626 100%);
-	border-radius: 50%;
-	border: 2px solid #fff;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
-	font-variant-numeric: tabular-nums;
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    z-index: 2;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    min-width: 1.25rem;
+    min-height: 1.25rem;
+    padding: 0;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 0;
+    color: #fff;
+    background: linear-gradient(180deg, #f87171 0%, #ef4444 45%, #dc2626 100%);
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+    font-variant-numeric: tabular-nums;
 }
 .notif-badge.notif-badge--pill {
-	width: auto;
-	min-width: 1.25rem;
-	height: 1.25rem;
-	min-height: 1.25rem;
-	padding: 0 0.35rem;
-	border-radius: 9999px;
-	font-size: 0.5625rem;
+    width: auto;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    min-height: 1.25rem;
+    padding: 0 0.35rem;
+    border-radius: 9999px;
+    font-size: 0.5625rem;
 }
 .notif-badge.hidden { display: none !important; }
 </style>
@@ -94,30 +94,30 @@ try {
     <!-- Sidebar -->
     <aside id="userSidebar" class="so-sidebar fixed md:relative z-50 inset-y-0 left-0 max-w-[min(85vw,var(--so-sidebar-width))] w-full min-w-0 h-full md:h-auto border-r border-slate-200 flex flex-col shadow-lg md:shadow-sm transform transition-transform duration-200 ease-out -translate-x-full md:translate-x-0 overflow-hidden">
         <nav class="flex-1 py-4 px-3 overflow-y-auto min-h-0">
-            <button type="button" data-user-view="userOverview" onclick="loadPage(this,'userOverview')" class="sidebar-btn active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
+            <button type="button" data-user-view="userOverview"  onclick="loadPage(this,'userOverview')"  class="sidebar-btn active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-chart-pie w-5"></i> <span>Overview</span>
             </button>
             <button type="button" data-user-view="userAttendance" onclick="loadPage(this,'userAttendance')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-user-check w-5"></i> <span>My Attendance</span>
             </button>
-            <button type="button" data-user-view="userTasks" onclick="loadPage(this,'userTasks')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
+            <button type="button" data-user-view="userTasks"     onclick="loadPage(this,'userTasks')"     class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-list-check w-5"></i> <span>Tasks</span>
             </button>
-            <button type="button" data-user-view="userTeam" onclick="loadPage(this,'userTeam')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
+            <button type="button" data-user-view="userTeam"      onclick="loadPage(this,'userTeam')"      class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-users w-5"></i> <span>My Team</span>
             </button>
-            <button type="button" data-user-view="userLeave" onclick="loadPage(this,'userLeave')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
+            <button type="button" data-user-view="userLeave"     onclick="loadPage(this,'userLeave')"     class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-calendar-xmark w-5"></i> <span>Apply Leave</span>
             </button>
-            <button type="button" data-user-view="userMeetings" onclick="loadPage(this,'userMeetings')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
+            <button type="button" data-user-view="userMeetings"  onclick="loadPage(this,'userMeetings')"  class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-handshake w-5"></i> <span>Scheduled Meetings</span>
             </button>
-            <button type="button" data-user-view="calendar.jsp" onclick="loadPage(this,'calendar.jsp')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
+            <button type="button" data-user-view="calendar.jsp"  onclick="loadPage(this,'calendar.jsp')"  class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-calendar-days w-5"></i> <span>Calendar</span>
             </button>
         </nav>
         <div class="border-t border-slate-200 px-3 py-4">
-            <button type="button" data-user-view="userSettings" onclick="loadPage(this,'userSettings')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
+            <button type="button" data-user-view="userSettings"  onclick="loadPage(this,'userSettings')"  class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
                 <i class="fa-solid fa-gear w-5"></i> <span>Settings</span>
             </button>
             <a href="<%=request.getContextPath()%>/logout" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors font-medium">
@@ -126,7 +126,7 @@ try {
         </div>
     </aside>
 
-    <!-- Content Area: default = Overview (must match first sidebar item) -->
+    <!-- Content Area -->
     <main class="so-main flex-1 min-h-0 overflow-auto bg-slate-100 flex flex-col w-full min-w-0">
         <iframe id="contentFrame" src="<%= ctxPath %>/userOverview" class="w-full flex-1 min-h-[50vh] md:min-h-0 border-0 block" title="Dashboard content"></iframe>
     </main>
@@ -136,50 +136,8 @@ try {
 <div id="toast" class="fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
 
 <script>
-window.addEventListener("DOMContentLoaded", function () {
-    const url = new URL(window.location);
-
-    let tab = url.searchParams.get("tab");
-    let view = url.searchParams.get("view");
-
-    // Support old ?tab
-    const tabMap = {
-        overview: 'userOverview',
-        tasks: 'userTasks',
-        leave: 'userLeave',
-        meetings: 'userMeetings',
-        calendar: 'calendar.jsp',
-        settings: 'userSettings',
-        attendance: 'userAttendance',
-        team: 'userTeam'
-    };
-
-    if (!view && tab && tabMap[tab]) {
-        view = tabMap[tab];
-    }
-
-    // Load page
-    if (view) {
-        document.getElementById("contentFrame").src = window.resolveDashboardUrl(view);
-
-        // Highlight sidebar
-        document.querySelectorAll('.sidebar-btn').forEach(b => {
-            if (b.getAttribute('data-user-view') === view) {
-                b.classList.add('active', 'bg-indigo-50', 'text-indigo-700');
-            } else {
-                b.classList.remove('active', 'bg-indigo-50', 'text-indigo-700');
-            }
-        });
-    }
-
-    // 🔥 Remove ALL params from URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-});
-</script>
-<script>
 (function() {
     var CTX = '<%= ctxPath %>';
-    /** Always load under app context (e.g. /Smart_Office_Management/userOverview) */
     window.resolveDashboardUrl = function(page) {
         if (!page) return CTX + '/userOverview';
         if (page.indexOf('http') === 0) return page;
@@ -188,22 +146,35 @@ window.addEventListener("DOMContentLoaded", function () {
         return CTX + '/' + page;
     };
 })();
+
+// ── Sidebar active state helper ──
+function setActiveSidebarBtn(view) {
+    document.querySelectorAll('.sidebar-btn').forEach(function(b) {
+        var v = b.getAttribute('data-user-view');
+        if (v === view) {
+            b.classList.add('active', 'bg-indigo-50', 'text-indigo-700');
+        } else {
+            b.classList.remove('active', 'bg-indigo-50', 'text-indigo-700');
+        }
+    });
+}
+
 function closeUserMobileNav() {
-    var aside = document.getElementById('userSidebar');
+    var aside   = document.getElementById('userSidebar');
     var overlay = document.getElementById('userNavOverlay');
-    var toggle = document.getElementById('userMobileNavToggle');
-    if (aside) { aside.classList.add('-translate-x-full'); aside.classList.remove('translate-x-0'); }
+    var toggle  = document.getElementById('userMobileNavToggle');
+    if (aside)   { aside.classList.add('-translate-x-full'); aside.classList.remove('translate-x-0'); }
     if (overlay) overlay.classList.add('hidden');
-    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    if (toggle)  toggle.setAttribute('aria-expanded', 'false');
 }
 function openUserMobileNav() {
-    var aside = document.getElementById('userSidebar');
+    var aside   = document.getElementById('userSidebar');
     var overlay = document.getElementById('userNavOverlay');
-    var toggle = document.getElementById('userMobileNavToggle');
+    var toggle  = document.getElementById('userMobileNavToggle');
     if (window.matchMedia('(min-width: 768px)').matches) return;
-    if (aside) { aside.classList.remove('-translate-x-full'); aside.classList.add('translate-x-0'); }
+    if (aside)   { aside.classList.remove('-translate-x-full'); aside.classList.add('translate-x-0'); }
     if (overlay) overlay.classList.remove('hidden');
-    if (toggle) toggle.setAttribute('aria-expanded', 'true');
+    if (toggle)  toggle.setAttribute('aria-expanded', 'true');
 }
 function toggleUserMobileNav() {
     var aside = document.getElementById('userSidebar');
@@ -211,47 +182,25 @@ function toggleUserMobileNav() {
     if (aside.classList.contains('-translate-x-full')) openUserMobileNav();
     else closeUserMobileNav();
 }
-function syncUserUrl(page) {
-    // 🔥 Do NOT show any params in URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-}
 
 function openUserNotifications() {
     document.getElementById('contentFrame').src = window.resolveDashboardUrl('sharedNotifications.jsp');
+    setActiveSidebarBtn(null); // deselect all
     closeUserMobileNav();
 }
 
-function applyUserViewFromUrl() {
-    var qs = new URLSearchParams(window.location.search);
-    var view = qs.get('view');
-    var legacyTab = qs.get('tab');
-    var tabToPage = {
-        overview: 'userOverview', tasks: 'userTasks', leave: 'userLeave', meetings: 'userMeetings',
-        calendar: 'calendar.jsp', settings: 'userSettings', attendance: 'userAttendance', team: 'userTeam'
-    };
-    if (!view && legacyTab && tabToPage[legacyTab]) {
-        view = tabToPage[legacyTab];
-    }
-    if (!view) return false;
-    var target = null;
-    document.querySelectorAll('.sidebar-btn[data-user-view]').forEach(function (b) {
-        if (b.getAttribute('data-user-view') === view) target = b;
-    });
-    if (!target) return false;
-    document.getElementById('contentFrame').src = window.resolveDashboardUrl(view);
-    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active', 'bg-indigo-50', 'text-indigo-700'));
-    target.classList.add('active');
-    syncUserUrl(view);
-    return true;
-}
-
+// ── Main navigation function ──
 function loadPage(btn, page) {
     document.getElementById('contentFrame').src = window.resolveDashboardUrl(page);
-    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active', 'bg-indigo-50', 'text-indigo-700'));
-    if (btn) btn.classList.add('active');
-    syncUserUrl(page);
+    // Highlight correct sidebar button
+    var view = btn ? btn.getAttribute('data-user-view') : page;
+    setActiveSidebarBtn(view || page);
+    // Never pollute URL with params
+    window.history.replaceState({}, document.title, window.location.pathname);
     closeUserMobileNav();
 }
+
+// ── Badge polling ──
 function updateBadge() {
     fetch('<%= ctxPath %>/notificationCount', { credentials: 'same-origin' })
         .then(function(r) { return r.json(); })
@@ -274,17 +223,39 @@ function updateBadge() {
 window.updateBadge = updateBadge;
 
 function showToast(message, type) {
-    const toast = document.getElementById('toast');
+    var toast = document.getElementById('toast');
     toast.className = 'fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)]';
     if (type === 'success') toast.classList.add('bg-emerald-500', 'text-white');
     else if (type === 'error') toast.classList.add('bg-red-500', 'text-white');
     else toast.classList.add('bg-indigo-500', 'text-white');
     toast.textContent = message;
     toast.classList.remove('hidden');
-    setTimeout(() => toast.classList.add('hidden'), 2500);
+    setTimeout(function() { toast.classList.add('hidden'); }, 2500);
 }
 
+// ── Tab/view name → route mapping ──
+var VIEW_MAP = {
+    'userOverview':  'userOverview',
+    'userAttendance':'userAttendance',
+    'userTasks':     'userTasks',
+    'userTeam':      'userTeam',
+    'userLeave':     'userLeave',
+    'userMeetings':  'userMeetings',
+    'calendar.jsp':  'calendar.jsp',
+    'userSettings':  'userSettings',
+    // legacy ?tab= param values
+    'overview':    'userOverview',
+    'attendance':  'userAttendance',
+    'tasks':       'userTasks',
+    'team':        'userTeam',
+    'leave':       'userLeave',
+    'meetings':    'userMeetings',
+    'calendar':    'calendar.jsp',
+    'settings':    'userSettings'
+};
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Mobile nav wiring
     var t = document.getElementById('userMobileNavToggle');
     var o = document.getElementById('userNavOverlay');
     if (t) t.addEventListener('click', function(e) { e.stopPropagation(); toggleUserMobileNav(); });
@@ -292,52 +263,46 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', function() {
         if (window.matchMedia('(min-width: 768px)').matches) closeUserMobileNav();
     });
-    if (!applyUserViewFromUrl()) {
-        const pageMap = {
-            'overview': ['userOverview', 0],
-            'tasks':    ['userTasks', 2],
-            'leave':    ['userLeave', 4],
-            'meetings': ['userMeetings', 5],
-            'calendar': ['calendar.jsp', 6],
-            'settings': ['userSettings', 7],
-            'attendance': ['userAttendance', 1],
-            'team': ['userTeam', 3]
-        };
-        const tab = new URLSearchParams(window.location.search).get('tab');
-        const btns = document.querySelectorAll('.sidebar-btn');
-        if (tab && pageMap[tab]) {
-            const [page, idx] = pageMap[tab];
-            loadPage(btns[idx] || null, page);
-        }
+
+    // ── Resolve initial view from URL params ──
+    var params = new URLSearchParams(window.location.search);
+    var requestedView = params.get('view') || params.get('tab');
+    var resolvedPage  = requestedView ? VIEW_MAP[requestedView] : null;
+
+    if (resolvedPage) {
+        // Load the requested view
+        document.getElementById('contentFrame').src = window.resolveDashboardUrl(resolvedPage);
+        setActiveSidebarBtn(resolvedPage);
+    } else {
+        // Default: Overview is already loaded via iframe src; just ensure sidebar reflects it
+        setActiveSidebarBtn('userOverview');
     }
 
-    updateBadge();
-    setInterval(updateBadge, 90000);
+    // Always clean URL params
+    window.history.replaceState({}, document.title, window.location.pathname);
 
-    const params = new URLSearchParams(window.location.search);
+    // Flash messages
     var hadFlash = params.has('success') || params.has('error');
     if (params.get('success')) {
-        const s = params.get('success');
-        const msgs = { Login:'Logged in successfully', LeaveApplied:'Leave applied successfully', PunchIn:'Punched in ✔', PunchOut:'Punched out ✔' };
-        if (msgs[s]) showToast(msgs[s], 'success');
-        params.delete('success');
+        var s = params.get('success');
+        var successMsgs = { Login:'Logged in successfully', LeaveApplied:'Leave applied successfully', PunchIn:'Punched in ✔', PunchOut:'Punched out ✔' };
+        if (successMsgs[s]) showToast(successMsgs[s], 'success');
     }
     if (params.get('error')) {
-        const e = params.get('error');
-        const msgs = { accessDenied:'Access denied.', HolidayAttendance:'Today is a holiday.', PasswordMismatch:'Passwords do not match.' };
-        showToast(msgs[e] || 'Something went wrong', 'error');
-        params.delete('error');
+        var e = params.get('error');
+        var errorMsgs = { accessDenied:'Access denied.', HolidayAttendance:'Today is a holiday.', PasswordMismatch:'Passwords do not match.' };
+        showToast(errorMsgs[e] || 'Something went wrong', 'error');
     }
-    if (hadFlash) {
-        var qClean = params.toString();
-        setTimeout(function () {
-            window.history.replaceState({}, document.title, window.location.pathname + (qClean ? '?' + qClean : ''));
-        }, 100);
-    }
+
+    // Badge
+    updateBadge();
+    setInterval(updateBadge, 90000);
 });
 
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.onkeydown = e => (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))) ? false : true;
+document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+document.onkeydown = function(e) {
+    return (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))) ? false : true;
+};
 </script>
 </body>
 </html>

@@ -619,6 +619,7 @@ public class AttendanceDAO {
 		}
 		fillMissingLeaveDates(list, sessionValue);
 		fillMissingAbsentDays(list, sessionValue); // ← fills missing Absent days
+		fillMissingWeekendDays(list); // ← fills missing Weekend days
 		int maxRows = limit <= 0 ? 14 : limit;
 		return list.size() > maxRows ? list.subList(0, maxRows) : list;
 	}
@@ -640,6 +641,7 @@ public class AttendanceDAO {
 		}
 		fillMissingLeaveDatesInRange(list, sessionValue, LocalDate.parse(fromDate), LocalDate.parse(toDate));
 		fillMissingAbsentDaysInRange(list, sessionValue, LocalDate.parse(fromDate), LocalDate.parse(toDate));
+		fillMissingWeekendDays(list, LocalDate.parse(fromDate), LocalDate.parse(toDate));
 		return list;
 	}
 
@@ -657,6 +659,7 @@ public class AttendanceDAO {
 		}
 		fillMissingLeaveDates(list, sessionValue);
 		fillMissingAbsentDays(list, sessionValue);
+		fillMissingWeekendDays(list);
 		return list;
 	}
 
@@ -781,6 +784,40 @@ public class AttendanceDAO {
 			}
 		}
 		return list;
+	}
+	
+	private void fillMissingWeekendDays(List<AttendanceLogEntry> list, LocalDate rangeStart, LocalDate rangeEnd) throws Exception {
+	    Set<LocalDate> existing = new HashSet<>();
+	    for (AttendanceLogEntry e : list) {
+	        if (e.getAttendanceDate() != null)
+	            existing.add(e.getAttendanceDate().toLocalDate());
+	    }
+
+	    LocalDate today = LocalDate.now();
+
+	    for (LocalDate d = rangeStart; !d.isAfter(rangeEnd); d = d.plusDays(1)) {
+	        if (d.isAfter(today)) continue; // don't show future dates
+	        java.time.DayOfWeek dow = d.getDayOfWeek();
+	        if (dow != java.time.DayOfWeek.SATURDAY && dow != java.time.DayOfWeek.SUNDAY)
+	            continue; // only weekends
+	        if (existing.contains(d)) continue;
+
+	        AttendanceLogEntry e = new AttendanceLogEntry();
+	        e.setAttendanceDate(java.sql.Date.valueOf(d));
+	        e.setPunchIn(null);
+	        e.setPunchOut(null);
+	        e.setStatus("Weekend");
+	        list.add(e);
+	        existing.add(d);
+	    }
+	    sortDescending(list);
+	}
+	
+	@SuppressWarnings("unused")
+	private void fillMissingWeekendDays(List<AttendanceLogEntry> list) throws Exception {
+	    // Use a 60-day window to match fillMissingAbsentDays
+	    LocalDate today = LocalDate.now();
+	    fillMissingWeekendDays(list, today.minusDays(60), today);
 	}
 
 	public List<TeamAttendance> getAttendanceForEmployeeAndDateRange(int employeeId, LocalDate start, LocalDate end)
