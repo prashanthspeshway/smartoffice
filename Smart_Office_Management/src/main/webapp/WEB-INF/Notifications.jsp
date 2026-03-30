@@ -39,6 +39,7 @@
 	rel="stylesheet">
 <link rel="stylesheet"
 	href="<%=request.getContextPath()%>/css/smart-office-theme.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
 .notif-card {
 	transition: opacity 0.3s ease, transform 0.3s ease;
@@ -100,10 +101,7 @@ to {
 			<% } %>
 		</div>
 	</div>
-		<!-- ── Toast ─────────────────────────────────────────────── -->
-		<div id="toast"
-			class="fixed bottom-6 right-4 z-50 px-5 py-3 rounded-lg shadow-lg hidden text-sm font-medium text-white"
-			style="max-width: min(92vw, 22rem)"></div>
+		<div id="toast" aria-live="polite"></div>
 
 		<!-- ═══════════════════════════════════════════
        UNREAD SECTION
@@ -301,15 +299,6 @@ to {
 		<script>
 var ctx = '<%=request.getContextPath()%>';
 
-/* Toast */
-function showToast(msg, ok) {
-  var t = document.getElementById('toast');
-  t.className = 'fixed bottom-6 right-4 z-50 px-5 py-3 rounded-lg shadow-lg text-sm font-medium text-white ' + (ok ? 'bg-emerald-500' : 'bg-red-500');
-  t.textContent = msg;
-  t.classList.remove('hidden');
-  setTimeout(function(){ t.classList.add('hidden'); }, 2600);
-}
-
 /* Badge counters */
 function syncBadges() {
   document.getElementById('unreadBadge').textContent = document.querySelectorAll('#unreadList .notif-card').length;
@@ -390,7 +379,7 @@ function markAsRead(id, btn) {
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
   var card = document.getElementById('notif-' + id);
-  if (!card) { showToast('Card not found', false); return; }
+  if (!card) { showToast('Card not found', 'error'); return; }
 
   var payload = {
     message : card.getAttribute('data-message'),
@@ -422,13 +411,13 @@ function markAsRead(id, btn) {
         syncBadges();
       }, 320);
 
-      showToast('Moved to Read section ✓', true);
+      showToast('Moved to Read section ✓', 'success');
       if (window.parent && window.parent.updateBadge) window.parent.updateBadge();
     })
     .catch(function(err) {
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Mark as read';
-      showToast('Failed: ' + err.message, false);
+      showToast('Failed: ' + err.message, 'error');
     });
 }
 
@@ -467,12 +456,12 @@ function markAll() {
       });
 
       setTimeout(function() { checkUnreadEmpty(); syncBadges(); }, 300 + cards.length * 60 + 80);
-      showToast('All moved to Read section ✓', true);
+      showToast('All moved to Read section ✓', 'success');
       if (window.parent && window.parent.updateBadge) window.parent.updateBadge();
     })
     .catch(function(err) {
       if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check-double mr-1"></i>Mark all as read'; }
-      showToast('Failed: ' + err.message, false);
+      showToast('Failed: ' + err.message, 'error');
     });
 }
 
@@ -488,12 +477,12 @@ function deleteNotif(id, btn) {
         card.classList.add('fade-out');
         setTimeout(function() { card.remove(); checkReadEmpty(); syncBadges(); }, 320);
       }
-      showToast('Notification deleted', true);
+      showToast('Notification deleted', 'success');
     })
     .catch(function(err) {
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-trash mr-1"></i>Delete';
-      showToast('Failed: ' + err.message, false);
+      showToast('Failed: ' + err.message, 'error');
     });
 }
 
@@ -510,11 +499,11 @@ function deleteAll() {
         setTimeout(function() { card.remove(); }, 280 + i * 50);
       });
       setTimeout(function() { checkReadEmpty(); syncBadges(); }, 280 + cards.length * 50 + 80);
-      showToast('All read notifications deleted', true);
+      showToast('All read notifications deleted', 'success');
     })
     .catch(function(err) {
       if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-trash mr-1"></i>Delete all read'; }
-      showToast('Failed: ' + err.message, false);
+      showToast('Failed: ' + err.message, 'error');
     });
 }
 </script>

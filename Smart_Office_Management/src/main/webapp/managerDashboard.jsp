@@ -26,6 +26,7 @@ try {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
 .notif-trigger { position: relative; }
 .notif-badge {
@@ -150,52 +151,67 @@ try {
 		</main>
 	</div>
 
-	<!-- Toast -->
-	<div id="toast"
-		class="toast fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
+	<div id="toast" aria-live="polite"></div>
 
-
-<!-- 		 url hidden code -->
-
-<script>
-window.addEventListener("DOMContentLoaded", function () {
-    const url = new URL(window.location);
-
-    // Get tab or view
-    let tab = url.searchParams.get("tab");
-    let view = url.searchParams.get("view");
-
-    // If tab exists → convert to your system view
-    if (tab) {
-        if (tab === "attendance") view = "managerAttendance";
-        if (tab === "overview") view = "managerOverview";
-        if (tab === "team") view = "managerTeams";
-    }
-
-    // Load page internally
-    if (view) {
-        document.getElementById("contentFrame").src = view;
-
-        // Highlight sidebar
-        document.querySelectorAll('.sidebar-btn').forEach(b => {
-            if (b.getAttribute('data-manager-view') === view) {
-                b.classList.add('bg-indigo-50', 'text-indigo-700');
-            } else {
-                b.classList.remove('bg-indigo-50', 'text-indigo-700');
-            }
-        });
-    }
-
-    // 🔥 Remove ALL params from URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-});
-
-function syncManagerUrl(page) {
-    window.history.replaceState({}, document.title, window.location.pathname);
-}
-</script>
-		
 	<script>
+	var MANAGER_VIEW_STORAGE_KEY = 'so_manager_dash_view';
+
+	function stripManagerViewQueryFromUrl() {
+		var u = new URL(window.location.href);
+		u.searchParams.delete('view');
+		u.searchParams.delete('tab');
+		window.history.replaceState({}, document.title, u.pathname + (u.search || ''));
+	}
+
+	function syncManagerUrl(page) {
+		if (!page) return;
+		try { sessionStorage.setItem(MANAGER_VIEW_STORAGE_KEY, page); } catch (e) {}
+		stripManagerViewQueryFromUrl();
+	}
+
+	function resolveManagerViewFromParams(params) {
+		var view = params.get('view');
+		var tab = params.get('tab');
+		if (tab) {
+			if (tab === 'attendance') view = view || 'managerAttendance';
+			if (tab === 'overview') view = view || 'managerOverview';
+			if (tab === 'team') view = view || 'managerTeams';
+		}
+		return view;
+	}
+
+	function applyManagerViewToFrame(view) {
+		if (!view) return false;
+		var frame = document.getElementById('contentFrame');
+		if (view === 'sharedNotifications.jsp') {
+			frame.src = 'sharedNotifications.jsp';
+			document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('bg-indigo-50', 'text-indigo-700'));
+			return true;
+		}
+		var target = null;
+		document.querySelectorAll('.sidebar-btn[data-manager-view]').forEach(function (b) {
+			if (b.getAttribute('data-manager-view') === view) target = b;
+		});
+		if (!target) return false;
+		frame.src = view;
+		document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('bg-indigo-50', 'text-indigo-700'));
+		target.classList.add('bg-indigo-50', 'text-indigo-700');
+		return true;
+	}
+
+	function applyManagerDashboardView() {
+		var params = new URLSearchParams(window.location.search);
+		var view = resolveManagerViewFromParams(params);
+		var fromUrl = !!view;
+		if (!view) {
+			try { view = sessionStorage.getItem(MANAGER_VIEW_STORAGE_KEY); } catch (e) {}
+		}
+		if (!view) return false;
+		if (!applyManagerViewToFrame(view)) return false;
+		try { sessionStorage.setItem(MANAGER_VIEW_STORAGE_KEY, view); } catch (e) {}
+		if (fromUrl) stripManagerViewQueryFromUrl();
+		return true;
+	}
 	function closeManagerMobileNav() {
 		var aside = document.getElementById('managerSidebar');
 		var overlay = document.getElementById('managerNavOverlay');
@@ -220,33 +236,11 @@ function syncManagerUrl(page) {
 		else closeManagerMobileNav();
 	}
 
-// 	function syncManagerUrl(page) {
-// 		try {
-// 			var qs = new URLSearchParams(window.location.search);
-// 			qs.set('view', page);
-// 			var q = qs.toString();
-// 			window.history.replaceState({}, document.title, window.location.pathname + (q ? '?' + q : ''));
-// 		} catch (e) { /* ignore */ }
-// 	}
-
 	function openManagerNotifications() {
 		document.getElementById('contentFrame').src = 'sharedNotifications.jsp';
-		closeManagerMobileNav();
-	}
-
-	function applyManagerViewFromUrl() {
-		var qs = new URLSearchParams(window.location.search);
-		var view = qs.get('view');
-		if (!view) return false;
-		var target = null;
-		document.querySelectorAll('.sidebar-btn[data-manager-view]').forEach(function (b) {
-			if (b.getAttribute('data-manager-view') === view) target = b;
-		});
-		if (!target) return false;
-		document.getElementById('contentFrame').src = view;
 		document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('bg-indigo-50', 'text-indigo-700'));
-		target.classList.add('bg-indigo-50', 'text-indigo-700');
-		return true;
+		syncManagerUrl('sharedNotifications.jsp');
+		closeManagerMobileNav();
 	}
 
 	function loadPage(btn, page) {
@@ -284,16 +278,16 @@ function syncManagerUrl(page) {
 		window.addEventListener('resize', function() {
 			if (window.matchMedia('(min-width: 768px)').matches) closeManagerMobileNav();
 		});
-		applyManagerViewFromUrl();
-		const params = new URLSearchParams(window.location.search);
-		if (!params.get('view')) {
+		var appliedView = applyManagerDashboardView();
+		var params = new URLSearchParams(window.location.search);
+		if (!appliedView) {
 			var btns = document.querySelectorAll('.sidebar-btn');
 			var overviewBtn = Array.from(btns).find(function(b) { return b.textContent.indexOf('Overview') >= 0; });
 			if (overviewBtn) overviewBtn.classList.add('bg-indigo-50', 'text-indigo-700');
 			else if (btns[0]) btns[0].classList.add('bg-indigo-50', 'text-indigo-700');
 		}
 		if (params.get('success') === 'Login') {
-			showToast('Logged in successfully', 'info');
+			showToast('Logged in successfully', 'success');
 			params.delete('success');
 			params.delete('error');
 			var q = params.toString();
@@ -309,27 +303,10 @@ function syncManagerUrl(page) {
 		setInterval(updateBadge, 90000);
 	});
 
-	function showToast(message, type) {
-		const toast = document.getElementById('toast');
-		toast.className = 'toast fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)]';
-		if (type === 'success') toast.classList.add('bg-emerald-500', 'text-white');
-		else if (type === 'error') toast.classList.add('bg-red-500', 'text-white');
-		else toast.classList.add('bg-indigo-500', 'text-white');
-		toast.textContent = message;
-		toast.classList.remove('hidden');
-		setTimeout(() => toast.classList.add('hidden'), 2500);
-	}
+	/* showToast: js/smart-office-toast.js */
 
 	document.addEventListener('contextmenu', e => e.preventDefault());
 	document.onkeydown = e => (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))) ? false : true;
 	</script>
-	
-	<script>
-    window.onload = function () {
-        const url = new URL(window.location);
-        url.searchParams.delete("tab"); // remove ?tab
-        window.history.replaceState({}, document.title, url.pathname);
-    };
-</script>
 </body>
 </html>

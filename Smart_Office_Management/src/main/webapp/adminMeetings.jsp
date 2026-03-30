@@ -25,6 +25,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-toast.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
 :root {
     --bg:           #f4f6fb;
@@ -257,6 +259,24 @@ body {
     box-shadow: 0 0 0 3px rgba(79,110,247,.1);
 }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-datetime-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-items: end;
+}
+.form-sublabel {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+@media (max-width: 560px) {
+    .form-row { grid-template-columns: 1fr; }
+}
 .radio-group { display: flex; flex-direction: column; gap: 8px; }
 .radio-item {
     display: flex; align-items: center; gap: 8px;
@@ -286,17 +306,6 @@ body {
 }
 .participant-chip .role { opacity: .65; font-size: 11px; font-weight: 500; }
 
-/* ── Toast ── */
-.toast {
-    position: fixed; bottom: 24px; right: 20px; top: auto;
-    padding: 13px 18px; border-radius: 10px; z-index: 9999;
-    display: none; font-size: 14px; font-weight: 500;
-    box-shadow: var(--shadow-lg); animation: slideIn .25s ease; max-width: 340px;
-}
-@keyframes slideIn { from { transform:translateX(110%); opacity:0; } to { transform:translateX(0); opacity:1; } }
-.toast.success { background: #166534; color: #fff; }
-.toast.error   { background: #991b1b; color: #fff; }
-
 /* ── Animations ── */
 @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 .anim   { animation: fadeUp .4s ease both; }
@@ -308,7 +317,7 @@ body {
 </head>
 <body>
 
-<div id="toast" class="toast"
+<div id="toast" aria-live="polite"
      data-success="<%=safeSuccess%>"
      data-error="<%=safeError%>"></div>
 
@@ -472,12 +481,32 @@ body {
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Start Time</label>
-                        <input type="datetime-local" name="startTime" class="form-input" required>
+                        <label class="form-label">Start</label>
+                        <div class="form-datetime-split">
+                            <div>
+                                <span class="form-sublabel">Date</span>
+                                <input type="date" id="meetingStartDate" class="form-input" required>
+                            </div>
+                            <div>
+                                <span class="form-sublabel">Time</span>
+                                <input type="time" id="meetingStartTimeOnly" class="form-input" required step="60">
+                            </div>
+                        </div>
+                        <input type="hidden" name="startTime" id="meetingStartTimeHidden" value="">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">End Time</label>
-                        <input type="datetime-local" name="endTime" class="form-input" required>
+                        <label class="form-label">End</label>
+                        <div class="form-datetime-split">
+                            <div>
+                                <span class="form-sublabel">Date</span>
+                                <input type="date" id="meetingEndDate" class="form-input" required>
+                            </div>
+                            <div>
+                                <span class="form-sublabel">Time</span>
+                                <input type="time" id="meetingEndTimeOnly" class="form-input" required step="60">
+                            </div>
+                        </div>
+                        <input type="hidden" name="endTime" id="meetingEndTimeHidden" value="">
                     </div>
                 </div>
 
@@ -566,8 +595,132 @@ body {
 </div>
 
 <script>
+/* ── Meeting date + time: separate inputs so type=time min grays past times (datetime-local often does not) ── */
+function meetingToDateOnly(d) {
+    var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+}
+function meetingToTimeOnly(d) {
+    var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+    return pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+function meetingGetStartDateTime() {
+    var sd = document.getElementById('meetingStartDate');
+    var st = document.getElementById('meetingStartTimeOnly');
+    if (!sd || !st || !sd.value || !st.value) return null;
+    return meetingParseLocalDatetime(sd.value + 'T' + st.value);
+}
+function meetingGetEndDateTime() {
+    var ed = document.getElementById('meetingEndDate');
+    var et = document.getElementById('meetingEndTimeOnly');
+    if (!ed || !et || !ed.value || !et.value) return null;
+    return meetingParseLocalDatetime(ed.value + 'T' + et.value);
+}
+function composeMeetingHiddenFields() {
+    var sd = document.getElementById('meetingStartDate');
+    var st = document.getElementById('meetingStartTimeOnly');
+    var ed = document.getElementById('meetingEndDate');
+    var et = document.getElementById('meetingEndTimeOnly');
+    var hs = document.getElementById('meetingStartTimeHidden');
+    var he = document.getElementById('meetingEndTimeHidden');
+    if (!sd || !st || !hs) return;
+    hs.value = (sd.value && st.value) ? (sd.value + 'T' + st.value) : '';
+    if (ed && et && he) he.value = (ed.value && et.value) ? (ed.value + 'T' + et.value) : '';
+}
+/** Earliest valid end = start + 1 minute (servlet requires end after start). */
+function meetingMinEndDateTime() {
+    var startDt = meetingGetStartDateTime();
+    if (!startDt) return new Date(Date.now() + 60 * 1000);
+    return new Date(startDt.getTime() + 60 * 1000);
+}
+function meetingParseLocalDatetime(str) {
+    if (!str) return null;
+    var parts = str.split('T');
+    if (parts.length !== 2) return null;
+    var da = parts[0].split('-');
+    var ti = parts[1].split(':');
+    if (da.length < 3 || ti.length < 2) return null;
+    return new Date(
+        parseInt(da[0], 10),
+        parseInt(da[1], 10) - 1,
+        parseInt(da[2], 10),
+        parseInt(ti[0], 10),
+        parseInt(ti[1], 10),
+        0,
+        0
+    );
+}
+/** Compare calendar minutes (datetime-local has no seconds). */
+function meetingMinuteTs(d) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes()).getTime();
+}
+function meetingSameOrAfterMinute(a, b) {
+    return meetingMinuteTs(a) >= meetingMinuteTs(b);
+}
+function meetingAfterMinute(a, b) {
+    return meetingMinuteTs(a) > meetingMinuteTs(b);
+}
+function refreshMeetingDatetimeConstraints() {
+    var now = new Date();
+    var startDateEl = document.getElementById('meetingStartDate');
+    var startTimeEl = document.getElementById('meetingStartTimeOnly');
+    var endDateEl = document.getElementById('meetingEndDate');
+    var endTimeEl = document.getElementById('meetingEndTimeOnly');
+    if (!startDateEl || !startTimeEl || !endDateEl || !endTimeEl) return;
+
+    var todayStr = meetingToDateOnly(now);
+    var nowTimeStr = meetingToTimeOnly(now);
+
+    startDateEl.min = todayStr;
+    if (startDateEl.value && startDateEl.value < todayStr) startDateEl.value = todayStr;
+
+    if (startDateEl.value === todayStr) {
+        startTimeEl.min = nowTimeStr;
+    } else {
+        startTimeEl.removeAttribute('min');
+    }
+    if (startDateEl.value === todayStr && startTimeEl.value && startTimeEl.min && startTimeEl.value < startTimeEl.min) {
+        startTimeEl.value = startTimeEl.min;
+    }
+
+    var minEnd = meetingMinEndDateTime();
+    var minEndDateStr = meetingToDateOnly(minEnd);
+    var minEndTimeStr = meetingToTimeOnly(minEnd);
+
+    endDateEl.min = minEndDateStr;
+    if (endDateEl.value && endDateEl.value < minEndDateStr) endDateEl.value = minEndDateStr;
+
+    if (endDateEl.value === minEndDateStr) {
+        endTimeEl.min = minEndTimeStr;
+    } else {
+        endTimeEl.removeAttribute('min');
+    }
+    if (endDateEl.value && endTimeEl.value && endDateEl.value === minEndDateStr) {
+        if (endTimeEl.min && endTimeEl.value < endTimeEl.min) {
+            endTimeEl.value = endTimeEl.min;
+        }
+    }
+
+    composeMeetingHiddenFields();
+}
+
 /* ── Modal controls ── */
-function openCreateModal()        { document.getElementById('createModal').classList.add('show'); }
+function openCreateModal() {
+    document.getElementById('createModal').classList.add('show');
+    var now = new Date();
+    var sd = document.getElementById('meetingStartDate');
+    var st = document.getElementById('meetingStartTimeOnly');
+    var ed = document.getElementById('meetingEndDate');
+    var et = document.getElementById('meetingEndTimeOnly');
+    if (sd && st && ed && et) {
+        sd.value = meetingToDateOnly(now);
+        st.value = meetingToTimeOnly(now);
+        var endSuggested = new Date(now.getTime() + 60 * 60 * 1000);
+        ed.value = meetingToDateOnly(endSuggested);
+        et.value = meetingToTimeOnly(endSuggested);
+    }
+    refreshMeetingDatetimeConstraints();
+}
 function closeCreateModal()       { document.getElementById('createModal').classList.remove('show'); }
 function closeParticipantsModal() { document.getElementById('participantsModal').classList.remove('show'); }
 
@@ -626,15 +779,7 @@ function viewParticipants(meetingId) {
         });
 }
 
-/* ── Toast ── */
-function showToast(msg, type) {
-    var t = document.getElementById('toast');
-    t.className = 'toast ' + type;
-    t.textContent = msg;
-    t.style.display = 'block';
-    clearTimeout(window.__tt);
-    window.__tt = setTimeout(function() { t.style.display = 'none'; }, 4000);
-}
+/* showToast: js/smart-office-toast.js */
 
 document.addEventListener('DOMContentLoaded', function() {
     var toast = document.getElementById('toast');
@@ -646,6 +791,44 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         document.querySelectorAll('.alert').forEach(function(a) { a.style.display = 'none'; });
     }, 5000);
+
+    var sd = document.getElementById('meetingStartDate');
+    var st = document.getElementById('meetingStartTimeOnly');
+    var ed = document.getElementById('meetingEndDate');
+    var et = document.getElementById('meetingEndTimeOnly');
+    if (sd && st && ed && et) {
+        function bindRefresh(el) {
+            el.addEventListener('input', refreshMeetingDatetimeConstraints);
+            el.addEventListener('change', refreshMeetingDatetimeConstraints);
+            el.addEventListener('focus', refreshMeetingDatetimeConstraints);
+        }
+        bindRefresh(sd);
+        bindRefresh(st);
+        bindRefresh(ed);
+        bindRefresh(et);
+
+        var form = document.querySelector('#createModal form');
+        if (form) {
+            form.addEventListener('submit', function(ev) {
+                composeMeetingHiddenFields();
+                refreshMeetingDatetimeConstraints();
+                var now = new Date();
+                var sv = meetingGetStartDateTime();
+                var evd = meetingGetEndDateTime();
+                if (!sv || !evd) return;
+                if (!meetingSameOrAfterMinute(sv, now)) {
+                    ev.preventDefault();
+                    showToast('Start time must be at or after the current date and time.', 'error');
+                    return;
+                }
+                if (!meetingAfterMinute(evd, sv)) {
+                    ev.preventDefault();
+                    showToast('End time must be after start time.', 'error');
+                    return;
+                }
+            });
+        }
+    }
 });
 </script>
 

@@ -69,6 +69,7 @@ User userObj = (User) request.getAttribute("user");
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -380,36 +381,6 @@ html, body {
   z-index: 35;
   background: rgba(0,0,0,.32);
 }
-
-/* ── TOAST ───────────────────────────────────────────── */
-#toast {
-  position: fixed;
-  bottom: 18px; right: 18px;
-  display: none;
-  align-items: center;
-  gap: 10px;
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--ink);
-  color: var(--ink);
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: .82rem;
-  font-weight: 500;
-  box-shadow: 0 4px 20px rgba(0,0,0,.08);
-  z-index: 9999;
-  max-width: 300px;
-}
-#toast.error   { border-left-color: #d63c3c; }
-#toast.success { border-left-color: #2d8a4e; }
-#toast.info    { border-left-color: #4f46e5; }
-#toast i { font-size: 13px; flex-shrink: 0; }
-#toast.error i   { color: #d63c3c; }
-#toast.success i { color: #2d8a4e; }
-#toast.info i    { color: #4f46e5; }
-
-@keyframes toastIn  { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
-@keyframes toastOut { to{opacity:0;transform:translateY(8px);} }
 
 /* ── RESPONSIVE ──────────────────────────────────────── */
 @media (max-width: 767px) {
@@ -1903,64 +1874,6 @@ html, body {
     font-weight: 600;
     color: #4a5568;
 }
-.toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    top: auto;
-    background: #e2ebf0;
-    color: black;
-    padding: 14px 20px 14px 44px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    display: none;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-    z-index: 9999;
-    line-height: 1.4;
-    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.toast.hide {
-    animation: toastOut 0.4s ease forwards;
-}
-.toast::before {
-    content: "✔";
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    font-weight: bold;
-}
-.toast.success {
-    background: #e2ebf0;
-    color: black;
-}
-.toast.success::before {
-    content: "✔";
-}
-.toast.error {
-    background: #e2ebf0;
-    color: black;
-}
-.toast.error::before {
-    content: "✖";
-}
-.toast.toast--bottom {
-    top: auto !important;
-    bottom: 24px;
-    right: 24px;
-    left: auto;
-    transform: none;
-    max-width: min(420px, 92vw);
-    text-align: left;
-    padding-left: 44px;
-}
-.toast.toast--bottom::before {
-    display: block;
-}
-@keyframes toastIn {from { opacity:0; transform: translateX(120px);} to { opacity:1; transform: translateX(0);} }
-@keyframes toastOut {from { opacity:1; transform: translateX(0);} to { opacity:0; transform: translateX(120px);} }
 body.dark-theme {
     background: #0f172a !important;
     color: #e5e7eb !important;
@@ -2954,7 +2867,7 @@ body.dark-theme .perf-selected-emp, body.dark-theme .perf-selected-banner {
   </div>
 </div>
 
-<div id="toast" class="toast"></div>
+<div id="toast" aria-live="polite"></div>
 
 <script>
 /* ================= MOBILE NAVIGATION ================= */
@@ -3002,30 +2915,7 @@ function updateBadge() {
         .catch(function() {});
 }
 
-/* ================= TOAST ================= */
-function showToast(message, type, placement) {
-    type = type || 'info';
-    var t = document.getElementById('toast');
-    var ti = document.getElementById('toastIco');
-    var tm = document.getElementById('toastMsg');
-    if (ti && tm) {
-        t.style.display = 'none'; t.className = ''; t.offsetHeight;
-        if (type === 'error') ti.className = 'fa-solid fa-circle-xmark';
-        else if (type === 'success') ti.className = 'fa-solid fa-circle-check';
-        else ti.className = 'fa-solid fa-circle-info';
-        tm.textContent = message;
-        t.className = type + (placement === 'bottom' ? ' toast--bottom' : '');
-        t.style.display = 'flex';
-        t.style.animation = 'toastIn .3s ease both';
-        setTimeout(function(){
-            t.style.animation = 'toastOut .3s ease forwards';
-            setTimeout(function(){ t.style.display = 'none'; t.className = ''; }, 320);
-        }, 2500);
-    } else {
-        // fallback
-        console.log('Toast:', message);
-    }
-}
+/* showToast: js/smart-office-toast.js */
 
 /* ================= SECTION SWITCHING ================= */
 function showSection(id) {
@@ -3298,7 +3188,7 @@ function submitPassword() {
     .then(response => {
         switch (response.trim()) {
             case "Success":
-                showToast("Password updated successfully");
+                showToast("Password updated successfully", "success");
                 closeChangePassword();
                 document.getElementById("newPassword").value = "";
                 document.getElementById("confirmPassword").value = "";

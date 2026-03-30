@@ -63,6 +63,8 @@ String safeError = (errorMsg != null)
 	rel="stylesheet">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-toast.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
 :root {
 	--bg: #f4f6fb;
@@ -361,16 +363,6 @@ body {
 .empty-state h3 { font-size: 16px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
 .empty-state p { font-size: 13px; }
 
-.toast {
-	position: fixed; bottom: 24px; right: 20px; top: auto;
-	padding: 13px 18px; border-radius: 10px; z-index: 9999;
-	display: none; font-size: 14px; font-weight: 500;
-	box-shadow: var(--shadow-lg); animation: slideIn 0.25s ease; max-width: 340px;
-}
-@keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-.toast.success { background: #166534; color: #fff; }
-.toast.error   { background: #991b1b; color: #fff; }
-
 .modal-overlay {
 	display: none; position: fixed; inset: 0;
 	background: rgba(15,20,40,0.5); backdrop-filter: blur(4px);
@@ -459,7 +451,6 @@ body {
 	.members-chips { grid-template-columns: 1fr; }
 	.add-member-row { flex-direction: column; align-items: stretch; }
 	.add-member-row .btn { width: 100%; justify-content: center; }
-	.toast { left: 12px; right: 12px; max-width: none; }
 	.modal-overlay { padding: 12px; align-items: center; }
 	.modal-box { max-width: 100% !important; width: 100%; border-radius: 16px 16px 0 0; max-height: 92vh; overflow-y: auto; }
 	#membersModal .modal-box { border-radius: 16px; max-height: min(92vh, 640px); }
@@ -472,7 +463,7 @@ body {
 </head>
 <body>
 
-<div id="toast" class="toast" data-success="<%=safeSuccess%>" data-error="<%=safeError%>"></div>
+<div id="toast" aria-live="polite" data-success="<%=safeSuccess%>" data-error="<%=safeError%>"></div>
 
 <div class="page">
 
@@ -854,16 +845,7 @@ body {
 </div>
 
 <script>
-// ── Toast ──────────────────────────────────────────────────────────
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  if (!t) return;
-  t.className = 'toast ' + type;
-  t.textContent = msg;
-  t.style.display = 'block';
-  clearTimeout(window.__tt);
-  window.__tt = setTimeout(function () { t.style.display = 'none'; }, 3000);
-}
+// showToast: js/smart-office-toast.js
 
 // ── Delete modal ───────────────────────────────────────────────────
 function openDeleteModal(teamId, teamName) {

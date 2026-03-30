@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 
 import com.smartoffice.dao.AttendanceDAO;
 import com.smartoffice.dao.LeaveRequestDAO;
+import com.smartoffice.dao.UserDao;
 import com.smartoffice.model.LeaveRequest;
 import com.smartoffice.service.NotificationService;
 
@@ -83,9 +84,9 @@ public class AdminLeaveServlet extends HttpServlet {
                     }
                 }
 
-                // NOTIFICATION 
+                // NOTIFICATION — recipient must be users.email (session uses email; leave row may store username)
                 if (lr != null) {
-                    String empEmail = lr.getAppliedBy();
+                    String notifyEmail = UserDao.resolveEmailForNotifications(lr.getAppliedBy());
                     String emoji    = "APPROVED".equals(newStatus) ? "✅" : "❌";
 
                     String empMsg;
@@ -100,13 +101,15 @@ public class AdminLeaveServlet extends HttpServlet {
                                  ") has been " + newStatus + " by Admin " + adminName + ".";
                     }
 
-                    NotificationService.notify(empEmail, adminEmail,
-                            NotificationService.TYPE_LEAVE, empMsg);
+                    if (notifyEmail != null) {
+                        NotificationService.notify(notifyEmail, adminEmail,
+                                NotificationService.TYPE_LEAVE, empMsg);
 
-                    NotificationService.notifyManagerOf(empEmail, adminEmail,
-                            NotificationService.TYPE_LEAVE,
-                            "ℹ️ Leave for " + lr.getDisplayName() +
-                            " has been " + newStatus + " by Admin " + adminName + ".");
+                        NotificationService.notifyManagerOf(notifyEmail, adminEmail,
+                                NotificationService.TYPE_LEAVE,
+                                "ℹ️ Leave for " + lr.getDisplayName() +
+                                " has been " + newStatus + " by Admin " + adminName + ".");
+                    }
                 }
 
                 response.sendRedirect(request.getContextPath() +

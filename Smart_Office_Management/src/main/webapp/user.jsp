@@ -28,6 +28,7 @@ try {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
+<script src="<%= ctxPath %>/js/smart-office-toast.js"></script>
 <style>
 .sidebar-btn { transition: all 0.2s; text-align: left; }
 .notif-trigger { position: relative; }
@@ -132,8 +133,8 @@ try {
     </main>
 </div>
 
-<!-- Toast -->
-<div id="toast" class="fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
+<!-- Toast (styled by css/smart-office-toast.css + js/smart-office-toast.js) -->
+<div id="toast" aria-live="polite"></div>
 
 <script>
 (function() {
@@ -183,20 +184,34 @@ function toggleUserMobileNav() {
     else closeUserMobileNav();
 }
 
+var USER_VIEW_STORAGE_KEY = 'so_employee_dash_view';
+
+function stripUserViewQueryFromUrl() {
+    var u = new URL(window.location.href);
+    u.searchParams.delete('view');
+    u.searchParams.delete('tab');
+    window.history.replaceState({}, document.title, u.pathname + (u.search || ''));
+}
+
+function syncUserUrl(page) {
+    if (!page) return;
+    try { sessionStorage.setItem(USER_VIEW_STORAGE_KEY, page); } catch (e) {}
+    stripUserViewQueryFromUrl();
+}
+
 function openUserNotifications() {
     document.getElementById('contentFrame').src = window.resolveDashboardUrl('sharedNotifications.jsp');
-    setActiveSidebarBtn(null); // deselect all
+    setActiveSidebarBtn(null);
+    syncUserUrl('sharedNotifications.jsp');
     closeUserMobileNav();
 }
 
 // ── Main navigation function ──
 function loadPage(btn, page) {
     document.getElementById('contentFrame').src = window.resolveDashboardUrl(page);
-    // Highlight correct sidebar button
     var view = btn ? btn.getAttribute('data-user-view') : page;
     setActiveSidebarBtn(view || page);
-    // Never pollute URL with params
-    window.history.replaceState({}, document.title, window.location.pathname);
+    syncUserUrl(view || page);
     closeUserMobileNav();
 }
 
@@ -222,16 +237,7 @@ function updateBadge() {
 }
 window.updateBadge = updateBadge;
 
-function showToast(message, type) {
-    var toast = document.getElementById('toast');
-    toast.className = 'fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)]';
-    if (type === 'success') toast.classList.add('bg-emerald-500', 'text-white');
-    else if (type === 'error') toast.classList.add('bg-red-500', 'text-white');
-    else toast.classList.add('bg-indigo-500', 'text-white');
-    toast.textContent = message;
-    toast.classList.remove('hidden');
-    setTimeout(function() { toast.classList.add('hidden'); }, 2500);
-}
+// showToast: global from js/smart-office-toast.js
 
 // ── Tab/view name → route mapping ──
 var VIEW_MAP = {
@@ -254,8 +260,41 @@ var VIEW_MAP = {
     'settings':    'userSettings'
 };
 
+function resolveUserViewFromParams(params) {
+    var raw = params.get('view') || params.get('tab');
+    if (!raw) return null;
+    return VIEW_MAP[raw] || null;
+}
+
+function applyUserViewToFrame(view) {
+    if (!view) return false;
+    if (view === 'sharedNotifications.jsp') {
+        document.getElementById('contentFrame').src = window.resolveDashboardUrl('sharedNotifications.jsp');
+        setActiveSidebarBtn(null);
+        return true;
+    }
+    var mapped = VIEW_MAP[view] || view;
+    if (!document.querySelector('.sidebar-btn[data-user-view="' + mapped + '"]')) return false;
+    document.getElementById('contentFrame').src = window.resolveDashboardUrl(mapped);
+    setActiveSidebarBtn(mapped);
+    return true;
+}
+
+function applyEmployeeDashboardView() {
+    var params = new URLSearchParams(window.location.search);
+    var view = resolveUserViewFromParams(params);
+    var fromUrl = !!view;
+    if (!view) {
+        try { view = sessionStorage.getItem(USER_VIEW_STORAGE_KEY); } catch (e) {}
+    }
+    if (!view) return false;
+    if (!applyUserViewToFrame(view)) return false;
+    try { sessionStorage.setItem(USER_VIEW_STORAGE_KEY, view); } catch (e) {}
+    if (fromUrl) stripUserViewQueryFromUrl();
+    return true;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile nav wiring
     var t = document.getElementById('userMobileNavToggle');
     var o = document.getElementById('userNavOverlay');
     if (t) t.addEventListener('click', function(e) { e.stopPropagation(); toggleUserMobileNav(); });
@@ -264,37 +303,30 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.matchMedia('(min-width: 768px)').matches) closeUserMobileNav();
     });
 
-    // ── Resolve initial view from URL params ──
+    var applied = applyEmployeeDashboardView();
     var params = new URLSearchParams(window.location.search);
-    var requestedView = params.get('view') || params.get('tab');
-    var resolvedPage  = requestedView ? VIEW_MAP[requestedView] : null;
-
-    if (resolvedPage) {
-        // Load the requested view
-        document.getElementById('contentFrame').src = window.resolveDashboardUrl(resolvedPage);
-        setActiveSidebarBtn(resolvedPage);
-    } else {
-        // Default: Overview is already loaded via iframe src; just ensure sidebar reflects it
+    if (!applied) {
         setActiveSidebarBtn('userOverview');
     }
 
-    // Always clean URL params
-    window.history.replaceState({}, document.title, window.location.pathname);
-
-    // Flash messages
-    var hadFlash = params.has('success') || params.has('error');
     if (params.get('success')) {
         var s = params.get('success');
         var successMsgs = { Login:'Logged in successfully', LeaveApplied:'Leave applied successfully', PunchIn:'Punched in ✔', PunchOut:'Punched out ✔' };
         if (successMsgs[s]) showToast(successMsgs[s], 'success');
     }
     if (params.get('error')) {
-        var e = params.get('error');
+        var err = params.get('error');
         var errorMsgs = { accessDenied:'Access denied.', HolidayAttendance:'Today is a holiday.', PasswordMismatch:'Passwords do not match.' };
-        showToast(errorMsgs[e] || 'Something went wrong', 'error');
+        showToast(errorMsgs[err] || 'Something went wrong', 'error');
     }
 
-    // Badge
+    var urlAfterFlash = new URL(window.location.href);
+    if (urlAfterFlash.searchParams.has('success') || urlAfterFlash.searchParams.has('error')) {
+        urlAfterFlash.searchParams.delete('success');
+        urlAfterFlash.searchParams.delete('error');
+        window.history.replaceState({}, document.title, urlAfterFlash.pathname + (urlAfterFlash.search || ''));
+    }
+
     updateBadge();
     setInterval(updateBadge, 90000);
 });

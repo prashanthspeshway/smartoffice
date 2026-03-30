@@ -20,9 +20,12 @@ java.util.Calendar cal = java.util.Calendar.getInstance();
 int dow = cal.get(Calendar.DAY_OF_WEEK);
 boolean isWeekend = (dow == Calendar.SATURDAY || dow == Calendar.SUNDAY);
 
-// ✅ On Leave flag
+// ✅ On Leave / holiday (weekend checked separately below)
 Boolean isOnLeaveAttr = (Boolean) request.getAttribute("isOnLeave");
 boolean isOnLeave = isOnLeaveAttr != null && isOnLeaveAttr;
+Boolean isHolidayAttr = (Boolean) request.getAttribute("isHoliday");
+boolean isHoliday = isHolidayAttr != null && isHolidayAttr;
+boolean attendanceBlockedToday = isWeekend || isOnLeave || isHoliday;
 
 int breakSecs = request.getAttribute("breakTotalSeconds") != null
 		? (Integer) request.getAttribute("breakTotalSeconds")
@@ -179,23 +182,20 @@ to {
 					</div>
 				</div>
 
-				<%-- ✅ Priority: On Leave > Weekend > Normal punch buttons --%>
+				<%-- Weekend / leave / holiday: no punch (toast on click instead of inline banners) --%>
 				<%
-				if (isOnLeave) {
+				if (attendanceBlockedToday) {
 				%>
-				<div
-					class="flex items-center gap-3 mt-5 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg">
-					<i class="fa-solid fa-plane-departure text-blue-500"></i> <span
-						class="text-sm font-semibold text-blue-700">You are on
-						approved leave today. Attendance is disabled.</span>
+				<div class="flex gap-3 mt-5 flex-wrap">
+					<button type="button" onclick="showAttendanceDisabledToast()"
+						class="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
+						<i class="fa-solid fa-right-to-bracket mr-1"></i> Punch In
+					</button>
+					<button type="button" onclick="showAttendanceDisabledToast()"
+						class="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors">
+						<i class="fa-solid fa-right-from-bracket mr-1"></i> Punch Out
+					</button>
 				</div>
-				<%
-				} else if (isWeekend) {
-				%>
-				<p class="text-sm text-slate-400 mt-4 flex items-center gap-2">
-					<i class="fa-solid fa-circle-info text-indigo-400"></i>Attendance
-					is closed on weekends.
-				</p>
 				<%
 				} else {
 				%>
@@ -242,7 +242,7 @@ to {
 							type="hidden" name="redirect" value="user">
 						<button type="submit"
 							class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-							<%=(isOnLeave || punchIn == null || punchOut != null || onBreak) ? "disabled" : ""%>>
+							<%=(attendanceBlockedToday || punchIn == null || punchOut != null || onBreak) ? "disabled" : ""%>>
 							<i class="fa-solid fa-mug-hot mr-1"></i> Start Break
 						</button>
 					</form>
@@ -483,25 +483,22 @@ to {
 	</div>
 
 	<script>
-		// ── Toast for OnLeave error ─────────────────────────────────────────────────
-		document
-				.addEventListener(
-						'DOMContentLoaded',
-						function() {
-							var params = new URLSearchParams(
-									window.location.search);
-							if (params.get('error') === 'OnLeave') {
-								if (window.parent
-										&& typeof window.parent.showToast === 'function') {
-									window.parent
-											.showToast(
-													'You are on approved leave today. Attendance is disabled.',
-													'error');
-								}
-								window.history.replaceState({}, document.title,
-										window.location.pathname);
-							}
-						});
+		var ATTENDANCE_DISABLED_MSG = 'Attendance is disabled today, please contact Admin';
+		function showAttendanceDisabledToast() {
+			if (window.parent && window.parent !== window && typeof window.parent.showToast === 'function') {
+				window.parent.showToast(ATTENDANCE_DISABLED_MSG, 'error', 'left');
+			} else {
+				alert(ATTENDANCE_DISABLED_MSG);
+			}
+		}
+		document.addEventListener('DOMContentLoaded', function() {
+			var params = new URLSearchParams(window.location.search);
+			var err = params.get('error');
+			if (err === 'OnLeave' || err === 'Weekend' || err === 'Holiday' || err === 'HolidayBreak') {
+				showAttendanceDisabledToast();
+				window.history.replaceState({}, document.title, window.location.pathname);
+			}
+		});
 
 		// ── Pagination ──────────────────────────────────────────────────────────────
 		(function() {

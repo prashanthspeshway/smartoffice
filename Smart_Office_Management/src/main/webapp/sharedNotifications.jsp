@@ -3,6 +3,14 @@
 <%@ page import="com.smartoffice.dao.NotificationReadsDAO"%>
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.ArrayList"%>
+<%!
+/** Escape text for HTML double-quoted attributes (order: & first). */
+private static String escAttr(String s) {
+	if (s == null) return "";
+	return s.replace("&", "&amp;").replace("\"", "&quot;").replace("'", "&#39;")
+			.replace("<", "&lt;").replace(">", "&gt;").replace("\r", " ").replace("\n", " ");
+}
+%>
 <%
 String username = (String) session.getAttribute("username");
 if (username == null) {
@@ -59,6 +67,7 @@ try {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
 /* Only transition, NO animation — avoids forwards fill-mode locking opacity */
 .notif-card {
@@ -122,7 +131,7 @@ try {
     </div>
 
     <!-- Toast -->
-    <div id="toast" class="fixed bottom-6 right-4 z-50 px-6 py-3 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
+    <div id="toast" aria-live="polite"></div>
 
     <!-- ═══════════ UNREAD PANE ═══════════ -->
     <div id="paneUnread">
@@ -170,31 +179,29 @@ try {
                 }
                 java.text.SimpleDateFormat fmt = new java.text.SimpleDateFormat("MMM d, hh:mm a");
                 String timeStr = n.getCreatedAt() != null ? fmt.format(n.getCreatedAt()) : "";
-                String safeMsg = n.getMessage() != null
-                    ? n.getMessage().replace("\\","\\\\").replace("'","\\'").replace("\r","").replace("\n"," ") : "";
-                String safeBy = n.getCreatedBy() != null
-                    ? n.getCreatedBy().replace("\\","\\\\").replace("'","\\'") : "System";
-                String safeTime = timeStr.replace("'","\\'");
-                String safeUrl = redirectUrl.replace("'","\\'");
-                String safeLabel = redirectLabel.replace("'","\\'");
-                String safeRedirectIcon = redirectIcon.replace("'","\\'");
+                String msgAttr = escAttr(n.getMessage());
+                String byAttr = escAttr(n.getCreatedBy() != null ? n.getCreatedBy() : "System");
+                String timeAttr = escAttr(timeStr);
+                String urlAttr = escAttr(redirectUrl);
+                String labelAttr = escAttr(redirectLabel);
+                String iconAttr = escAttr(redirectIcon);
                 boolean hasRedirect = !redirectUrl.equals("#");
         %>
         <div class="notif-card bg-white rounded-xl border border-slate-200 border-l-4 <%=borderClass%> shadow-sm p-5 flex items-start gap-4 hover:shadow-md <%=hasRedirect ? "clickable" : ""%>"
              id="notif-<%=n.getId()%>"
-             data-msg="<%=safeMsg%>"
-             data-by="<%=safeBy%>"
-             data-time="<%=safeTime%>"
-             data-type="<%=type%>"
-             data-icon="<%=iconClass%>"
-             data-bg="<%=bgClass%>"
-             data-border="<%=borderClass%>"
-             data-iconcolor="<%=iconColor%>"
-             data-badge="<%=badgeCls%>"
-             data-url="<%=safeUrl%>"
-             data-label="<%=safeLabel%>"
-             data-redirecticon="<%=safeRedirectIcon%>"
-             <%=hasRedirect ? "onclick=\"handleNotifClick(" + n.getId() + ", '" + safeUrl + "', event)\"" : ""%>>
+             data-msg="<%=msgAttr%>"
+             data-by="<%=byAttr%>"
+             data-time="<%=timeAttr%>"
+             data-type="<%=escAttr(type)%>"
+             data-icon="<%=escAttr(iconClass)%>"
+             data-bg="<%=escAttr(bgClass)%>"
+             data-border="<%=escAttr(borderClass)%>"
+             data-iconcolor="<%=escAttr(iconColor)%>"
+             data-badge="<%=escAttr(badgeCls)%>"
+             data-url="<%=urlAttr%>"
+             data-label="<%=labelAttr%>"
+             data-redirecticon="<%=iconAttr%>"
+             <%=hasRedirect ? "onclick=\"handleNotifClick(" + n.getId() + ", event)\"" : ""%>>
 
             <div class="w-10 h-10 rounded-full <%=bgClass%> flex items-center justify-center flex-shrink-0 mt-0.5">
                 <i class="fa-solid <%=iconClass%> <%=iconColor%>"></i>
@@ -219,7 +226,7 @@ try {
                     <%}%>
                 </div>
             </div>
-            <button onclick="markAsRead(<%=n.getId()%>, this)"
+            <button type="button" onclick="event.stopPropagation(); markAsRead(<%=n.getId()%>, this)"
                 class="flex-shrink-0 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors mt-0.5 whitespace-nowrap">
                 <i class="fa-solid fa-check mr-1"></i>Mark as read
             </button>
@@ -273,15 +280,13 @@ try {
                 }
                 java.text.SimpleDateFormat fmt = new java.text.SimpleDateFormat("MMM d, hh:mm a");
                 String timeStr = n.getCreatedAt() != null ? fmt.format(n.getCreatedAt()) : "";
-                String safeUrl = redirectUrl.replace("'","\\'");
-                String safeLabel = redirectLabel.replace("'","\\'");
-                String safeRedirectIcon = redirectIcon.replace("'","\\'");
+                String rUrlAttr = escAttr(redirectUrl);
                 boolean hasRedirect = !redirectUrl.equals("#");
         %>
         <div class="notif-card bg-white rounded-xl border border-slate-200 border-l-4 <%=borderClass%> shadow-sm p-5 flex items-start gap-4 hover:shadow-md <%=hasRedirect ? "clickable" : ""%>"
              id="read-<%=n.getId()%>"
              style="opacity:0.75"
-             <%=hasRedirect ? "onclick=\"handleReadClick('" + safeUrl + "', event)\"" : ""%>
+             <%if (hasRedirect) {%>data-url="<%=rUrlAttr%>" onclick="handleReadClick(event)"<%}%>
              onmouseenter="this.style.opacity='1'"
              onmouseleave="this.style.opacity='0.75'">
 
@@ -343,19 +348,6 @@ function switchTab(tab) {
 }
 
 /* ══════════════════════════════════
-   TOAST
-══════════════════════════════════ */
-function showToast(msg, type) {
-    const t = document.getElementById('toast');
-    t.className = 'fixed bottom-6 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)] text-white';
-    t.classList.add(type === 'success' ? 'bg-emerald-500' : 'bg-red-500');
-    t.textContent = msg;
-    t.classList.remove('hidden');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.add('hidden'), 2500);
-}
-
-/* ══════════════════════════════════
    FADE HELPERS — pure JS, no CSS animation
 ══════════════════════════════════ */
 function fadeOut(el, cb) {
@@ -366,12 +358,8 @@ function fadeOut(el, cb) {
 }
 
 function fadeInReadCard(el) {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(-6px)';
-    el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-    el.getBoundingClientRect();
-    el.style.opacity = '0.75';
-    el.style.transform = 'translateY(0)';
+    el.style.opacity = '1';
+    el.style.transform = 'none';
 }
 
 /* ══════════════════════════════════
@@ -379,16 +367,15 @@ function fadeInReadCard(el) {
    Marks as read silently, then navigates parent window.
    Ignores clicks on buttons inside the card.
 ══════════════════════════════════ */
-function handleNotifClick(id, url, event) {
-    if (!url || url === '#') return;
-    // If the click was on the "Mark as read" button, let that handler run instead
+function handleNotifClick(id, event) {
     if (event.target.closest('button')) return;
+    var card = document.getElementById('notif-' + id);
+    var url = card ? card.getAttribute('data-url') : '';
+    if (!url || url === '#') return;
 
-    // Mark as read silently in background, then redirect
     fetch('<%=request.getContextPath()%>/markNotificationRead?id=' + id, { method: 'POST' })
         .finally(() => {
             if (window.parent && window.parent.updateBadge) window.parent.updateBadge();
-            // Navigate the parent (dashboard) window, not just the iframe
             navigateTo(url);
         });
 }
@@ -397,10 +384,10 @@ function handleNotifClick(id, url, event) {
    CLICK TO REDIRECT — READ
    Just navigates; already marked as read.
 ══════════════════════════════════ */
-function handleReadClick(url, event) {
-    if (!url || url === '#') return;
-    // Ignore clicks on the Delete button
+function handleReadClick(event) {
     if (event.target.closest('button')) return;
+    var url = event.currentTarget.getAttribute('data-url');
+    if (!url || url === '#') return;
     navigateTo(url);
 }
 
@@ -424,43 +411,153 @@ function navigateTo(url) {
 }
 
 /* ══════════════════════════════════
-   BUILD READ CARD — no CSS animation class
+   Read payload: prefer visible DOM text (data-* can truncate or fail with long / special messages)
 ══════════════════════════════════ */
-function buildReadCard(id, msg, createdBy, timeStr, type, iconClass, bgClass, borderClass, iconColor, badgeCls, redirectUrl, redirectLabel, redirectIcon) {
-    const timeHtml = timeStr
-        ? `<span class="text-xs text-slate-300">•</span>
-           <span class="text-xs text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${timeStr}</span>`
-        : '';
-    const hasRedirect = redirectUrl && redirectUrl !== '#';
-    const redirectHint = hasRedirect
-        ? `<span class="redirect-hint"><i class="fa-solid ${redirectIcon}"></i>${redirectLabel} <i class="fa-solid fa-arrow-right" style="font-size:0.6rem"></i></span>`
-        : '';
-    const clickHandler = hasRedirect
-        ? `onclick="handleReadClick('${redirectUrl}', event)"`
-        : '';
-    return `
-    <div class="notif-card bg-white rounded-xl border border-slate-200 border-l-4 ${borderClass} shadow-sm p-5 flex items-start gap-4 hover:shadow-md ${hasRedirect ? 'clickable' : ''}"
-         id="read-${id}"
-         ${clickHandler}
-         onmouseenter="this.style.opacity='1'"
-         onmouseleave="this.style.opacity='0.75'">
-        <div class="w-10 h-10 rounded-full ${bgClass} flex items-center justify-center flex-shrink-0 mt-0.5">
-            <i class="fa-solid ${iconClass} ${iconColor}"></i>
-        </div>
-        <div class="flex-1 min-w-0">
-            <p class="text-sm text-slate-500 font-medium leading-relaxed">${msg}</p>
-            <div class="flex items-center gap-3 mt-1.5 flex-wrap">
-                <span class="text-xs text-slate-400"><i class="fa-solid fa-user mr-1"></i>${createdBy}</span>
-                ${timeHtml}
-                <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${badgeCls}">${type}</span>
-                ${redirectHint}
-            </div>
-        </div>
-        <button onclick="deleteNotification(${id}, this)"
-            class="flex-shrink-0 px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-600 hover:text-white text-red-500 border border-red-200 text-xs font-semibold transition-colors mt-0.5 whitespace-nowrap">
-            <i class="fa-solid fa-trash mr-1"></i>Delete
-        </button>
-    </div>`;
+function gAttr(card, k) {
+    var v = card.getAttribute('data-' + k);
+    return v === null ? '' : v;
+}
+function parseIconFromUnreadCard(card) {
+    var icon = card.querySelector('div.rounded-full i.fa-solid');
+    if (!icon) return { icon: '', color: '' };
+    var parts = icon.className.split(/\s+/);
+    var iconName = '';
+    var color = '';
+    for (var i = 0; i < parts.length; i++) {
+        var c = parts[i];
+        if (c.indexOf('text-') === 0) color = c;
+        else if (c.indexOf('fa-') === 0 && c !== 'fa-solid' && c !== 'fa-regular' && c !== 'fa-brands') {
+            iconName = c;
+        }
+    }
+    return { icon: iconName, color: color };
+}
+function readPayloadFromUnreadCard(card) {
+    var pEl = card.querySelector('.flex-1.min-w-0 > p') || card.querySelector('div.flex-1 p');
+    var msg = (pEl && pEl.textContent) ? pEl.textContent.trim() : '';
+    if (!msg) msg = gAttr(card, 'msg');
+
+    var createdBy = gAttr(card, 'by');
+    var userIcon = card.querySelector('.fa-user');
+    if (userIcon && userIcon.parentElement) {
+        var ut = (userIcon.parentElement.textContent || '').replace(/\s+/g, ' ').trim();
+        if (ut) createdBy = ut;
+    }
+
+    var timeStr = gAttr(card, 'time');
+    var clockIcon = card.querySelector('.fa-clock');
+    if (clockIcon && clockIcon.parentElement) {
+        var tt = (clockIcon.parentElement.textContent || '').replace(/\s+/g, ' ').trim();
+        if (tt) timeStr = tt;
+    }
+
+    var ic = parseIconFromUnreadCard(card);
+    var iconClass = gAttr(card, 'icon') || ic.icon;
+    var iconColor = gAttr(card, 'iconcolor') || ic.color;
+
+    return {
+        msg: msg,
+        createdBy: createdBy || 'System',
+        timeStr: timeStr,
+        type: gAttr(card, 'type') || 'GENERAL',
+        iconClass: iconClass,
+        bgClass: gAttr(card, 'bg'),
+        borderClass: gAttr(card, 'border'),
+        iconColor: iconColor,
+        badgeCls: gAttr(card, 'badge'),
+        redirectUrl: gAttr(card, 'url'),
+        redirectLabel: gAttr(card, 'label'),
+        redirectIcon: gAttr(card, 'redirecticon')
+    };
+}
+
+/* ══════════════════════════════════
+   Build read card via DOM APIs (avoids broken innerHTML / template literals)
+══════════════════════════════════ */
+function createReadCardElement(id, p) {
+    var hasRedirect = p.redirectUrl && p.redirectUrl !== '#';
+    var root = document.createElement('div');
+    root.id = 'read-' + id;
+    root.className = 'notif-card bg-white rounded-xl border border-slate-200 border-l-4 ' + (p.borderClass || '') +
+        ' shadow-sm p-5 flex items-start gap-4 hover:shadow-md' + (hasRedirect ? ' clickable' : '');
+    root.style.opacity = '0.75';
+    root.onmouseenter = function () { this.style.opacity = '1'; };
+    root.onmouseleave = function () { this.style.opacity = '0.75'; };
+    if (hasRedirect) {
+        root.setAttribute('data-url', p.redirectUrl);
+        root.addEventListener('click', handleReadClick);
+    }
+
+    var iconWrap = document.createElement('div');
+    iconWrap.className = 'w-10 h-10 rounded-full ' + (p.bgClass || '') + ' flex items-center justify-center flex-shrink-0 mt-0.5';
+    var fa = document.createElement('i');
+    fa.className = 'fa-solid ' + (p.iconClass || 'fa-bell') + ' ' + (p.iconColor || '');
+    fa.setAttribute('aria-hidden', 'true');
+    iconWrap.appendChild(fa);
+
+    var body = document.createElement('div');
+    body.className = 'flex-1 min-w-0';
+    var para = document.createElement('p');
+    para.className = 'text-sm text-slate-500 font-medium leading-relaxed';
+    para.textContent = (p.msg && String(p.msg).trim()) ? p.msg : '(No message)';
+    body.appendChild(para);
+
+    var meta = document.createElement('div');
+    meta.className = 'flex items-center gap-3 mt-1.5 flex-wrap';
+
+    var userSpan = document.createElement('span');
+    userSpan.className = 'text-xs text-slate-400';
+    var ui = document.createElement('i');
+    ui.className = 'fa-solid fa-user mr-1';
+    userSpan.appendChild(ui);
+    userSpan.appendChild(document.createTextNode(p.createdBy || 'System'));
+    meta.appendChild(userSpan);
+
+    if (p.timeStr) {
+        var dot = document.createElement('span');
+        dot.className = 'text-xs text-slate-300';
+        dot.textContent = '•';
+        meta.appendChild(dot);
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'text-xs text-slate-400';
+        var ci = document.createElement('i');
+        ci.className = 'fa-regular fa-clock mr-1';
+        timeSpan.appendChild(ci);
+        timeSpan.appendChild(document.createTextNode(p.timeStr));
+        meta.appendChild(timeSpan);
+    }
+
+    var typeBadge = document.createElement('span');
+    typeBadge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full ' + (p.badgeCls || '');
+    typeBadge.textContent = p.type || 'GENERAL';
+    meta.appendChild(typeBadge);
+
+    if (hasRedirect && p.redirectLabel) {
+        var hint = document.createElement('span');
+        hint.className = 'redirect-hint';
+        var hi = document.createElement('i');
+        hi.className = 'fa-solid ' + (p.redirectIcon || 'fa-arrow-right');
+        hint.appendChild(hi);
+        hint.appendChild(document.createTextNode(' ' + p.redirectLabel + ' '));
+        var ar = document.createElement('i');
+        ar.className = 'fa-solid fa-arrow-right';
+        ar.style.fontSize = '0.6rem';
+        hint.appendChild(ar);
+        meta.appendChild(hint);
+    }
+
+    body.appendChild(meta);
+    root.appendChild(iconWrap);
+    root.appendChild(body);
+
+    var delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'flex-shrink-0 px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-600 hover:text-white text-red-500 border border-red-200 text-xs font-semibold transition-colors mt-0.5 whitespace-nowrap';
+    delBtn.innerHTML = '<i class="fa-solid fa-trash mr-1"></i>Delete';
+    delBtn.addEventListener('click', function (e) { e.stopPropagation(); deleteNotification(id, delBtn); });
+    root.appendChild(delBtn);
+
+    return root;
 }
 
 /* ══════════════════════════════════
@@ -475,27 +572,21 @@ function markAsRead(id, btn) {
     .then(res => {
         if (!res.ok) throw new Error('HTTP ' + res.status);
 
-        const card        = document.getElementById('notif-' + id);
-        const msg         = card.dataset.msg;
-        const createdBy   = card.dataset.by;
-        const timeStr     = card.dataset.time;
-        const type        = card.dataset.type;
-        const iconClass   = card.dataset.icon;
-        const bgClass     = card.dataset.bg;
-        const borderClass = card.dataset.border;
-        const iconColor   = card.dataset.iconcolor;
-        const badgeCls    = card.dataset.badge;
-        const redirectUrl = card.dataset.url;
-        const redirectLabel = card.dataset.label;
-        const redirectIcon  = card.dataset.redirecticon;
+        const card = document.getElementById('notif-' + id);
+        if (!card) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Mark as read';
+            showToast('Notification card not found', 'error');
+            return;
+        }
+        const payload = readPayloadFromUnreadCard(card);
 
         fadeOut(card, () => {
             const emptyRead = document.getElementById('emptyRead');
             if (emptyRead) emptyRead.remove();
 
             const readList = document.getElementById('readList');
-            readList.insertAdjacentHTML('afterbegin',
-                buildReadCard(id, msg, createdBy, timeStr, type, iconClass, bgClass, borderClass, iconColor, badgeCls, redirectUrl, redirectLabel, redirectIcon));
+            readList.insertBefore(createReadCardElement(id, payload), readList.firstChild);
 
             const newCard = document.getElementById('read-' + id);
             if (newCard) fadeInReadCard(newCard);
@@ -535,23 +626,11 @@ function markAll() {
         let done = 0;
 
         cards.forEach(card => {
-            const id            = card.id.replace('notif-', '');
-            const msg           = card.dataset.msg;
-            const createdBy     = card.dataset.by;
-            const timeStr       = card.dataset.time;
-            const type          = card.dataset.type;
-            const iconClass     = card.dataset.icon;
-            const bgClass       = card.dataset.bg;
-            const borderClass   = card.dataset.border;
-            const iconColor     = card.dataset.iconcolor;
-            const badgeCls      = card.dataset.badge;
-            const redirectUrl   = card.dataset.url;
-            const redirectLabel = card.dataset.label;
-            const redirectIcon  = card.dataset.redirecticon;
+            const id = card.id.replace('notif-', '');
+            const payload = readPayloadFromUnreadCard(card);
 
             fadeOut(card, () => {
-                readList.insertAdjacentHTML('afterbegin',
-                    buildReadCard(id, msg, createdBy, timeStr, type, iconClass, bgClass, borderClass, iconColor, badgeCls, redirectUrl, redirectLabel, redirectIcon));
+                readList.insertBefore(createReadCardElement(id, payload), readList.firstChild);
                 const newCard = document.getElementById('read-' + id);
                 if (newCard) fadeInReadCard(newCard);
                 done++;

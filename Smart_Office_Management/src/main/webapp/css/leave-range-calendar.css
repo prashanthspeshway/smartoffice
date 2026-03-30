@@ -1,0 +1,122 @@
+/* Leave calendar — single month, fits card; clean range + single-day styling */
+.leave-range-wrap {
+  max-width: 100%;
+}
+
+/* One-month calendar scales to card width (avoids double-month overflow) */
+.leave-range-wrap .flatpickr-calendar {
+  width: 100% !important;
+  max-width: 100%;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.07);
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 10px 8px 14px;
+  margin: 0 auto;
+}
+.leave-range-wrap .flatpickr-months {
+  padding: 6px 2px 8px;
+  width: 100%;
+}
+.leave-range-wrap .flatpickr-month {
+  width: 100%;
+}
+.leave-range-wrap .flatpickr-days {
+  width: 100%;
+}
+.leave-range-wrap .dayContainer {
+  width: 100%;
+  min-width: 0;
+}
+.leave-range-wrap .flatpickr-current-month {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #0f172a;
+  padding: 4px 0 8px;
+}
+.leave-range-wrap .flatpickr-weekdays {
+  padding-bottom: 6px;
+}
+.leave-range-wrap .flatpickr-weekday {
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.leave-range-wrap .flatpickr-day {
+  border-radius: 10px;
+  border-color: transparent;
+  line-height: 36px;
+  max-width: 40px;
+  height: 36px;
+  font-weight: 500;
+  color: #334155;
+}
+.leave-range-wrap .flatpickr-day:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: transparent;
+}
+
+/* Range: soft band (each cell slightly rounded for a polished look) */
+.leave-range-wrap .flatpickr-day.inRange {
+  background: linear-gradient(
+    180deg,
+    rgba(99, 102, 241, 0.14) 0%,
+    rgba(99, 102, 241, 0.2) 100%
+  );
+  border-color: transparent;
+  box-shadow: none;
+  color: #1e293b;
+  border-radius: 8px;
+}
+.leave-range-wrap .flatpickr-day.inRange:hover {
+  background: rgba(99, 102, 241, 0.28);
+}
+
+/* Range endpoints — solid pills */
+.leave-range-wrap .flatpickr-day.startRange,
+.leave-range-wrap .flatpickr-day.endRange {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+  border-radius: 9999px;
+  box-shadow: 0 2px 12px rgba(79, 70, 229, 0.35);
+  font-weight: 600;
+}
+.leave-range-wrap .flatpickr-day.startRange.inRange,
+.leave-range-wrap .flatpickr-day.endRange.inRange {
+  border-radius: 9999px;
+}
+
+/* Single-day range (same cell) or single mode selection */
+.leave-range-wrap .flatpickr-day.startRange.endRange,
+.leave-range-wrap .flatpickr-day.selected {
+  border-radius: 9999px;
+}
+.leave-range-wrap .flatpickr-day.selected,
+.leave-range-wrap .flatpickr-day.selected:hover {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+}
+
+.leave-range-wrap .flatpickr-day.prevMonthDay,
+.leave-range-wrap .flatpickr-day.nextMonthDay {
+  opacity: 0.35;
+}
+.leave-range-wrap .flatpickr-day.flatpickr-disabled {
+  color: #cbd5e1 !important;
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+/* Today — light ring when not selected */
+.leave-range-wrap .flatpickr-day.today:not(.selected):not(.startRange):not(.endRange):not(.inRange) {
+  border: 1px solid rgba(79, 70, 229, 0.4);
+  background: #fafafa;
+}
+.leave-range-wrap .flatpickr-day.today:not(.selected):not(.startRange):not(.endRange):not(.inRange):hover {
+  background: rgba(99, 102, 241, 0.08);
+}

@@ -23,6 +23,7 @@ boolean isWeekend = (dow == java.util.Calendar.SATURDAY || dow == java.util.Cale
 // ✅ On Leave flag
 Boolean isOnLeaveAttr = (Boolean) request.getAttribute("isOnLeave");
 boolean isOnLeave = isOnLeaveAttr != null && isOnLeaveAttr;
+boolean attendanceBlockedToday = isWeekend || isOnLeave;
 
 boolean onBreak = Boolean.TRUE.equals(request.getAttribute("onBreak"));
 
@@ -234,23 +235,20 @@ to {
 					</div>
 				</div>
 
-				<%-- ✅ Priority: On Leave > Weekend > Normal buttons --%>
+				<%-- Weekend / leave: toast on punch click (same message as employee) --%>
 				<%
-				if (isOnLeave) {
+				if (attendanceBlockedToday) {
 				%>
-				<div
-					class="flex items-center gap-3 mt-5 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg">
-					<i class="fa-solid fa-plane-departure text-blue-500"></i> <span
-						class="text-sm font-semibold text-blue-700">You are on
-						approved leave today. Attendance is disabled.</span>
+				<div class="flex gap-3 mt-6">
+					<button type="button" onclick="showAttendanceDisabledToast()"
+						class="w-full px-4 py-2 rounded-lg font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
+						<i class="fa-solid fa-right-to-bracket mr-1"></i> Punch In
+					</button>
+					<button type="button" onclick="showAttendanceDisabledToast()"
+						class="w-full px-4 py-2 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors">
+						<i class="fa-solid fa-right-from-bracket mr-1"></i> Punch Out
+					</button>
 				</div>
-				<%
-				} else if (isWeekend) {
-				%>
-				<p class="text-slate-500 text-sm mt-4 flex items-center gap-2">
-					<i class="fa-solid fa-circle-info text-indigo-400"></i>Attendance
-					is closed on weekends.
-				</p>
 				<%
 				} else {
 				%>
@@ -307,10 +305,10 @@ to {
 							type="hidden" name="redirect" value="manager">
 						<button type="submit"
 							class="w-full px-4 py-2 rounded-lg font-semibold text-white transition-colors
-                        <%=(isOnLeave || punchIn == null || punchOut != null || onBreak)
+                        <%=(attendanceBlockedToday || punchIn == null || punchOut != null || onBreak)
 		? "bg-slate-400 cursor-not-allowed"
 		: "bg-purple-600 hover:bg-purple-700"%>"
-							<%=(isOnLeave || punchIn == null || punchOut != null || onBreak) ? "disabled" : ""%>>
+							<%=(attendanceBlockedToday || punchIn == null || punchOut != null || onBreak) ? "disabled" : ""%>>
 							<i class="fa-solid fa-mug-hot mr-1"></i> Start Break
 						</button>
 					</form>
@@ -624,16 +622,22 @@ to {
 	</div>
 
 	<script>
-// ── Toast for OnLeave error ─────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function () {
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('error') === 'OnLeave') {
-        if (window.parent && typeof window.parent.showToast === 'function') {
-            window.parent.showToast('You are on approved leave today. Attendance is disabled.', 'error');
-        }
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-});
+	var ATTENDANCE_DISABLED_MSG = 'Attendance is disabled today, please contact Admin';
+	function showAttendanceDisabledToast() {
+		if (window.parent && window.parent !== window && typeof window.parent.showToast === 'function') {
+			window.parent.showToast(ATTENDANCE_DISABLED_MSG, 'error', 'left');
+		} else {
+			alert(ATTENDANCE_DISABLED_MSG);
+		}
+	}
+	document.addEventListener('DOMContentLoaded', function () {
+		var params = new URLSearchParams(window.location.search);
+		var err = params.get('error');
+		if (err === 'OnLeave' || err === 'Weekend' || err === 'Holiday' || err === 'HolidayBreak') {
+			showAttendanceDisabledToast();
+			window.history.replaceState({}, document.title, window.location.pathname);
+		}
+	});
 
 // ── Pagination ──────────────────────────────────────────────────────────────
 (function () {

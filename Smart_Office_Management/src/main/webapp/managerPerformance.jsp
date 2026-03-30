@@ -22,6 +22,8 @@ if (username == null) {
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-toast.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
 body{font-family:'Geist',system-ui,sans-serif;}
 .step-indicator {
@@ -422,24 +424,12 @@ body{font-family:'Geist',system-ui,sans-serif;}
 			r.addEventListener('change', checkSubmit);
 		});
 
-		// Toast notification handler
-		function showToast(message, type) {
+		function notifyPerformanceToast(message, type) {
 			type = type || 'success';
-			// Try to use parent frame's toast if available
-			if (window.parent && window.parent.showToast) {
+			if (window.parent && window.parent !== window && typeof window.parent.showToast === 'function') {
 				window.parent.showToast(message, type);
 			} else {
-				// Fallback: create inline toast
-				var toast = document.createElement('div');
-				var bgColor = (type === 'success') ? 'bg-green-500'
-						: 'bg-red-500';
-				toast.className = 'fixed bottom-6 right-4 px-6 py-3 rounded-lg shadow-lg z-50 max-w-[min(92vw,24rem)] '
-						+ bgColor + ' text-white';
-				toast.textContent = message;
-				document.body.appendChild(toast);
-				setTimeout(function() {
-					toast.remove();
-				}, 3000);
+				showToast(message, type);
 			}
 		}
 
@@ -448,7 +438,7 @@ body{font-family:'Geist',system-ui,sans-serif;}
 		if (urlParams.has('success')) {
 			var success = urlParams.get('success');
 			if (success === 'PerformanceSaved') {
-				showToast('Performance rating saved successfully!', 'success');
+				notifyPerformanceToast('Performance rating saved successfully!', 'success');
 			}
 		}
 		if (urlParams.has('error')) {
@@ -459,7 +449,7 @@ body{font-family:'Geist',system-ui,sans-serif;}
 				'AlreadyRated' : 'Performance already rated for this employee this week.',
 				'SaveFailed' : 'Failed to save performance rating. Please try again.'
 			};
-			showToast(errorMessages[error] || 'An error occurred.', 'error');
+			notifyPerformanceToast(errorMessages[error] || 'An error occurred.', 'error');
 		}
 
 		document.addEventListener('contextmenu', function(e) {

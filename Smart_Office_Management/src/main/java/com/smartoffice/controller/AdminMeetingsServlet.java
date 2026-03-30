@@ -3,6 +3,7 @@ package com.smartoffice.controller;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -149,11 +150,23 @@ public class AdminMeetingsServlet extends HttpServlet {
         String meetingLink     = req.getParameter("meetingLink");
         String participantType = req.getParameter("participantType");
 
+        Timestamp startTs = Timestamp.valueOf(startTimeStr.replace("T", " ") + ":00");
+        Timestamp endTs = Timestamp.valueOf(endTimeStr.replace("T", " ") + ":00");
+        // Match datetime-local (minute precision): reject only if start minute is before current minute
+        LocalDateTime startMinute = startTs.toLocalDateTime().withSecond(0).withNano(0);
+        LocalDateTime nowMinute = LocalDateTime.now().withSecond(0).withNano(0);
+        if (startMinute.isBefore(nowMinute)) {
+            throw new Exception("Start time cannot be in the past");
+        }
+        if (!endTs.after(startTs)) {
+            throw new Exception("End time must be after start time");
+        }
+
         Meeting meeting = new Meeting();
         meeting.setTitle(title);
         meeting.setDescription(description);
-        meeting.setStartTime(Timestamp.valueOf(startTimeStr.replace("T", " ") + ":00"));
-        meeting.setEndTime(Timestamp.valueOf(endTimeStr.replace("T", " ") + ":00"));
+        meeting.setStartTime(startTs);
+        meeting.setEndTime(endTs);
         meeting.setMeetingLink(meetingLink);
         meeting.setCreatedBy((String) session.getAttribute("username"));
 

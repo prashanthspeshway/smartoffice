@@ -3,6 +3,7 @@ package com.smartoffice.controller;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +56,13 @@ public class ScheduleMeetingServlet extends HttpServlet {
             Timestamp startTime = Timestamp.valueOf(startStr.replace("T", " ") + ":00");
             Timestamp endTime   = Timestamp.valueOf(endStr.replace("T", " ") + ":00");
 
-            if (endTime.before(startTime)) {
+            LocalDateTime startMinute = startTime.toLocalDateTime().withSecond(0).withNano(0);
+            LocalDateTime nowMinute = LocalDateTime.now().withSecond(0).withNano(0);
+            if (startMinute.isBefore(nowMinute)) {
+                response.sendRedirect(request.getContextPath() + "/managerMeetings?error=PastStart");
+                return;
+            }
+            if (!endTime.after(startTime)) {
                 response.sendRedirect(request.getContextPath() + "/managerMeetings?error=InvalidTime");
                 return;
             }

@@ -52,6 +52,8 @@ String todayStr = sdf.format(new java.util.Date());
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-toast.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
   body { font-family: 'DM Sans', system-ui, sans-serif; }
 
@@ -184,7 +186,7 @@ String todayStr = sdf.format(new java.util.Date());
 </head>
 <body class="bg-slate-100 p-6">
 
-<div id="toast" class="fixed bottom-6 right-4 z-50 px-5 py-3 rounded-lg shadow-lg hidden text-sm font-medium max-w-xs"></div>
+<div id="toast" aria-live="polite"></div>
 
 <div class="max-w-7xl mx-auto">
   <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
@@ -287,7 +289,7 @@ String todayStr = sdf.format(new java.util.Date());
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Deadline <span class="text-red-500">*</span></label>
-            <input type="date" name="deadline" required
+            <input type="date" name="deadline" id="assignTaskDeadline" required min="<%=todayStr%>"
               class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
           <div>
@@ -783,7 +785,35 @@ function updateEmpLabel() {
     label.className = 'text-slate-800 text-sm'; val.value = 'ok';
   }
 }
+function localDateISO() {
+  var d = new Date();
+  var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+}
+function refreshAssignDeadlineMin() {
+  var el = document.getElementById('assignTaskDeadline');
+  if (!el) return;
+  var m = localDateISO();
+  el.min = m;
+  if (el.value && el.value < m) el.value = m;
+}
+document.addEventListener('DOMContentLoaded', function() {
+  refreshAssignDeadlineMin();
+  var dl = document.getElementById('assignTaskDeadline');
+  if (dl) {
+    dl.addEventListener('focus', refreshAssignDeadlineMin);
+    dl.addEventListener('click', refreshAssignDeadlineMin);
+  }
+});
+
 document.getElementById('assignTaskForm').addEventListener('submit', function(e) {
+  refreshAssignDeadlineMin();
+  var dl = document.getElementById('assignTaskDeadline');
+  if (dl && dl.value && dl.min && dl.value < dl.min) {
+    e.preventDefault();
+    if (typeof showToast === 'function') showToast('Deadline cannot be in the past.', 'error');
+    return;
+  }
   if (!document.querySelectorAll('.emp-checkbox:checked').length) {
     e.preventDefault();
     document.getElementById('empDropdownPanel').classList.remove('hidden');
@@ -794,22 +824,15 @@ document.getElementById('assignTaskForm').addEventListener('submit', function(e)
   }
 });
 
-// ── Toast ────────────────────────────────────────────────────────
-function showToast(msg, ok) {
-  var el = document.getElementById('toast');
-  el.className = 'fixed bottom-6 right-4 z-50 px-5 py-3 rounded-lg shadow-lg text-sm font-medium max-w-xs '
-    + (ok ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white');
-  el.textContent = msg; el.classList.remove('hidden');
-  setTimeout(function(){ el.classList.add('hidden'); }, 3800);
-}
+// showToast: js/smart-office-toast.js
 (function() {
   var p = new URLSearchParams(window.location.search);
   var flash = p.get('taskFlash');
-  if (flash === 'review')                showToast('Task returned — employee can resubmit.', true);
-  else if (flash === 'completed')        showToast('Task marked as completed!', true);
-  else if (flash === 'alreadyCompleted') showToast('Task was already completed.', true);
-  var s = p.get('success'); if (s) showToast(decodeURIComponent(s.replace(/\+/g,' ')), true);
-  var err = p.get('error'); if (err) showToast(decodeURIComponent(err.replace(/\+/g,' ')), false);
+  if (flash === 'review')                showToast('Task returned — employee can resubmit.', 'success');
+  else if (flash === 'completed')        showToast('Task marked as completed!', 'success');
+  else if (flash === 'alreadyCompleted') showToast('Task was already completed.', 'success');
+  var s = p.get('success'); if (s) showToast(decodeURIComponent(s.replace(/\+/g,' ')), 'success');
+  var err = p.get('error'); if (err) showToast(decodeURIComponent(err.replace(/\+/g,' ')), 'error');
   if (flash||s||err) {
     p.delete('taskFlash'); p.delete('success'); p.delete('error');
     var q = p.toString();

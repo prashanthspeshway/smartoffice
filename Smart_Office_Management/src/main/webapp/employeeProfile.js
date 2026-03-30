@@ -48,9 +48,11 @@
       to   { transform: scale(1);  opacity: 1; }
     }
 
-    /* ── Header band ── */
+    /* ── Header band: matches app sidebar (--so-sidebar-bg / --so-sidebar-border in smart-office-theme.css) ── */
     #empProfileHeader {
-      background: linear-gradient(135deg, #4f6ef7 0%, #7c3aed 100%);
+      background: #2d2d2d !important;
+      background-image: none !important;
+      border-bottom: 1px solid #242424;
       padding: 24px 28px 20px;
       display: flex;
       align-items: center;
@@ -100,8 +102,8 @@
       border-bottom: 2.5px solid transparent;
       transition: all .15s; display: flex; align-items: center; gap: 7px;
     }
-    .emp-tab:hover { color: #4f6ef7; }
-    .emp-tab.active { color: #4f6ef7; border-bottom-color: #4f6ef7; background: #fff; }
+    .emp-tab:hover { color: #000000; }
+    .emp-tab.active { color: #000000; border-bottom-color: #000000; background: #fff; }
 
     /* ── Body ── */
     #empProfileBody {
@@ -119,7 +121,7 @@
       align-items: center; justify-content: center;
       padding: 48px; color: #8d96b0; gap: 12px;
     }
-    .emp-spinner i { font-size: 28px; color: #4f6ef7; }
+    .emp-spinner i { font-size: 28px; color: #111111; }
 
     /* ── Info grid ── */
     .emp-info-grid {
@@ -131,7 +133,7 @@
       border-radius: 10px; padding: 14px 16px;
     }
     .emp-info-label {
-      font-size: 11px; font-weight: 700; color: #8d96b0;
+      font-size: 11px; font-weight: 700; color: #111111;
       text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px;
     }
     .emp-info-value {
@@ -179,25 +181,25 @@
     .pill.present  { background: #d1fae5; color: #065f46; }
     .pill.absent   { background: #fee2e2; color: #991b1b; }
     .pill.halfday  { background: #fef3c7; color: #92400e; }
-    .pill.punched  { background: #dbeafe; color: #1e40af; }
+    .pill.punched  { background: #e5e5e5; color: #111111; }
     .pill.pending  { background: #fef3c7; color: #92400e; }
     .pill.approved { background: #d1fae5; color: #065f46; }
     .pill.rejected { background: #fee2e2; color: #991b1b; }
 
     /* ── Team card ── */
     .emp-team-card {
-      background: linear-gradient(135deg, #eef1fe 0%, #f0f4ff 100%);
-      border: 1px solid #d4daea; border-radius: 14px;
+      background: linear-gradient(135deg, #f5f5f5 0%, #ebebeb 100%);
+      border: 1px solid #d4d4d4; border-radius: 14px;
       padding: 18px 20px; margin-bottom: 14px;
     }
     .emp-team-name {
       font-size: 15px; font-weight: 700; color: #1a1d2e;
       display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
     }
-    .emp-team-name i { color: #4f6ef7; }
+    .emp-team-name i { color: #111111; }
     .emp-team-meta { font-size: 13px; color: #5a6278; display: flex; gap: 20px; flex-wrap: wrap; }
     .emp-team-meta span { display: flex; align-items: center; gap: 6px; }
-    .emp-team-meta i { color: #4f6ef7; font-size: 12px; }
+    .emp-team-meta i { color: #111111; font-size: 12px; }
 
     /* ── Section title ── */
     .emp-section-title {
@@ -205,7 +207,7 @@
       text-transform: uppercase; letter-spacing: .5px;
       margin-bottom: 14px; display: flex; align-items: center; gap: 7px;
     }
-    .emp-section-title i { color: #4f6ef7; }
+    .emp-section-title i { color: #111111; }
 
     /* ── Empty ── */
     .emp-empty {
@@ -216,7 +218,7 @@
 
     /* ── Clickable rows ── */
     tr[data-profile-email] { cursor: pointer; }
-    tr[data-profile-email]:hover td { background: #f0f4ff !important; }
+    tr[data-profile-email]:hover td { background: #f5f5f5 !important; }
   `;
 
   const styleEl = document.createElement('style');
@@ -370,7 +372,7 @@
   function _infoItem(icon, label, value) {
     return `
       <div class="emp-info-item">
-        <div class="emp-info-label"><i class="fa-solid ${icon}" style="margin-right:5px;color:#4f6ef7;"></i>${label}</div>
+        <div class="emp-info-label"><i class="fa-solid ${icon}" style="margin-right:5px;color:#111111;"></i>${label}</div>
         <div class="emp-info-value">${_esc(value)}</div>
       </div>`;
   }

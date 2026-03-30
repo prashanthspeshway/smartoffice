@@ -22,6 +22,9 @@ if (username == null) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/leave-range-calendar.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-toast.css">
 </head>
 <body class="user-iframe-page p-6">
     <div class="max-w-7xl mx-auto">
@@ -47,7 +50,7 @@ if (username == null) {
                     <i class="fa-solid fa-paper-plane text-indigo-600 text-2xl"></i>
                     <h3 class="text-lg font-semibold text-slate-800">Submit Request</h3>
                 </div>
-                <form action="<%=request.getContextPath()%>/applyLeave" method="post" class="space-y-4">
+                <form id="applyLeaveForm" action="<%=request.getContextPath()%>/applyLeave" method="post" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">Leave Type</label>
                         <select name="leaveType" required
@@ -58,17 +61,21 @@ if (username == null) {
                             <option>Earned Leave</option>
                         </select>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">From Date</label>
-                            <input type="date" name="fromDate" required
-                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <div class="leave-range-wrap">
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Leave period</label>
+                        <div class="flex rounded-lg border border-slate-200 p-0.5 bg-slate-100 mb-2" role="group" aria-label="Single day or date range">
+                            <button type="button" id="leaveModeSingleBtn"
+                                class="flex-1 py-2 px-3 text-sm font-semibold rounded-md transition-all bg-white text-indigo-700 shadow-sm ring-1 ring-slate-200">Single day</button>
+                            <button type="button" id="leaveModeRangeBtn"
+                                class="flex-1 py-2 px-3 text-sm font-semibold rounded-md transition-all text-slate-600 hover:text-slate-800">Date range</button>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">To Date</label>
-                            <input type="date" name="toDate" required
-                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
+                        <p id="leaveModeHint" class="text-xs text-slate-500 mb-3 leading-relaxed">
+                            Choose the calendar day you will be away. One tap is enough — no separate start and end.
+                        </p>
+                        <div id="leaveFlatpickrEl" class="leave-flatpickr-mount"></div>
+                        <p id="leaveRangeSummary" class="text-sm text-indigo-700 font-medium mt-3 min-h-[1.25rem] hidden"></p>
+                        <input type="hidden" name="fromDate" id="leaveFromDate" value="">
+                        <input type="hidden" name="toDate" id="leaveToDate" value="">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">Reason</label>
@@ -168,6 +175,9 @@ if (username == null) {
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
+    <script src="<%=request.getContextPath()%>/js/leave-range-calendar.js"></script>
     <script>
     function showTab(tab) {
         const applySection    = document.getElementById('applySection');

@@ -22,6 +22,7 @@ String phone    = userObj != null ? userObj.getPhone()    : (String) session.get
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 </head>
 <body class="user-iframe-page p-6">
 
@@ -31,8 +32,7 @@ String phone    = userObj != null ? userObj.getPhone()    : (String) session.get
         <p class="text-slate-500 text-sm mt-1">Manage your profile and account preferences.</p>
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-6 right-4 z-50 px-6 py-3 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
+    <div id="toast" aria-live="polite"></div>
 
     <!-- Inner tabs -->
     <div class="flex gap-1 border-b border-slate-200">
@@ -99,15 +99,6 @@ function showTab(tab) {
     var inactive = 'px-5 py-3 text-sm font-semibold text-slate-500 border-b-2 border-transparent -mb-px hover:text-slate-700 bg-transparent';
     document.getElementById('tabProfile').className  = tab === 'profile'  ? active : inactive;
     document.getElementById('tabPassword').className = tab === 'password' ? active : inactive;
-}
-
-function showToast(msg, type) {
-    const t = document.getElementById('toast');
-    t.className = 'fixed bottom-6 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)]';
-    t.classList.add(type === 'success' ? 'bg-emerald-500' : 'bg-red-500', 'text-white');
-    t.textContent = msg;
-    t.classList.remove('hidden');
-    setTimeout(() => t.classList.add('hidden'), 2500);
 }
 
 function submitPassword() {

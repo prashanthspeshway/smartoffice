@@ -18,6 +18,7 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 </head>
 <body class="user-iframe-page p-6">
 
@@ -27,8 +28,7 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
         <p class="text-slate-500 text-sm mt-1">Submit a request with an optional comment or file. Your manager will review it.</p>
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-6 right-4 z-50 px-6 py-3 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
+    <div id="toast" aria-live="polite"></div>
 
     <%if (tasks == null || tasks.isEmpty()) {%>
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-12 text-center">
@@ -102,16 +102,6 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
 </div>
 
 <script>
-function showToast(message, type) {
-    const toast = document.getElementById('toast');
-    toast.className = 'fixed bottom-6 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)]';
-    if (type === 'success') toast.classList.add('bg-emerald-500', 'text-white');
-    else toast.classList.add('bg-red-500', 'text-white');
-    toast.textContent = message;
-    toast.classList.remove('hidden');
-    setTimeout(() => toast.classList.add('hidden'), 2500);
-}
-
 function submitTaskRequest(taskId, btn) {
     var commentEl = document.getElementById('comment-' + taskId);
     var fileEl    = document.getElementById('file-'    + taskId);

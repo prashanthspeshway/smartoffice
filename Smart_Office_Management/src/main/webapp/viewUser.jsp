@@ -31,6 +31,8 @@ if (designationOptions == null)
 <link
 	href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
 	rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-toast.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
 body {
 	font-family: 'Geist', system-ui, sans-serif;
@@ -216,31 +218,6 @@ body {
 
 .grid-card:hover {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.toast {
-	position: fixed;
-	bottom: 24px;
-	right: 20px;
-	top: auto;
-	max-width: 350px;
-	z-index: 3000;
-	padding: 14px 20px;
-	border-radius: 10px;
-	font-size: 15px;
-	font-weight: 500;
-	display: none;
-	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-}
-
-.toast.success {
-	background: #d1fae5;
-	color: #065f46;
-}
-
-.toast.error {
-	background: #fecaca;
-	color: #b91c1c;
 }
 </style>
 </head>
@@ -503,7 +480,7 @@ body {
 		</div>
 	</div>
 
-	<div id="toast" class="toast"></div>
+	<div id="toast" aria-live="polite"></div>
 
 	<!-- Import Modal -->
 	<div id="importModal"
@@ -610,15 +587,6 @@ function setView(v) {
 	try { localStorage.setItem('employees_view_mode', v); } catch(e) {}
 }
 
-function showToast(message, type) {
-	var t = document.getElementById('toast');
-	if (!t) return;
-	t.className = 'toast ' + (type || 'success');
-	t.textContent = message;
-	t.style.display = 'block';
-	setTimeout(function(){ t.style.display = 'none'; }, 2500);
-}
-
 document.addEventListener('DOMContentLoaded', function() {
 	// Toast messages
 	var params = new URLSearchParams(window.location.search);
@@ -626,10 +594,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	else if (params.get('msg') === 'error') showToast('Failed to delete employee', 'error');
 	else if (params.get('msg') === 'updated') showToast('Employee updated successfully', 'success');
 	<%if (successMsg != null && !successMsg.isEmpty()) {%>showToast('<%=successMsg.replace("'", "\\'").replace("\n", " ")%>', 'success');<%}%>
-	<%if (errorMsg != null && !errorMsg.isEmpty()) {%>showToast('<%=errorMsg.replace("'", "\\'").replace("\n", " ")%>
-		',
-									'error');
-	<%}%>
+	<%if (errorMsg != null && !errorMsg.isEmpty()) {%>showToast('<%=errorMsg.replace("'", "\\'").replace("\n", " ")%>', 'error');<%}%>
 		// Persist view mode
 							try {
 								var savedView = localStorage
@@ -715,6 +680,6 @@ document.addEventListener('DOMContentLoaded', function() {
 							}
 						});
 	</script>
-	<script src="employeeProfile.js"></script>
+	<script src="<%=request.getContextPath()%>/employeeProfile.js?v=so-emp-profile-3"></script>
 </body>
 </html>

@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-toast.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 
 <style>
 * {
@@ -106,81 +109,6 @@ button[type="submit"]:active {
     transform: scale(0.98);
 }
 
-/* ================= TOAST ================= */
-.toast {
-    position: fixed;
-    bottom: 24px;
-    right: 25px;
-    top: auto;
-    background: #e2ebf0;
-    color: black;
-    padding: 14px 20px 14px 44px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    display: none;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-    z-index: 3000;
-    line-height: 1.4;
-    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.toast.hide {
-    animation: toastOut 0.4s ease forwards;
-}
-
-/* Icon */
-.toast::before {
-    content: "✔";
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    font-weight: bold;
-}
-
-/* SUCCESS */
-.toast.success {
-    background: #e2ebf0;
-    color: black;
-}
-
-/* ERROR */
-.toast.error {
-    background: #e2ebf0;
-    color: black;
-}
-
-/* INFO */
-.toast.info {
-    background: #e2ebf0;
-    color: black;
-}
-
-/* Animations */
-@keyframes toastIn {
-    from {
-        opacity: 0;
-        transform: translateX(120px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes toastOut {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(120px);
-    }
-}
-
 /* ===== Dark Mode (same logic preserved) ===== */
 body.dark-theme {
     background: #121212 !important;
@@ -225,30 +153,9 @@ body.dark-theme input {
     </form>
 </div>
 
-<div id="toast" class="toast"></div>
+<div id="toast" aria-live="polite"></div>
 
 <script>
-function showToast(message, type = "success") {
-    const toast = document.getElementById("toast");
-
-    toast.style.display = "none";
-    toast.className = "toast";
-    toast.offsetHeight; // force reflow
-
-    toast.classList.add(type);
-    toast.textContent = message;
-    toast.style.display = "block";
-
-    setTimeout(() => {
-        toast.classList.add("hide");
-
-        setTimeout(() => {
-            toast.style.display = "none";
-            toast.className = "toast";
-        }, 400);
-    }, 2500);
-}
-
 window.onload = function () {
     const params = new URLSearchParams(window.location.search);
     if (params.get("success") === "true") {

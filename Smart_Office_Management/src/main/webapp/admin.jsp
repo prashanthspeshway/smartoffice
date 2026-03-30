@@ -29,6 +29,7 @@ try {
 	rel="stylesheet">
 <link rel="stylesheet"
 	href="<%=request.getContextPath()%>/css/smart-office-theme.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
 /* Notification bell + badge — circle (1–9) vs pill (10+) */
 .notif-trigger {
@@ -74,17 +75,57 @@ try {
 .notif-badge.hidden {
 	display: none !important;
 }
+
+/* Top bar only: charcoal + subtle depth (matches sidebar tone; soft highlight like a matte bar) */
+#adminShellHeader.so-header {
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0) 42%),
+		linear-gradient(180deg, #343434 0%, var(--so-sidebar-bg) 45%, #232323 100%) !important;
+	border-color: var(--so-sidebar-border) !important;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+#adminShellHeader.so-header h1 {
+	color: rgba(255, 255, 255, 0.95) !important;
+}
+#adminShellHeader .so-welcome {
+	color: rgba(255, 255, 255, 0.75) !important;
+}
+#adminShellHeader .so-welcome strong,
+#adminShellHeader strong.text-slate-800 {
+	color: #ffffff !important;
+}
+#adminShellHeader .so-menu-btn {
+	border-color: rgba(255, 255, 255, 0.22) !important;
+	background: transparent !important;
+	color: rgba(255, 255, 255, 0.92) !important;
+}
+#adminShellHeader .so-menu-btn:hover {
+	background: var(--so-sidebar-hover) !important;
+	color: #ffffff !important;
+}
+#adminShellHeader .notif-trigger {
+	border-color: rgba(255, 255, 255, 0.22) !important;
+	background: transparent !important;
+	color: rgba(255, 255, 255, 0.92) !important;
+}
+#adminShellHeader .notif-trigger:hover {
+	background: var(--so-sidebar-hover) !important;
+	color: #ffffff !important;
+}
+#adminShellHeader .notif-badge {
+	border-color: #232323 !important;
+}
 </style>
 </head>
 <body
 	class="so-shell bg-slate-100 min-h-screen flex flex-col h-screen overflow-hidden">
 
-	<!-- Top Bar -->
-	<header
-		class="so-header bg-white border-b border-slate-200 flex flex-wrap gap-2 justify-between items-center shadow-sm shrink-0">
+	<!-- Top Bar (charcoal matches .so-sidebar via #adminShellHeader rules above) -->
+	<header id="adminShellHeader"
+		class="so-header border-b flex flex-wrap gap-2 justify-between items-center shrink-0">
 		<div class="flex items-center gap-2 min-w-0 flex-1">
 			<button type="button" id="adminMobileNavToggle"
-				class="so-menu-btn md:hidden inline-flex shrink-0 items-center justify-center border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50"
+				class="so-menu-btn md:hidden inline-flex shrink-0 items-center justify-center border shadow-sm"
 				aria-label="Open navigation menu" aria-expanded="false"
 				aria-controls="adminSidebar">
 				<i class="fa-solid fa-bars text-lg" aria-hidden="true"></i>
@@ -93,7 +134,7 @@ try {
 		</div>
 		<div class="flex items-center gap-2 sm:gap-4 shrink-0">
 			<button type="button" onclick="openAdminNotifications()"
-				class="notif-trigger group relative inline-flex shrink-0 items-center justify-center border border-slate-200/90 bg-white text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/35"
+				class="notif-trigger group relative inline-flex shrink-0 items-center justify-center border shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white/25"
 				title="Notifications" aria-label="Notifications">
 				<i
 					class="fa-regular fa-bell pointer-events-none text-[1.15rem] transition-transform duration-200 group-hover:scale-105"
@@ -181,43 +222,7 @@ try {
 		</main>
 	</div>
 
-	<!-- Toast -->
-	<div id="toast"
-		class="toast fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
-
-	<script>
-window.addEventListener("DOMContentLoaded", function () {
-    const url = new URL(window.location);
-
-    // Get values
-    let tab = url.searchParams.get("tab");
-    let view = url.searchParams.get("view");
-
-    // Optional: support old ?tab system
-    if (tab) {
-        if (tab === "attendance") view = "adminAttendance";
-        if (tab === "overview") view = "adminOverview";
-        if (tab === "users") view = "viewUser";
-    }
-
-    // Load correct page
-    if (view) {
-        document.getElementById("contentFrame").src = view;
-
-        // Highlight sidebar
-        document.querySelectorAll('.sidebar-btn').forEach(b => {
-            if (b.getAttribute('data-admin-view') === view) {
-                b.classList.add('bg-indigo-50', 'text-indigo-700');
-            } else {
-                b.classList.remove('bg-indigo-50', 'text-indigo-700');
-            }
-        });
-    }
-
-    // 🔥 Remove ALL parameters from URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-});
-</script>
+	<div id="toast" aria-live="polite"></div>
 
 	<script>
 	function closeAdminMobileNav() {
@@ -243,14 +248,27 @@ window.addEventListener("DOMContentLoaded", function () {
 		if (aside.classList.contains('-translate-x-full')) openAdminMobileNav();
 		else closeAdminMobileNav();
 	}
-	function syncAdminUrl(page) {
-	    // 🔥 Do NOT show anything in URL
-	    window.history.replaceState({}, document.title, window.location.pathname);
+	var ADMIN_VIEW_STORAGE_KEY = 'so_admin_dash_view';
+
+	function stripAdminViewQueryFromUrl() {
+		var u = new URL(window.location.href);
+		u.searchParams.delete('view');
+		u.searchParams.delete('tab');
+		window.history.replaceState({}, document.title, u.pathname + (u.search || ''));
 	}
 
-	/** Notifications overlay iframe — does not change ?view= so refresh returns to last section */
+	/** Persist section in sessionStorage and keep the address bar free of ?view= */
+	function syncAdminUrl(page) {
+		if (!page) return;
+		try { sessionStorage.setItem(ADMIN_VIEW_STORAGE_KEY, page); } catch (e) {}
+		stripAdminViewQueryFromUrl();
+	}
+
+	/** Notifications iframe — same storage + clean URL as sidebar */
 	function openAdminNotifications() {
 		document.getElementById('contentFrame').src = 'sharedNotifications.jsp';
+		document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('bg-indigo-50', 'text-indigo-700'));
+		syncAdminUrl('sharedNotifications.jsp');
 		closeAdminMobileNav();
 	}
 
@@ -262,18 +280,49 @@ window.addEventListener("DOMContentLoaded", function () {
 		closeAdminMobileNav();
 	}
 
-	function applyAdminViewFromUrl() {
-		var qs = new URLSearchParams(window.location.search);
-		var view = qs.get('view');
-		if (!view) return;
+	function resolveAdminViewFromParams(params) {
+		var view = params.get('view');
+		var tab = params.get('tab');
+		if (tab) {
+			if (tab === 'attendance') view = view || 'adminAttendance';
+			if (tab === 'overview') view = view || 'adminOverview';
+			if (tab === 'users') view = view || 'viewUser';
+		}
+		return view;
+	}
+
+	function applyAdminViewToFrame(view) {
+		if (!view) return false;
+		var frame = document.getElementById('contentFrame');
+		if (view === 'sharedNotifications.jsp') {
+			frame.src = 'sharedNotifications.jsp';
+			document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('bg-indigo-50', 'text-indigo-700'));
+			return true;
+		}
 		var target = null;
 		document.querySelectorAll('.sidebar-btn[data-admin-view]').forEach(function (b) {
 			if (b.getAttribute('data-admin-view') === view) target = b;
 		});
-		if (!target) return;
-		document.getElementById('contentFrame').src = view;
+		if (!target) return false;
+		frame.src = view;
 		document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('bg-indigo-50', 'text-indigo-700'));
 		target.classList.add('bg-indigo-50', 'text-indigo-700');
+		return true;
+	}
+
+	/** URL ?view= (legacy/bookmarks) or sessionStorage; then remove view/tab from visible URL */
+	function applyAdminDashboardView() {
+		var params = new URLSearchParams(window.location.search);
+		var view = resolveAdminViewFromParams(params);
+		var fromUrl = !!view;
+		if (!view) {
+			try { view = sessionStorage.getItem(ADMIN_VIEW_STORAGE_KEY); } catch (e) {}
+		}
+		if (!view) return false;
+		if (!applyAdminViewToFrame(view)) return false;
+		try { sessionStorage.setItem(ADMIN_VIEW_STORAGE_KEY, view); } catch (e) {}
+		if (fromUrl) stripAdminViewQueryFromUrl();
+		return true;
 	}
 	function updateBadge() {
 		fetch('<%=request.getContextPath()%>/notificationCount', { credentials: 'same-origin' })
@@ -303,16 +352,16 @@ window.addEventListener("DOMContentLoaded", function () {
 		window.addEventListener('resize', function() {
 			if (window.matchMedia('(min-width: 768px)').matches) closeAdminMobileNav();
 		});
-		applyAdminViewFromUrl();
-		const params = new URLSearchParams(window.location.search);
-		if (!params.get('view')) {
+		var appliedView = applyAdminDashboardView();
+		var params = new URLSearchParams(window.location.search);
+		if (!appliedView) {
 			var btns = document.querySelectorAll('.sidebar-btn');
 			var overviewBtn = Array.from(btns).find(function(b) { return b.textContent.indexOf('Admin Overview') >= 0; });
 			if (overviewBtn) overviewBtn.classList.add('bg-indigo-50', 'text-indigo-700');
 			else if (btns[0]) btns[0].classList.add('bg-indigo-50', 'text-indigo-700');
 		}
 		if (params.get('success') === 'Login') {
-			showToast('Logged in successfully', 'info');
+			showToast('Logged in successfully', 'success');
 			params.delete('success');
 			params.delete('error');
 			var q = params.toString();
@@ -328,17 +377,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		setInterval(updateBadge, 90000);
 	});
 
-	function showToast(message, type, placement) {
-		const toast = document.getElementById('toast');
-		var base = 'toast z-[10050] px-5 py-3 rounded-lg shadow-lg text-sm font-medium max-w-[min(92vw,24rem)] fixed bottom-6 right-4';
-		toast.className = base;
-		if (type === 'success') toast.classList.add('bg-emerald-500', 'text-white');
-		else if (type === 'error') toast.classList.add('bg-red-500', 'text-white');
-		else toast.classList.add('bg-indigo-500', 'text-white');
-		toast.textContent = message;
-		toast.classList.remove('hidden');
-		setTimeout(() => toast.classList.add('hidden'), 3200);
-	}
+	/* showToast: js/smart-office-toast.js */
 
 	document.addEventListener('contextmenu', e => e.preventDefault());
 	document.onkeydown = e => (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))) ? false : true;

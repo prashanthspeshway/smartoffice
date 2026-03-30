@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="css/smart-office-theme.css">
+<script src="js/smart-office-toast.js"></script>
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -344,28 +345,6 @@ html, body {
 .anim-slide-in-left   { animation: slideInLeft   .3s ease forwards; }
 .anim-entry           { animation: entryReveal   .5s cubic-bezier(.22,1,.36,1) .06s both; }
 
-/* Toast */
-#toast {
-  position: fixed; bottom: 18px; right: 18px; top: auto;
-  display: none; align-items: center; gap: 10px;
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--ink);
-  color: var(--ink);
-  padding: 10px 16px; border-radius: 8px;
-  font-size: .82rem; font-weight: 500;
-  box-shadow: 0 4px 20px rgba(0,0,0,.08);
-  z-index: 9999; max-width: 300px;
-}
-#toast.error   { border-left-color: #d63c3c; }
-#toast.success { border-left-color: #2d8a4e; }
-#toast i { font-size: 13px; flex-shrink: 0; color: var(--ink); }
-#toast.error i { color: #d63c3c; }
-#toast.success i { color: #2d8a4e; }
-
-@keyframes toastIn  { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
-@keyframes toastOut { to{opacity:0;transform:translateY(8px);} }
-
 @media (max-width: 768px) {
   .left { display: none; }
   .right { flex: 0 0 100%; }
@@ -494,7 +473,7 @@ html, body {
 
 </div>
 
-<div id="toast"><i id="toastIco"></i><span id="toastMsg"></span></div>
+<div id="toast" aria-live="polite"></div>
 
 <script>
 (function () {
@@ -540,17 +519,6 @@ eyeBtn.addEventListener('mouseup',    () => { pwInp.type = 'password'; eyeIco.cl
 eyeBtn.addEventListener('mouseleave', () => { pwInp.type = 'password'; eyeIco.className = 'fa-regular fa-eye'; });
 eyeBtn.addEventListener('touchstart', e => { e.preventDefault(); pwInp.type = 'text'; eyeIco.className = 'fa-regular fa-eye-slash'; });
 eyeBtn.addEventListener('touchend',   () => { pwInp.type = 'password'; eyeIco.className = 'fa-regular fa-eye'; });
-
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  const ti = document.getElementById('toastIco');
-  const tm = document.getElementById('toastMsg');
-  t.style.display = 'none'; t.className = ''; t.offsetHeight;
-  ti.className = type === 'error' ? 'fa-solid fa-circle-xmark' : type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-info';
-  tm.textContent = msg; t.className = type; t.style.display = 'flex';
-  t.style.animation = 'toastIn .3s ease both';
-  setTimeout(() => { t.style.animation = 'toastOut .3s ease forwards'; setTimeout(() => { t.style.display='none'; t.className=''; }, 320); }, 3400);
-}
 
 const sp = new URLSearchParams(window.location.search);
 const MSGS = { invalid:'Invalid email or password.', inactive:'Your account is inactive. Contact admin.', invalidRole:'Invalid role assigned. Contact admin.', server:'Server error. Please try again later.', weakPassword:'Password must be ≥8 chars: upper, lower, number & symbol.', sessionExpired:'Session expired. Please login again.' };

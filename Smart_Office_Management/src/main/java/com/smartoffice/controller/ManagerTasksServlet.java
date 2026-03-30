@@ -3,6 +3,7 @@ package com.smartoffice.controller;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,6 +134,11 @@ public class ManagerTasksServlet extends HttpServlet {
 						deadlineDate = java.sql.Date.valueOf(deadline);
 					} catch (Exception ignore) {
 					}
+				}
+				if (deadlineDate != null && deadlineDate.toLocalDate().isBefore(LocalDate.now())) {
+					response.sendRedirect(request.getContextPath() + "/managerTasks?error="
+							+ URLEncoder.encode("Deadline cannot be in the past.", StandardCharsets.UTF_8));
+					return;
 				}
 
 				for (String assignedTo : assignedToList) {

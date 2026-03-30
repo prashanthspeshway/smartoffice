@@ -1,0 +1,218 @@
+/**
+ * Smart Office — unified toast (pill card + circular type badge)
+ * Works with js/smart-office-toast.js — load after base resets.
+ */
+#toast.so-toast,
+.so-toast {
+  position: fixed;
+  z-index: 2147483000;
+  bottom: 1.25rem;
+  right: 1rem;
+  left: auto;
+  top: auto;
+  box-sizing: border-box;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  max-width: min(92vw, 22rem);
+  min-height: 48px;
+  padding: 10px 14px 10px 12px;
+  margin: 0;
+  border-radius: 9999px;
+  font-family: var(--so-font, "Geist", system-ui, -apple-system, "Segoe UI", sans-serif);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #0f172a;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 4px 24px rgba(15, 23, 42, 0.12),
+    0 2px 8px rgba(15, 23, 42, 0.06);
+  animation: soToastIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+#toast.so-toast:not(.so-toast--visible),
+.so-toast:not(.so-toast--visible) {
+  display: none !important;
+  pointer-events: none;
+}
+
+#toast.so-toast.so-toast--visible,
+.so-toast.so-toast--visible {
+  display: flex !important;
+  pointer-events: auto;
+}
+
+/* Bottom-center (export / validation) */
+.so-toast.so-toast--placement-bottom {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  bottom: 1.25rem;
+  animation: soToastInCenter 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Bottom snackbar (full width, light bar — optional) */
+.so-toast.so-toast--placement-left {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: none;
+  min-height: 52px;
+  padding: 14px 16px;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  background: #f4f4f5;
+  box-shadow: 0 -4px 24px rgba(15, 23, 42, 0.08);
+  animation: soToastInBar 0.28s ease both;
+}
+
+.so-toast__badge {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  overflow: hidden;
+}
+
+/* Tailwind v4 (and other resets) often set svg { max-width: 100% } — blows up icons in flex rows */
+.so-toast__badge svg,
+.so-toast__svg,
+#toast.so-toast svg,
+.so-toast svg {
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px !important;
+  max-height: 16px !important;
+  min-width: 16px !important;
+  flex-shrink: 0 !important;
+  display: block !important;
+  vertical-align: middle;
+  box-sizing: content-box;
+}
+
+.so-toast.so-toast--placement-left .so-toast__badge {
+  width: 28px;
+  height: 28px;
+}
+
+.so-toast.so-toast--placement-left .so-toast__badge svg,
+.so-toast.so-toast--placement-left .so-toast__svg {
+  width: 14px !important;
+  height: 14px !important;
+  max-width: 14px !important;
+  max-height: 14px !important;
+  min-width: 14px !important;
+}
+
+.so-toast__text {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.so-toast__close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #64748b;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.so-toast__close:hover {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+}
+
+.so-toast.so-toast--placement-left .so-toast__close {
+  order: -1;
+  width: 28px;
+  height: 28px;
+  font-size: 1.1rem;
+}
+
+/* Type colors — circular badge fill */
+.so-toast--success .so-toast__badge {
+  background: #16a34a;
+  color: #fff;
+}
+.so-toast--error .so-toast__badge {
+  background: #dc2626;
+  color: #fff;
+}
+.so-toast--warning .so-toast__badge {
+  background: #d97706;
+  color: #fff;
+}
+.so-toast--info .so-toast__badge {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.so-toast.so-toast--placement-left.so-toast--success .so-toast__badge {
+  background: #15803d;
+}
+.so-toast.so-toast--placement-left.so-toast--error .so-toast__badge {
+  background: #b91c1c;
+}
+
+@keyframes soToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soToastInCenter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes soToastInBar {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  #toast.so-toast:not(.so-toast--placement-left):not(.so-toast--placement-bottom),
+  .so-toast:not(.so-toast--placement-left):not(.so-toast--placement-bottom) {
+    left: 0.75rem;
+    right: 0.75rem;
+    max-width: none;
+  }
+}

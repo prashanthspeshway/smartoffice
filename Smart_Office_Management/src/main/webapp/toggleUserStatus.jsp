@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-toast.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 
 <style>
 * {
@@ -123,84 +126,6 @@ button:active {
     transform: scale(0.97);
 }
 
-/* ===== TOAST (SAME STYLE AS DASHBOARD) ===== */
-.toast {
-    position: fixed;
-    bottom: 24px;
-    right: 25px;
-    top: auto;
-    background: #e2ebf0;
-    color: black;
-    padding: 14px 20px 14px 44px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    display: none;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-    z-index: 3000;
-    line-height: 1.4;
-    animation: toastIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Toast Types */
-.toast.success {
-    background: #e2ebf0;
-    color: black;
-}
-
-.toast.error {
-    background: #e2ebf0;
-    color: black;
-}
-
-.toast.warning {
-    background: #e2ebf0;
-    color: black;
-}
-
-.toast.info {
-    background: #e2ebf0;
-    color: black;
-}
-
-.toast.hide {
-    animation: toastOut 0.4s ease forwards;
-}
-
-/* Icon */
-.toast::before {
-    content: "✔";
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    font-weight: bold;
-}
-
-/* Animations */
-@keyframes toastIn {
-    from {
-        opacity: 0;
-        transform: translateX(120px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes toastOut {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(120px);
-    }
-}
-
 /* ===== Dark Mode (kept intact) ===== */
 body.dark-theme {
     background: #121212 !important;
@@ -230,8 +155,7 @@ body.dark-theme input {
 
 <body>
 
-<!-- Toasts -->
-<div id="toast" class="toast"></div>
+<div id="toast" aria-live="polite"></div>
 
 <div class="container">
 
@@ -261,23 +185,6 @@ body.dark-theme input {
 
 <script>
 const params = new URLSearchParams(window.location.search);
-
-function showToast(message, type = "success") {
-    const toast = document.getElementById("toast");
-
-    toast.className = "toast " + type;
-    toast.textContent = message;
-    toast.style.display = "block";
-
-    setTimeout(() => {
-        toast.classList.add("hide");
-
-        setTimeout(() => {
-            toast.style.display = "none";
-            toast.classList.remove("hide");
-        }, 400);
-    }, 2500);
-}
 
 // Handle messages
 if (params.get("msg")) {

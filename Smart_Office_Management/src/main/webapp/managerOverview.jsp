@@ -261,7 +261,7 @@ body{font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--t
 <div class="hero a1">
   <div class="hl">
     <div class="h-eye">Manager Dashboard</div>
-    <div class="h-title">Welcome back, ${sessionScope.fullName != null ? sessionScope.fullName : sessionScope.username}! 👋</div>
+    <div class="h-title">Welcome back, ${sessionScope.fullName != null ? sessionScope.fullName : sessionScope.username}!</div>
     <div class="h-sub"><span class="hdot"></span><%=todayStr%></div>
   </div>
   <div class="hr">

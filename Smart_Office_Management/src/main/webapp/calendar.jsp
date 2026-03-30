@@ -17,6 +17,7 @@ boolean isAdmin = role != null && "admin".equalsIgnoreCase(role);
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
+<script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
 body.user-iframe-page { min-height: 100vh; }
 .cal-day { min-height: 80px; padding: 8px; }
@@ -25,9 +26,6 @@ body.user-iframe-page { min-height: 100vh; }
 .cal-day.weekend-blocked { background: linear-gradient(135deg, #ffe4e6 0%, #fff1f2 100%); color: #9f1239; cursor: not-allowed; }
 .cal-day.today { background: #eef2ff; border: 2px solid #6366f1; font-weight: 700; }
 .cal-day.other-month { color: #cbd5e1; }
-.toast { position: fixed; bottom: 24px; right: 24px; top: auto; padding: 14px 20px; border-radius: 8px; z-index: 9999; display: none; font-size: 14px; font-weight: 500; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: min(92vw, 24rem); }
-.toast.success { background: #10b981; color: white; }
-.toast.error { background: #ef4444; color: white; }
 
 /* Delete Confirm Modal Animation */
 @keyframes popIn {
@@ -42,7 +40,7 @@ body.user-iframe-page { min-height: 100vh; }
 </head>
 <body class="user-iframe-page min-h-screen">
 
-<div id="toast" class="toast"></div>
+<div id="toast" aria-live="polite"></div>
 
 <div class="max-w-7xl mx-auto p-6">
   <header class="mb-8">
@@ -562,15 +560,6 @@ function loadUpcoming() {
       }).join("");
     })
     .catch(() => { document.getElementById("upcomingList").innerHTML = "<p class=\"text-slate-500 text-sm\">Unable to load</p>"; });
-}
-
-/* ── Toast ── */
-function showToast(msg, type) {
-  const t = document.getElementById("toast");
-  t.className = "toast " + (type || "success");
-  t.textContent = msg;
-  t.style.display = "block";
-  setTimeout(() => { t.style.display = "none"; }, 2500);
 }
 
 /* ── Full List ── */

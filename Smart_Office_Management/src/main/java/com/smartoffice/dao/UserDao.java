@@ -121,6 +121,27 @@ public class UserDao {
 		return list;
 	}
 
+	/**
+	 * Notifications and login sessions use {@code users.email}. {@code leave_requests} may store either
+	 * {@code username} or {@code email} depending on schema — resolve to canonical email for inserts/queries.
+	 */
+	public static String resolveEmailForNotifications(String usernameOrEmail) {
+		if (usernameOrEmail == null || usernameOrEmail.trim().isEmpty())
+			return null;
+		String key = usernameOrEmail.trim();
+		String sql = "SELECT email FROM users WHERE email = ? OR username = ? LIMIT 1";
+		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setString(1, key);
+			ps.setString(2, key);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next())
+				return rs.getString("email");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return key.contains("@") ? key : null;
+	}
+
 	public static User getUserByEmail(String email) {
 		User user = null;
 		String sql = "SELECT id, email, firstname, lastname, role, status, phone FROM users WHERE email = ?";

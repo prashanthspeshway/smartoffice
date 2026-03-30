@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 
 import com.smartoffice.dao.AttendanceDAO;
 import com.smartoffice.dao.LeaveRequestDAO;
+import com.smartoffice.dao.UserDao;
 import com.smartoffice.model.LeaveRequest;
 import com.smartoffice.service.NotificationService;
 
@@ -64,9 +65,9 @@ public class LeaveApprovalServlet extends HttpServlet {
                 }
             }
 
-            // ── NOTIFICATIONS ──────────────────────────────────────────────────
+            // ── NOTIFICATIONS (recipient = users.email; leave row may store username) ──
             if (leave != null) {
-                String employeeEmail = leave.getUsername();
+                String notifyEmail = UserDao.resolveEmailForNotifications(leave.getAppliedBy());
                 String approverName  = getDisplayName(session);
 
                 String emoji = approved ? "✅" : "❌";
@@ -76,16 +77,16 @@ public class LeaveApprovalServlet extends HttpServlet {
                         + leave.getFromDate() + " → " + leave.getToDate()
                         + ") has been " + label + " by " + approverName + ".";
 
-                if (employeeEmail != null && !employeeEmail.isEmpty()) {
+                if (notifyEmail != null) {
                     NotificationService.notify(
-                            employeeEmail, approver,
+                            notifyEmail, approver,
                             NotificationService.TYPE_LEAVE, msgForEmployee);
                 }
 
                 if (isManager) {
                     String msgForAdmin = emoji + " Manager " + approverName
                             + " has " + label.toLowerCase() + " leave for "
-                            + employeeEmail
+                            + (notifyEmail != null ? notifyEmail : leave.getAppliedBy())
                             + " (" + leave.getFromDate() + " → " + leave.getToDate() + ").";
                     NotificationService.notifyAllAdmins(
                             approver, NotificationService.TYPE_LEAVE, msgForAdmin);

@@ -58,10 +58,9 @@ public class ApplyLeaveServlet extends HttpServlet {
 			if (isManager) {
 				NotificationService.notifyAllAdmins(applicantEmail, NotificationService.TYPE_LEAVE, msg);
 			} else {
+				// Manager + all admins (notifyManagerOf already calls notifyAllAdmins — do not call twice)
 				NotificationService.notifyManagerOf(applicantEmail, applicantEmail, NotificationService.TYPE_LEAVE,
 						msg);
-
-				NotificationService.notifyAllAdmins(applicantEmail, NotificationService.TYPE_LEAVE, msg);
 			}
 			
 			response.sendRedirect(successRedirect);

@@ -36,6 +36,8 @@ String errorSafe = h(errorMsg);
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-toast.css">
+  <script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 
   <style>
     body { font-family: 'Geist', system-ui, sans-serif; }
@@ -51,15 +53,7 @@ String errorSafe = h(errorMsg);
 </head>
 
 <body class="min-h-screen bg-gradient-to-br from-indigo-50 via-slate-50 to-emerald-50 px-4 py-6 sm:p-6 lg:p-10">
-  <!-- Toast -->
-  <div
-    id="toast"
-    class="fixed bottom-6 right-4 z-50 hidden max-w-[92vw] sm:max-w-md px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-lg text-sm font-medium break-words"
-    data-success="<%= successSafe %>"
-    data-error="<%= errorSafe %>"
-    role="status"
-    aria-live="polite"
-  ></div>
+  <div id="toast" aria-live="polite" data-success="<%= successSafe %>" data-error="<%= errorSafe %>"></div>
 
   <div class="mx-auto w-full max-w-4xl">
     <!-- Header -->
@@ -300,23 +294,6 @@ String errorSafe = h(errorMsg);
   </div>
 
   <script>
-    function showToast(msg, type) {
-      var t = document.getElementById('toast');
-      if (!t) return;
-
-      t.className =
-        'fixed bottom-6 right-4 z-50 max-w-[92vw] sm:max-w-md px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-lg text-sm font-medium break-words';
-
-      t.classList.add(type === 'success' ? 'bg-emerald-500' : 'bg-red-500', 'text-white');
-      t.textContent = msg;
-      t.classList.remove('hidden');
-
-      clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(function () {
-        t.classList.add('hidden');
-      }, 2500);
-    }
-
     function initDesignationSearchCombo() {
       var sel = document.getElementById('designation');
       var btn = document.getElementById('designationComboBtn');
