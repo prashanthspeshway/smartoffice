@@ -154,6 +154,47 @@ try {
 	<div id="toast"
 		class="toast fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
 
+
+<!-- 		 url hidden code -->
+
+<script>
+window.addEventListener("DOMContentLoaded", function () {
+    const url = new URL(window.location);
+
+    // Get tab or view
+    let tab = url.searchParams.get("tab");
+    let view = url.searchParams.get("view");
+
+    // If tab exists → convert to your system view
+    if (tab) {
+        if (tab === "attendance") view = "managerAttendance";
+        if (tab === "overview") view = "managerOverview";
+        if (tab === "team") view = "managerTeams";
+    }
+
+    // Load page internally
+    if (view) {
+        document.getElementById("contentFrame").src = view;
+
+        // Highlight sidebar
+        document.querySelectorAll('.sidebar-btn').forEach(b => {
+            if (b.getAttribute('data-manager-view') === view) {
+                b.classList.add('bg-indigo-50', 'text-indigo-700');
+            } else {
+                b.classList.remove('bg-indigo-50', 'text-indigo-700');
+            }
+        });
+    }
+
+    // 🔥 Remove ALL params from URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+});
+
+function syncManagerUrl(page) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+</script>
+		
 	<script>
 	function closeManagerMobileNav() {
 		var aside = document.getElementById('managerSidebar');
@@ -179,14 +220,14 @@ try {
 		else closeManagerMobileNav();
 	}
 
-	function syncManagerUrl(page) {
-		try {
-			var qs = new URLSearchParams(window.location.search);
-			qs.set('view', page);
-			var q = qs.toString();
-			window.history.replaceState({}, document.title, window.location.pathname + (q ? '?' + q : ''));
-		} catch (e) { /* ignore */ }
-	}
+// 	function syncManagerUrl(page) {
+// 		try {
+// 			var qs = new URLSearchParams(window.location.search);
+// 			qs.set('view', page);
+// 			var q = qs.toString();
+// 			window.history.replaceState({}, document.title, window.location.pathname + (q ? '?' + q : ''));
+// 		} catch (e) { /* ignore */ }
+// 	}
 
 	function openManagerNotifications() {
 		document.getElementById('contentFrame').src = 'sharedNotifications.jsp';
@@ -282,5 +323,13 @@ try {
 	document.addEventListener('contextmenu', e => e.preventDefault());
 	document.onkeydown = e => (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))) ? false : true;
 	</script>
+	
+	<script>
+    window.onload = function () {
+        const url = new URL(window.location);
+        url.searchParams.delete("tab"); // remove ?tab
+        window.history.replaceState({}, document.title, url.pathname);
+    };
+</script>
 </body>
 </html>

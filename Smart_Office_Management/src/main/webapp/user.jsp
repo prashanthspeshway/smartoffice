@@ -136,6 +136,47 @@ try {
 <div id="toast" class="fixed bottom-6 right-4 z-50 px-6 py-4 rounded-lg shadow-lg hidden text-sm font-medium max-w-[min(92vw,24rem)]"></div>
 
 <script>
+window.addEventListener("DOMContentLoaded", function () {
+    const url = new URL(window.location);
+
+    let tab = url.searchParams.get("tab");
+    let view = url.searchParams.get("view");
+
+    // Support old ?tab
+    const tabMap = {
+        overview: 'userOverview',
+        tasks: 'userTasks',
+        leave: 'userLeave',
+        meetings: 'userMeetings',
+        calendar: 'calendar.jsp',
+        settings: 'userSettings',
+        attendance: 'userAttendance',
+        team: 'userTeam'
+    };
+
+    if (!view && tab && tabMap[tab]) {
+        view = tabMap[tab];
+    }
+
+    // Load page
+    if (view) {
+        document.getElementById("contentFrame").src = window.resolveDashboardUrl(view);
+
+        // Highlight sidebar
+        document.querySelectorAll('.sidebar-btn').forEach(b => {
+            if (b.getAttribute('data-user-view') === view) {
+                b.classList.add('active', 'bg-indigo-50', 'text-indigo-700');
+            } else {
+                b.classList.remove('active', 'bg-indigo-50', 'text-indigo-700');
+            }
+        });
+    }
+
+    // 🔥 Remove ALL params from URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+});
+</script>
+<script>
 (function() {
     var CTX = '<%= ctxPath %>';
     /** Always load under app context (e.g. /Smart_Office_Management/userOverview) */
@@ -171,13 +212,8 @@ function toggleUserMobileNav() {
     else closeUserMobileNav();
 }
 function syncUserUrl(page) {
-    try {
-        var qs = new URLSearchParams(window.location.search);
-        qs.set('view', page);
-        qs.delete('tab');
-        var q = qs.toString();
-        window.history.replaceState({}, document.title, window.location.pathname + (q ? '?' + q : ''));
-    } catch (e) { /* ignore */ }
+    // 🔥 Do NOT show any params in URL
+    window.history.replaceState({}, document.title, window.location.pathname);
 }
 
 function openUserNotifications() {

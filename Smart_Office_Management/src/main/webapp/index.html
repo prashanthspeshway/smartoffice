@@ -555,9 +555,26 @@ function showToast(msg, type = 'success') {
 const sp = new URLSearchParams(window.location.search);
 const MSGS = { invalid:'Invalid email or password.', inactive:'Your account is inactive. Contact admin.', invalidRole:'Invalid role assigned. Contact admin.', server:'Server error. Please try again later.', weakPassword:'Password must be ≥8 chars: upper, lower, number & symbol.', sessionExpired:'Session expired. Please login again.' };
 const err = sp.get('error');
-if (err && MSGS[err]) showToast(MSGS[err], 'error');
-if (sp.get('logout') === 'success') { showToast('Logged out successfully.', 'success'); window.history.replaceState({}, '', window.location.pathname); }
+const logout = sp.get('logout');
 
+let hasParams = false;
+
+if (err && MSGS[err]) {
+    showToast(MSGS[err], 'error');
+    hasParams = true;
+}
+
+if (logout === 'success') {
+    showToast('Logged out successfully.', 'success');
+    hasParams = true;
+}
+
+// 🔥 Remove params after showing message
+if (hasParams) {
+    setTimeout(() => {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }, 100);
+}
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.onkeydown = e => e.keyCode===123||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key.toUpperCase()))?false:true;
 </script>
