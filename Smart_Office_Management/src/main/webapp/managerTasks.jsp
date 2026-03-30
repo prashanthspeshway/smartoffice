@@ -21,17 +21,6 @@ List<User> team     = (List<User>) request.getAttribute("teamList");
 List<Task> allTasks = (List<Task>) request.getAttribute("allManagerTasks");
 if (allTasks == null) allTasks = java.util.Collections.emptyList();
 
-TreeSet<String> teams        = new TreeSet<>();
-TreeSet<String> designations = new TreeSet<>();
-if (team != null) {
-    for (User u : team) {
-        if (u.getTeamName() != null && !u.getTeamName().trim().isEmpty())
-            teams.add(u.getTeamName().trim());
-        if (u.getDesignation() != null && !u.getDesignation().trim().isEmpty())
-            designations.add(u.getDesignation().trim());
-    }
-}
-
 Calendar cal = Calendar.getInstance();
 cal.set(Calendar.HOUR_OF_DAY, 0); cal.set(Calendar.MINUTE, 0);
 cal.set(Calendar.SECOND, 0);      cal.set(Calendar.MILLISECOND, 0);
@@ -49,688 +38,722 @@ String todayStr = sdf.format(new java.util.Date());
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tasks • Manager</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-toast.css">
 <script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
-  body { font-family: 'DM Sans', system-ui, sans-serif; }
+/* ══════════════════════════════════
+   TOKENS
+══════════════════════════════════ */
+:root {
+  --brand:       #4F6EF7;
+  --brand-dark:  #3B57E3;
+  --brand-light: #EEF2FF;
+  --brand-glow:  rgba(79,110,247,.12);
 
-  .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:9999px; font-size:11px; font-weight:600; }
-  .badge-assigned   { background:#e0f2fe; color:#0369a1; }
-  .badge-processing { background:#fef3c7; color:#92400e; }
-  .badge-submitted  { background:#fef3c7; color:#92400e; }
-  .badge-completed  { background:#dcfce7; color:#166534; }
-  .badge-incomplete { background:#fee2e2; color:#b91c1c; }
-  .badge-docverify  { background:#ede9fe; color:#6d28d9; }
+  --green:       #10B981;
+  --green-bg:    #D1FAE5;
+  --amber:       #F59E0B;
+  --amber-bg:    #FEF3C7;
+  --red:         #EF4444;
+  --red-bg:      #FEE2E2;
+  --violet:      #8B5CF6;
+  --violet-bg:   #EDE9FE;
+  --sky:         #0EA5E9;
+  --sky-bg:      #E0F2FE;
 
-  .ftab { padding:5px 14px; border-radius:9999px; font-size:12px; font-weight:500; cursor:pointer;
-          border:1.5px solid #e2e8f0; background:white; color:#64748b; transition:all .15s;
-          display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
-  .ftab:hover        { border-color:#6366f1; color:#6366f1; }
-  .ftab.f-all        { background:#6366f1; color:white; border-color:#6366f1; }
-  .ftab.f-today      { background:#0ea5e9; color:white; border-color:#0ea5e9; }
-  .ftab.f-week       { background:#f0fdf4; color:#15803d; border-color:#86efac; }
-  .ftab.f-assigned   { background:#e0f2fe; color:#0369a1; border-color:#7dd3fc; }
-  .ftab.f-processing { background:#fef3c7; color:#92400e; border-color:#fcd34d; }
-  .ftab.f-completed  { background:#dcfce7; color:#166534; border-color:#86efac; }
-  .cpill { background:rgba(0,0,0,.12); border-radius:9999px; padding:0 7px; font-size:10px; font-weight:700; }
+  --surface:     #FFFFFF;
+  --surface-2:   #F8FAFC;
+  --surface-3:   #F1F5F9;
+  --border:      #E2E8F0;
+  --border-mid:  #CBD5E1;
+  --text-1:      #0F172A;
+  --text-2:      #334155;
+  --text-3:      #64748B;
+  --text-4:      #94A3B8;
+  --text-5:      #CBD5E1;
 
-  /* Date picker pill */
-  .date-pill { padding:5px 14px; border-radius:9999px; font-size:12px; font-weight:500; cursor:pointer;
-               border:1.5px solid #e2e8f0; background:white; color:#64748b; transition:all .15s;
-               display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
-  .date-pill:hover  { border-color:#6366f1; color:#6366f1; }
-  .date-pill.active { background:#f5f3ff; color:#6d28d9; border-color:#c4b5fd; }
+  --r-sm:  6px;
+  --r-md:  10px;
+  --r-lg:  14px;
+  --r-xl:  18px;
+  --r-2xl: 24px;
 
-  /* ── Custom Calendar Dropdown ── */
-  .cal-wrapper {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-  }
-  #customCalendar {
-    position: absolute;
-    z-index: 9999;
-    background: white;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 14px;
-    box-shadow: 0 8px 30px rgba(0,0,0,.14);
-    padding: 14px 16px 12px;
-    width: 272px;
-    display: none;
-    top: calc(100% + 8px);
-    left: 0;
-  }
-  #customCalendar.open { display: block; }
-  .cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
-  .cal-header span { font-size:13px; font-weight:600; color:#1e293b; }
-  .cal-nav { background:none; border:none; cursor:pointer; color:#64748b; padding:4px 8px;
-             border-radius:6px; font-size:13px; line-height:1; }
-  .cal-nav:hover { background:#f1f5f9; color:#6366f1; }
-  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
-  .cal-dow  { text-align:center; font-size:10px; font-weight:700; color:#94a3b8;
-              padding:4px 0 6px; text-transform:uppercase; }
-  .cal-day  { text-align:center; font-size:12px; padding:6px 0; border-radius:7px;
-              cursor:pointer; color:#374151; transition:background .12s, color .12s; line-height:1.2; }
-  .cal-day:hover:not(.cal-empty):not(.cal-disabled) { background:#eef2ff; color:#6366f1; }
-  .cal-day.cal-today    { font-weight:700; color:#6366f1; }
-  .cal-day.cal-selected { background:#6366f1 !important; color:white !important; font-weight:700; border-radius:7px; }
-  .cal-day.cal-disabled { color:#d1d5db; cursor:default; }
-  .cal-day.cal-empty    { cursor:default; }
-  .cal-footer { display:flex; justify-content:space-between; margin-top:10px; padding-top:10px;
-                border-top:1px solid #f1f5f9; }
-  .cal-footer button { font-size:11px; font-weight:600; padding:4px 14px; border-radius:7px;
-                       border:none; cursor:pointer; transition:background .12s; }
-  .cal-clear      { background:#f1f5f9; color:#64748b; }
-  .cal-clear:hover { background:#e2e8f0; }
-  .cal-jump-today { background:#eef2ff; color:#6366f1; }
-  .cal-jump-today:hover { background:#e0e7ff; }
+  --shadow-xs: 0 1px 2px rgba(0,0,0,.05);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.12);
+}
 
-  .task-card { background:white; border:1.5px solid #e2e8f0; border-radius:14px; padding:16px 18px;
-               transition:box-shadow .15s, border-color .15s; }
-  .task-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.08); border-color:#c7d2fe; }
-  .task-card.needs-review  { border-left:4px solid #f59e0b; }
-  .task-card.completed     { border-left:4px solid #22c55e; opacity:.85; }
-  .task-card.this-week-card{ box-shadow: 0 0 0 1.5px #bbf7d0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: var(--surface-2);
+  color: var(--text-2);
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
-  .week-pill  { display:inline-flex; align-items:center; gap:4px;
-                background:#f0fdf4; color:#15803d; border:1px solid #86efac;
-                border-radius:9999px; font-size:10px; font-weight:600; padding:2px 8px; }
-  .today-pill { display:inline-flex; align-items:center; gap:4px;
-                background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc;
-                border-radius:9999px; font-size:10px; font-weight:600; padding:2px 8px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 99px; }
 
-  .team-tag  { display:inline-flex; align-items:center; gap:3px; background:#eef2ff; color:#4338ca;
-               border:1px solid #c7d2fe; border-radius:9999px; font-size:10px; font-weight:500;
-               padding:1px 7px; margin-top:2px; }
-  .desig-tag { display:inline-flex; align-items:center; gap:3px; background:#f1f5f9; color:#475569;
-               border:1px solid #e2e8f0; border-radius:9999px; font-size:10px; font-weight:500;
-               padding:1px 7px; margin-top:2px; }
+/* ══════════════════════════════════
+   PAGE
+══════════════════════════════════ */
+.page { max-width: 1100px; margin: 0 auto; padding: 28px 28px 60px; }
 
-  .team-btn { font-size:12px; padding:4px 14px; border-radius:9999px; cursor:pointer;
-              border:1.5px solid #e2e8f0; background:white; color:#64748b;
-              transition:all .15s; display:inline-flex; align-items:center; gap:4px; }
-  .team-btn:hover  { border-color:#6366f1; color:#6366f1; background:#eef2ff; }
-  .team-btn.active { background:#6366f1; color:white; border-color:#6366f1; }
+/* Header */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
+}
+.page-header-left { display: flex; align-items: center; gap: 14px; }
+.page-icon {
+  width: 44px; height: 44px; background: var(--brand);
+  border-radius: var(--r-lg); display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 18px; box-shadow: 0 4px 16px rgba(79,110,247,.3); flex-shrink: 0;
+}
+.page-title { font-size: 1.4rem; font-weight: 800; color: var(--text-1); letter-spacing: -.02em; }
+.page-subtitle { font-size: .78rem; color: var(--text-4); margin-top: 2px; }
 
-  .emp-row.hidden-by-team { display:none !important; }
+/* Refresh btn */
+.btn-refresh {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .75rem; font-weight: 600; color: var(--text-3);
+  border: 1.5px solid var(--border); border-radius: 99px;
+  padding: 7px 14px; background: var(--surface); transition: all .15s;
+}
+.btn-refresh:hover { border-color: var(--brand); color: var(--brand); }
 
-  .prio-HIGH   { color:#ef4444; font-weight:600; }
-  .prio-MEDIUM { color:#f59e0b; font-weight:600; }
-  .prio-LOW    { color:#22c55e; font-weight:600; }
+/* ══════════════════════════════════
+   SUMMARY STATS ROW
+══════════════════════════════════ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px; margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--r-xl); padding: 16px 18px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: var(--shadow-xs); transition: box-shadow .15s, transform .15s;
+}
+.stat-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.stat-icon {
+  width: 38px; height: 38px; border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.stat-val { font-size: 1.35rem; font-weight: 800; color: var(--text-1); line-height: 1; }
+.stat-lbl { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-4); margin-top: 3px; }
 
-  .panel-left,
-  .panel-right {
-    max-height: calc(100vh - 140px);
-    overflow-y: auto;
-  }
+/* ══════════════════════════════════
+   TOOLBAR  (filters + date)
+══════════════════════════════════ */
+.toolbar {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--r-xl); padding: 14px 18px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  box-shadow: var(--shadow-xs); margin-bottom: 20px;
+}
+.toolbar-label {
+  font-size: .65rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--text-4); white-space: nowrap;
+  padding-right: 6px; border-right: 1.5px solid var(--border);
+}
+.ftab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 99px; font-size: .75rem; font-weight: 600;
+  border: 1.5px solid var(--border); background: var(--surface); color: var(--text-3);
+  transition: all .13s; white-space: nowrap; cursor: pointer;
+}
+.ftab:hover { border-color: var(--brand); color: var(--brand); }
+.ftab.active-all        { background: var(--brand);      color: white; border-color: var(--brand);      box-shadow: 0 2px 10px rgba(79,110,247,.3); }
+.ftab.active-today      { background: var(--sky);        color: white; border-color: var(--sky);        box-shadow: 0 2px 10px rgba(14,165,233,.3); }
+.ftab.active-week       { background: var(--green);      color: white; border-color: var(--green);      box-shadow: 0 2px 10px rgba(16,185,129,.3); }
+.ftab.active-assigned   { background: var(--sky-bg);     color: #0369A1; border-color: #7DD3FC; }
+.ftab.active-review     { background: var(--amber-bg);   color: #92400E; border-color: #FCD34D; }
+.ftab.active-completed  { background: var(--green-bg);   color: #065F46; border-color: #6EE7B7; }
+.cpill {
+  background: rgba(0,0,0,.12); border-radius: 99px;
+  padding: 0 6px; font-size: .65rem; font-weight: 800; line-height: 1.6;
+}
+.ftab.active-all .cpill, .ftab.active-today .cpill, .ftab.active-week .cpill { background: rgba(255,255,255,.25); }
 
-  .panel-left::-webkit-scrollbar,
-  .panel-right::-webkit-scrollbar  { width: 5px; }
-  .panel-left::-webkit-scrollbar-track,
-  .panel-right::-webkit-scrollbar-track { background:#f1f5f9; border-radius:9999px; }
-  .panel-left::-webkit-scrollbar-thumb,
-  .panel-right::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:9999px; }
+/* date pill */
+.date-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 99px; font-size: .75rem; font-weight: 600;
+  border: 1.5px solid var(--border); background: var(--surface); color: var(--text-3);
+  transition: all .13s; cursor: pointer; white-space: nowrap;
+}
+.date-pill:hover { border-color: var(--brand); color: var(--brand); }
+.date-pill.active { background: var(--violet-bg); color: #5B21B6; border-color: #DDD6FE; }
 
-  .pulse-dot { width:8px; height:8px; border-radius:50%; background:#f59e0b;
-               box-shadow:0 0 0 0 rgba(245,158,11,.5);
-               animation:pulse-ring 1.4s ease-out infinite; display:inline-block; }
-  @keyframes pulse-ring {
-    0%   { box-shadow:0 0 0 0 rgba(245,158,11,.5); }
-    70%  { box-shadow:0 0 0 7px rgba(245,158,11,0); }
-    100% { box-shadow:0 0 0 0 rgba(245,158,11,0); }
-  }
+.btn-clear-date {
+  display: none; align-items: center; gap: 5px;
+  font-size: .72rem; font-weight: 600; color: var(--text-3);
+  border: 1.5px solid var(--border); border-radius: 99px;
+  padding: 6px 12px; background: var(--surface); transition: all .13s;
+}
+.btn-clear-date:hover { border-color: var(--red); color: var(--red); }
+.btn-clear-date.visible { display: inline-flex; }
+
+/* ══════════════════════════════════
+   CALENDAR DROPDOWN
+══════════════════════════════════ */
+.cal-anchor { position: relative; display: inline-flex; align-items: center; }
+#customCalendar {
+  position: absolute; z-index: 9999; top: calc(100% + 8px); left: 0;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-lg);
+  padding: 14px 16px 12px; width: 268px; display: none;
+}
+#customCalendar.open { display: block; }
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.cal-header span { font-size: .82rem; font-weight: 700; color: var(--text-1); }
+.cal-nav {
+  background: none; border: none; cursor: pointer; color: var(--text-3);
+  padding: 4px 8px; border-radius: var(--r-sm); font-size: .85rem; line-height: 1; transition: all .12s;
+}
+.cal-nav:hover { background: var(--surface-3); color: var(--brand); }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-dow { text-align: center; font-size: .62rem; font-weight: 700; color: var(--text-5); padding: 4px 0 6px; text-transform: uppercase; }
+.cal-day {
+  text-align: center; font-size: .75rem; padding: 6px 0; border-radius: var(--r-sm);
+  cursor: pointer; color: var(--text-2); transition: all .1s; line-height: 1.2;
+}
+.cal-day:hover:not(.cal-empty):not(.cal-disabled) { background: var(--brand-light); color: var(--brand); }
+.cal-day.cal-today { font-weight: 800; color: var(--brand); }
+.cal-day.cal-selected { background: var(--brand) !important; color: white !important; font-weight: 700; }
+.cal-day.cal-disabled { color: var(--text-5); cursor: default; }
+.cal-day.cal-empty    { cursor: default; }
+.cal-footer {
+  display: flex; justify-content: space-between; margin-top: 10px;
+  padding-top: 10px; border-top: 1px solid var(--surface-3);
+}
+.cal-footer button {
+  font-size: .72rem; font-weight: 700; padding: 5px 14px; border-radius: var(--r-sm); border: none; cursor: pointer; transition: background .12s;
+}
+.cal-clear      { background: var(--surface-3); color: var(--text-3); }
+.cal-clear:hover { background: var(--border); }
+.cal-jump       { background: var(--brand-light); color: var(--brand); }
+.cal-jump:hover { background: #E0E7FF; }
+
+/* ══════════════════════════════════
+   TASK FEED
+══════════════════════════════════ */
+.feed-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.feed-title { font-size: .9rem; font-weight: 800; color: var(--text-1); }
+.review-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .72rem; font-weight: 700; color: #92400E;
+  background: var(--amber-bg); border: 1.5px solid #FCD34D;
+  padding: 4px 12px; border-radius: 99px;
+}
+
+/* Task grid */
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 14px;
+}
+
+/* Task Card */
+.task-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 0;
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow .18s, border-color .18s, transform .18s;
+  position: relative; overflow: hidden;
+  animation: cardIn .25s ease both;
+}
+.task-card:hover { box-shadow: var(--shadow-md); border-color: #C7D2FE; transform: translateY(-2px); }
+
+/* left accent stripe */
+.task-card::before {
+  content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3.5px;
+  background: var(--border); border-radius: var(--r-xl) 0 0 var(--r-xl);
+  transition: background .15s;
+}
+.task-card.stripe-review::before  { background: var(--amber); }
+.task-card.stripe-completed::before { background: var(--green); }
+.task-card.stripe-assigned::before  { background: var(--brand); }
+.task-card.stripe-overdue::before   { background: var(--red); }
+
+/* Card sections */
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.card-title { font-size: .88rem; font-weight: 800; color: var(--text-1); line-height: 1.35; }
+.card-assignee { font-size: .7rem; color: var(--text-4); font-family: 'JetBrains Mono', monospace; margin-top: 3px; }
+.card-badges { display: flex; flex-wrap: wrap; gap: 5px; flex-shrink: 0; align-items: flex-start; }
+
+.card-desc {
+  font-size: .76rem; color: var(--text-3); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.card-meta {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  font-size: .72rem; color: var(--text-4); margin-bottom: 12px;
+}
+.meta-item { display: inline-flex; align-items: center; gap: 4px; }
+.meta-item i { font-size: .65rem; }
+.meta-item strong { color: var(--text-2); font-weight: 600; }
+.prio-HIGH   { color: var(--red);   font-weight: 700; }
+.prio-MEDIUM { color: var(--amber); font-weight: 700; }
+.prio-LOW    { color: var(--green); font-weight: 700; }
+
+/* Comment box */
+.card-comment {
+  background: #FFFBEB; border: 1.5px solid #FDE68A;
+  border-radius: var(--r-md); padding: 9px 12px;
+  font-size: .72rem; color: #92400E; margin-bottom: 10px; line-height: 1.5;
+}
+.card-comment strong { font-weight: 800; }
+
+/* Attachment links */
+.card-attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.attach-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: .7rem; font-weight: 600;
+  padding: 4px 11px; border-radius: 99px; text-decoration: none;
+  transition: all .12s;
+}
+.attach-emp  { background: var(--green-bg); color: #065F46; border: 1.5px solid #6EE7B7; }
+.attach-emp:hover  { background: #A7F3D0; }
+.attach-mgr  { background: var(--brand-light); color: var(--brand-dark); border: 1.5px solid #C7D2FE; }
+.attach-mgr:hover  { background: #E0E7FF; }
+
+/* Card action row */
+.card-action {
+  display: flex; align-items: center; gap: 8px;
+  padding-top: 12px; border-top: 1.5px solid var(--surface-3);
+  margin-top: auto;
+}
+.action-select {
+  flex: 1; font-size: .75rem; font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 7px 10px; border: 1.5px solid var(--border); border-radius: var(--r-md);
+  background: var(--surface-2); color: var(--text-2); outline: none; transition: all .13s;
+}
+.action-select:focus { border-color: var(--brand); background: white; box-shadow: 0 0 0 3px var(--brand-glow); }
+.btn-apply {
+  padding: 7px 16px; background: var(--brand); color: white;
+  font-size: .75rem; font-weight: 700; border-radius: var(--r-md);
+  box-shadow: 0 2px 8px rgba(79,110,247,.25);
+  transition: all .13s; white-space: nowrap;
+}
+.btn-apply:hover { background: var(--brand-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(79,110,247,.35); }
+
+/* Badges */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 99px; font-size: .68rem; font-weight: 700; white-space: nowrap;
+}
+.b-assigned   { background: var(--sky-bg);   color: #0369A1;  border: 1.5px solid #7DD3FC; }
+.b-review     { background: var(--amber-bg); color: #92400E;  border: 1.5px solid #FCD34D; }
+.b-completed  { background: var(--green-bg); color: #065F46;  border: 1.5px solid #6EE7B7; }
+.b-docverify  { background: var(--violet-bg);color: #5B21B6;  border: 1.5px solid #DDD6FE; }
+.b-today      { background: var(--sky-bg);   color: #0369A1;  border: 1.5px solid #7DD3FC; }
+.b-week       { background: var(--green-bg); color: #065F46;  border: 1.5px solid #6EE7B7; }
+
+/* Pulse dot */
+.pulse-dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--amber); flex-shrink: 0;
+  box-shadow: 0 0 0 0 rgba(245,158,11,.5);
+  animation: pulse 1.4s ease-out infinite;
+}
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(245,158,11,.5); }
+  70%  { box-shadow: 0 0 0 7px rgba(245,158,11,0); }
+  100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+}
+@keyframes cardIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* Empty state */
+.empty-state {
+  grid-column: 1 / -1;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--r-xl); padding: 56px 24px; text-align: center;
+}
+.empty-state i { font-size: 36px; color: var(--text-5); display: block; margin-bottom: 10px; }
+.empty-state p { font-size: .82rem; color: var(--text-4); }
 </style>
 </head>
-<body class="bg-slate-100 p-6">
+<body>
 
 <div id="toast" aria-live="polite"></div>
 
-<div class="max-w-7xl mx-auto">
-  <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-    <i class="fa-solid fa-list-check text-indigo-500"></i> Tasks
-  </h2>
+<div class="page">
 
-  <div class="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-6 items-start">
+  <!-- ── Page Header ── -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-icon"><i class="fa-solid fa-list-check"></i></div>
+      <div>
+        <div class="page-title">Team Task Feed</div>
+        <div class="page-subtitle">Monitor and manage all tasks assigned to your team</div>
+      </div>
+    </div>
+    <button class="btn-refresh" onclick="location.reload()">
+      <i class="fa-solid fa-rotate-right" style="font-size:.7rem;"></i> Refresh
+    </button>
+  </div>
 
-    <!-- ══════════════ LEFT: Assign Task ══════════════ -->
-    <div class="panel-left bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-      <div class="flex items-center gap-3 mb-5">
-        <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center">
-          <i class="fa-solid fa-paper-plane text-indigo-600"></i>
+  <!-- ── Summary Stats ── -->
+  <%
+  long cAll       = allTasks.size();
+  long cAssigned  = allTasks.stream().filter(t -> { String s=t.getStatus()!=null?t.getStatus().trim().toUpperCase():""; return !s.equals("COMPLETED")&&!s.equals("PROCESSING")&&!s.equals("SUBMITTED"); }).count();
+  long cReview    = allTasks.stream().filter(t -> { String s=t.getStatus()!=null?t.getStatus().trim().toUpperCase():""; return s.equals("PROCESSING")||s.equals("SUBMITTED"); }).count();
+  long cCompleted = allTasks.stream().filter(t -> { String s=t.getStatus()!=null?t.getStatus().trim().toUpperCase():""; return s.equals("COMPLETED"); }).count();
+  long cToday     = 0;
+  for (Task t : allTasks) { if (t.getAssignedDate()!=null && sdf.format(t.getAssignedDate()).equals(todayStr)) cToday++; }
+  %>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--brand-light);color:var(--brand);"><i class="fa-solid fa-border-all"></i></div>
+      <div><div class="stat-val"><%=cAll%></div><div class="stat-lbl">Total</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--sky-bg);color:var(--sky);"><i class="fa-solid fa-sun"></i></div>
+      <div><div class="stat-val" style="color:var(--sky);"><%=cToday%></div><div class="stat-lbl">Today</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--sky-bg);color:#0369A1;"><i class="fa-solid fa-clock"></i></div>
+      <div><div class="stat-val" style="color:#0369A1;"><%=cAssigned%></div><div class="stat-lbl">Assigned</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--amber-bg);color:var(--amber);"><i class="fa-solid fa-hourglass-half"></i></div>
+      <div><div class="stat-val" style="color:var(--amber);"><%=cReview%></div><div class="stat-lbl">Review</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--green-bg);color:var(--green);"><i class="fa-solid fa-circle-check"></i></div>
+      <div><div class="stat-val" style="color:var(--green);"><%=cCompleted%></div><div class="stat-lbl">Completed</div></div>
+    </div>
+  </div>
+
+  <!-- ── Toolbar ── -->
+  <div class="toolbar">
+    <span class="toolbar-label">Filter</span>
+
+    <button class="ftab" id="tabAll"       onclick="filterFeed('all',this)">
+      <i class="fa-solid fa-border-all" style="font-size:.65rem;"></i> All
+      <span class="cpill" id="fc-all">0</span>
+    </button>
+    <button class="ftab" id="tabToday"     onclick="filterFeed('TODAY',this)">
+      <i class="fa-solid fa-sun" style="font-size:.65rem;"></i> Today
+      <span class="cpill" id="fc-today">0</span>
+    </button>
+    <button class="ftab" id="tabWeek"      onclick="filterFeed('WEEK',this)">
+      <i class="fa-solid fa-calendar-week" style="font-size:.65rem;"></i> This Week
+      <span class="cpill" id="fc-week">0</span>
+    </button>
+    <button class="ftab"                   onclick="filterFeed('ASSIGNED',this)">
+      <i class="fa-solid fa-clock" style="font-size:.65rem;"></i> Assigned
+      <span class="cpill" id="fc-assigned">0</span>
+    </button>
+    <button class="ftab"                   onclick="filterFeed('REVIEW',this)">
+      <span class="pulse-dot"></span> Needs Review
+      <span class="cpill" id="fc-review">0</span>
+    </button>
+    <button class="ftab"                   onclick="filterFeed('COMPLETED',this)">
+      <i class="fa-solid fa-circle-check" style="font-size:.65rem;"></i> Completed
+      <span class="cpill" id="fc-completed">0</span>
+    </button>
+
+    <div class="cal-anchor" id="calWrapper" style="margin-left:auto;">
+      <button class="date-pill" id="datePillBtn" onclick="toggleCalendar(event)">
+        <i class="fa-solid fa-calendar-days" style="font-size:.65rem;"></i>
+        <span id="datePillLabel">Pick a Date</span>
+      </button>
+      <div id="customCalendar">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="calNav(-1)" type="button">&#8249;</button>
+          <span id="calMonthYear"></span>
+          <button class="cal-nav" onclick="calNav(1)"  type="button">&#8250;</button>
         </div>
-        <h3 class="text-base font-semibold text-slate-800">Assign New Task</h3>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-footer">
+          <button class="cal-clear" onclick="clearDateFilter()" type="button">Clear</button>
+          <button class="cal-jump"  onclick="calJumpToday()"    type="button">Today</button>
+        </div>
+      </div>
+    </div>
+
+    <button id="clearDateBtn" class="btn-clear-date" onclick="clearDateFilter()" type="button">
+      <i class="fa-solid fa-xmark" style="font-size:.65rem;"></i> Clear date
+    </button>
+  </div>
+
+  <!-- ── Feed Header ── -->
+  <div class="feed-header">
+    <span class="feed-title">Tasks</span>
+    <%if (cReview > 0) {%>
+    <span class="review-badge"><span class="pulse-dot"></span> <%=cReview%> awaiting review</span>
+    <%}%>
+    <span id="visibleCount" style="font-size:.72rem;color:var(--text-4);margin-left:auto;"></span>
+  </div>
+
+  <!-- ── Task Grid ── -->
+  <div class="task-grid" id="taskFeed">
+
+    <%if (allTasks.isEmpty()) {%>
+    <div class="empty-state">
+      <i class="fa-solid fa-inbox"></i>
+      <p>No tasks assigned yet.</p>
+    </div>
+    <%} else {
+      for (Task t : allTasks) {
+        String rawStatus     = t.getStatus() != null ? t.getStatus().trim().toUpperCase() : "ASSIGNED";
+        boolean isProcessing = rawStatus.equals("PROCESSING") || rawStatus.equals("SUBMITTED");
+        boolean isCompleted  = rawStatus.equals("COMPLETED");
+        boolean needsReview  = isProcessing;
+        boolean isThisWeek   = t.getAssignedDate() != null && !t.getAssignedDate().before(weekStart);
+
+        String assignedDateStr = "";
+        boolean isToday = false;
+        if (t.getAssignedDate() != null) {
+            assignedDateStr = sdf.format(t.getAssignedDate());
+            isToday = assignedDateStr.equals(todayStr);
+        }
+
+        String badgeCls, badgeLabel, filterKey, stripeCls;
+        switch (rawStatus) {
+          case "COMPLETED":
+            badgeCls="b-completed"; badgeLabel="Completed"; filterKey="COMPLETED"; stripeCls="stripe-completed"; break;
+          case "PROCESSING": case "SUBMITTED":
+            badgeCls="b-review"; badgeLabel="Awaiting Review"; filterKey="REVIEW"; stripeCls="stripe-review"; break;
+          case "DOCUMENT_VERIFICATION":
+            badgeCls="b-docverify"; badgeLabel="Doc Verification"; filterKey="ASSIGNED"; stripeCls="stripe-assigned"; break;
+          default:
+            badgeCls="b-assigned"; badgeLabel="Assigned"; filterKey="ASSIGNED"; stripeCls="stripe-assigned"; break;
+        }
+
+        String prioCls   = "prio-" + (t.getPriority() != null ? t.getPriority().trim().toUpperCase() : "MEDIUM");
+        String prioLabel = t.getPriority() != null ? t.getPriority() : "MEDIUM";
+        String prioIcon  = "MEDIUM".equals(prioLabel.toUpperCase()) ? "fa-flag" : "HIGH".equals(prioLabel.toUpperCase()) ? "fa-flag" : "fa-flag";
+        String deadlineStr = t.getDeadline()  != null ? t.getDeadline().toString() : "—";
+        String assignedTo  = t.getAssignedTo()!= null ? t.getAssignedTo()         : "";
+        String title       = t.getTitle()     != null ? t.getTitle()              : "Untitled";
+        String desc        = t.getDescription()!= null? t.getDescription()        : "";
+    %>
+    <div class="task-card <%=stripeCls%>"
+         data-filter="<%=filterKey%>"
+         data-week="<%=isThisWeek?"1":"0"%>"
+         data-today="<%=isToday?"1":"0"%>"
+         data-assigned-date="<%=assignedDateStr%>">
+
+      <!-- Top row: title + badges -->
+      <div class="card-top">
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:7px;">
+            <%if (needsReview) {%><span class="pulse-dot" style="margin-top:2px;flex-shrink:0;"></span><%}%>
+            <div class="card-title"><%=title%></div>
+          </div>
+          <div class="card-assignee"><%=assignedTo%></div>
+        </div>
+        <div class="card-badges">
+          <%if (isToday) {%><span class="badge b-today"><i class="fa-solid fa-sun" style="font-size:.6rem;"></i> Today</span><%}
+          else if (isThisWeek) {%><span class="badge b-week"><i class="fa-solid fa-calendar-week" style="font-size:.6rem;"></i> This Week</span><%}%>
+          <span class="badge <%=badgeCls%>"><%=badgeLabel%></span>
+        </div>
       </div>
 
-      <%if (errorMessage != null) {%>
-      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-lg mb-4 text-sm">
-        <i class="fa-solid fa-exclamation-circle mr-2"></i><%=errorMessage%>
+      <%if (!desc.isEmpty()) {%>
+      <p class="card-desc"><%=desc%></p>
+      <%}%>
+
+      <!-- Meta row -->
+      <div class="card-meta">
+        <span class="meta-item"><i class="fa-regular fa-calendar"></i> Due: <strong><%=deadlineStr%></strong></span>
+        <span class="meta-item <%=prioCls%>"><i class="fa-solid fa-flag"></i> <%=prioLabel%></span>
+        <%if (t.getAssignedDate() != null) {%>
+        <span class="meta-item"><i class="fa-regular fa-clock"></i> Assigned: <strong><%=t.getAssignedDate().toLocalDateTime().toLocalDate()%></strong></span>
+        <%}%>
+        <%if (t.getSubmittedAt() != null) {%>
+        <span class="meta-item" style="color:var(--amber);"><i class="fa-regular fa-clock"></i> Submitted: <strong><%=t.getSubmittedAt().toLocalDateTime().toLocalDate()%></strong></span>
+        <%}%>
+      </div>
+
+      <%if (t.getEmployeeComment() != null && !t.getEmployeeComment().isEmpty()) {%>
+      <div class="card-comment">
+        <strong><i class="fa-solid fa-message" style="margin-right:4px;"></i>Employee note:</strong> <%=t.getEmployeeComment()%>
       </div>
       <%}%>
 
-      <form action="<%=request.getContextPath()%>/managerTasks" method="post"
-            enctype="multipart/form-data" class="space-y-4" id="assignTaskForm">
-        <input type="hidden" name="action" value="assign">
-
-        <%if (!teams.isEmpty()) {%>
-        <div>
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-            <i class="fa-solid fa-people-group mr-1"></i>Filter by Team
-          </label>
-          <div class="flex flex-wrap gap-1.5" id="teamFilterRow">
-            <button type="button" class="team-btn active" data-team="all" onclick="filterByTeam('all',this)">
-              <i class="fa-solid fa-users text-xs"></i> All Teams
-            </button>
-            <%for (String tm : teams) {%>
-            <button type="button" class="team-btn" data-team="<%=tm%>" onclick="filterByTeam('<%=tm%>',this)">
-              <i class="fa-solid fa-people-group text-xs"></i> <%=tm%>
-            </button>
-            <%}%>
-          </div>
-        </div>
+      <%boolean hasAttach = (t.getEmployeeAttachmentName()!=null&&!t.getEmployeeAttachmentName().isEmpty()) || (t.getAttachmentName()!=null&&!t.getAttachmentName().isEmpty());
+      if (hasAttach) {%>
+      <div class="card-attachments">
+        <%if (t.getEmployeeAttachmentName() != null && !t.getEmployeeAttachmentName().isEmpty()) {%>
+        <a href="<%=request.getContextPath()%>/employeeTaskAttachment?id=<%=t.getId()%>" target="_blank" class="attach-link attach-emp">
+          <i class="fa-solid fa-file-arrow-up"></i> <%=t.getEmployeeAttachmentName()%>
+        </a>
         <%}%>
+        <%if (t.getAttachmentName() != null && !t.getAttachmentName().isEmpty()) {%>
+        <a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>" target="_blank" class="attach-link attach-mgr">
+          <i class="fa-solid fa-paperclip"></i> <%=t.getAttachmentName()%>
+        </a>
+        <%}%>
+      </div>
+      <%}%>
 
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-            Assign to <span class="text-red-500">*</span>
-            <span id="empCountLabel" class="text-slate-400 font-normal text-xs ml-1"></span>
-          </label>
-          <div class="relative" id="empDropdownWrapper">
-            <button type="button" onclick="toggleEmpDropdown()"
-              class="w-full px-4 py-2.5 border border-slate-300 rounded-lg bg-white text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 flex justify-between items-center min-h-[42px]">
-              <span id="empDropdownLabel" class="text-slate-400 text-sm">Select employees…</span>
-              <i class="fa-solid fa-chevron-down text-slate-400 text-xs ml-2 shrink-0 transition-transform" id="empChevron"></i>
-            </button>
-            <div id="empDropdownPanel" class="hidden absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-52 overflow-y-auto">
-              <%if (team != null && !team.isEmpty()) {
-                  for (User u : team) {
-                      String desig   = u.getDesignation() != null ? u.getDesignation().trim() : "";
-                      String empTeam = u.getTeamName()    != null ? u.getTeamName().trim()    : "";
-              %>
-              <label class="emp-row flex items-center gap-3 px-4 py-2.5 hover:bg-indigo-50 cursor-pointer border-b border-slate-100 last:border-0"
-                     data-team="<%=empTeam%>">
-                <input type="checkbox" name="employeeUsername" value="<%=u.getEmail()%>"
-                       class="emp-checkbox accent-indigo-600 w-4 h-4 shrink-0" onchange="updateEmpLabel()">
-                <span class="text-sm text-slate-700 flex-1 min-w-0">
-                  <span class="block font-medium truncate emp-name"><%=u.getFullname()%></span>
-                  <span class="text-slate-400 text-xs font-mono block"><%=u.getEmail()%></span>
-                  <span class="flex flex-wrap gap-1 mt-0.5">
-                    <%if (!empTeam.isEmpty()) {%>
-                    <span class="team-tag"><i class="fa-solid fa-people-group text-xs"></i> <%=empTeam%></span>
-                    <%}%>
-                    <%if (!desig.isEmpty()) {%>
-                    <span class="desig-tag"><i class="fa-solid fa-id-badge text-xs"></i> <%=desig%></span>
-                    <%}%>
-                  </span>
-                </span>
-              </label>
-              <%} } else { %>
-              <div class="px-4 py-3 text-sm text-slate-400">No employees available</div>
-              <%}%>
-            </div>
-          </div>
-          <input type="text" id="empValidation" class="sr-only" required tabindex="-1" aria-hidden="true" autocomplete="off">
-        </div>
-
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Title <span class="text-red-500">*</span></label>
-          <input type="text" name="title" placeholder="E.g. Submit weekly report" required
-            class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Description <span class="text-red-500">*</span></label>
-          <textarea name="taskDesc" rows="3" placeholder="Add clear instructions and details" required
-            class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Deadline <span class="text-red-500">*</span></label>
-            <input type="date" name="deadline" id="assignTaskDeadline" required min="<%=todayStr%>"
-              class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Priority <span class="text-red-500">*</span></label>
-            <select name="priority" required
-              class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="HIGH">High</option>
-              <option value="MEDIUM" selected>Medium</option>
-              <option value="LOW">Low</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Attachment <span class="text-slate-400 font-normal">(optional)</span></label>
-          <input type="file" name="attachment" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg"
-            class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-
-        <button type="submit"
-          class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
-          <i class="fa-solid fa-paper-plane"></i> Assign Task
-        </button>
+      <%if (!isCompleted) {%>
+      <form action="<%=request.getContextPath()%>/managerTasks" method="post" class="card-action">
+        <input type="hidden" name="action" value="updateStatus">
+        <input type="hidden" name="taskId" value="<%=t.getId()%>">
+        <select name="decision" required class="action-select">
+          <option value="">Select action…</option>
+          <%if (needsReview) {%><option value="review">↩ Return to Employee</option><%}%>
+          <option value="completed">✓ Mark as Completed</option>
+        </select>
+        <button type="submit" class="btn-apply">Apply</button>
       </form>
+      <%}%>
     </div>
-
-    <!-- ══════════════ RIGHT: Task Feed ══════════════ -->
-    <div class="panel-right bg-transparent rounded-xl flex flex-col gap-0">
-
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <div class="flex items-center gap-2">
-          <h3 class="text-base font-semibold text-slate-800">Team Task Feed</h3>
-          <%
-          long pendingCount = allTasks.stream().filter(t -> {
-              String s = t.getStatus() != null ? t.getStatus().trim().toUpperCase() : "";
-              return s.equals("PROCESSING") || s.equals("SUBMITTED");
-          }).count();
-          %>
-          <%if (pendingCount > 0) {%>
-          <span class="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full">
-            <span class="pulse-dot"></span> <%=pendingCount%> awaiting review
-          </span>
-          <%}%>
-        </div>
-        <button onclick="location.reload()"
-          class="text-xs text-slate-500 hover:text-indigo-600 flex items-center gap-1.5 border border-slate-200 rounded-full px-3 py-1.5 bg-white transition-colors">
-          <i class="fa-solid fa-rotate-right text-xs"></i> Refresh
-        </button>
-      </div>
-
-      <!-- Filter tabs -->
-      <div class="flex flex-wrap gap-2 mb-4 items-center">
-        <button class="ftab" id="tabAll"   onclick="filterFeed('all',this)">
-          <i class="fa-solid fa-border-all text-xs"></i> All
-          <span class="cpill" id="fc-all">0</span>
-        </button>
-        <button class="ftab" id="tabToday" onclick="filterFeed('TODAY',this)">
-          <i class="fa-solid fa-sun text-xs"></i> Today
-          <span class="cpill" id="fc-today">0</span>
-        </button>
-        <button class="ftab" id="tabWeek"  onclick="filterFeed('WEEK',this)">
-          <i class="fa-solid fa-calendar-week text-xs"></i> This Week
-          <span class="cpill" id="fc-week">0</span>
-        </button>
-        <button class="ftab" onclick="filterFeed('ASSIGNED',this)">
-          <i class="fa-solid fa-clock text-xs"></i> Assigned
-          <span class="cpill" id="fc-assigned">0</span>
-        </button>
-        <button class="ftab" onclick="filterFeed('REVIEW',this)">
-          <span class="pulse-dot"></span> Needs Review
-          <span class="cpill" id="fc-review">0</span>
-        </button>
-        <button class="ftab" onclick="filterFeed('COMPLETED',this)">
-          <i class="fa-solid fa-circle-check text-xs"></i> Completed
-          <span class="cpill" id="fc-completed">0</span>
-        </button>
-
-        <!-- Custom calendar date picker pill (anchored dropdown) -->
-        <div class="cal-wrapper" id="calWrapper">
-          <button class="date-pill" id="datePillBtn" onclick="toggleCalendar(event)">
-            <i class="fa-solid fa-calendar-days text-xs"></i>
-            <span id="datePillLabel">Pick a Date</span>
-          </button>
-
-          <!-- Custom calendar dropdown -->
-          <div id="customCalendar">
-            <div class="cal-header">
-              <button class="cal-nav" onclick="calNav(-1)" type="button">&#8249;</button>
-              <span id="calMonthYear"></span>
-              <button class="cal-nav" onclick="calNav(1)" type="button">&#8250;</button>
-            </div>
-            <div class="cal-grid" id="calGrid"></div>
-            <div class="cal-footer">
-              <button class="cal-clear" onclick="clearDateFilter()" type="button">Clear</button>
-              <button class="cal-jump-today" onclick="calJumpToday()" type="button">Today</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Clear date (hidden until a date is picked) -->
-        <button id="clearDateBtn" onclick="clearDateFilter()"
-          class="hidden text-xs text-slate-500 hover:text-red-500 border border-slate-200
-                 hover:border-red-300 bg-white rounded-full px-3 py-1.5 transition-colors
-                 inline-flex items-center gap-1" type="button">
-          <i class="fa-solid fa-xmark text-xs"></i> Clear date
-        </button>
-      </div>
-
-      <!-- Task cards -->
-      <div class="space-y-3" id="taskFeed">
-        <%if (allTasks.isEmpty()) {%>
-        <div class="bg-white rounded-xl border border-slate-200 px-6 py-12 text-center">
-          <i class="fa-solid fa-inbox text-slate-300 text-4xl mb-3"></i>
-          <p class="text-slate-400 text-sm">No tasks assigned yet. Use the form to assign your first task.</p>
-        </div>
-        <%} else {
-          for (Task t : allTasks) {
-            String rawStatus     = t.getStatus() != null ? t.getStatus().trim().toUpperCase() : "ASSIGNED";
-            boolean isProcessing = rawStatus.equals("PROCESSING") || rawStatus.equals("SUBMITTED");
-            boolean isCompleted  = rawStatus.equals("COMPLETED");
-            boolean needsReview  = isProcessing;
-            boolean isThisWeek   = t.getAssignedDate() != null && !t.getAssignedDate().before(weekStart);
-
-            String assignedDateStr = "";
-            boolean isToday = false;
-            if (t.getAssignedDate() != null) {
-                assignedDateStr = sdf.format(t.getAssignedDate());
-                isToday = assignedDateStr.equals(todayStr);
-            }
-
-            String badgeCls, badgeLabel, filterKey;
-            switch (rawStatus) {
-              case "COMPLETED":
-                badgeCls="badge-completed"; badgeLabel="Completed"; filterKey="COMPLETED"; break;
-              case "PROCESSING": case "SUBMITTED":
-                badgeCls="badge-processing"; badgeLabel="Awaiting Review"; filterKey="REVIEW"; break;
-              case "DOCUMENT_VERIFICATION":
-                badgeCls="badge-docverify"; badgeLabel="Doc Verification"; filterKey="ASSIGNED"; break;
-              default:
-                badgeCls="badge-assigned"; badgeLabel="Assigned"; filterKey="ASSIGNED"; break;
-            }
-
-            String cardExtra = (isCompleted ? "completed" : (needsReview ? "needs-review" : ""))
-                             + (isThisWeek ? " this-week-card" : "");
-            String prioCls   = "prio-" + (t.getPriority() != null ? t.getPriority().trim().toUpperCase() : "MEDIUM");
-            String prioLabel = t.getPriority() != null ? t.getPriority() : "MEDIUM";
-            String deadlineStr = t.getDeadline() != null ? t.getDeadline().toString() : "—";
-            String assignedTo  = t.getAssignedTo() != null ? t.getAssignedTo() : "";
-            String title       = t.getTitle()  != null ? t.getTitle() : "Untitled";
-            String desc        = t.getDescription() != null ? t.getDescription() : "";
-        %>
-        <div class="task-card <%=cardExtra.trim()%>"
-             data-filter="<%=filterKey%>"
-             data-week="<%=isThisWeek?"1":"0"%>"
-             data-today="<%=isToday?"1":"0"%>"
-             data-assigned-date="<%=assignedDateStr%>">
-
-          <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
-            <div class="flex items-start gap-2 flex-1 min-w-0">
-              <%if (needsReview) {%><span class="pulse-dot mt-1.5 shrink-0"></span><%}%>
-              <div class="min-w-0">
-                <p class="font-semibold text-slate-800 text-sm leading-snug truncate"><%=title%></p>
-                <p class="text-xs text-slate-400 font-mono mt-0.5"><%=assignedTo%></p>
-              </div>
-            </div>
-            <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-              <%if (isToday) {%>
-              <span class="today-pill"><i class="fa-solid fa-sun text-xs"></i> Today</span>
-              <%} else if (isThisWeek) {%>
-              <span class="week-pill"><i class="fa-solid fa-calendar-week text-xs"></i> This Week</span>
-              <%}%>
-              <span class="badge <%=badgeCls%>"><%=badgeLabel%></span>
-            </div>
-          </div>
-
-          <%if (!desc.isEmpty()) {%>
-          <p class="text-xs text-slate-500 mb-2 line-clamp-2"><%=desc%></p>
-          <%}%>
-
-          <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500 mb-3">
-            <span><i class="fa-regular fa-calendar mr-1"></i>Due: <span class="font-medium text-slate-700"><%=deadlineStr%></span></span>
-            <span class="<%=prioCls%>"><i class="fa-solid fa-flag mr-1"></i><%=prioLabel%></span>
-            <%if (t.getSubmittedAt() != null) {%>
-            <span class="text-amber-600"><i class="fa-regular fa-clock mr-1"></i>Submitted: <%=t.getSubmittedAt().toLocalDateTime().toLocalDate()%></span>
-            <%}%>
-            <%if (t.getAssignedDate() != null) {%>
-            <span><i class="fa-regular fa-clock mr-1"></i>Assigned: <%=t.getAssignedDate().toLocalDateTime().toLocalDate()%></span>
-            <%}%>
-          </div>
-
-          <%if (t.getEmployeeComment() != null && !t.getEmployeeComment().isEmpty()) {%>
-          <div class="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3 text-xs text-amber-800">
-            <i class="fa-solid fa-message mr-1"></i><span class="font-semibold">Employee note:</span> <%=t.getEmployeeComment()%>
-          </div>
-          <%}%>
-          <%if (t.getEmployeeAttachmentName() != null && !t.getEmployeeAttachmentName().isEmpty()) {%>
-          <a href="<%=request.getContextPath()%>/employeeTaskAttachment?id=<%=t.getId()%>" target="_blank"
-             class="inline-flex items-center gap-1.5 text-xs text-green-700 bg-green-50 border border-green-200 rounded-full px-3 py-1 mb-3 hover:bg-green-100 transition-colors">
-            <i class="fa-solid fa-file-arrow-up"></i> <%=t.getEmployeeAttachmentName()%>
-          </a>
-          <%}%>
-          <%if (t.getAttachmentName() != null && !t.getAttachmentName().isEmpty()) {%>
-          <a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>" target="_blank"
-             class="inline-flex items-center gap-1.5 text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-3 py-1 mb-3 hover:bg-indigo-100 transition-colors ml-1">
-            <i class="fa-solid fa-paperclip"></i> <%=t.getAttachmentName()%>
-          </a>
-          <%}%>
-
-          <%if (!isCompleted) {%>
-          <form action="<%=request.getContextPath()%>/managerTasks" method="post"
-                class="flex items-center gap-2 pt-2 border-t border-slate-100">
-            <input type="hidden" name="action" value="updateStatus">
-            <input type="hidden" name="taskId" value="<%=t.getId()%>">
-            <select name="decision" required
-              class="flex-1 text-xs px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-              <option value="">Select action…</option>
-              <%if (needsReview) {%><option value="review">↩ Return to Employee</option><%}%>
-              <option value="completed">✓ Mark as Completed</option>
-            </select>
-            <button type="submit"
-              class="px-4 py-2 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
-              Apply
-            </button>
-          </form>
-          <%}%>
-        </div>
-        <%}}%>
-      </div>
-    </div><!-- /panel-right -->
-
+    <%}}%>
   </div>
+
 </div>
 
 <script>
 var TODAY_STR = '<%=todayStr%>';
-
-// ── Custom Calendar State ────────────────────────────────────────
 var calViewYear, calViewMonth, calSelectedDate = null;
 
-(function initCalView() {
-  var d = new Date();
-  calViewYear  = d.getFullYear();
-  calViewMonth = d.getMonth(); // 0-based
-})();
-
-function toggleCalendar(e) {
-  e.stopPropagation();
-  var cal = document.getElementById('customCalendar');
-  var isOpen = cal.classList.contains('open');
-  if (!isOpen) {
-    renderCalendar();
-    cal.classList.add('open');
-  } else {
-    cal.classList.remove('open');
-  }
-}
-
-function closeCalendar() {
-  document.getElementById('customCalendar').classList.remove('open');
-}
-
-function calNav(dir) {
-  calViewMonth += dir;
-  if (calViewMonth < 0)  { calViewMonth = 11; calViewYear--; }
-  if (calViewMonth > 11) { calViewMonth = 0;  calViewYear++; }
-  renderCalendar();
-}
-
-function calJumpToday() {
+(function() {
   var d = new Date();
   calViewYear  = d.getFullYear();
   calViewMonth = d.getMonth();
+})();
+
+// ── Calendar ──────────────────────────────
+function toggleCalendar(e) {
+  e.stopPropagation();
+  var cal = document.getElementById('customCalendar');
+  if (!cal.classList.contains('open')) { renderCalendar(); cal.classList.add('open'); }
+  else cal.classList.remove('open');
+}
+function closeCalendar() { document.getElementById('customCalendar').classList.remove('open'); }
+function calNav(dir) {
+  calViewMonth += dir;
+  if (calViewMonth < 0)  { calViewMonth=11; calViewYear--; }
+  if (calViewMonth > 11) { calViewMonth=0;  calViewYear++; }
   renderCalendar();
 }
-
+function calJumpToday() {
+  var d=new Date(); calViewYear=d.getFullYear(); calViewMonth=d.getMonth();
+  renderCalendar();
+}
 function renderCalendar() {
-  var months = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('calMonthYear').textContent = months[calViewMonth] + ' ' + calViewYear;
-
   var grid = document.getElementById('calGrid');
   grid.innerHTML = '';
-
-  // Day-of-week headers (Mon first)
   ['Mo','Tu','We','Th','Fr','Sa','Su'].forEach(function(d) {
-    var el = document.createElement('div');
-    el.className = 'cal-dow';
-    el.textContent = d;
-    grid.appendChild(el);
+    var el=document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el);
   });
-
-  var firstDay = new Date(calViewYear, calViewMonth, 1).getDay(); // 0=Sun
-  var offset   = (firstDay === 0) ? 6 : firstDay - 1; // shift to Mon-start
-  var daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
-
-  var todayParts = TODAY_STR.split('-');
-  var todayY = parseInt(todayParts[0]);
-  var todayM = parseInt(todayParts[1]) - 1;
-  var todayD = parseInt(todayParts[2]);
-
-  // Empty cells before first day
-  for (var i = 0; i < offset; i++) {
-    var empty = document.createElement('div');
-    empty.className = 'cal-day cal-empty';
-    grid.appendChild(empty);
-  }
-
-  for (var day = 1; day <= daysInMonth; day++) {
-    var el = document.createElement('div');
-    el.className = 'cal-day';
-    el.textContent = day;
-
-    var isToday    = (calViewYear === todayY && calViewMonth === todayM && day === todayD);
-    var isFuture   = new Date(calViewYear, calViewMonth, day) > new Date(todayY, todayM, todayD);
-    var dateVal    = calViewYear + '-'
-                   + String(calViewMonth + 1).padStart(2,'0') + '-'
-                   + String(day).padStart(2,'0');
-    var isSelected = (calSelectedDate === dateVal);
-
-    if (isFuture)   el.classList.add('cal-disabled');
-    if (isToday)    el.classList.add('cal-today');
-    if (isSelected) el.classList.add('cal-selected');
-
+  var firstDay = new Date(calViewYear, calViewMonth, 1).getDay();
+  var offset   = (firstDay===0)?6:firstDay-1;
+  var daysInMonth = new Date(calViewYear, calViewMonth+1, 0).getDate();
+  var tp=TODAY_STR.split('-'), ty=parseInt(tp[0]), tm=parseInt(tp[1])-1, td=parseInt(tp[2]);
+  for (var i=0;i<offset;i++) { var e=document.createElement('div'); e.className='cal-day cal-empty'; grid.appendChild(e); }
+  for (var day=1;day<=daysInMonth;day++) {
+    var el=document.createElement('div'); el.className='cal-day'; el.textContent=day;
+    var isToday=(calViewYear===ty&&calViewMonth===tm&&day===td);
+    var isFuture=new Date(calViewYear,calViewMonth,day)>new Date(ty,tm,td);
+    var dateVal=calViewYear+'-'+String(calViewMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    if (isFuture) el.classList.add('cal-disabled');
+    if (isToday)  el.classList.add('cal-today');
+    if (calSelectedDate===dateVal) el.classList.add('cal-selected');
     if (!isFuture) {
-      (function(dv) {
-        el.addEventListener('click', function() {
-          calSelectedDate = dv;
-          closeCalendar();
-          onDateSelected(dv);
-        });
-      })(dateVal);
+      (function(dv){ el.addEventListener('click',function(){ calSelectedDate=dv; closeCalendar(); onDateSelected(dv); }); })(dateVal);
     }
-
     grid.appendChild(el);
   }
 }
-
 function onDateSelected(dateVal) {
-  var parts  = dateVal.split('-');
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var label  = months[parseInt(parts[1]) - 1] + ' ' + parseInt(parts[2]) + ', ' + parts[0];
-  if (dateVal === TODAY_STR) label = 'Today (' + label + ')';
-
-  document.getElementById('datePillLabel').textContent = label;
+  var parts=dateVal.split('-'), months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var label=months[parseInt(parts[1])-1]+' '+parseInt(parts[2])+', '+parts[0];
+  if (dateVal===TODAY_STR) label='Today ('+label+')';
+  document.getElementById('datePillLabel').textContent=label;
   document.getElementById('datePillBtn').classList.add('active');
-  document.getElementById('clearDateBtn').classList.remove('hidden');
-
-  document.querySelectorAll('.ftab').forEach(function(t) { t.className = 'ftab'; });
-  applyFilter('DATE', dateVal);
+  document.getElementById('clearDateBtn').classList.add('visible');
+  document.querySelectorAll('.ftab').forEach(function(t){t.className='ftab';});
+  applyFilter('DATE',dateVal);
 }
 
-// ── Team filter ─────────────────────────────────────────────────
-function filterByTeam(team, btn) {
-  document.querySelectorAll('.team-btn').forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
-  var rows = document.querySelectorAll('.emp-row');
-  var visible = 0;
-  rows.forEach(function(row) {
-    var match = team === 'all' || row.dataset.team === team;
-    row.classList.toggle('hidden-by-team', !match);
-    if (match) visible++;
-  });
-  var label = document.getElementById('empCountLabel');
-  if (label) label.textContent = team === 'all'
-    ? '(' + visible + ' employees)'
-    : '(' + visible + ' in ' + team + ' team)';
-  document.querySelectorAll('.emp-row.hidden-by-team .emp-checkbox:checked').forEach(function(cb) { cb.checked = false; });
-  updateEmpLabel();
-}
+// ── Tab style map ─────────────────────────
+var TAB_MAP = { all:'active-all', TODAY:'active-today', WEEK:'active-week', ASSIGNED:'active-assigned', REVIEW:'active-review', COMPLETED:'active-completed' };
 
-// ── Tab style map ────────────────────────────────────────────────
-var TAB_CLS = { all:'f-all', TODAY:'f-today', WEEK:'f-week', ASSIGNED:'f-assigned', REVIEW:'f-processing', COMPLETED:'f-completed' };
-
-// ── Feed filter (tabs) ───────────────────────────────────────────
 function filterFeed(key, btn) {
-  calSelectedDate = null;
-  document.getElementById('datePillLabel').textContent = 'Pick a Date';
+  calSelectedDate=null;
+  document.getElementById('datePillLabel').textContent='Pick a Date';
   document.getElementById('datePillBtn').classList.remove('active');
-  document.getElementById('clearDateBtn').classList.add('hidden');
+  document.getElementById('clearDateBtn').classList.remove('visible');
   closeCalendar();
-
-  document.querySelectorAll('.ftab').forEach(function(t) { t.className = 'ftab'; });
-  if (btn) btn.classList.add(TAB_CLS[key] || 'f-all');
-  applyFilter(key, null);
+  document.querySelectorAll('.ftab').forEach(function(t){t.className='ftab';});
+  if (btn) btn.classList.add(TAB_MAP[key]||'active-all');
+  applyFilter(key,null);
 }
 
-// ── Clear date ───────────────────────────────────────────────────
 function clearDateFilter() {
-  calSelectedDate = null;
-  document.getElementById('datePillLabel').textContent = 'Pick a Date';
+  calSelectedDate=null;
+  document.getElementById('datePillLabel').textContent='Pick a Date';
   document.getElementById('datePillBtn').classList.remove('active');
-  document.getElementById('clearDateBtn').classList.add('hidden');
+  document.getElementById('clearDateBtn').classList.remove('visible');
   closeCalendar();
-
-  document.querySelectorAll('.ftab').forEach(function(t) { t.className = 'ftab'; });
-  document.getElementById('tabToday').classList.add('f-today');
-  applyFilter('TODAY', null);
+  document.querySelectorAll('.ftab').forEach(function(t){t.className='ftab';});
+  document.getElementById('tabToday').classList.add('active-today');
+  applyFilter('TODAY',null);
 }
 
-// ── Core filter logic ────────────────────────────────────────────
 function applyFilter(key, dateVal) {
-  var cards   = document.querySelectorAll('.task-card');
-  var visible = 0;
-  cards.forEach(function(c) {
+  var cards=document.querySelectorAll('.task-card'), visible=0;
+  cards.forEach(function(c){
     var show;
-    switch (key) {
-      case 'all':      show = true; break;
-      case 'TODAY':    show = c.dataset.today === '1'; break;
-      case 'WEEK':     show = c.dataset.week  === '1'; break;
-      case 'DATE':     show = c.dataset.assignedDate === dateVal; break;
-      default:         show = c.dataset.filter === key; break;
+    switch(key){
+      case 'all':    show=true; break;
+      case 'TODAY':  show=c.dataset.today==='1'; break;
+      case 'WEEK':   show=c.dataset.week==='1'; break;
+      case 'DATE':   show=c.dataset.assignedDate===dateVal; break;
+      default:       show=c.dataset.filter===key; break;
     }
-    c.style.display = show ? '' : 'none';
-    if (show) visible++;
+    c.style.display=show?'':'none';
+    if(show) visible++;
   });
-
-  var feed  = document.getElementById('taskFeed');
-  var empty = document.getElementById('feedEmpty');
-  if (visible === 0 && !empty) {
-    var el = document.createElement('div');
-    el.id = 'feedEmpty';
-    el.className = 'bg-white rounded-xl border border-slate-200 px-6 py-10 text-center text-slate-400 text-sm';
-    var msg = key === 'TODAY' ? 'No tasks assigned today.'
-            : key === 'DATE'  ? 'No tasks found for the selected date.'
-            : 'No tasks match this filter.';
-    el.innerHTML = '<i class="fa-solid fa-filter-circle-xmark text-3xl mb-2 block"></i>' + msg;
+  var feed=document.getElementById('taskFeed');
+  var empty=document.getElementById('feedEmpty');
+  if(visible===0&&!empty){
+    var el=document.createElement('div'); el.id='feedEmpty'; el.className='empty-state';
+    el.style.gridColumn='1/-1';
+    var msg=key==='TODAY'?'No tasks assigned today.':key==='DATE'?'No tasks on this date.':'No tasks match this filter.';
+    el.innerHTML='<i class="fa-solid fa-filter-circle-xmark"></i><p>'+msg+'</p>';
     feed.appendChild(el);
-  } else if (visible > 0 && empty) {
-    empty.remove();
-  }
+  } else if(visible>0&&empty) empty.remove();
+  var vc=document.getElementById('visibleCount');
+  if(vc) vc.textContent=visible+' task'+(visible!==1?'s':'');
 }
 
-// ── Count pills + default tab ────────────────────────────────────
-(function initCounts() {
-  var counts = { all:0, TODAY:0, WEEK:0, ASSIGNED:0, REVIEW:0, COMPLETED:0 };
-  document.querySelectorAll('.task-card').forEach(function(c) {
+// ── Init ─────────────────────────────────
+(function initCounts(){
+  var counts={all:0,TODAY:0,WEEK:0,ASSIGNED:0,REVIEW:0,COMPLETED:0};
+  document.querySelectorAll('.task-card').forEach(function(c){
     counts.all++;
-    if (c.dataset.today === '1') counts.TODAY++;
-    if (c.dataset.week  === '1') counts.WEEK++;
-    var k = c.dataset.filter;
-    if (counts[k] != null) counts[k]++;
+    if(c.dataset.today==='1') counts.TODAY++;
+    if(c.dataset.week==='1')  counts.WEEK++;
+    var k=c.dataset.filter;
+    if(counts[k]!=null) counts[k]++;
   });
   document.getElementById('fc-all').textContent       = counts.all;
   document.getElementById('fc-today').textContent     = counts.TODAY;
@@ -738,105 +761,29 @@ function applyFilter(key, dateVal) {
   document.getElementById('fc-assigned').textContent  = counts.ASSIGNED;
   document.getElementById('fc-review').textContent    = counts.REVIEW;
   document.getElementById('fc-completed').textContent = counts.COMPLETED;
-
-  var label = document.getElementById('empCountLabel');
-  if (label) {
-    var total = document.querySelectorAll('.emp-row').length;
-    if (total > 0) label.textContent = '(' + total + ' employees)';
-  }
-
-  document.getElementById('tabToday').classList.add('f-today');
-  applyFilter('TODAY', null);
+  document.getElementById('tabToday').classList.add('active-today');
+  applyFilter('TODAY',null);
 })();
 
-// ── Close calendar on outside click ─────────────────────────────
-document.addEventListener('click', function(e) {
-  var wrapper = document.getElementById('calWrapper');
-  if (wrapper && !wrapper.contains(e.target)) closeCalendar();
-
-  var empW = document.getElementById('empDropdownWrapper');
-  if (empW && !empW.contains(e.target)) {
-    document.getElementById('empDropdownPanel').classList.add('hidden');
-    document.getElementById('empChevron').style.transform = 'rotate(0deg)';
-  }
+// close calendar on outside click
+document.addEventListener('click',function(e){
+  var w=document.getElementById('calWrapper');
+  if(w&&!w.contains(e.target)) closeCalendar();
 });
 
-// ── Employee dropdown ────────────────────────────────────────────
-function toggleEmpDropdown() {
-  var panel   = document.getElementById('empDropdownPanel');
-  var chevron = document.getElementById('empChevron');
-  var open    = !panel.classList.contains('hidden');
-  panel.classList.toggle('hidden', open);
-  chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
-}
-
-function updateEmpLabel() {
-  var checked = document.querySelectorAll('.emp-checkbox:checked');
-  var label   = document.getElementById('empDropdownLabel');
-  var val     = document.getElementById('empValidation');
-  if (checked.length === 0) {
-    label.textContent = 'Select employees…'; label.className = 'text-slate-400 text-sm'; val.value = '';
-  } else if (checked.length === 1) {
-    var nameEl = checked[0].closest('label').querySelector('.emp-name');
-    label.textContent = nameEl ? nameEl.textContent.trim() : checked[0].value;
-    label.className = 'text-slate-800 text-sm'; val.value = 'ok';
-  } else {
-    label.textContent = checked.length + ' employees selected';
-    label.className = 'text-slate-800 text-sm'; val.value = 'ok';
-  }
-}
-function localDateISO() {
-  var d = new Date();
-  var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
-  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-}
-function refreshAssignDeadlineMin() {
-  var el = document.getElementById('assignTaskDeadline');
-  if (!el) return;
-  var m = localDateISO();
-  el.min = m;
-  if (el.value && el.value < m) el.value = m;
-}
-document.addEventListener('DOMContentLoaded', function() {
-  refreshAssignDeadlineMin();
-  var dl = document.getElementById('assignTaskDeadline');
-  if (dl) {
-    dl.addEventListener('focus', refreshAssignDeadlineMin);
-    dl.addEventListener('click', refreshAssignDeadlineMin);
-  }
-});
-
-document.getElementById('assignTaskForm').addEventListener('submit', function(e) {
-  refreshAssignDeadlineMin();
-  var dl = document.getElementById('assignTaskDeadline');
-  if (dl && dl.value && dl.min && dl.value < dl.min) {
-    e.preventDefault();
-    if (typeof showToast === 'function') showToast('Deadline cannot be in the past.', 'error');
-    return;
-  }
-  if (!document.querySelectorAll('.emp-checkbox:checked').length) {
-    e.preventDefault();
-    document.getElementById('empDropdownPanel').classList.remove('hidden');
-    document.getElementById('empChevron').style.transform = 'rotate(180deg)';
-    var btn = document.querySelector('#empDropdownWrapper button');
-    btn.classList.add('border-red-400','ring-2','ring-red-300');
-    setTimeout(function(){ btn.classList.remove('border-red-400','ring-2','ring-red-300'); }, 2000);
-  }
-});
-
-// showToast: js/smart-office-toast.js
-(function() {
-  var p = new URLSearchParams(window.location.search);
-  var flash = p.get('taskFlash');
-  if (flash === 'review')                showToast('Task returned — employee can resubmit.', 'success');
-  else if (flash === 'completed')        showToast('Task marked as completed!', 'success');
-  else if (flash === 'alreadyCompleted') showToast('Task was already completed.', 'success');
-  var s = p.get('success'); if (s) showToast(decodeURIComponent(s.replace(/\+/g,' ')), 'success');
-  var err = p.get('error'); if (err) showToast(decodeURIComponent(err.replace(/\+/g,' ')), 'error');
-  if (flash||s||err) {
+// toast flash messages
+(function(){
+  var p=new URLSearchParams(window.location.search);
+  var flash=p.get('taskFlash');
+  if(flash==='review')              showToast('Task returned — employee can resubmit.','success');
+  else if(flash==='completed')      showToast('Task marked as completed!','success');
+  else if(flash==='alreadyCompleted') showToast('Task was already completed.','success');
+  var s=p.get('success'); if(s) showToast(decodeURIComponent(s.replace(/\+/g,' ')),'success');
+  var err=p.get('error'); if(err) showToast(decodeURIComponent(err.replace(/\+/g,' ')),'error');
+  if(flash||s||err){
     p.delete('taskFlash'); p.delete('success'); p.delete('error');
-    var q = p.toString();
-    window.history.replaceState({}, '', window.location.pathname + (q ? '?'+q : ''));
+    var q=p.toString();
+    window.history.replaceState({},'',window.location.pathname+(q?'?'+q:''));
   }
 })();
 </script>
