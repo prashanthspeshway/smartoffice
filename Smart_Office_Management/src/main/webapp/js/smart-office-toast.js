@@ -86,7 +86,7 @@
       hideToast(el);
       timer = null;
     }, DURATION_MS);
-  }
+  }	
 
   function hideToast(el) {
     if (!el) return;

@@ -492,12 +492,49 @@ to {
 			}
 		}
 		document.addEventListener('DOMContentLoaded', function() {
-			var params = new URLSearchParams(window.location.search);
-			var err = params.get('error');
-			if (err === 'OnLeave' || err === 'Weekend' || err === 'Holiday' || err === 'HolidayBreak') {
-				showAttendanceDisabledToast();
-				window.history.replaceState({}, document.title, window.location.pathname);
-			}
+		    var params = new URLSearchParams(window.location.search);
+		    var err = params.get('error');
+		    var success = params.get('success');
+
+		    function toast(msg, type) {
+		        if (window.parent && window.parent !== window && typeof window.parent.showToast === 'function') {
+		            window.parent.showToast(msg, type, 'left');
+		        } else {
+		            alert(msg);
+		        }
+		    }
+
+		    if (success === 'PunchIn') {
+		        toast('Punched in successfully!', 'success');
+		        window.history.replaceState({}, document.title, window.location.pathname);
+		    } else if (success === 'PunchOut') {
+		        toast('Punched out successfully!', 'success');
+		        window.history.replaceState({}, document.title, window.location.pathname);
+		    } else if (success === 'breakstart') {
+		        toast('Break started. Enjoy your break!', 'info');
+		        window.history.replaceState({}, document.title, window.location.pathname);
+		    } else if (success === 'breakend') {
+		        toast('Break ended. Welcome back!', 'success');
+		        window.history.replaceState({}, document.title, window.location.pathname);
+		    } else if (err === 'OnLeave' || err === 'Weekend' || err === 'Holiday' || err === 'HolidayBreak') {
+		        showAttendanceDisabledToast();
+		        window.history.replaceState({}, document.title, window.location.pathname);
+		    } else if (err === 'NotPunchedIn') {
+		        toast('Please punch in before starting a break.', 'error');
+		        window.history.replaceState({}, document.title, window.location.pathname);
+		    } else if (err === 'AlreadyPunchedOut') {
+		        toast('You have already punched out for today.', 'error');
+		        window.history.replaceState({}, document.title, window.location.pathname);
+		    } else if (err === 'AlreadyOnBreak') {
+		        toast('You are already on a break.', 'error');
+		        window.history.replaceState({}, document.title, window.location.pathname);
+		    } else if (err === 'NotOnBreak') {
+		        toast('No active break found to end.', 'error');
+		        window.history.replaceState({}, document.title, window.location.pathname);
+		    } else if (err === 'AttendanceError') {
+		        toast('Something went wrong. Please try again.', 'error');
+		        window.history.replaceState({}, document.title, window.location.pathname);
+		    }
 		});
 
 		// ── Pagination ──────────────────────────────────────────────────────────────

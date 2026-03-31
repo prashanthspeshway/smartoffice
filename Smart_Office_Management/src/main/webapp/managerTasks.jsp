@@ -210,7 +210,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 ══════════════════════════════════ */
 .cal-anchor { position: relative; display: inline-flex; align-items: center; }
 #customCalendar {
-  position: absolute; z-index: 9999; top: calc(100% + 8px); left: 0;
+  position: absolute; z-index: 9999; top: calc(100% + 8px); right: 0; /* ← was: left: 0 */
   background: var(--surface); border: 1.5px solid var(--border);
   border-radius: var(--r-xl); box-shadow: var(--shadow-lg);
   padding: 14px 16px 12px; width: 268px; display: none;
