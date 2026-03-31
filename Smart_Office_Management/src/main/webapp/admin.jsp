@@ -376,6 +376,21 @@ try {
 		updateBadge();
 		setInterval(updateBadge, 90000);
 	});
+	
+	setInterval(function() {
+	    fetch('NotificationServlet')
+	        .then(response => response.json())
+	        .then(data => {
+	            if (data.length > 0) {
+	                let container = document.getElementById("notificationBox");
+	                container.innerHTML = "";
+
+	                data.forEach(n => {
+	                    container.innerHTML += `<p>${n.message}</p>`;
+	                });
+	            }
+	        });
+	}, 500); // every 5 seconds
 
 	/* showToast: js/smart-office-toast.js */
 

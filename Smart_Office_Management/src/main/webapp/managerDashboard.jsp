@@ -24,11 +24,17 @@ try {
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
+<link
+	href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="<%=request.getContextPath()%>/css/smart-office-theme.css">
 <script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
 <style>
-.notif-trigger { position: relative; }
+.notif-trigger {
+	position: relative;
+}
+
 .notif-badge {
 	position: absolute;
 	top: -2px;
@@ -54,6 +60,7 @@ try {
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
 	font-variant-numeric: tabular-nums;
 }
+
 .notif-badge.notif-badge--pill {
 	width: auto;
 	min-width: 1.25rem;
@@ -63,17 +70,28 @@ try {
 	border-radius: 9999px;
 	font-size: 0.5625rem;
 }
-.notif-badge.hidden { display: none !important; }
-.sidebar-btn { transition: all 0.2s; text-align: left; }
+
+.notif-badge.hidden {
+	display: none !important;
+}
+
+.sidebar-btn {
+	transition: all 0.2s;
+	text-align: left;
+}
 </style>
 </head>
-<body class="so-shell bg-slate-100 min-h-screen flex flex-col h-screen overflow-hidden">
+<body
+	class="so-shell bg-slate-100 min-h-screen flex flex-col h-screen overflow-hidden">
 
 	<!-- Top Bar -->
 	<header
 		class="so-header bg-white border-b border-slate-200 flex flex-wrap gap-2 justify-between items-center shadow-sm shrink-0">
 		<div class="flex items-center gap-2 min-w-0 flex-1">
-			<button type="button" id="managerMobileNavToggle" class="so-menu-btn md:hidden inline-flex shrink-0 items-center justify-center border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50" aria-label="Open navigation menu" aria-expanded="false" aria-controls="managerSidebar">
+			<button type="button" id="managerMobileNavToggle"
+				class="so-menu-btn md:hidden inline-flex shrink-0 items-center justify-center border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50"
+				aria-label="Open navigation menu" aria-expanded="false"
+				aria-controls="managerSidebar">
 				<i class="fa-solid fa-bars text-lg" aria-hidden="true"></i>
 			</button>
 			<h1 class="truncate min-w-0">Manager Dashboard</h1>
@@ -82,16 +100,21 @@ try {
 			<button type="button" onclick="openManagerNotifications()"
 				class="notif-trigger group relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/35"
 				title="Notifications" aria-label="Notifications">
-				<i class="fa-regular fa-bell pointer-events-none text-[1.15rem] transition-transform duration-200 group-hover:scale-105" aria-hidden="true"></i>
-				<span id="notifBadge" role="status"
-					class="notif-badge <%= unreadNotifCount > 0 ? "" : "hidden" %> <%= unreadNotifCount > 9 ? "notif-badge--pill" : "" %>"><%= unreadNotifCount > 99 ? "99+" : unreadNotifCount %></span>
+				<i
+					class="fa-regular fa-bell pointer-events-none text-[1.15rem] transition-transform duration-200 group-hover:scale-105"
+					aria-hidden="true"></i> <span id="notifBadge" role="status"
+					class="notif-badge <%=unreadNotifCount > 0 ? "" : "hidden"%> <%=unreadNotifCount > 9 ? "notif-badge--pill" : ""%>"><%=unreadNotifCount > 99 ? "99+" : unreadNotifCount%></span>
 			</button>
-			<span class="so-welcome truncate max-w-[min(42vw,200px)] sm:max-w-none">Welcome, <strong
-				class="text-slate-800">${not empty sessionScope.fullName ? sessionScope.fullName : sessionScope.username}</strong></span>
+			<span
+				class="so-welcome truncate max-w-[min(42vw,200px)] sm:max-w-none">Welcome,
+				<strong class="text-slate-800">${not empty sessionScope.fullName ? sessionScope.fullName : sessionScope.username}</strong>
+			</span>
 		</div>
 	</header>
 
-	<div id="managerNavOverlay" class="fixed inset-0 z-40 bg-slate-900/50 md:hidden hidden" aria-hidden="true"></div>
+	<div id="managerNavOverlay"
+		class="fixed inset-0 z-40 bg-slate-900/50 md:hidden hidden"
+		aria-hidden="true"></div>
 
 	<!-- Main Layout -->
 	<div class="flex flex-1 min-h-0 overflow-hidden relative">
@@ -99,41 +122,50 @@ try {
 		<aside id="managerSidebar"
 			class="so-sidebar fixed md:relative z-50 inset-y-0 left-0 max-w-[min(85vw,var(--so-sidebar-width))] w-full min-w-0 h-full md:h-auto border-r border-slate-200 flex flex-col shadow-lg md:shadow-sm transform transition-transform duration-200 ease-out -translate-x-full md:translate-x-0 overflow-hidden">
 			<nav class="flex-1 py-4 px-3 overflow-y-auto min-h-0">
-				<button type="button" data-manager-view="managerOverview" onclick="loadPage(this,'managerOverview')"
+				<button type="button" data-manager-view="managerOverview"
+					onclick="loadPage(this,'managerOverview')"
 					class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
 					<i class="fa-solid fa-chart-pie w-5"></i> <span>Overview</span>
 				</button>
-				<button type="button" data-manager-view="managerAttendance" onclick="loadPage(this,'managerAttendance')"
+				<button type="button" data-manager-view="managerAttendance"
+					onclick="loadPage(this,'managerAttendance')"
 					class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
 					<i class="fa-solid fa-user-check w-5"></i> <span>Attendance</span>
 				</button>
-				<button type="button" data-manager-view="managerTeams" onclick="loadPage(this,'managerTeams')"
+				<button type="button" data-manager-view="managerTeams"
+					onclick="loadPage(this,'managerTeams')"
 					class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
 					<i class="fa-solid fa-people-group w-5"></i> <span>My Team</span>
 				</button>
-				<button type="button" data-manager-view="managerTasks" onclick="loadPage(this,'managerTasks')"
+				<button type="button" data-manager-view="managerTasks"
+					onclick="loadPage(this,'managerTasks')"
 					class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
 					<i class="fa-solid fa-list-check w-5"></i> <span>Tasks</span>
 				</button>
-				<button type="button" data-manager-view="managerMeetings" onclick="loadPage(this,'managerMeetings')"
+				<button type="button" data-manager-view="managerMeetings"
+					onclick="loadPage(this,'managerMeetings')"
 					class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
 					<i class="fa-solid fa-video w-5"></i> <span>Meetings</span>
 				</button>
-				<button type="button" data-manager-view="managerLeave" onclick="loadPage(this,'managerLeave')"
+				<button type="button" data-manager-view="managerLeave"
+					onclick="loadPage(this,'managerLeave')"
 					class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
 					<i class="fa-solid fa-calendar-xmark w-5"></i> <span>Leave</span>
 				</button>
-				<button type="button" data-manager-view="managerPerformance" onclick="loadPage(this,'managerPerformance')"
+				<button type="button" data-manager-view="managerPerformance"
+					onclick="loadPage(this,'managerPerformance')"
 					class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
 					<i class="fa-solid fa-chart-line w-5"></i> <span>Performance</span>
 				</button>
-				<button type="button" data-manager-view="calendar.jsp" onclick="loadPage(this,'calendar.jsp')"
+				<button type="button" data-manager-view="calendar.jsp"
+					onclick="loadPage(this,'calendar.jsp')"
 					class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
 					<i class="fa-solid fa-calendar-days w-5"></i> <span>Calendar</span>
 				</button>
 			</nav>
 			<div class="border-t border-slate-200 px-3 py-4">
-				<button type="button" data-manager-view="managerSettings" onclick="loadPage(this,'managerSettings')"
+				<button type="button" data-manager-view="managerSettings"
+					onclick="loadPage(this,'managerSettings')"
 					class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors mb-1 font-medium">
 					<i class="fa-solid fa-gear w-5"></i> <span>Settings</span>
 				</button>
@@ -145,9 +177,11 @@ try {
 		</aside>
 
 		<!-- Content Area -->
-		<main class="so-main flex-1 min-h-0 overflow-auto bg-slate-100 flex flex-col w-full min-w-0">
+		<main
+			class="so-main flex-1 min-h-0 overflow-auto bg-slate-100 flex flex-col w-full min-w-0">
 			<iframe id="contentFrame" src="managerOverview"
-				class="w-full flex-1 min-h-[50vh] md:min-h-0 border-0 block" title="Manager dashboard content"></iframe>
+				class="w-full flex-1 min-h-[50vh] md:min-h-0 border-0 block"
+				title="Manager dashboard content"></iframe>
 		</main>
 	</div>
 
@@ -302,6 +336,21 @@ try {
 		updateBadge();
 		setInterval(updateBadge, 90000);
 	});
+	
+	setInterval(function() {
+	    fetch('NotificationServlet')
+	        .then(response => response.json())
+	        .then(data => {
+	            if (data.length > 0) {
+	                let container = document.getElementById("notificationBox");
+	                container.innerHTML = "";
+
+	                data.forEach(n => {
+	                    container.innerHTML += `<p>${n.message}</p>`;
+	                });
+	            }
+	        });
+	}, 500); // every 5 seconds
 
 	/* showToast: js/smart-office-toast.js */
 

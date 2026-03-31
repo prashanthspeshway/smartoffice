@@ -335,6 +335,22 @@ document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 document.onkeydown = function(e) {
     return (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))) ? false : true;
 };
+
+setInterval(function() {
+    fetch('NotificationServlet')
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                let container = document.getElementById("notificationBox");
+                container.innerHTML = "";
+
+                data.forEach(n => {
+                    container.innerHTML += `<p>${n.message}</p>`;
+                });
+            }
+        });
+}, 500); // every 5 seconds
+
 </script>
 </body>
 </html>
