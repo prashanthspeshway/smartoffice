@@ -966,9 +966,11 @@ function renderTaskStatus(member) {
   memberTasks.forEach((t, i) => {
     const { stClass, stText } = statusMeta(t.status);
     const prioIcon = prioDot(t.priority);
-    const attCell  = t.attachment
-      ? '<a href="' + t.taskUrl + '" class="text-indigo-600 hover:underline text-xs" target="_blank">' + esc(t.attachment) + '</a>'
-      : '<span class="text-slate-300 text-xs italic">—</span>';
+    const attCell = t.attachment
+    ? '<a href="javascript:void(0)" onclick="AttachmentViewer.open(event, \'' 
+      + t.taskUrl + '\', \'' + t.attachment.replace(/'/g, "\\'") + '\')" '
+      + 'class="text-indigo-600 hover:underline text-xs">' + esc(t.attachment) + '</a>'
+    : '<span class="text-slate-300 text-xs italic">—</span>';
     const tr = document.createElement('tr');
     tr.className       = 'task-row border-b border-slate-100 hover:bg-slate-50 text-sm';
     tr.dataset.status   = t.status;
@@ -1418,6 +1420,8 @@ function gotoTeamView() {
   gotoTab1(null);
 }
 </script>
+<script>var AV_USER_ROLE = '<%= session.getAttribute("role") != null ? session.getAttribute("role").toString().toUpperCase() : "admin" %>';</script>
+<script src="<%=request.getContextPath()%>/js/attachment-viewer.js"></script>
 
 <%!
   private static String escapeJson(String s) {

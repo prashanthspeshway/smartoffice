@@ -37,14 +37,20 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
     </div>
     <%} else { for (Task t : tasks) {
         String rawSt = t.getStatus() != null ? t.getStatus().trim() : "";
-        boolean isCompleted = "COMPLETED".equalsIgnoreCase(rawSt);
+        boolean isCompleted  = "COMPLETED".equalsIgnoreCase(rawSt);
         boolean isProcessing = "PROCESSING".equalsIgnoreCase(rawSt) || "SUBMITTED".equalsIgnoreCase(rawSt);
-        String priorityCls = "HIGH".equalsIgnoreCase(t.getPriority()) ? "text-red-500"
-            : "LOW".equalsIgnoreCase(t.getPriority()) ? "text-emerald-500" : "text-amber-500";
+        String priorityCls = "HIGH".equalsIgnoreCase(t.getPriority())  ? "text-red-500"
+                           : "LOW".equalsIgnoreCase(t.getPriority())   ? "text-emerald-500"
+                           : "text-amber-500";
         String statusLabel = isCompleted ? "Completed" : (isProcessing ? "Processing" : "Assigned");
+        // ── safe filename for JS string ──
+        String safeAttName = t.getAttachmentName() != null
+            ? t.getAttachmentName().replace("\\","\\\\").replace("'","\\'").replace("\"","\\\"")
+            : "";
     %>
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6" id="task-card-<%=t.getId()%>">
         <div class="flex flex-col md:flex-row md:items-start gap-6">
+
             <!-- Left: Task Info -->
             <div class="flex-1 min-w-0">
                 <div class="flex items-start gap-3 mb-3">
@@ -56,26 +62,31 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
                         <p class="text-sm text-slate-500 mt-0.5"><%=t.getDescription()%></p>
                     </div>
                 </div>
+
                 <div class="flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-500 ml-13">
                     <span><i class="fa-solid fa-calendar mr-1"></i>Deadline: <strong class="text-slate-700"><%=t.getDeadline() != null ? t.getDeadline().toString() : "--"%></strong></span>
                     <span><i class="fa-solid fa-flag mr-1 <%=priorityCls%>"></i>Priority: <strong class="<%=priorityCls%>"><%=t.getPriority() != null ? t.getPriority() : "MEDIUM"%></strong></span>
                     <span><i class="fa-solid fa-user mr-1"></i>By: <strong class="text-slate-700"><%=t.getAssignedBy()%></strong></span>
                 </div>
+
                 <div class="mt-3 ml-13 text-sm">
                     <span class="text-slate-500">Status:</span>
                     <span class="font-semibold text-slate-800 ml-1"><%=statusLabel%></span>
                 </div>
+
+                <%-- ── Attachment: open in viewer instead of downloading ── --%>
                 <%if (t.getAttachmentName() != null && !t.getAttachmentName().isEmpty()) {%>
                 <div class="mt-3 ml-13">
-                    <a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>" target="_blank"
-                       class="inline-flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-800 font-medium border border-indigo-200 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors">
-                        <i class="fa-solid fa-paperclip"></i> <%=t.getAttachmentName()%>
+                    <a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
+                       onclick="AttachmentViewer.open(event, this.href, '<%=safeAttName%>'); return false;"
+                       class="inline-flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-800 font-medium border border-indigo-200 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+                        <i class="fa-solid fa-eye"></i> <%=t.getAttachmentName()%>
                     </a>
                 </div>
                 <%}%>
             </div>
 
-            <!-- Right: Request form (hidden when completed; read-only when processing) -->
+            <!-- Right: Request form -->
             <div class="w-full md:w-72 flex-shrink-0 space-y-3">
                 <% if (isCompleted) { %>
                 <p class="text-sm text-slate-500 text-center py-2">This task is completed.</p>
@@ -88,14 +99,17 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
                     <i class="fa-solid fa-spinner mr-1"></i> Processing
                 </button>
                 <% } else { %>
-                <input type="file" id="file-<%=t.getId()%>" accept="*/*" class="w-full text-xs text-slate-500 border border-slate-200 rounded-lg px-3 py-2 bg-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-indigo-50 file:text-indigo-600 file:font-medium cursor-pointer">
-                <textarea id="comment-<%=t.getId()%>" placeholder="Add a comment…" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300" rows="2"></textarea>
+                <input type="file" id="file-<%=t.getId()%>" accept="*/*"
+                    class="w-full text-xs text-slate-500 border border-slate-200 rounded-lg px-3 py-2 bg-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-indigo-50 file:text-indigo-600 file:font-medium cursor-pointer">
+                <textarea id="comment-<%=t.getId()%>" placeholder="Add a comment…"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300" rows="2"></textarea>
                 <button onclick="submitTaskRequest(<%=t.getId()%>, this)" type="button"
                     class="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors disabled:opacity-50">
                     <i class="fa-solid fa-paper-plane mr-1"></i> Submit Request
                 </button>
                 <% } %>
             </div>
+
         </div>
     </div>
     <%}}%>
@@ -114,22 +128,20 @@ function submitTaskRequest(taskId, btn) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Submitting…';
 
-    fetch('<%=request.getContextPath()%>/submitTaskUpdate', { method: 'POST', body: formData, credentials: 'same-origin' })
-    .then(function (res) {
+    fetch('<%=request.getContextPath()%>/submitTaskUpdate', { method:'POST', body:formData, credentials:'same-origin' })
+    .then(function(res) {
         if (res.ok) {
             btn.innerHTML = '<i class="fa-solid fa-hourglass-half mr-1"></i> Processing';
-            btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
-            btn.classList.add('bg-slate-200', 'text-slate-600', 'cursor-not-allowed');
-            showToast('Request submitted', 'success');
-            setTimeout(function () { window.location.reload(); }, 600);
+            btn.classList.remove('bg-indigo-600','hover:bg-indigo-700');
+            btn.classList.add('bg-slate-200','text-slate-600','cursor-not-allowed');
+            showToast('Request submitted','success');
+            setTimeout(function(){ window.location.reload(); }, 600);
             return;
         }
-        return res.text().then(function (t) {
-            showToast(t || ('Request failed (' + res.status + ')'), 'error');
-        });
+        return res.text().then(function(t){ showToast(t||('Request failed (' + res.status + ')'),'error'); });
     })
-    .catch(function () { showToast('Network error. Try again.', 'error'); })
-    .finally(function () {
+    .catch(function(){ showToast('Network error. Try again.','error'); })
+    .finally(function(){
         if (!btn.classList.contains('cursor-not-allowed')) {
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i> Submit Request';
@@ -137,5 +149,8 @@ function submitTaskRequest(taskId, btn) {
     });
 }
 </script>
+
+<script>var AV_USER_ROLE = '<%= session.getAttribute("role") != null ? session.getAttribute("role").toString().toUpperCase() : "employee" %>';</script>
+<script src="<%=request.getContextPath()%>/js/attachment-viewer.js"></script>
 </body>
 </html>

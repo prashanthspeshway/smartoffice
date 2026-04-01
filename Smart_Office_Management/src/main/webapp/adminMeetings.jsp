@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List, com.smartoffice.model.*, java.text.SimpleDateFormat" %>
+<%@ page import="java.util.List, com.smartoffice.model.*, java.text.SimpleDateFormat, java.util.Date" %>
 <%
     List<Meeting> meetings = (List<Meeting>) request.getAttribute("meetings");
     List<User> users       = (List<User>)   request.getAttribute("users");
@@ -14,6 +14,8 @@
 
     String safeSuccess = success != null ? success.replace("&","&amp;").replace("\"","&quot;") : "";
     String safeError   = error   != null ? error.replace("&","&amp;").replace("\"","&quot;")   : "";
+
+    Date now = new Date();
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,7 +74,6 @@ body {
     margin-bottom: 32px; flex-wrap: wrap;
 }
 .page-title {
-    font-family: 'Geist', system-ui, sans-serif;
     font-size: 28px; font-weight: 600; color: var(--text);
     display: flex; align-items: center; gap: 10px; line-height: 1.2;
 }
@@ -140,16 +141,29 @@ body {
 }
 .meeting-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
 
+/* Live card gets a green left border */
+.meeting-card.live {
+    border-left: 4px solid var(--success);
+}
+/* Upcoming card gets accent left border */
+.meeting-card.upcoming {
+    border-left: 4px solid var(--accent);
+}
+
 .meeting-card-top {
     padding: 18px 20px 14px;
     border-bottom: 1px solid var(--border);
     background: linear-gradient(135deg, var(--accent-light) 0%, #f0f4ff 100%);
+}
+.meeting-card.live .meeting-card-top {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
 }
 .meeting-card-title {
     font-size: 15px; font-weight: 700; color: var(--text);
     display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px;
 }
 .meeting-card-title i { color: var(--accent); margin-top: 2px; flex-shrink: 0; }
+.meeting-card.live .meeting-card-title i { color: var(--success); }
 
 .time-badge {
     display: inline-flex; align-items: center; gap: 6px;
@@ -157,6 +171,33 @@ body {
     border-radius: var(--radius-full);
     padding: 4px 12px; font-size: 12px; font-weight: 600;
     color: var(--accent);
+}
+
+/* ── Status badge (LIVE / UPCOMING) ── */
+.status-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: var(--radius-full);
+    font-size: 11px; font-weight: 700; letter-spacing: .5px;
+    text-transform: uppercase; margin-left: 8px;
+}
+.status-badge.live {
+    background: var(--success-light); color: #15803d;
+    border: 1px solid #86efac;
+}
+.status-badge.upcoming {
+    background: var(--accent-light); color: var(--accent);
+    border: 1px solid #c7d3fd;
+}
+/* Pulsing dot for live */
+.live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--success);
+    animation: pulse 1.4s ease-in-out infinite;
+    display: inline-block;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: .4; transform: scale(.7); }
 }
 
 .meeting-card-body { padding: 16px 20px; flex: 1; }
@@ -173,6 +214,7 @@ body {
     font-size: 12px; font-weight: 600;
 }
 .meta-chip.purple { background: var(--purple-light); color: var(--purple); }
+.meta-chip.green  { background: var(--success-light); color: #15803d; }
 
 .meeting-card-footer {
     padding: 12px 20px; border-top: 1px solid var(--border);
@@ -187,6 +229,10 @@ body {
     transition: background .15s;
 }
 .meeting-link-btn:hover { background: #dde5fd; }
+.meeting-link-btn.live {
+    background: var(--success-light); color: #15803d;
+}
+.meeting-link-btn.live:hover { background: #bbf7d0; }
 
 /* ── Empty state ── */
 .empty-state {
@@ -204,7 +250,6 @@ body {
     justify-content: space-between; margin-bottom: 20px;
 }
 .section-title {
-    font-family: 'Geist', system-ui, sans-serif;
     font-size: 20px; font-weight: 600; color: var(--text);
     display: flex; align-items: center; gap: 8px;
 }
@@ -230,7 +275,7 @@ body {
     background: linear-gradient(135deg, var(--accent-light), #f0f4ff);
     border-radius: 20px 20px 0 0;
 }
-.modal-title { font-family: 'Geist', system-ui, sans-serif; font-size: 20px; font-weight: 600; color: var(--text); }
+.modal-title { font-size: 20px; font-weight: 600; color: var(--text); }
 .close-btn {
     background: #fff; border: 1px solid var(--border2);
     border-radius: 8px; width: 32px; height: 32px;
@@ -259,24 +304,13 @@ body {
     box-shadow: 0 0 0 3px rgba(79,110,247,.1);
 }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.form-datetime-split {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    align-items: end;
-}
+.form-datetime-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; }
 .form-sublabel {
-    display: block;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text3);
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
+    display: block; font-size: 11px; font-weight: 600;
+    color: var(--text3); margin-bottom: 4px;
+    text-transform: uppercase; letter-spacing: 0.4px;
 }
-@media (max-width: 560px) {
-    .form-row { grid-template-columns: 1fr; }
-}
+@media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } }
 .radio-group { display: flex; flex-direction: column; gap: 8px; }
 .radio-item {
     display: flex; align-items: center; gap: 8px;
@@ -387,22 +421,40 @@ body {
         <% if (meetings == null || meetings.isEmpty()) { %>
         <div class="empty-state">
             <i class="fa-solid fa-calendar-xmark"></i>
-            <h3>No meetings today</h3>
-            <p>Schedule a meeting using the button above</p>
+            <h3>No active meetings today</h3>
+            <p>All meetings for today have ended, or none have been scheduled yet</p>
         </div>
 
         <% } else { %>
         <div class="meetings-grid">
-            <% for (Meeting m : meetings) {
+            <%
+            for (Meeting m : meetings) {
                 String startT = m.getStartTime() != null ? timeFmt.format(m.getStartTime()) : "--";
                 String endT   = m.getEndTime()   != null ? timeFmt.format(m.getEndTime())   : "--";
+
+                // Determine status: live = started but not ended, upcoming = not started yet
+                boolean isLive     = m.getStartTime() != null && m.getEndTime() != null
+                                     && now.after(m.getStartTime()) && now.before(m.getEndTime());
+                boolean isUpcoming = m.getStartTime() != null && now.before(m.getStartTime());
             %>
-            <div class="meeting-card">
+            <div class="meeting-card <%=isLive ? "live" : (isUpcoming ? "upcoming" : "")%>">
+
                 <!-- Top band -->
                 <div class="meeting-card-top">
-                    <div class="meeting-card-title">
-                        <i class="fa-solid fa-video"></i>
-                        <span><%=m.getTitle()%></span>
+                    <div class="meeting-card-title" style="justify-content:space-between;align-items:flex-start;">
+                        <div style="display:flex;align-items:flex-start;gap:8px;">
+                            <i class="fa-solid fa-video"></i>
+                            <span><%=m.getTitle()%></span>
+                        </div>
+                        <% if (isLive) { %>
+                        <span class="status-badge live">
+                            <span class="live-dot"></span> Live
+                        </span>
+                        <% } else if (isUpcoming) { %>
+                        <span class="status-badge upcoming">
+                            <i class="fa-solid fa-clock" style="font-size:9px;"></i> Upcoming
+                        </span>
+                        <% } %>
                     </div>
                     <span class="time-badge">
                         <i class="fa-solid fa-clock"></i>
@@ -416,7 +468,7 @@ body {
                     <p class="meeting-desc"><%=m.getDescription()%></p>
                     <% } %>
                     <div class="meta-row">
-                        <span class="meta-chip">
+                        <span class="meta-chip <%=isLive ? "green" : ""%>">
                             <i class="fa-solid fa-users"></i>
                             <%=m.getParticipantCount()%> participant<%=m.getParticipantCount() != 1 ? "s" : ""%>
                         </span>
@@ -430,8 +482,10 @@ body {
                 <!-- Footer -->
                 <div class="meeting-card-footer">
                     <% if (m.getMeetingLink() != null && !m.getMeetingLink().isEmpty()) { %>
-                    <a href="<%=m.getMeetingLink()%>" target="_blank" class="meeting-link-btn">
-                        <i class="fa-solid fa-video"></i> Join Meeting
+                    <a href="<%=m.getMeetingLink()%>" target="_blank"
+                       class="meeting-link-btn <%=isLive ? "live" : ""%>">
+                        <i class="fa-solid fa-video"></i>
+                        <%=isLive ? "Join Now" : "Join Meeting"%>
                     </a>
                     <% } %>
                     <button class="btn btn-primary btn-sm" onclick="viewParticipants(<%=m.getId()%>)">
@@ -466,7 +520,7 @@ body {
             </button>
         </div>
         <div class="modal-body">
-            <form method="post" action="adminMeetings">
+            <form method="post" action="adminMeetings" id="createMeetingForm">
                 <input type="hidden" name="action" value="create">
 
                 <div class="form-group">
@@ -541,6 +595,7 @@ body {
                     </div>
                 </div>
 
+                <!-- Specific Users Panel -->
                 <div id="specificUsers" class="form-group">
                     <label class="form-label">Select Users</label>
                     <div class="checkbox-group">
@@ -557,9 +612,10 @@ body {
                     </div>
                 </div>
 
-                <div id="teamSelect" class="form-group" style="display:none;">
+                <!-- Team Select Panel — disabled by default, enabled only when "team" radio active -->
+                <div id="teamSelectPanel" class="form-group" style="display:none;">
                     <label class="form-label">Select Team</label>
-                    <select name="teamId" class="form-select">
+                    <select name="teamId" id="teamIdSelect" class="form-select" disabled>
                         <option value="">-- Select Team --</option>
                         <% if (teams != null) for (Team t : teams) { %>
                         <option value="<%=t.getId()%>"><%=t.getName()%></option>
@@ -595,7 +651,7 @@ body {
 </div>
 
 <script>
-/* ── Meeting date + time: separate inputs so type=time min grays past times (datetime-local often does not) ── */
+/* ── Date/time helpers ── */
 function meetingToDateOnly(d) {
     var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
@@ -627,7 +683,6 @@ function composeMeetingHiddenFields() {
     hs.value = (sd.value && st.value) ? (sd.value + 'T' + st.value) : '';
     if (ed && et && he) he.value = (ed.value && et.value) ? (ed.value + 'T' + et.value) : '';
 }
-/** Earliest valid end = start + 1 minute (servlet requires end after start). */
 function meetingMinEndDateTime() {
     var startDt = meetingGetStartDateTime();
     if (!startDt) return new Date(Date.now() + 60 * 1000);
@@ -640,40 +695,28 @@ function meetingParseLocalDatetime(str) {
     var da = parts[0].split('-');
     var ti = parts[1].split(':');
     if (da.length < 3 || ti.length < 2) return null;
-    return new Date(
-        parseInt(da[0], 10),
-        parseInt(da[1], 10) - 1,
-        parseInt(da[2], 10),
-        parseInt(ti[0], 10),
-        parseInt(ti[1], 10),
-        0,
-        0
-    );
+    return new Date(parseInt(da[0],10), parseInt(da[1],10)-1, parseInt(da[2],10),
+                    parseInt(ti[0],10), parseInt(ti[1],10), 0, 0);
 }
-/** Compare calendar minutes (datetime-local has no seconds). */
 function meetingMinuteTs(d) {
     return new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes()).getTime();
 }
-function meetingSameOrAfterMinute(a, b) {
-    return meetingMinuteTs(a) >= meetingMinuteTs(b);
-}
-function meetingAfterMinute(a, b) {
-    return meetingMinuteTs(a) > meetingMinuteTs(b);
-}
+function meetingSameOrAfterMinute(a, b) { return meetingMinuteTs(a) >= meetingMinuteTs(b); }
+function meetingAfterMinute(a, b)       { return meetingMinuteTs(a) >  meetingMinuteTs(b); }
+
 function refreshMeetingDatetimeConstraints() {
     var now = new Date();
     var startDateEl = document.getElementById('meetingStartDate');
     var startTimeEl = document.getElementById('meetingStartTimeOnly');
-    var endDateEl = document.getElementById('meetingEndDate');
-    var endTimeEl = document.getElementById('meetingEndTimeOnly');
+    var endDateEl   = document.getElementById('meetingEndDate');
+    var endTimeEl   = document.getElementById('meetingEndTimeOnly');
     if (!startDateEl || !startTimeEl || !endDateEl || !endTimeEl) return;
 
-    var todayStr = meetingToDateOnly(now);
+    var todayStr   = meetingToDateOnly(now);
     var nowTimeStr = meetingToTimeOnly(now);
 
     startDateEl.min = todayStr;
     if (startDateEl.value && startDateEl.value < todayStr) startDateEl.value = todayStr;
-
     if (startDateEl.value === todayStr) {
         startTimeEl.min = nowTimeStr;
     } else {
@@ -689,18 +732,14 @@ function refreshMeetingDatetimeConstraints() {
 
     endDateEl.min = minEndDateStr;
     if (endDateEl.value && endDateEl.value < minEndDateStr) endDateEl.value = minEndDateStr;
-
     if (endDateEl.value === minEndDateStr) {
         endTimeEl.min = minEndTimeStr;
     } else {
         endTimeEl.removeAttribute('min');
     }
     if (endDateEl.value && endTimeEl.value && endDateEl.value === minEndDateStr) {
-        if (endTimeEl.min && endTimeEl.value < endTimeEl.min) {
-            endTimeEl.value = endTimeEl.min;
-        }
+        if (endTimeEl.min && endTimeEl.value < endTimeEl.min) endTimeEl.value = endTimeEl.min;
     }
-
     composeMeetingHiddenFields();
 }
 
@@ -720,36 +759,42 @@ function openCreateModal() {
         et.value = meetingToTimeOnly(endSuggested);
     }
     refreshMeetingDatetimeConstraints();
+    var specificRadio = document.getElementById('specific');
+    if (specificRadio) specificRadio.checked = true;
+    toggleParticipants();
 }
 function closeCreateModal()       { document.getElementById('createModal').classList.remove('show'); }
 function closeParticipantsModal() { document.getElementById('participantsModal').classList.remove('show'); }
 
+/* ── Participant type toggle with enable/disable fix ── */
 function toggleParticipants() {
     var type = document.querySelector('input[name="participantType"]:checked').value;
-    document.getElementById('specificUsers').style.display = type === 'specific' ? 'block' : 'none';
-    document.getElementById('teamSelect').style.display    = type === 'team'     ? 'block' : 'none';
+    document.getElementById('specificUsers').style.display   = (type === 'specific') ? 'block' : 'none';
+    document.getElementById('teamSelectPanel').style.display = (type === 'team')     ? 'block' : 'none';
+
+    var teamIdSelect = document.getElementById('teamIdSelect');
+    if (teamIdSelect) {
+        teamIdSelect.disabled = (type !== 'team');
+        if (type !== 'team') teamIdSelect.value = '';
+    }
+    var checkboxes = document.querySelectorAll('#specificUsers input[type="checkbox"]');
+    checkboxes.forEach(function(cb) {
+        cb.disabled = (type !== 'specific');
+        if (type !== 'specific') cb.checked = false;
+    });
 }
 
-/* ── ✅ Participants via JSON — no page navigation ── */
+/* ── Participants viewer ── */
 function viewParticipants(meetingId) {
     var list = document.getElementById('participantsList');
-
-    // Show spinner immediately
     list.innerHTML =
         '<div style="text-align:center;padding:32px;">' +
         '<i class="fa-solid fa-spinner fa-spin" style="color:var(--accent);font-size:28px;"></i>' +
         '<p style="margin-top:12px;font-size:13px;color:var(--text3);">Loading participants…</p>' +
         '</div>';
-
-    // Open modal straight away so spinner is visible
     document.getElementById('participantsModal').classList.add('show');
-
-    // ✅ Calls action=participants → servlet returns clean JSON
     fetch('adminMeetings?action=participants&id=' + meetingId)
-        .then(function(res) {
-            if (!res.ok) throw new Error('Network error');
-            return res.json();
-        })
+        .then(function(res) { if (!res.ok) throw new Error('Network error'); return res.json(); })
         .then(function(data) {
             if (!data || data.length === 0) {
                 list.innerHTML =
@@ -761,12 +806,8 @@ function viewParticipants(meetingId) {
             }
             var html = '<div class="participants-list">';
             data.forEach(function(p) {
-                html +=
-                    '<div class="participant-chip">' +
-                    '<i class="fa-solid fa-user"></i>' +
-                    '<span>' + p.name + '</span>' +
-                    '<span class="role">(' + p.role + ')</span>' +
-                    '</div>';
+                html += '<div class="participant-chip"><i class="fa-solid fa-user"></i>' +
+                        '<span>' + p.name + '</span><span class="role">(' + p.role + ')</span></div>';
             });
             html += '</div>';
             list.innerHTML = html;
@@ -779,8 +820,7 @@ function viewParticipants(meetingId) {
         });
 }
 
-/* showToast: js/smart-office-toast.js */
-
+/* ── DOMContentLoaded ── */
 document.addEventListener('DOMContentLoaded', function() {
     var toast = document.getElementById('toast');
     var s = toast.getAttribute('data-success');
@@ -792,28 +832,37 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.alert').forEach(function(a) { a.style.display = 'none'; });
     }, 5000);
 
+    toggleParticipants();
+
     var sd = document.getElementById('meetingStartDate');
     var st = document.getElementById('meetingStartTimeOnly');
     var ed = document.getElementById('meetingEndDate');
     var et = document.getElementById('meetingEndTimeOnly');
     if (sd && st && ed && et) {
         function bindRefresh(el) {
-            el.addEventListener('input', refreshMeetingDatetimeConstraints);
+            el.addEventListener('input',  refreshMeetingDatetimeConstraints);
             el.addEventListener('change', refreshMeetingDatetimeConstraints);
-            el.addEventListener('focus', refreshMeetingDatetimeConstraints);
+            el.addEventListener('focus',  refreshMeetingDatetimeConstraints);
         }
-        bindRefresh(sd);
-        bindRefresh(st);
-        bindRefresh(ed);
-        bindRefresh(et);
+        bindRefresh(sd); bindRefresh(st); bindRefresh(ed); bindRefresh(et);
 
-        var form = document.querySelector('#createModal form');
+        var form = document.getElementById('createMeetingForm');
         if (form) {
             form.addEventListener('submit', function(ev) {
                 composeMeetingHiddenFields();
                 refreshMeetingDatetimeConstraints();
+
+                var type = document.querySelector('input[name="participantType"]:checked').value;
+                if (type === 'team') {
+                    var teamVal = document.getElementById('teamIdSelect').value;
+                    if (!teamVal || teamVal === '') {
+                        ev.preventDefault();
+                        showToast('Please select a team before scheduling the meeting.', 'error');
+                        return;
+                    }
+                }
                 var now = new Date();
-                var sv = meetingGetStartDateTime();
+                var sv  = meetingGetStartDateTime();
                 var evd = meetingGetEndDateTime();
                 if (!sv || !evd) return;
                 if (!meetingSameOrAfterMinute(sv, now)) {

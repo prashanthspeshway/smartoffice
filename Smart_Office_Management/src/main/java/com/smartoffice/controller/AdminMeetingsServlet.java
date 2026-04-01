@@ -181,9 +181,10 @@ public class AdminMeetingsServlet extends HttpServlet {
                     break;
                 case "team":
                     String teamIdStr = req.getParameter("teamId");
-                    if (teamIdStr != null && !teamIdStr.isEmpty())
-                        participantEmails.addAll(
-                                meetingDao.getTeamMemberEmails(Integer.parseInt(teamIdStr)));
+                    if (teamIdStr != null && !teamIdStr.isEmpty()) {
+                        List<String> teamEmails = meetingDao.getTeamMemberEmails(Integer.parseInt(teamIdStr));
+                        participantEmails.addAll(teamEmails);
+                    }
                     break;
                 case "allManagers":
                     participantEmails.addAll(meetingDao.getAllManagerEmails()); break;
