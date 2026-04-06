@@ -135,6 +135,8 @@ public class AttendanceDAO {
 		sortDescending(list);
 	}
 
+	// FIX: Removed isHolidayDate() check — holidays not declared in the system
+	// should still be marked Absent if the employee didn't punch in.
 	private void fillMissingAbsentDays(List<AttendanceLogEntry> list, String sessionValue) throws Exception {
 		Set<LocalDate> existing = new HashSet<>();
 		for (AttendanceLogEntry e : list) {
@@ -158,11 +160,10 @@ public class AttendanceDAO {
 			if (dow == java.time.DayOfWeek.SATURDAY || dow == java.time.DayOfWeek.SUNDAY)
 				continue;
 
-			// Skip holidays
-			if (isHolidayDate(d))
-				continue;
+			// NOTE: Holiday check intentionally removed.
+			// If a day is not declared as a holiday in the system and the employee
+			// did not punch in, it should be marked Absent regardless.
 
-			// It's a working day with no record — mark Absent
 			AttendanceLogEntry e = new AttendanceLogEntry();
 			e.setAttendanceDate(java.sql.Date.valueOf(d));
 			e.setPunchIn(null);
@@ -174,6 +175,7 @@ public class AttendanceDAO {
 		sortDescending(list);
 	}
 
+	// FIX: Removed isHolidayDate() check — same reasoning as fillMissingAbsentDays.
 	private void fillMissingAbsentDaysInRange(List<AttendanceLogEntry> list, String sessionValue, LocalDate rangeStart,
 			LocalDate rangeEnd) throws Exception {
 		Set<LocalDate> existing = new HashSet<>();
@@ -198,8 +200,9 @@ public class AttendanceDAO {
 			if (dow == java.time.DayOfWeek.SATURDAY || dow == java.time.DayOfWeek.SUNDAY)
 				continue;
 
-			if (isHolidayDate(d))
-				continue;
+			// NOTE: Holiday check intentionally removed.
+			// If a day is not declared as a holiday in the system and the employee
+			// did not punch in, it should be marked Absent regardless.
 
 			AttendanceLogEntry e = new AttendanceLogEntry();
 			e.setAttendanceDate(java.sql.Date.valueOf(d));
@@ -369,10 +372,13 @@ public class AttendanceDAO {
 		}
 	}
 
+	// -------------------------------------------------------------------------
+	// END OF DAY JOB — call this from your scheduler every night
+	// -------------------------------------------------------------------------
 	public void runEndOfDayJob() throws Exception {
 		autoCloseMissedPunchOuts();
 		markYesterdayApprovedLeaves();
-		markDailyAbsentees();
+		markDailyAbsenteesWithCatchup(); // replaces old markDailyAbsentees()
 		recalculatePreviousDayStatuses();
 	}
 
@@ -394,38 +400,110 @@ public class AttendanceDAO {
 		}
 	}
 
-	public void markDailyAbsentees() throws Exception {
-		java.time.LocalDate yesterday = java.time.LocalDate.now().minusDays(1);
-		java.time.DayOfWeek dow = yesterday.getDayOfWeek();
-		if (dow == java.time.DayOfWeek.SATURDAY || dow == java.time.DayOfWeek.SUNDAY) {
-			System.out.println("[AttendanceDAO] markDailyAbsentees: skipped (weekend).");
-			return;
-		}
-		String holidayCheck = "SELECT COUNT(*) FROM holidays WHERE holiday_date = CURDATE() - INTERVAL 1 DAY";
-		try (Connection con = DBConnectionUtil.getConnection();
-				PreparedStatement ps = con.prepareStatement(holidayCheck)) {
-			ResultSet rs = ps.executeQuery();
-			if (rs.next() && rs.getInt(1) > 0) {
-				System.out.println("[AttendanceDAO] markDailyAbsentees: skipped (holiday).");
-				return;
+	// -------------------------------------------------------------------------
+	// CATCHUP: Scans every weekday in the past 60 days and writes Absent for
+	// any employee who has no attendance record and no approved leave.
+	//
+	// This handles two scenarios:
+	//   1. Normal nightly run — catches yesterday as usual.
+	//   2. Server was off for N days — catches all missed days on next startup.
+	//
+	// Call this method BOTH from runEndOfDayJob() AND from your startup listener
+	// (ServletContextListener.contextInitialized) so missed days are backfilled
+	// automatically whenever the server comes back online.
+	//
+	// Holiday check is intentionally removed — if a day was not declared as a
+	// holiday in the holidays table, employees who didn't punch are Absent.
+	// Only weekends and approved leaves are excluded.
+	// -------------------------------------------------------------------------
+	public void markDailyAbsenteesWithCatchup() throws Exception {
+		LocalDate today = LocalDate.now();
+		LocalDate cutoff = today.minusDays(60);
+
+		for (LocalDate day = today.minusDays(1); !day.isBefore(cutoff); day = day.minusDays(1)) {
+			java.time.DayOfWeek dow = day.getDayOfWeek();
+			if (dow == java.time.DayOfWeek.SATURDAY || dow == java.time.DayOfWeek.SUNDAY) {
+				continue; // skip weekends
 			}
+			markAbsenteesForDate(day);
+		}
+	}
+
+	// -------------------------------------------------------------------------
+	// Kept for backward compatibility — delegates to catchup version so any
+	// existing scheduler calls to markDailyAbsentees() still work correctly.
+	// -------------------------------------------------------------------------
+	public void markDailyAbsentees() throws Exception {
+		markDailyAbsenteesWithCatchup();
+	}
+
+	// -------------------------------------------------------------------------
+	// Inserts Absent rows for a specific past date for all non-admin employees
+	// who have no attendance record and no approved leave for that date.
+	//
+	// Populates both username AND user_email because your attendance table
+	// has user_email as NOT NULL with no default value — omitting it causes
+	// Error 1364. The users.email column maps to attendance.user_email.
+	// -------------------------------------------------------------------------
+	private void markAbsenteesForDate(LocalDate targetDate) throws Exception {
+		String aCol = getAttendanceUserColumn();
+		java.sql.Date sqlDate = java.sql.Date.valueOf(targetDate);
+
+		// Detect which user-identity columns exist in the attendance table
+		// and build the INSERT column list and SELECT list dynamically.
+		boolean hasUsername  = hasAttendanceColumn("username");
+		boolean hasUserEmail = hasAttendanceColumn("user_email");
+		boolean hasEmail     = hasAttendanceColumn("email");
+
+		StringBuilder colList    = new StringBuilder();
+		StringBuilder selectList = new StringBuilder();
+
+		if (hasUsername) {
+			colList.append("username, ");
+			selectList.append("u.username, ");
+		}
+		if (hasUserEmail) {
+			// attendance.user_email stores the value from users.email
+			colList.append("user_email, ");
+			selectList.append("u.email, ");
+		}
+		if (hasEmail && !hasUserEmail) {
+			colList.append("email, ");
+			selectList.append("u.email, ");
 		}
 
-		String aCol = getAttendanceUserColumn();
-		String userCol = "username".equals(aCol) ? "username" : "email";
+		colList.append("punch_date, status");
+		selectList.append("?, 'Absent'");
 
-		String sql = "INSERT INTO attendance (" + aCol + ", punch_date, status) " + "SELECT u." + userCol
-				+ ", CURDATE() - INTERVAL 1 DAY, 'Absent' " + "FROM users u " + "LEFT JOIN attendance a " + "  ON a."
-				+ aCol + " = u." + userCol + " AND a.punch_date = CURDATE() - INTERVAL 1 DAY "
-				+ "LEFT JOIN leave_requests lr " + "  ON lr.username IN (u.username, u.email) "
+		// Join key: match on the primary user-identity column in attendance
+		String joinUserCol = "username".equals(aCol) ? "username" : "email";
+
+		String sql = "INSERT INTO attendance (" + colList + ") "
+				+ "SELECT " + selectList + " "
+				+ "FROM users u "
+				+ "LEFT JOIN attendance a "
+				+ "  ON a." + aCol + " = u." + joinUserCol
+				+ " AND a.punch_date = ? "
+				+ "LEFT JOIN leave_requests lr "
+				+ "  ON lr.username IN (u.username, u.email) "
 				+ " AND UPPER(lr.status) = 'APPROVED' "
-				+ " AND (CURDATE() - INTERVAL 1 DAY) BETWEEN lr.from_date AND lr.to_date "
-				+ "WHERE LOWER(TRIM(COALESCE(u.role,''))) != 'admin' " + "  AND a.id IS NULL " + "  AND lr.id IS NULL "
-				+ "ON DUPLICATE KEY UPDATE " + "  status = IF(status IS NULL OR status = '', 'Absent', status)";
+				+ " AND ? BETWEEN lr.from_date AND lr.to_date "
+				+ "WHERE LOWER(TRIM(COALESCE(u.role,''))) != 'admin' "
+				+ "  AND a.id IS NULL "
+				+ "  AND lr.id IS NULL "
+				+ "ON DUPLICATE KEY UPDATE "
+				+ "  status = IF(status IS NULL OR status = '', 'Absent', status)";
 
-		try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+		try (Connection con = DBConnectionUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setDate(1, sqlDate); // punch_date value in SELECT
+			ps.setDate(2, sqlDate); // attendance LEFT JOIN condition
+			ps.setDate(3, sqlDate); // leave_requests LEFT JOIN condition
 			int rows = ps.executeUpdate();
-			System.out.println("[AttendanceDAO] markDailyAbsentees: " + rows + " absent row(s) inserted.");
+			if (rows > 0) {
+				System.out.println("[AttendanceDAO] markAbsenteesForDate: "
+						+ rows + " absent row(s) inserted for " + targetDate);
+			}
 		}
 	}
 
@@ -618,8 +696,8 @@ public class AttendanceDAO {
 				list.add(buildLogEntry(rs));
 		}
 		fillMissingLeaveDates(list, sessionValue);
-		fillMissingAbsentDays(list, sessionValue); // ← fills missing Absent days
-		fillMissingWeekendDays(list); // ← fills missing Weekend days
+		fillMissingAbsentDays(list, sessionValue);
+		fillMissingWeekendDays(list);
 		int maxRows = limit <= 0 ? 14 : limit;
 		return list.size() > maxRows ? list.subList(0, maxRows) : list;
 	}
@@ -785,39 +863,41 @@ public class AttendanceDAO {
 		}
 		return list;
 	}
-	
-	private void fillMissingWeekendDays(List<AttendanceLogEntry> list, LocalDate rangeStart, LocalDate rangeEnd) throws Exception {
-	    Set<LocalDate> existing = new HashSet<>();
-	    for (AttendanceLogEntry e : list) {
-	        if (e.getAttendanceDate() != null)
-	            existing.add(e.getAttendanceDate().toLocalDate());
-	    }
 
-	    LocalDate today = LocalDate.now();
+	private void fillMissingWeekendDays(List<AttendanceLogEntry> list, LocalDate rangeStart, LocalDate rangeEnd)
+			throws Exception {
+		Set<LocalDate> existing = new HashSet<>();
+		for (AttendanceLogEntry e : list) {
+			if (e.getAttendanceDate() != null)
+				existing.add(e.getAttendanceDate().toLocalDate());
+		}
 
-	    for (LocalDate d = rangeStart; !d.isAfter(rangeEnd); d = d.plusDays(1)) {
-	        if (d.isAfter(today)) continue; // don't show future dates
-	        java.time.DayOfWeek dow = d.getDayOfWeek();
-	        if (dow != java.time.DayOfWeek.SATURDAY && dow != java.time.DayOfWeek.SUNDAY)
-	            continue; // only weekends
-	        if (existing.contains(d)) continue;
+		LocalDate today = LocalDate.now();
 
-	        AttendanceLogEntry e = new AttendanceLogEntry();
-	        e.setAttendanceDate(java.sql.Date.valueOf(d));
-	        e.setPunchIn(null);
-	        e.setPunchOut(null);
-	        e.setStatus("Weekend");
-	        list.add(e);
-	        existing.add(d);
-	    }
-	    sortDescending(list);
+		for (LocalDate d = rangeStart; !d.isAfter(rangeEnd); d = d.plusDays(1)) {
+			if (d.isAfter(today))
+				continue;
+			java.time.DayOfWeek dow = d.getDayOfWeek();
+			if (dow != java.time.DayOfWeek.SATURDAY && dow != java.time.DayOfWeek.SUNDAY)
+				continue;
+			if (existing.contains(d))
+				continue;
+
+			AttendanceLogEntry e = new AttendanceLogEntry();
+			e.setAttendanceDate(java.sql.Date.valueOf(d));
+			e.setPunchIn(null);
+			e.setPunchOut(null);
+			e.setStatus("Weekend");
+			list.add(e);
+			existing.add(d);
+		}
+		sortDescending(list);
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void fillMissingWeekendDays(List<AttendanceLogEntry> list) throws Exception {
-	    // Use a 60-day window to match fillMissingAbsentDays
-	    LocalDate today = LocalDate.now();
-	    fillMissingWeekendDays(list, today.minusDays(60), today);
+		LocalDate today = LocalDate.now();
+		fillMissingWeekendDays(list, today.minusDays(60), today);
 	}
 
 	public List<TeamAttendance> getAttendanceForEmployeeAndDateRange(int employeeId, LocalDate start, LocalDate end)

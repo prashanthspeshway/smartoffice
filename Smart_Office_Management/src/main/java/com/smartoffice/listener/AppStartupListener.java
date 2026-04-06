@@ -11,6 +11,7 @@ public class AppStartupListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
 
+        // Auto close missed punch-outs from past days
         try {
             new AttendanceDAO().autoCloseMissedPunchOuts();
             System.out.println("[Startup] Missed punch-out cleanup done (past days).");
@@ -18,6 +19,7 @@ public class AppStartupListener implements ServletContextListener {
             System.err.println("[Startup] Auto punch-out cleanup failed: " + e.getMessage());
         }
 
+        // Close orphaned breaks from past days
         try {
             closeOrphanedBreaksFromPastDays();
             System.out.println("[Startup] Orphaned break cleanup done.");
@@ -25,11 +27,21 @@ public class AppStartupListener implements ServletContextListener {
             System.err.println("[Startup] Orphaned break cleanup failed: " + e.getMessage());
         }
 
+        // Ensure MySQL scheduled event exists
         try {
             ensureMySQLScheduledEvent();
             System.out.println("[Startup] MySQL scheduled event verified/created.");
         } catch (Exception e) {
             System.err.println("[Startup] MySQL scheduled event setup failed: " + e.getMessage());
+        }
+
+        // Mark daily absentees with catchup (from new version)
+        try {
+            System.out.println("[Startup] Running attendance catchup...");
+            new AttendanceDAO().markDailyAbsenteesWithCatchup();
+            System.out.println("[Startup] Attendance catchup completed.");
+        } catch (Exception e) {
+            System.err.println("[Startup] Attendance catchup failed: " + e.getMessage());
         }
     }
 
@@ -38,7 +50,7 @@ public class AppStartupListener implements ServletContextListener {
                 + "SET end_time = TIMESTAMP(break_date, '19:30:00'), "
                 + "    duration_seconds = TIMESTAMPDIFF(SECOND, start_time, TIMESTAMP(break_date, '19:30:00')) "
                 + "WHERE end_time IS NULL "
-                + "  AND break_date < CURDATE()";  // strictly past days only
+                + "  AND break_date < CURDATE()";
         try (java.sql.Connection con = com.smartoffice.utils.DBConnectionUtil.getConnection();
              java.sql.PreparedStatement ps = con.prepareStatement(sql)) {
             int rows = ps.executeUpdate();

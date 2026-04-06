@@ -10,53 +10,82 @@ import com.smartoffice.dao.AdminDAO;
 @WebServlet("/adminOverview")
 public class AdminOverviewServlet extends HttpServlet {
 
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		try {
-			AdminDAO dao = new AdminDAO();
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        AdminDAO dao = new AdminDAO();
 
-			int managers = dao.getManagerCount();
-			int employees = dao.getEmployeeCount();
-			int totalStaff = managers + employees;
-			int presentToday = dao.getPresentTodayCount();
-			int absentToday = dao.getAbsentTodayCount();
+        // ── Staff counts ──────────────────────────────────────────────────
+        int managers  = safeInt(() -> dao.getManagerCount());
+        int employees = safeInt(() -> dao.getEmployeeCount());
+        request.setAttribute("managers",   managers);
+        request.setAttribute("employees",  employees);
+        request.setAttribute("totalStaff", managers + employees);
+        request.setAttribute("presentToday", safeInt(() -> dao.getPresentTodayCount()));
+        request.setAttribute("absentToday",  safeInt(() -> dao.getAbsentTodayCount()));
 
-			request.setAttribute("managers", managers);
-			request.setAttribute("employees", employees);
-			request.setAttribute("totalStaff", totalStaff);
-			request.setAttribute("presentToday", presentToday);
-			request.setAttribute("absentToday", absentToday);
+        // ── Insight row 1 ─────────────────────────────────────────────────
+        request.setAttribute("attendanceRate", safeInt(() -> dao.getAttendanceRate()));
+        request.setAttribute("tasksCompleted", safeInt(() -> dao.getTasksCompletedThisMonth()));
+        request.setAttribute("leavesPending",  safeInt(() -> dao.getLeavesPending()));
+        request.setAttribute("activeTeams",    safeInt(() -> dao.getActiveTeams()));
 
-			request.setAttribute("attendanceRate", dao.getAttendanceRate());
-			request.setAttribute("tasksCompleted", dao.getTasksCompletedThisMonth());
-			request.setAttribute("leavesPending", dao.getLeavesPending());
-			request.setAttribute("activeTeams", dao.getActiveTeams());
+        // ── Insight row 2 ─────────────────────────────────────────────────
+        request.setAttribute("avgWorkHours",      safeStr(() -> dao.getAvgWorkHoursToday(), "0.0"));
+        request.setAttribute("lateArrivals",      safeInt(() -> dao.getLateArrivalsThisWeek()));
+        request.setAttribute("leaveApprovalRate", safeStr(() -> dao.getLeaveApprovalRate(), "0"));
 
-			request.setAttribute("weekPresent", dao.getWeekPresent());
-			request.setAttribute("weekAbsent", dao.getWeekAbsent());
+        // ── Weekly attendance ─────────────────────────────────────────────
+        request.setAttribute("weekPresent", safeStr(() -> dao.getWeekPresent(), "0,0,0,0,0,0,0"));
+        request.setAttribute("weekAbsent",  safeStr(() -> dao.getWeekAbsent(),  "0,0,0,0,0,0,0"));
 
-			request.setAttribute("attendanceTrend", dao.getAttendanceTrend());
+        // ── 30-day trend ──────────────────────────────────────────────────
+        request.setAttribute("attendanceTrend", safeStr(() -> dao.getAttendanceTrend(),
+            "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"));
 
-			request.setAttribute("punchData", dao.getPunchInDistribution());
+        // ── Task status pie ───────────────────────────────────────────────
+        request.setAttribute("taskStatusDist", safeStr(() -> dao.getTaskStatusDistribution(), "0|0|0|0|0"));
 
-			request.setAttribute("taskCompleted", dao.getTaskCountByStatus("COMPLETED"));
-			request.setAttribute("taskAssigned", dao.getTaskCountByStatus("ASSIGNED"));
-			request.setAttribute("taskDocVerify", dao.getTaskCountByStatus("DOCUMENT_VERIFICATION"));
-			request.setAttribute("taskErrorsRaised", dao.getTaskCountByStatus("ERRORS_RAISED"));
+        // ── Leave type doughnut ───────────────────────────────────────────
+        request.setAttribute("leaveCasual", safeInt(() -> dao.getLeaveCountByType("Casual Leave")));
+        request.setAttribute("leaveSick",   safeInt(() -> dao.getLeaveCountByType("Sick Leave")));
+        request.setAttribute("leaveEarned", safeInt(() -> dao.getLeaveCountByType("Earned Leave")));
 
-			request.setAttribute("leaveSick", dao.getLeaveCountByType("SICK"));
-			request.setAttribute("leaveAnnual", dao.getLeaveCountByType("ANNUAL"));
-			request.setAttribute("leavePersonal", dao.getLeaveCountByType("PERSONAL"));
-			request.setAttribute("leaveMaternity", dao.getLeaveCountByType("MATERNITY"));
-			request.setAttribute("leaveUnpaid", dao.getLeaveCountByType("UNPAID"));
+        // ── Task completion by week ───────────────────────────────────────
+        request.setAttribute("taskWeekData", safeStr(() -> dao.getTaskCompletionByWeek(), "0,0,0,0"));
 
-			request.setAttribute("holidays", dao.getUpcomingHolidays());
+        // ── Break analytics ───────────────────────────────────────────────
+        request.setAttribute("breakData", safeStr(() -> dao.getBreakAnalytics(), "0,0,0,0,0,0,0"));
 
-			request.getRequestDispatcher("adminOverview.jsp").forward(request, response);
+        // ── Punch-in distribution ─────────────────────────────────────────
+        request.setAttribute("punchData", safeStr(() -> dao.getPunchInDistribution(), "0,0,0,0,0"));
 
-		} catch (Exception e) {
-			throw new ServletException("Error loading admin overview", e);
-		}
-	}
+        // ── Holidays ──────────────────────────────────────────────────────
+        try {
+            request.setAttribute("holidays", dao.getUpcomingHolidays());
+        } catch (Exception e) {
+            request.setAttribute("holidays", java.util.Collections.emptyList());
+            log("holidays failed: " + e.getMessage());
+        }
+
+        request.getRequestDispatcher("adminOverview.jsp").forward(request, response);
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    @FunctionalInterface
+    interface IntSupplier { int get() throws Exception; }
+
+    @FunctionalInterface
+    interface StrSupplier { String get() throws Exception; }
+
+    private int safeInt(IntSupplier s) {
+        try { return s.get(); }
+        catch (Exception e) { log("DAO int error: " + e.getMessage()); return 0; }
+    }
+
+    private String safeStr(StrSupplier s, String fallback) {
+        try { return s.get(); }
+        catch (Exception e) { log("DAO str error: " + e.getMessage()); return fallback; }
+    }
 }
