@@ -6,8 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.smartoffice.dao.MeetingDao;
 import com.smartoffice.dao.TeamDAO;
 import com.smartoffice.model.Meeting;
 import com.smartoffice.model.Team;
@@ -25,6 +26,62 @@ import com.smartoffice.utils.DBConnectionUtil;
 @SuppressWarnings("serial")
 @WebServlet("/managerOverview")
 public class ManagerOverviewServlet extends HttpServlet {
+
+    private boolean hasColumn(String table, String column) {
+        String sql = "SELECT 1 FROM information_schema.COLUMNS " +
+                     "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ? LIMIT 1";
+        try (Connection c = DBConnectionUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, table);
+            ps.setString(2, column);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) { return false; }
+    }
+
+    private String getAttendanceUserColumn() {
+        if (hasColumn("attendance", "user_email")) return "user_email";
+        if (hasColumn("attendance", "email")) return "email";
+        return "username";
+    }
+
+    private String getLeaveUserColumn() {
+        if (hasColumn("leave_requests", "username")) return "username";
+        return "email";
+    }
+
+    private List<String> getManagerIdentityKeys(String mgr, String mgrEmail) {
+        Set<String> keys = new LinkedHashSet<>();
+        if (mgrEmail != null && !mgrEmail.trim().isEmpty()) keys.add(mgrEmail.trim());
+        if (mgr != null && !mgr.trim().isEmpty()) keys.add(mgr.trim());
+
+        String hasUsernameSelect = hasColumn("users", "username") ? ", username" : "";
+        String sql = "SELECT email, firstname, lastname" + hasUsernameSelect + " FROM users WHERE email = ? LIMIT 1";
+        String lookup = (mgrEmail != null && !mgrEmail.trim().isEmpty()) ? mgrEmail.trim() : mgr;
+
+        if (lookup != null && !lookup.trim().isEmpty()) {
+            try (Connection c = DBConnectionUtil.getConnection();
+                 PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setString(1, lookup.trim());
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    String email = rs.getString("email");
+                    if (email != null && !email.trim().isEmpty()) keys.add(email.trim());
+                    if (hasColumn("users", "username")) {
+                        try {
+                            String uname = rs.getString("username");
+                            if (uname != null && !uname.trim().isEmpty()) keys.add(uname.trim());
+                        } catch (Exception ignored) {}
+                    }
+                    String first = rs.getString("firstname");
+                    String last = rs.getString("lastname");
+                    String full = ((first == null ? "" : first.trim()) + " " + (last == null ? "" : last.trim())).trim();
+                    if (!full.isEmpty()) keys.add(full);
+                }
+            } catch (Exception ignored) {}
+        }
+        return new ArrayList<>(keys);
+    }
 
     // ─────────────────────────────────────────────────────────────────────
     // DATA LAYOUT (verified from DB screenshots):
@@ -124,7 +181,7 @@ public class ManagerOverviewServlet extends HttpServlet {
             request.setAttribute("onBreakCount", att.get("onBreak"));
 
             // 3. Tasks — all status values, correct pending/overdue counts
-            Map<String, Integer> task = getTaskStats(mgr);
+            Map<String, Integer> task = getTaskStats(mgr, mgrEmail);
             request.setAttribute("totalTasks",      task.get("total"));
             request.setAttribute("pendingTasks",    task.get("pending"));
             request.setAttribute("completedTasks",  task.get("completed"));
@@ -136,15 +193,15 @@ public class ManagerOverviewServlet extends HttpServlet {
             request.setAttribute("pendingLeaves", pendingLeaves);
 
             // 5. Meetings (uses email)
-            List<Meeting> todayMeetings = MeetingDao.getTodayMeetings(mgrEmail);
+            List<Meeting> todayMeetings = getTodayMeetingsForManagerKeys(mgr, mgrEmail);
             request.setAttribute("todayMeetings", todayMeetings);
             request.setAttribute("meetingCount",  todayMeetings.size());
 
             // 6. Recent Activities
-            request.setAttribute("recentActivities", getRecentActivities(mgr));
+            request.setAttribute("recentActivities", getRecentActivities(mgr, mgrEmail));
 
             // 7. Performance stats
-            Map<String, Integer> perf = getPerformanceStats(mgr, totalMembers);
+            Map<String, Integer> perf = getPerformanceStats(mgr, mgrEmail, totalMembers);
             request.setAttribute("ratedEmployees", perf.get("rated"));
             request.setAttribute("pendingRatings", perf.get("pending"));
 
@@ -155,7 +212,7 @@ public class ManagerOverviewServlet extends HttpServlet {
             request.setAttribute("weekAbsentData",  weekly.get("absent"));
 
             // 9. Task status breakdown (for pie chart)
-            Map<String, Integer> ts = getTaskStatusBreakdown(mgr);
+            Map<String, Integer> ts = getTaskStatusBreakdown(mgr, mgrEmail);
             request.setAttribute("taskAssigned",   ts.get("ASSIGNED"));
             request.setAttribute("taskCompleted",  ts.get("COMPLETED"));
             request.setAttribute("taskSubmitted",  ts.get("SUBMITTED"));
@@ -185,7 +242,7 @@ public class ManagerOverviewServlet extends HttpServlet {
             request.setAttribute("avgWorkHoursToday", workHours.get("avgToday"));
 
             // 13. Task priority breakdown
-            Map<String, Integer> tp = getTaskPriorityBreakdown(mgr);
+            Map<String, Integer> tp = getTaskPriorityBreakdown(mgr, mgrEmail);
             request.setAttribute("taskHighPriority",   tp.get("HIGH"));
             request.setAttribute("taskMediumPriority", tp.get("MEDIUM"));
             request.setAttribute("taskLowPriority",    tp.get("LOW"));
@@ -197,17 +254,17 @@ public class ManagerOverviewServlet extends HttpServlet {
             request.setAttribute("leavePendingCount", las.get("PENDING"));
 
             // 15. Performance rating distribution
-            Map<String, Integer> prd = getPerformanceRatingDistribution(mgr);
+            Map<String, Integer> prd = getPerformanceRatingDistribution(mgr, mgrEmail);
             request.setAttribute("perfExcellent", prd.getOrDefault("EXCELLENCE", 0));
             request.setAttribute("perfGood",      prd.getOrDefault("GOOD",      0));
             request.setAttribute("perfAverage",   prd.getOrDefault("AVERAGE",   0));
             request.setAttribute("perfPoor",      prd.getOrDefault("POOR",      0));
 
             // 16. Top performers
-            request.setAttribute("topPerformers", getTopPerformers(mgr));
+            request.setAttribute("topPerformers", getTopPerformers(mgr, mgrEmail));
 
             // 17. Overdue task employees
-            request.setAttribute("overdueEmployees", getOverdueTaskEmployees(mgr));
+            request.setAttribute("overdueEmployees", getOverdueTaskEmployees(mgr, mgrEmail));
 
             // 18. Monthly leave trend
             Map<String, String> leaveTrend = getMonthlyLeaveTrend(mgr);
@@ -218,7 +275,7 @@ public class ManagerOverviewServlet extends HttpServlet {
             request.setAttribute("avgAttendanceLast4Weeks", getAvgAttendanceLast4Weeks(mgr));
 
             // 20. Task completion trend
-            Map<String, String> taskTrend = getTaskCompletionTrend(mgr);
+            Map<String, String> taskTrend = getTaskCompletionTrend(mgr, mgrEmail);
             request.setAttribute("taskTrendLabels", taskTrend.get("labels"));
             request.setAttribute("taskTrendData",   taskTrend.get("data"));
 
@@ -240,22 +297,78 @@ public class ManagerOverviewServlet extends HttpServlet {
     //      So we must resolve: team_members.username (email) → users.username (display name).
     // ─────────────────────────────────────────────────────────────────────
     private List<String> getTeamMemberUsernames(String mgr) {
-        List<String> displayNames = new ArrayList<>();
-        // Join path: teams → team_members (email) → users (display name)
+        List<String> members = new ArrayList<>();
         String sql =
-            "SELECT DISTINCT u.username " +
+            "SELECT DISTINCT tm.username " +
             "FROM team_members tm " +
             "INNER JOIN teams t ON tm.team_id = t.id " +
-            "INNER JOIN users u ON tm.username = u.email " +
             "WHERE t.manager_username = ? " +
-            "  AND u.username IS NOT NULL AND u.username != ''";
+            "  AND tm.username IS NOT NULL AND tm.username != ''";
         try (Connection c = DBConnectionUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, mgr);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) displayNames.add(rs.getString("username"));
+            while (rs.next()) members.add(rs.getString("username"));
         } catch (Exception e) { e.printStackTrace(); }
-        return displayNames;
+        return members;
+    }
+
+    private List<String> getTeamMemberIdentityKeys(String mgr) {
+        Set<String> keys = new LinkedHashSet<>(getTeamMemberUsernames(mgr)); // emails in team_members
+
+        // Add legacy usernames when users.username exists.
+        if (hasColumn("users", "username")) {
+            String sql = "SELECT DISTINCT u.username FROM team_members tm " +
+                         "JOIN teams t ON tm.team_id = t.id " +
+                         "JOIN users u ON tm.username = u.email " +
+                         "WHERE t.manager_username = ? AND u.username IS NOT NULL AND u.username != ''";
+            try (Connection c = DBConnectionUtil.getConnection();
+                 PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setString(1, mgr);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) keys.add(rs.getString("username"));
+            } catch (Exception ignored) {}
+        }
+
+        // Add full names because some legacy rows store "firstname lastname".
+        String fullNameSql = "SELECT DISTINCT TRIM(CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,''))) full_name " +
+                             "FROM team_members tm " +
+                             "JOIN teams t ON tm.team_id = t.id " +
+                             "JOIN users u ON tm.username = u.email " +
+                             "WHERE t.manager_username = ?";
+        try (Connection c = DBConnectionUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(fullNameSql)) {
+            ps.setString(1, mgr);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                String full = rs.getString("full_name");
+                if (full != null && !full.trim().isEmpty()) keys.add(full.trim());
+            }
+        } catch (Exception ignored) {}
+
+        return new ArrayList<>(keys);
+    }
+
+    private List<String> getTeamMembersForAttendanceColumn(String mgr, String attUserCol) {
+        if ("email".equalsIgnoreCase(attUserCol) || "user_email".equalsIgnoreCase(attUserCol)) {
+            return getTeamMemberUsernames(mgr);
+        }
+        // For legacy username-based attendance tables.
+        if (hasColumn("users", "username")) {
+            List<String> usernames = new ArrayList<>();
+            String sql = "SELECT DISTINCT u.username FROM team_members tm " +
+                         "JOIN teams t ON tm.team_id = t.id " +
+                         "JOIN users u ON tm.username = u.email " +
+                         "WHERE t.manager_username = ? AND u.username IS NOT NULL AND u.username != ''";
+            try (Connection c = DBConnectionUtil.getConnection();
+                 PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setString(1, mgr);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) usernames.add(rs.getString("username"));
+            } catch (Exception ignored) {}
+            if (!usernames.isEmpty()) return usernames;
+        }
+        return getTeamMemberUsernames(mgr);
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -272,10 +385,14 @@ public class ManagerOverviewServlet extends HttpServlet {
         Map<String, Integer> s = new HashMap<>();
         s.put("present", 0); s.put("absent", 0); s.put("onBreak", 0);
 
-        List<String> members = getTeamMemberUsernames(mgr);
+        String attUserCol = getAttendanceUserColumn();
+        List<String> members = getTeamMembersForAttendanceColumn(mgr, attUserCol);
         if (members.isEmpty()) return s;
+        List<String> breakKeys = getTeamMemberIdentityKeys(mgr);
+        if (breakKeys.isEmpty()) breakKeys = members;
 
         String inClause = buildInClause(members.size());
+        String breakInClause = buildInClause(breakKeys.size());
 
         // Count employees currently on break (break_logs today, end_time IS NULL)
         String breakSql =
@@ -283,12 +400,12 @@ public class ManagerOverviewServlet extends HttpServlet {
             "FROM break_logs bl " +
             "WHERE DATE(bl.break_date) = CURDATE() " +
             "  AND bl.end_time IS NULL " +
-            "  AND bl.username IN " + inClause;
+            "  AND bl.username IN " + breakInClause;
 
         int onBreak = 0;
         try (Connection c = DBConnectionUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(breakSql)) {
-            setParams(ps, members);
+            setParams(ps, breakKeys);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) onBreak = rs.getInt("cnt");
         } catch (Exception e) { e.printStackTrace(); }
@@ -301,7 +418,7 @@ public class ManagerOverviewServlet extends HttpServlet {
             "  COALESCE(SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END),0) ab " +
             "FROM attendance " +
             "WHERE DATE(punch_date) = CURDATE() " +
-            "  AND user_email IN " + inClause;
+            "  AND " + attUserCol + " IN " + inClause;
 
         try (Connection c = DBConnectionUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(attSql)) {
@@ -309,8 +426,8 @@ public class ManagerOverviewServlet extends HttpServlet {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 int rawPresent = rs.getInt("p");
-                // Subtract on-break employees from "present" count
-                s.put("present", Math.max(0, rawPresent - onBreak));
+                // Keep present count intact; break count is shown separately.
+                s.put("present", rawPresent);
                 s.put("absent",  rs.getInt("ab"));
                 s.put("onBreak", onBreak);
             }
@@ -328,10 +445,12 @@ public class ManagerOverviewServlet extends HttpServlet {
     // FIX 1: pending = ASSIGNED + PROCESSING (both are "pending work")
     // FIX 2: overdue = ASSIGNED or PROCESSING tasks past their deadline
     // ─────────────────────────────────────────────────────────────────────
-    private Map<String, Integer> getTaskStats(String mgr) {
+    private Map<String, Integer> getTaskStats(String mgr, String mgrEmail) {
         Map<String, Integer> s = new HashMap<>();
         s.put("total", 0); s.put("pending", 0); s.put("completed", 0);
         s.put("overdue", 0); s.put("processing", 0);
+        List<String> keys = getManagerIdentityKeys(mgr, mgrEmail);
+        if (keys.isEmpty()) return s;
 
         String sql =
             "SELECT " +
@@ -342,11 +461,11 @@ public class ManagerOverviewServlet extends HttpServlet {
             "  COALESCE(SUM(CASE WHEN UPPER(status) = 'SUBMITTED'  THEN 1 ELSE 0 END),0) submitted, " +
             "  COALESCE(SUM(CASE WHEN UPPER(status) IN ('ASSIGNED','PROCESSING') " +
             "                     AND deadline IS NOT NULL AND deadline < CURDATE() THEN 1 ELSE 0 END),0) overdue " +
-            "FROM tasks WHERE assigned_by = ?";
+            "FROM tasks WHERE assigned_by IN " + buildInClause(keys.size());
 
         try (Connection c = DBConnectionUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, mgr);
+            setParams(ps, keys);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 s.put("total",      rs.getInt("total"));
@@ -367,12 +486,13 @@ public class ManagerOverviewServlet extends HttpServlet {
     // FIX: was returning 0 because member list was emails; now uses display names.
     // ─────────────────────────────────────────────────────────────────────
     private int getPendingLeaveCount(String mgr) {
-        List<String> members = getTeamMemberUsernames(mgr);
+        List<String> members = getTeamMemberIdentityKeys(mgr);
         if (members.isEmpty()) return 0;
+        String leaveUserCol = getLeaveUserColumn();
 
         String sql =
             "SELECT COUNT(*) cnt FROM leave_requests " +
-            "WHERE username IN " + buildInClause(members.size()) +
+            "WHERE " + leaveUserCol + " IN " + buildInClause(members.size()) +
             "  AND UPPER(status) = 'PENDING'";
 
         try (Connection c = DBConnectionUtil.getConnection();
@@ -387,33 +507,36 @@ public class ManagerOverviewServlet extends HttpServlet {
     // ─────────────────────────────────────────────────────────────────────
     // 6. RECENT ACTIVITIES
     // ─────────────────────────────────────────────────────────────────────
-    private List<Map<String, String>> getRecentActivities(String mgr) {
+    private List<Map<String, String>> getRecentActivities(String mgr, String mgrEmail) {
         List<Map<String, String>> list = new ArrayList<>();
 
-        List<String> members = getTeamMemberUsernames(mgr);
+        List<String> members = getTeamMemberIdentityKeys(mgr);
         String memberIn = members.isEmpty() ? "('__none__')" : buildInClause(members.size());
+        String leaveUserCol = getLeaveUserColumn();
+        List<String> managerKeys = getManagerIdentityKeys(mgr, mgrEmail);
+        String managerIn = managerKeys.isEmpty() ? "('__none__')" : buildInClause(managerKeys.size());
 
         String sql =
             "SELECT type, description, user, ts FROM (" +
             "  SELECT 'Task Assigned' type, title description, assigned_to user, " +
             "         CAST(assigned_date AS CHAR) ts " +
-            "  FROM tasks WHERE assigned_by = ? " +
+            "  FROM tasks WHERE assigned_by IN " + managerIn +
             "  UNION ALL " +
             "  SELECT 'Leave Request', " +
             "         CONCAT(leave_type,' - ',from_date,' to ',to_date), " +
-            "         username, CAST(applied_at AS CHAR) " +
-            "  FROM leave_requests WHERE username IN " + memberIn +
+            "         " + leaveUserCol + ", CAST(applied_at AS CHAR) " +
+            "  FROM leave_requests WHERE " + leaveUserCol + " IN " + memberIn +
             "  UNION ALL " +
             "  SELECT 'Meeting Scheduled', title, created_by, CAST(created_at AS CHAR) " +
-            "  FROM meetings WHERE created_by = ? " +
+            "  FROM meetings WHERE created_by IN " + managerIn +
             ") sub ORDER BY ts DESC LIMIT 8";
 
         try (Connection c = DBConnectionUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             int idx = 1;
-            ps.setString(idx++, mgr);
+            for (String k : managerKeys) ps.setString(idx++, k);
             for (String m : members) ps.setString(idx++, m);
-            ps.setString(idx, resolveEmailFromUsername(mgr));
+            for (String k : managerKeys) ps.setString(idx++, k);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Map<String, String> a = new HashMap<>();
@@ -434,20 +557,22 @@ public class ManagerOverviewServlet extends HttpServlet {
     // rated   = DISTINCT employees who have any rating this month.
     // pending = totalMembers - rated.
     // ─────────────────────────────────────────────────────────────────────
-    private Map<String, Integer> getPerformanceStats(String mgr, int totalMembers) {
+    private Map<String, Integer> getPerformanceStats(String mgr, String mgrEmail, int totalMembers) {
         Map<String, Integer> s = new HashMap<>();
         s.put("rated", 0); s.put("pending", 0);
+        List<String> keys = getManagerIdentityKeys(mgr, mgrEmail);
+        if (keys.isEmpty()) return s;
 
         String sql =
             "SELECT COUNT(DISTINCT employee_username) rated " +
             "FROM employee_performance " +
-            "WHERE manager_username = ? " +
-            "  AND MONTH(performance_month) = MONTH(CURDATE()) " +
-            "  AND YEAR(performance_month)  = YEAR(CURDATE())";
+            "WHERE manager_username IN " + buildInClause(keys.size()) + " " +
+            "  AND performance_month >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) " +
+            "  AND performance_month < DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 7 DAY)";
 
         try (Connection c = DBConnectionUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, mgr);
+            setParams(ps, keys);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 int rated = rs.getInt("rated");
@@ -465,7 +590,8 @@ public class ManagerOverviewServlet extends HttpServlet {
     // ─────────────────────────────────────────────────────────────────────
     private Map<String, String> getWeeklyAttendance(String mgr) {
         Map<String, String> result = new HashMap<>();
-        List<String> members = getTeamMemberUsernames(mgr);
+        List<String> members = getTeamMemberIdentityKeys(mgr);
+        String attUserCol = getAttendanceUserColumn();
 
         if (members.isEmpty()) {
             result.put("labels",  "'Mon','Tue','Wed','Thu','Fri','Sat','Sun'");
@@ -486,7 +612,7 @@ public class ManagerOverviewServlet extends HttpServlet {
             "  UNION ALL SELECT CURDATE() " +
             ") d " +
             "LEFT JOIN attendance a ON DATE(a.punch_date) = d.dy " +
-            "  AND a.user_email IN " + memberIn +
+            "  AND a." + attUserCol + " IN " + memberIn +
             "GROUP BY d.dy ORDER BY d.dy";
 
         StringBuilder lbl = new StringBuilder(), pre = new StringBuilder(), abs = new StringBuilder();
@@ -511,10 +637,12 @@ public class ManagerOverviewServlet extends HttpServlet {
     // ─────────────────────────────────────────────────────────────────────
     // 9. TASK STATUS BREAKDOWN (for pie chart)
     // ─────────────────────────────────────────────────────────────────────
-    private Map<String, Integer> getTaskStatusBreakdown(String mgr) {
+    private Map<String, Integer> getTaskStatusBreakdown(String mgr, String mgrEmail) {
         Map<String, Integer> s = new HashMap<>();
         s.put("ASSIGNED", 0); s.put("COMPLETED", 0);
         s.put("SUBMITTED", 0); s.put("OVERDUE", 0); s.put("PROCESSING", 0);
+        List<String> keys = getManagerIdentityKeys(mgr, mgrEmail);
+        if (keys.isEmpty()) return s;
 
         String sql =
             "SELECT " +
@@ -524,11 +652,11 @@ public class ManagerOverviewServlet extends HttpServlet {
             "  COALESCE(SUM(CASE WHEN UPPER(status)='PROCESSING' THEN 1 ELSE 0 END),0) processing, " +
             "  COALESCE(SUM(CASE WHEN UPPER(status) IN ('ASSIGNED','PROCESSING') " +
             "                     AND deadline IS NOT NULL AND deadline < CURDATE() THEN 1 ELSE 0 END),0) overdue " +
-            "FROM tasks WHERE assigned_by = ?";
+            "FROM tasks WHERE assigned_by IN " + buildInClause(keys.size());
 
         try (Connection c = DBConnectionUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, mgr);
+            setParams(ps, keys);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 s.put("ASSIGNED",   rs.getInt("assigned"));
@@ -547,12 +675,13 @@ public class ManagerOverviewServlet extends HttpServlet {
     // ─────────────────────────────────────────────────────────────────────
     private Map<String, Integer> getLeaveTypeBreakdown(String mgr) {
         Map<String, Integer> types = new HashMap<>();
-        List<String> members = getTeamMemberUsernames(mgr);
+        List<String> members = getTeamMemberIdentityKeys(mgr);
         if (members.isEmpty()) return types;
+        String leaveUserCol = getLeaveUserColumn();
 
         String sql =
             "SELECT leave_type, COUNT(*) cnt FROM leave_requests " +
-            "WHERE username IN " + buildInClause(members.size()) +
+            "WHERE " + leaveUserCol + " IN " + buildInClause(members.size()) +
             " GROUP BY leave_type";
 
         try (Connection c = DBConnectionUtil.getConnection();
@@ -584,7 +713,8 @@ public class ManagerOverviewServlet extends HttpServlet {
         d.put("before8", 0); d.put("8to9", 0); d.put("9to10", 0);
         d.put("10to11", 0); d.put("after11", 0);
 
-        List<String> members = getTeamMemberUsernames(mgr);
+        String attUserCol = getAttendanceUserColumn();
+        List<String> members = getTeamMembersForAttendanceColumn(mgr, attUserCol);
         if (members.isEmpty()) return d;
 
         String sql =
@@ -595,7 +725,7 @@ public class ManagerOverviewServlet extends HttpServlet {
             "  COALESCE(SUM(CASE WHEN HOUR(punch_in) >= 10 AND HOUR(punch_in) < 11 THEN 1 ELSE 0 END),0) h1011, " +
             "  COALESCE(SUM(CASE WHEN HOUR(punch_in) >= 11 THEN 1 ELSE 0 END),0) a11 " +
             "FROM attendance " +
-            "WHERE user_email IN " + buildInClause(members.size()) +
+            "WHERE " + attUserCol + " IN " + buildInClause(members.size()) +
             "  AND punch_in IS NOT NULL " +
             "  AND DATE(punch_date) >= DATE(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY))";
 
@@ -619,7 +749,8 @@ public class ManagerOverviewServlet extends HttpServlet {
     // ─────────────────────────────────────────────────────────────────────
     private Map<String, String> getAvgWorkHoursThisWeek(String mgr) {
         Map<String, String> result = new HashMap<>();
-        List<String> members = getTeamMemberUsernames(mgr);
+        String attUserCol = getAttendanceUserColumn();
+        List<String> members = getTeamMembersForAttendanceColumn(mgr, attUserCol);
 
         if (members.isEmpty()) {
             result.put("labels",   "'Mon','Tue','Wed','Thu','Fri','Sat','Sun'");
@@ -646,7 +777,7 @@ public class ManagerOverviewServlet extends HttpServlet {
             "  UNION ALL SELECT CURDATE() " +
             ") d " +
             "LEFT JOIN attendance a ON DATE(a.punch_date) = d.dy " +
-            "  AND a.user_email IN " + memberIn +
+            "  AND a." + attUserCol + " IN " + memberIn +
             "GROUP BY d.dy ORDER BY d.dy";
 
         StringBuilder lbl = new StringBuilder(), data = new StringBuilder();
@@ -674,20 +805,22 @@ public class ManagerOverviewServlet extends HttpServlet {
     // ─────────────────────────────────────────────────────────────────────
     // 13. TASK PRIORITY BREAKDOWN
     // ─────────────────────────────────────────────────────────────────────
-    private Map<String, Integer> getTaskPriorityBreakdown(String mgr) {
+    private Map<String, Integer> getTaskPriorityBreakdown(String mgr, String mgrEmail) {
         Map<String, Integer> s = new HashMap<>();
         s.put("HIGH", 0); s.put("MEDIUM", 0); s.put("LOW", 0);
+        List<String> keys = getManagerIdentityKeys(mgr, mgrEmail);
+        if (keys.isEmpty()) return s;
 
         String sql =
             "SELECT " +
             "  COALESCE(SUM(CASE WHEN UPPER(priority)='HIGH'   THEN 1 ELSE 0 END),0) h, " +
             "  COALESCE(SUM(CASE WHEN UPPER(priority)='MEDIUM' THEN 1 ELSE 0 END),0) m, " +
             "  COALESCE(SUM(CASE WHEN UPPER(priority)='LOW'    THEN 1 ELSE 0 END),0) l " +
-            "FROM tasks WHERE assigned_by = ?";
+            "FROM tasks WHERE assigned_by IN " + buildInClause(keys.size());
 
         try (Connection c = DBConnectionUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, mgr);
+            setParams(ps, keys);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 s.put("HIGH",   rs.getInt("h"));
@@ -707,12 +840,13 @@ public class ManagerOverviewServlet extends HttpServlet {
         Map<String, Integer> s = new HashMap<>();
         s.put("APPROVED", 0); s.put("REJECTED", 0); s.put("PENDING", 0);
 
-        List<String> members = getTeamMemberUsernames(mgr);
+        List<String> members = getTeamMemberIdentityKeys(mgr);
         if (members.isEmpty()) return s;
+        String leaveUserCol = getLeaveUserColumn();
 
         String sql =
             "SELECT UPPER(status) st, COUNT(*) cnt FROM leave_requests " +
-            "WHERE username IN " + buildInClause(members.size()) +
+            "WHERE " + leaveUserCol + " IN " + buildInClause(members.size()) +
             " GROUP BY UPPER(status)";
 
         try (Connection c = DBConnectionUtil.getConnection();
@@ -735,20 +869,22 @@ public class ManagerOverviewServlet extends HttpServlet {
     // DB stores: EXCELLENCE, GOOD, AVERAGE, POOR (uppercase)
     // FIX: filter to current month only.
     // ─────────────────────────────────────────────────────────────────────
-    private Map<String, Integer> getPerformanceRatingDistribution(String mgr) {
+    private Map<String, Integer> getPerformanceRatingDistribution(String mgr, String mgrEmail) {
         Map<String, Integer> s = new HashMap<>();
+        List<String> keys = getManagerIdentityKeys(mgr, mgrEmail);
+        if (keys.isEmpty()) return s;
 
         String sql =
             "SELECT UPPER(rating) rating, COUNT(*) cnt " +
             "FROM employee_performance " +
-            "WHERE manager_username = ? " +
-            "  AND MONTH(performance_month) = MONTH(CURDATE()) " +
-            "  AND YEAR(performance_month)  = YEAR(CURDATE()) " +
+            "WHERE manager_username IN " + buildInClause(keys.size()) + " " +
+            "  AND performance_month >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) " +
+            "  AND performance_month < DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 7 DAY) " +
             "GROUP BY UPPER(rating)";
 
         try (Connection c = DBConnectionUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, mgr);
+            setParams(ps, keys);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) s.put(rs.getString("rating"), rs.getInt("cnt"));
         } catch (Exception e) { e.printStackTrace(); }
@@ -759,23 +895,25 @@ public class ManagerOverviewServlet extends HttpServlet {
     // ─────────────────────────────────────────────────────────────────────
     // 16. TOP PERFORMERS
     // ─────────────────────────────────────────────────────────────────────
-    private List<Map<String, String>> getTopPerformers(String mgr) {
+    private List<Map<String, String>> getTopPerformers(String mgr, String mgrEmail) {
         List<Map<String, String>> list = new ArrayList<>();
+        List<String> keys = getManagerIdentityKeys(mgr, mgrEmail);
+        if (keys.isEmpty()) return list;
 
         String sql =
             "SELECT ep.employee_username, UPPER(ep.rating) rating, " +
             "  TRIM(CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,''))) fullname " +
             "FROM employee_performance ep " +
-            "LEFT JOIN users u ON ep.employee_username = u.username " +
-            "WHERE ep.manager_username = ? " +
-            "  AND MONTH(ep.performance_month) = MONTH(CURDATE()) " +
-            "  AND YEAR(ep.performance_month)  = YEAR(CURDATE()) " +
+            "LEFT JOIN users u ON ep.employee_username = u.email " +
+            "WHERE ep.manager_username IN " + buildInClause(keys.size()) + " " +
+            "  AND ep.performance_month >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) " +
+            "  AND ep.performance_month < DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 7 DAY) " +
             "ORDER BY FIELD(UPPER(ep.rating),'EXCELLENCE','GOOD','AVERAGE','POOR') ASC " +
             "LIMIT 5";
 
         try (Connection c = DBConnectionUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, mgr);
+            setParams(ps, keys);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Map<String, String> row = new HashMap<>();
@@ -794,15 +932,17 @@ public class ManagerOverviewServlet extends HttpServlet {
     // ─────────────────────────────────────────────────────────────────────
     // 17. OVERDUE TASK EMPLOYEES
     // ─────────────────────────────────────────────────────────────────────
-    private List<Map<String, String>> getOverdueTaskEmployees(String mgr) {
+    private List<Map<String, String>> getOverdueTaskEmployees(String mgr, String mgrEmail) {
         List<Map<String, String>> list = new ArrayList<>();
+        List<String> keys = getManagerIdentityKeys(mgr, mgrEmail);
+        if (keys.isEmpty()) return list;
 
         String sql =
             "SELECT t.assigned_to, COUNT(*) cnt, " +
             "  TRIM(CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,''))) fullname " +
             "FROM tasks t " +
-            "LEFT JOIN users u ON t.assigned_to = u.username " +
-            "WHERE t.assigned_by = ? " +
+            "LEFT JOIN users u ON t.assigned_to = u.email " +
+            "WHERE t.assigned_by IN " + buildInClause(keys.size()) + " " +
             "  AND UPPER(t.status) IN ('ASSIGNED','PROCESSING') " +
             "  AND t.deadline IS NOT NULL AND t.deadline < CURDATE() " +
             "GROUP BY t.assigned_to, u.firstname, u.lastname " +
@@ -810,7 +950,7 @@ public class ManagerOverviewServlet extends HttpServlet {
 
         try (Connection c = DBConnectionUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, mgr);
+            setParams(ps, keys);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Map<String, String> row = new HashMap<>();
@@ -831,7 +971,8 @@ public class ManagerOverviewServlet extends HttpServlet {
     // ─────────────────────────────────────────────────────────────────────
     private Map<String, String> getMonthlyLeaveTrend(String mgr) {
         Map<String, String> result = new HashMap<>();
-        List<String> members = getTeamMemberUsernames(mgr);
+        List<String> members = getTeamMemberIdentityKeys(mgr);
+        String leaveUserCol = getLeaveUserColumn();
 
         if (members.isEmpty()) {
             result.put("labels", "''"); result.put("data", "0"); return result;
@@ -841,7 +982,7 @@ public class ManagerOverviewServlet extends HttpServlet {
             "SELECT DATE_FORMAT(CAST(applied_at AS DATE),'%b %Y') mon, COUNT(*) cnt, " +
             "  DATE_FORMAT(CAST(applied_at AS DATE),'%Y-%m') sort_key " +
             "FROM leave_requests " +
-            "WHERE username IN " + buildInClause(members.size()) +
+            "WHERE " + leaveUserCol + " IN " + buildInClause(members.size()) +
             "  AND CAST(applied_at AS DATE) >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) " +
             "GROUP BY DATE_FORMAT(CAST(applied_at AS DATE),'%b %Y'), " +
             "         DATE_FORMAT(CAST(applied_at AS DATE),'%Y-%m') " +
@@ -868,7 +1009,8 @@ public class ManagerOverviewServlet extends HttpServlet {
     // 19. AVG ATTENDANCE LAST 4 WEEKS
     // ─────────────────────────────────────────────────────────────────────
     private int getAvgAttendanceLast4Weeks(String mgr) {
-        List<String> members = getTeamMemberUsernames(mgr);
+        String attUserCol = getAttendanceUserColumn();
+        List<String> members = getTeamMembersForAttendanceColumn(mgr, attUserCol);
         if (members.isEmpty()) return 0;
 
         String sql =
@@ -876,7 +1018,7 @@ public class ManagerOverviewServlet extends HttpServlet {
             "  COALESCE(SUM(CASE WHEN status IN ('Present','In Progress','Half Day') THEN 1 ELSE 0 END),0) p, " +
             "  COUNT(*) tot " +
             "FROM attendance " +
-            "WHERE user_email IN " + buildInClause(members.size()) +
+            "WHERE " + attUserCol + " IN " + buildInClause(members.size()) +
             "  AND DATE(punch_date) >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)";
 
         try (Connection c = DBConnectionUtil.getConnection();
@@ -894,9 +1036,15 @@ public class ManagerOverviewServlet extends HttpServlet {
     // ─────────────────────────────────────────────────────────────────────
     // 20. TASK COMPLETION TREND
     // ─────────────────────────────────────────────────────────────────────
-    private Map<String, String> getTaskCompletionTrend(String mgr) {
+    private Map<String, String> getTaskCompletionTrend(String mgr, String mgrEmail) {
         Map<String, String> result = new HashMap<>();
         StringBuilder lbl = new StringBuilder(), data = new StringBuilder();
+        List<String> keys = getManagerIdentityKeys(mgr, mgrEmail);
+        if (keys.isEmpty()) {
+            result.put("labels", "'Wk 1','Wk 2','Wk 3','Wk 4'");
+            result.put("data", "0,0,0,0");
+            return result;
+        }
 
         String[] dateColumns = {"assigned_date", "created_at"};
         for (String dateCol : dateColumns) {
@@ -906,14 +1054,14 @@ public class ManagerOverviewServlet extends HttpServlet {
                 "  CONCAT('Wk ', WEEK(MIN(" + dateCol + "))) lbl, " +
                 "  COALESCE(SUM(CASE WHEN UPPER(status)='COMPLETED' THEN 1 ELSE 0 END),0) done " +
                 "FROM tasks " +
-                "WHERE assigned_by = ? " +
+                "WHERE assigned_by IN " + buildInClause(keys.size()) + " " +
                 "  AND " + dateCol + " >= DATE_SUB(CURDATE(), INTERVAL 4 WEEK) " +
                 "GROUP BY YEARWEEK(" + dateCol + ", 1) " +
                 "ORDER BY YEARWEEK(" + dateCol + ", 1) ASC";
 
             try (Connection c = DBConnectionUtil.getConnection();
                  PreparedStatement ps = c.prepareStatement(sql)) {
-                ps.setString(1, mgr);
+                setParams(ps, keys);
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
                     if (lbl.length() > 0) { lbl.append(","); data.append(","); }
@@ -927,6 +1075,42 @@ public class ManagerOverviewServlet extends HttpServlet {
         result.put("labels", lbl.length() > 0 ? lbl.toString() : "'Wk 1','Wk 2','Wk 3','Wk 4'");
         result.put("data",   data.length() > 0 ? data.toString() : "0,0,0,0");
         return result;
+    }
+
+    private List<Meeting> getTodayMeetingsForManagerKeys(String mgr, String mgrEmail) {
+        List<Meeting> list = new ArrayList<>();
+        List<String> keys = getManagerIdentityKeys(mgr, mgrEmail);
+        if (keys.isEmpty()) return list;
+
+        String keyIn = buildInClause(keys.size());
+        String sql =
+            "SELECT DISTINCT m.id, m.title, m.description, m.start_time, m.end_time, m.meeting_link, m.created_by " +
+            "FROM meetings m " +
+            "LEFT JOIN meeting_participants mp ON m.id = mp.meeting_id " +
+            "WHERE (m.created_by IN " + keyIn + " OR mp.user_email IN " + keyIn + ") " +
+            "AND DATE(m.start_time) = CURDATE() " +
+            "AND m.end_time > NOW() " +
+            "ORDER BY m.start_time ASC LIMIT 50";
+
+        try (Connection con = DBConnectionUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            int idx = 1;
+            for (String k : keys) ps.setString(idx++, k);
+            for (String k : keys) ps.setString(idx++, k);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Meeting m = new Meeting();
+                m.setId(rs.getInt("id"));
+                m.setTitle(rs.getString("title"));
+                m.setDescription(rs.getString("description"));
+                m.setStartTime(rs.getTimestamp("start_time"));
+                m.setEndTime(rs.getTimestamp("end_time"));
+                m.setMeetingLink(rs.getString("meeting_link"));
+                m.setCreatedBy(rs.getString("created_by"));
+                list.add(m);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
     }
 
     // ─────────────────────────────────────────────────────────────────────

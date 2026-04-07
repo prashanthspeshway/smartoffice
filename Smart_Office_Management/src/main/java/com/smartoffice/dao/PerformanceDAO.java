@@ -63,20 +63,23 @@ public class PerformanceDAO {
      * Returns true if a rating already exists for the given employee
      * within the same ISO week (Monday–Sunday) as the provided weekStart date.
      */
-    public boolean performanceExists(String employeeEmail, Date weekStart) {
+    public boolean performanceExists(String employeeEmail, String managerEmail, Date weekStart) {
         String employeeUsername = getUsernameFromEmail(employeeEmail);
+        String managerUsername  = getUsernameFromEmail(managerEmail);
 
         String sql =
             "SELECT 1 FROM employee_performance " +
             "WHERE employee_username = ? " +
+            "  AND manager_username = ? " +
             "  AND performance_month >= ? " +
             "  AND performance_month < DATE_ADD(?, INTERVAL 7 DAY)";
 
         try (Connection con = DBConnectionUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, employeeUsername);
-            ps.setDate(2, weekStart);
+            ps.setString(2, managerUsername);
             ps.setDate(3, weekStart);
+            ps.setDate(4, weekStart);
             ResultSet rs = ps.executeQuery();
             return rs.next();
         } catch (SQLException e) {

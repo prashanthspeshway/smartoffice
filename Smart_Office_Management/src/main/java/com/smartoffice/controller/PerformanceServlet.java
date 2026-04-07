@@ -56,7 +56,7 @@ public class PerformanceServlet extends HttpServlet {
 
 			PerformanceDAO dao = new PerformanceDAO();
 
-			if (dao.performanceExists(employee, weekStart)) {
+			if (dao.performanceExists(employee, manager, weekStart)) {
 				resp.sendRedirect(req.getContextPath() + "/managerPerformance?error=AlreadyRated");
 				return;
 			}

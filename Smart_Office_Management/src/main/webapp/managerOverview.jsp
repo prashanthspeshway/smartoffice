@@ -312,7 +312,7 @@ a{text-decoration:none;color:inherit}
 .jb:hover{background:#2f4dd4;transform:scale(1.04)}
 
 /* ── QUICK ACTIONS ── */
-.qg{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.qg{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 @media(max-width:500px){.qg{grid-template-columns:repeat(2,1fr)}}
 .qa{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit;transition:all .18s}
 .qa:hover{border-color:#c0ceff;background:var(--blue-lt);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
@@ -345,6 +345,7 @@ a{text-decoration:none;color:inherit}
 .aci:last-child{border-bottom:none}
 .acd{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
 .act-t{font-size:12px;font-weight:700;color:var(--text)}.act-d{font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}.act-tm{font-size:10px;color:var(--text3);margin-top:2px}
+.recent-activity-list{max-height:250px;overflow-y:auto;padding-right:4px}
 
 /* ── PERF CARD (gradient) ── */
 .perf-card{background:linear-gradient(135deg,#1e2d8f 0%,#3b4dd4 50%,#6d4fc7 100%);border-radius:var(--r);padding:20px;color:#fff;box-shadow:0 8px 28px rgba(67,97,238,.25)}
@@ -855,14 +856,6 @@ a{text-decoration:none;color:inherit}
           <div class="qi" style="background:var(--amber-lt);color:var(--amber)"><i class="fa-solid fa-clock"></i></div>
           <span class="ql">View Attendance</span>
         </button>
-        <button class="qa" onclick="parent.loadPage(null,'managerReports')">
-          <div class="qi" style="background:#f0f9ff;color:#0369a1"><i class="fa-solid fa-file-lines"></i></div>
-          <span class="ql">Reports</span>
-        </button>
-        <button class="qa" onclick="parent.loadPage(null,'managerChat')">
-          <div class="qi" style="background:var(--violet-lt);color:var(--violet)"><i class="fa-solid fa-message"></i></div>
-          <span class="ql">Team Chat</span>
-        </button>
       </div>
     </div>
 
@@ -891,29 +884,37 @@ a{text-decoration:none;color:inherit}
       </div>
     </div>
 
-    <!-- Overdue Task Employees -->
-    <div class="card">
-      <div class="ch">
+    <!-- Performance Summary Card (moved here) -->
+    <div class="perf-card">
+      <div style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <i class="fa-solid fa-chart-line"></i> Performance Overview
+      </div>
+      <div class="pb-wrap">
+        <div class="pb-lbl"><span>Attendance Rate</span><span><%=attRate%>%</span></div>
+        <div class="pb-trk"><div class="pb-fill" style="width:<%=attRate%>%;background:rgba(255,255,255,.9)"></div></div>
+      </div>
+      <div class="pb-wrap">
+        <div class="pb-lbl"><span>Task Completion</span><span><%=compRate%>%</span></div>
+        <div class="pb-trk"><div class="pb-fill" style="width:<%=compRate%>%;background:rgba(255,255,255,.75)"></div></div>
+      </div>
+      <div class="pb-wrap">
+        <div class="pb-lbl"><span>Reviews Done</span><span><%=revRate%>%</span></div>
+        <div class="pb-trk"><div class="pb-fill" style="width:<%=revRate%>%;background:rgba(255,255,255,.6)"></div></div>
+      </div>
+      <div class="pb-wrap">
+        <div class="pb-lbl"><span>4-Week Avg Attendance</span><span><%=vAA4%>%</span></div>
+        <div class="pb-trk"><div class="pb-fill" style="width:<%=vAA4%>%;background:rgba(255,255,255,.45)"></div></div>
+      </div>
+      <div class="sep"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
-          <div class="ct"><div class="ci" style="background:var(--red-lt);color:var(--red)"><i class="fa-solid fa-user-clock"></i></div> Overdue by Employee</div>
-          <div class="cs">Team members with the most overdue tasks</div>
+          <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.05em">Rated this week</div>
+          <div style="font-size:22px;font-weight:700;margin-top:3px"><%=sR%> <span style="font-size:12px;opacity:.5">/ <%=totalRev%></span></div>
         </div>
-        <a href="#" onclick="parent.loadPage(null,'managerTasks');return false;" style="font-size:12px;font-weight:700;color:var(--blue)">View Tasks →</a>
+        <a href="#" onclick="parent.loadPage(null,'managerPerformance');return false;"
+          style="padding:9px 16px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:10px;font-size:13px;font-weight:700"
+          onmouseover="this.style.background='rgba(255,255,255,.28)'" onmouseout="this.style.background='rgba(255,255,255,.18)'">Rate Now →</a>
       </div>
-      <%if(overdueEmployees!=null&&!overdueEmployees.isEmpty()){
-        for(Map<String,String> oe:overdueEmployees){
-          String oeName=oe.get("name"); if(oeName==null||oeName.trim().isEmpty())oeName="Unknown";
-          String oeCount=oe.get("count"); if(oeCount==null)oeCount="0";
-          String oeInit=oeName.trim().substring(0,1).toUpperCase();
-      %>
-      <div class="overdue-row">
-        <div class="perf-avatar" style="background:var(--red);width:30px;height:30px;font-size:11px"><%=oeInit%></div>
-        <div class="od-name"><%=oeName%></div>
-        <span class="od-count"><%=oeCount%> overdue</span>
-      </div>
-      <%}}else{%>
-      <div class="empty" style="padding:14px"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i><span style="color:var(--green);font-weight:700">No overdue tasks!</span></div>
-      <%}%>
     </div>
 
   </div>
@@ -979,6 +980,7 @@ a{text-decoration:none;color:inherit}
     <!-- Recent Activity -->
     <div class="card">
       <div class="ct" style="margin-bottom:12px"><div class="ci"><i class="fa-solid fa-clock-rotate-left"></i></div> Recent Activity</div>
+      <div class="recent-activity-list">
       <%
       if(recentActivities!=null&&!recentActivities.isEmpty()){
         for(Map<String,String> act:recentActivities){
@@ -998,38 +1000,6 @@ a{text-decoration:none;color:inherit}
       <%}}else{%>
       <div class="empty" style="padding:14px"><i class="fa-solid fa-inbox"></i><span>No recent activity</span></div>
       <%}%>
-    </div>
-
-    <!-- Performance Summary Card (gradient) -->
-    <div class="perf-card">
-      <div style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <i class="fa-solid fa-chart-line"></i> Performance Overview
-      </div>
-      <div class="pb-wrap">
-        <div class="pb-lbl"><span>Attendance Rate</span><span><%=attRate%>%</span></div>
-        <div class="pb-trk"><div class="pb-fill" style="width:<%=attRate%>%;background:rgba(255,255,255,.9)"></div></div>
-      </div>
-      <div class="pb-wrap">
-        <div class="pb-lbl"><span>Task Completion</span><span><%=compRate%>%</span></div>
-        <div class="pb-trk"><div class="pb-fill" style="width:<%=compRate%>%;background:rgba(255,255,255,.75)"></div></div>
-      </div>
-      <div class="pb-wrap">
-        <div class="pb-lbl"><span>Reviews Done</span><span><%=revRate%>%</span></div>
-        <div class="pb-trk"><div class="pb-fill" style="width:<%=revRate%>%;background:rgba(255,255,255,.6)"></div></div>
-      </div>
-      <div class="pb-wrap">
-        <div class="pb-lbl"><span>4-Week Avg Attendance</span><span><%=vAA4%>%</span></div>
-        <div class="pb-trk"><div class="pb-fill" style="width:<%=vAA4%>%;background:rgba(255,255,255,.45)"></div></div>
-      </div>
-      <div class="sep"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.05em">Rated this month</div>
-          <div style="font-size:22px;font-weight:700;margin-top:3px"><%=sR%> <span style="font-size:12px;opacity:.5">/ <%=totalRev%></span></div>
-        </div>
-        <a href="#" onclick="parent.loadPage(null,'managerPerformance');return false;"
-          style="padding:9px 16px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:10px;font-size:13px;font-weight:700"
-          onmouseover="this.style.background='rgba(255,255,255,.28)'" onmouseout="this.style.background='rgba(255,255,255,.18)'">Rate Now →</a>
       </div>
     </div>
 
