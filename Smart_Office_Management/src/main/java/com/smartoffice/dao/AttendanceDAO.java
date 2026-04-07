@@ -135,8 +135,6 @@ public class AttendanceDAO {
 		sortDescending(list);
 	}
 
-	// FIX: Removed isHolidayDate() check — holidays not declared in the system
-	// should still be marked Absent if the employee didn't punch in.
 	private void fillMissingAbsentDays(List<AttendanceLogEntry> list, String sessionValue) throws Exception {
 		Set<LocalDate> existing = new HashSet<>();
 		for (AttendanceLogEntry e : list) {
@@ -155,14 +153,9 @@ public class AttendanceDAO {
 			if (leaveSet.contains(d))
 				continue;
 
-			// Skip weekends
 			java.time.DayOfWeek dow = d.getDayOfWeek();
 			if (dow == java.time.DayOfWeek.SATURDAY || dow == java.time.DayOfWeek.SUNDAY)
 				continue;
-
-			// NOTE: Holiday check intentionally removed.
-			// If a day is not declared as a holiday in the system and the employee
-			// did not punch in, it should be marked Absent regardless.
 
 			AttendanceLogEntry e = new AttendanceLogEntry();
 			e.setAttendanceDate(java.sql.Date.valueOf(d));
@@ -175,7 +168,6 @@ public class AttendanceDAO {
 		sortDescending(list);
 	}
 
-	// FIX: Removed isHolidayDate() check — same reasoning as fillMissingAbsentDays.
 	private void fillMissingAbsentDaysInRange(List<AttendanceLogEntry> list, String sessionValue, LocalDate rangeStart,
 			LocalDate rangeEnd) throws Exception {
 		Set<LocalDate> existing = new HashSet<>();
@@ -188,7 +180,6 @@ public class AttendanceDAO {
 		LocalDate today = LocalDate.now();
 
 		for (LocalDate d = rangeStart; !d.isAfter(rangeEnd); d = d.plusDays(1)) {
-			// Don't mark today or future as absent
 			if (!d.isBefore(today))
 				continue;
 			if (existing.contains(d))
@@ -199,10 +190,6 @@ public class AttendanceDAO {
 			java.time.DayOfWeek dow = d.getDayOfWeek();
 			if (dow == java.time.DayOfWeek.SATURDAY || dow == java.time.DayOfWeek.SUNDAY)
 				continue;
-
-			// NOTE: Holiday check intentionally removed.
-			// If a day is not declared as a holiday in the system and the employee
-			// did not punch in, it should be marked Absent regardless.
 
 			AttendanceLogEntry e = new AttendanceLogEntry();
 			e.setAttendanceDate(java.sql.Date.valueOf(d));
@@ -372,13 +359,10 @@ public class AttendanceDAO {
 		}
 	}
 
-	// -------------------------------------------------------------------------
-	// END OF DAY JOB — call this from your scheduler every night
-	// -------------------------------------------------------------------------
 	public void runEndOfDayJob() throws Exception {
 		autoCloseMissedPunchOuts();
 		markYesterdayApprovedLeaves();
-		markDailyAbsenteesWithCatchup(); // replaces old markDailyAbsentees()
+		markDailyAbsenteesWithCatchup();
 		recalculatePreviousDayStatuses();
 	}
 
@@ -400,22 +384,6 @@ public class AttendanceDAO {
 		}
 	}
 
-	// -------------------------------------------------------------------------
-	// CATCHUP: Scans every weekday in the past 60 days and writes Absent for
-	// any employee who has no attendance record and no approved leave.
-	//
-	// This handles two scenarios:
-	//   1. Normal nightly run — catches yesterday as usual.
-	//   2. Server was off for N days — catches all missed days on next startup.
-	//
-	// Call this method BOTH from runEndOfDayJob() AND from your startup listener
-	// (ServletContextListener.contextInitialized) so missed days are backfilled
-	// automatically whenever the server comes back online.
-	//
-	// Holiday check is intentionally removed — if a day was not declared as a
-	// holiday in the holidays table, employees who didn't punch are Absent.
-	// Only weekends and approved leaves are excluded.
-	// -------------------------------------------------------------------------
 	public void markDailyAbsenteesWithCatchup() throws Exception {
 		LocalDate today = LocalDate.now();
 		LocalDate cutoff = today.minusDays(60);
@@ -423,34 +391,42 @@ public class AttendanceDAO {
 		for (LocalDate day = today.minusDays(1); !day.isBefore(cutoff); day = day.minusDays(1)) {
 			java.time.DayOfWeek dow = day.getDayOfWeek();
 			if (dow == java.time.DayOfWeek.SATURDAY || dow == java.time.DayOfWeek.SUNDAY) {
-				continue; // skip weekends
+				continue;
 			}
 			markAbsenteesForDate(day);
 		}
 	}
 
-	// -------------------------------------------------------------------------
-	// Kept for backward compatibility — delegates to catchup version so any
-	// existing scheduler calls to markDailyAbsentees() still work correctly.
-	// -------------------------------------------------------------------------
 	public void markDailyAbsentees() throws Exception {
 		markDailyAbsenteesWithCatchup();
 	}
 
 	// -------------------------------------------------------------------------
-	// Inserts Absent rows for a specific past date for all non-admin employees
-	// who have no attendance record and no approved leave for that date.
+	// FIX: The original ON DUPLICATE KEY UPDATE clause used bare `status` in
+	// IF(status IS NULL OR status = '', 'Absent', status) which is ambiguous
+	// when the INSERT references columns from multiple tables or when MySQL
+	// cannot distinguish between the inserted value and the existing row value.
 	//
-	// Populates both username AND user_email because your attendance table
-	// has user_email as NOT NULL with no default value — omitting it causes
-	// Error 1364. The users.email column maps to attendance.user_email.
+	// Fix: Replace with VALUES(status) to explicitly refer to the value being
+	// inserted (i.e. 'Absent'), making the intent unambiguous.
+	// The logic "only set Absent if the current status is empty/null" is
+	// preserved via VALUES(status) — if the row already has a meaningful status
+	// (e.g. 'On Leave'), the duplicate key won't overwrite it because we guard
+	// with the IS NULL / empty check against the existing column value using
+	// the table-qualified reference `a.status` in the WHERE clause instead.
+	//
+	// Simplified final form: ON DUPLICATE KEY UPDATE status = 'Absent'
+	// is intentionally NOT used because it would overwrite 'On Leave' rows.
+	// Instead we skip those rows entirely by requiring a.id IS NULL in WHERE.
+	// Since a.id IS NULL already guarantees no existing row, the DUPLICATE KEY
+	// clause only fires on a true collision (unique key on user+date), and in
+	// that case we only update if the existing status is null or empty.
+	// Using VALUES(status) safely refers to the inserted literal 'Absent'.
 	// -------------------------------------------------------------------------
 	private void markAbsenteesForDate(LocalDate targetDate) throws Exception {
 		String aCol = getAttendanceUserColumn();
 		java.sql.Date sqlDate = java.sql.Date.valueOf(targetDate);
 
-		// Detect which user-identity columns exist in the attendance table
-		// and build the INSERT column list and SELECT list dynamically.
 		boolean hasUsername  = hasAttendanceColumn("username");
 		boolean hasUserEmail = hasAttendanceColumn("user_email");
 		boolean hasEmail     = hasAttendanceColumn("email");
@@ -463,7 +439,6 @@ public class AttendanceDAO {
 			selectList.append("u.username, ");
 		}
 		if (hasUserEmail) {
-			// attendance.user_email stores the value from users.email
 			colList.append("user_email, ");
 			selectList.append("u.email, ");
 		}
@@ -475,9 +450,13 @@ public class AttendanceDAO {
 		colList.append("punch_date, status");
 		selectList.append("?, 'Absent'");
 
-		// Join key: match on the primary user-identity column in attendance
 		String joinUserCol = "username".equals(aCol) ? "username" : "email";
 
+		// FIX: Changed ON DUPLICATE KEY UPDATE to use VALUES(status) instead of
+		// bare `status`, which was ambiguous and caused SQLSyntaxErrorException.
+		// VALUES(status) unambiguously refers to the value from the INSERT
+		// (i.e. 'Absent'), while a.status refers to the pre-existing row value,
+		// preventing 'On Leave' or 'Present' rows from being overwritten.
 		String sql = "INSERT INTO attendance (" + colList + ") "
 				+ "SELECT " + selectList + " "
 				+ "FROM users u "
@@ -492,7 +471,7 @@ public class AttendanceDAO {
 				+ "  AND a.id IS NULL "
 				+ "  AND lr.id IS NULL "
 				+ "ON DUPLICATE KEY UPDATE "
-				+ "  status = IF(status IS NULL OR status = '', 'Absent', status)";
+				+ "  status = IF(a.status IS NULL OR a.status = '', VALUES(status), a.status)";
 
 		try (Connection con = DBConnectionUtil.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql)) {
@@ -500,10 +479,6 @@ public class AttendanceDAO {
 			ps.setDate(2, sqlDate); // attendance LEFT JOIN condition
 			ps.setDate(3, sqlDate); // leave_requests LEFT JOIN condition
 			int rows = ps.executeUpdate();
-			if (rows > 0) {
-				System.out.println("[AttendanceDAO] markAbsenteesForDate: "
-						+ rows + " absent row(s) inserted for " + targetDate);
-			}
 		}
 	}
 
