@@ -19,19 +19,61 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-theme.css">
 <script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
+<style>
+body { font-family: 'Geist', system-ui, -apple-system, sans-serif; }
+.tasks-wrap { max-width: 980px; }
+.tasks-title { font-size: 29px; font-weight: 700; letter-spacing: -.01em; color: #1e293b; }
+.tasks-sub { color: #64748b; font-size: 14px; margin-top: 3px; }
+.task-card {
+    background: linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+    padding: 20px 20px;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.task-card:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(15, 23, 42, .10); }
+.task-icon {
+    width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg,#eef2ff,#ede9fe);
+    display: inline-flex; align-items: center; justify-content: center; color: #6366f1;
+}
+.task-name { font-size: 25px; font-weight: 700; color: #1e293b; line-height: 1.2; }
+.task-desc { font-size: 13px; color: #64748b; margin-top: 2px; }
+.meta-row { display:flex; flex-wrap:wrap; gap: 10px 14px; margin-top: 9px; color:#64748b; font-size: 12px; }
+.meta-badge {
+    display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px;
+    border:1px solid #e2e8f0; background:#f8fafc; font-weight:600;
+}
+.status-pill {
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700;
+    margin-top: 10px; padding: 4px 10px; border-radius: 999px; border:1px solid #dbeafe; background:#eff6ff; color:#1d4ed8;
+}
+.attach-pill {
+    margin-top: 10px; display:inline-flex; align-items:center; gap:7px; padding:5px 11px; border-radius:999px;
+    font-size:12px; font-weight:600; color:#4f46e5; background:#eef2ff; border:1px solid #c7d2fe;
+}
+.action-panel {
+    border:1px solid #e2e8f0; border-radius:14px; padding:12px; background:#f8fafc;
+}
+.soft-input {
+    width:100%; border:1px solid #e2e8f0; border-radius:10px; padding:9px 10px; background:#fff; font-size:13px; color:#334155;
+}
+.soft-input:focus { outline:none; border-color:#a5b4fc; box-shadow:0 0 0 3px rgba(99,102,241,.12); }
+</style>
 </head>
 <body class="user-iframe-page p-6">
 
-<div class="max-w-5xl mx-auto space-y-6">
+<div class="tasks-wrap mx-auto space-y-6">
     <div>
-        <h2 class="text-2xl font-bold text-slate-800"><i class="fa-solid fa-list-check mr-2 text-indigo-500"></i>Assigned Tasks</h2>
-        <p class="text-slate-500 text-sm mt-1">Submit a request with an optional comment or file. Your manager will review it.</p>
+        <h2 class="tasks-title"><i class="fa-solid fa-list-check mr-2 text-indigo-500"></i>Assigned Tasks</h2>
+        <p class="tasks-sub">Submit a request with optional comment/file. Manager will review and respond.</p>
     </div>
 
     <div id="toast" aria-live="polite"></div>
 
     <%if (tasks == null || tasks.isEmpty()) {%>
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-12 text-center">
+    <div class="task-card p-12 text-center">
         <i class="fa-solid fa-inbox text-4xl text-slate-300 mb-3"></i>
         <p class="text-slate-400 font-medium">No tasks assigned yet.</p>
     </div>
@@ -48,38 +90,35 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
             ? t.getAttachmentName().replace("\\","\\\\").replace("'","\\'").replace("\"","\\\"")
             : "";
     %>
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6" id="task-card-<%=t.getId()%>">
+    <div class="task-card" id="task-card-<%=t.getId()%>">
         <div class="flex flex-col md:flex-row md:items-start gap-6">
 
             <!-- Left: Task Info -->
             <div class="flex-1 min-w-0">
                 <div class="flex items-start gap-3 mb-3">
-                    <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-file-lines text-indigo-500"></i>
+                    <div class="task-icon">
+                        <i class="fa-solid fa-file-lines"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-base leading-tight"><%=t.getTitle() != null ? t.getTitle() : t.getDescription()%></h3>
-                        <p class="text-sm text-slate-500 mt-0.5"><%=t.getDescription()%></p>
+                        <h3 class="task-name"><%=t.getTitle() != null ? t.getTitle() : t.getDescription()%></h3>
+                        <p class="task-desc"><%=t.getDescription()%></p>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-500 ml-13">
-                    <span><i class="fa-solid fa-calendar mr-1"></i>Deadline: <strong class="text-slate-700"><%=t.getDeadline() != null ? t.getDeadline().toString() : "--"%></strong></span>
-                    <span><i class="fa-solid fa-flag mr-1 <%=priorityCls%>"></i>Priority: <strong class="<%=priorityCls%>"><%=t.getPriority() != null ? t.getPriority() : "MEDIUM"%></strong></span>
-                    <span><i class="fa-solid fa-user mr-1"></i>By: <strong class="text-slate-700"><%=t.getAssignedBy()%></strong></span>
+                <div class="meta-row ml-13">
+                    <span class="meta-badge"><i class="fa-solid fa-calendar text-slate-400"></i> Deadline: <strong class="text-slate-700"><%=t.getDeadline() != null ? t.getDeadline().toString() : "--"%></strong></span>
+                    <span class="meta-badge"><i class="fa-solid fa-flag <%=priorityCls%>"></i> Priority: <strong class="<%=priorityCls%>"><%=t.getPriority() != null ? t.getPriority() : "MEDIUM"%></strong></span>
+                    <span class="meta-badge"><i class="fa-solid fa-user text-slate-400"></i> By: <strong class="text-slate-700"><%=t.getAssignedBy()%></strong></span>
                 </div>
 
-                <div class="mt-3 ml-13 text-sm">
-                    <span class="text-slate-500">Status:</span>
-                    <span class="font-semibold text-slate-800 ml-1"><%=statusLabel%></span>
-                </div>
+                <div class="ml-13"><span class="status-pill"><i class="fa-solid fa-circle-check"></i> <%=statusLabel%></span></div>
 
                 <%-- ── Attachment: open in viewer instead of downloading ── --%>
                 <%if (t.getAttachmentName() != null && !t.getAttachmentName().isEmpty()) {%>
                 <div class="mt-3 ml-13">
                     <a href="<%=request.getContextPath()%>/taskAttachment?id=<%=t.getId()%>"
                        onclick="AttachmentViewer.open(event, this.href, '<%=safeAttName%>'); return false;"
-                       class="inline-flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-800 font-medium border border-indigo-200 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+                       class="attach-pill hover:text-indigo-800 transition-colors cursor-pointer">
                         <i class="fa-solid fa-eye"></i> <%=t.getAttachmentName()%>
                     </a>
                 </div>
@@ -89,9 +128,9 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
             <!-- Right: Request form -->
             <div class="w-full md:w-72 flex-shrink-0 space-y-3">
                 <% if (isCompleted) { %>
-                <p class="text-sm text-slate-500 text-center py-2">This task is completed.</p>
+                <p class="text-sm text-slate-500 text-center py-2 action-panel">This task is completed.</p>
                 <% } else if (isProcessing) { %>
-                <p class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-center font-medium">
+                <p class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-center font-semibold">
                     <i class="fa-solid fa-hourglass-half mr-1"></i>Processing — waiting for your manager
                 </p>
                 <button type="button" disabled
@@ -99,14 +138,16 @@ List<Task> tasks = (List<Task>) request.getAttribute("tasks");
                     <i class="fa-solid fa-spinner mr-1"></i> Processing
                 </button>
                 <% } else { %>
+                <div class="action-panel space-y-3">
                 <input type="file" id="file-<%=t.getId()%>" accept="*/*"
-                    class="w-full text-xs text-slate-500 border border-slate-200 rounded-lg px-3 py-2 bg-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-indigo-50 file:text-indigo-600 file:font-medium cursor-pointer">
+                    class="soft-input text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-indigo-50 file:text-indigo-600 file:font-medium cursor-pointer">
                 <textarea id="comment-<%=t.getId()%>" placeholder="Add a comment…"
-                    class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300" rows="2"></textarea>
+                    class="soft-input resize-none" rows="2"></textarea>
                 <button onclick="submitTaskRequest(<%=t.getId()%>, this)" type="button"
-                    class="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors disabled:opacity-50">
+                    class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors disabled:opacity-50">
                     <i class="fa-solid fa-paper-plane mr-1"></i> Submit Request
                 </button>
+                </div>
                 <% } %>
             </div>
 

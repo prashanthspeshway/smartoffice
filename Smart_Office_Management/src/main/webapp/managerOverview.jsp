@@ -181,11 +181,19 @@ String todayStr = new java.text.SimpleDateFormat("EEEE, MMMM d yyyy").format(new
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  min-height:100dvh;
+  font-size:14px;
+  padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 18px);
+}
 a{text-decoration:none;color:inherit}
 
 /* ── LAYOUT ── */
-.pg{max-width:1240px;margin:0 auto;padding:28px 20px}
+.pg{max-width:1240px;margin:0 auto;padding:28px 20px calc(28px + env(safe-area-inset-bottom, 0px))}
 
 /* ── HERO ── */
 .hero{
@@ -212,6 +220,33 @@ a{text-decoration:none;color:inherit}
 }
 .hs-num{font-size:24px;font-weight:700;line-height:1}
 .hs-lbl{font-size:11px;font-weight:500;opacity:.7;margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+@media(max-width:640px){
+  .hero{
+    padding:16px 14px;
+    gap:10px;
+    align-items:flex-start;
+    display:block;
+  }
+  .hero-l{width:100%}
+  .hero-title{
+    font-size:40px;
+    line-height:1.2;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis
+  }
+  .hero-sub{font-size:12px}
+  .hero-r{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    margin-top:10px
+  }
+  .hero-stat{min-width:0;padding:10px 8px;border-radius:10px}
+  .hs-num{font-size:35px}
+  .hs-lbl{font-size:10px}
+}
 
 /* ── KPI STRIP ── */
 .krow{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:14px}
@@ -271,6 +306,7 @@ a{text-decoration:none;color:inherit}
   padding:18px;box-shadow:var(--shadow-sm);transition:box-shadow .18s
 }
 .card:hover{box-shadow:var(--shadow)}
+.card.fill-card{display:flex;flex-direction:column;height:100%}
 .ch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:8px}
 .ct{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
 .ci{width:27px;height:27px;border-radius:8px;background:var(--blue-lt);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
@@ -400,6 +436,20 @@ a{text-decoration:none;color:inherit}
 /* ── 4-WEEK TREND MINI ── */
 .trend-num{font-size:32px;font-weight:700;line-height:1}
 .trend-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.summary-card .trend-num{font-size:40px}
+.summary-head{margin-bottom:18px}
+.summary-bars{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:6px}
+.summary-stats{display:flex;gap:10px;margin-top:14px}
+.summary-stats .att-stat{padding:12px 10px}
+.summary-stats .att-stat-num{font-size:22px}
+.chart-slot{position:relative;width:100%;flex:1;min-height:0}
+.chart-slot canvas{height:100% !important;width:100% !important}
+.chart-slot.trend{min-height:220px}
+.chart-slot.leave-trend{min-height:180px}
+.leave-approval-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.leave-approval-stat{display:flex;flex-direction:column;justify-content:center;text-align:center;padding:13px 10px;border-radius:10px}
+.leave-approval-stat .num{font-size:24px;font-weight:700;line-height:1}
+.leave-approval-stat .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:5px}
 
 /* ── EMPTY ── */
 .empty{text-align:center;padding:24px 16px;color:var(--text3)}
@@ -531,7 +581,7 @@ a{text-decoration:none;color:inherit}
 
 <div class="cr2 a4">
   <!-- Weekly Attendance -->
-  <div class="card">
+  <div class="card fill-card summary-card">
     <div class="ch">
       <div>
         <div class="ct"><div class="ci"><i class="fa-solid fa-calendar-check"></i></div> Weekly Attendance</div>
@@ -590,11 +640,11 @@ a{text-decoration:none;color:inherit}
         <div class="cs">Attendance trend over last 28 days</div>
       </div>
     </div>
-    <div style="margin-bottom:14px">
+    <div class="summary-head">
       <div class="trend-num" style="color:var(--green)"><%=vAA4%>%</div>
       <div class="trend-sub">Average attendance rate (last 4 weeks)</div>
     </div>
-    <div style="margin-bottom:12px">
+    <div class="summary-bars">
       <div class="pbar-row">
         <span class="pbar-lbl" style="color:var(--green)">Present</span>
         <div class="pbar-track"><div class="pbar-fill" style="width:<%=attRate%>%;background:var(--green)"></div></div>
@@ -611,7 +661,7 @@ a{text-decoration:none;color:inherit}
         <span class="pbar-num"><%=sB%></span>
       </div>
     </div>
-    <div style="display:flex;gap:8px">
+    <div class="summary-stats">
       <div class="att-stat" style="flex:1"><div class="att-stat-num" style="color:var(--green)"><%=attRate%>%</div><div class="att-stat-lbl">Present Rate</div></div>
       <div class="att-stat" style="flex:1"><div class="att-stat-num" style="color:var(--red)"><%=absentRate%>%</div><div class="att-stat-lbl">Absent Rate</div></div>
     </div>
@@ -625,7 +675,7 @@ a{text-decoration:none;color:inherit}
 
 <div class="cr3 a5">
   <!-- Task Status Pie -->
-  <div class="card">
+  <div class="card fill-card">
     <div class="ch">
       <div>
         <div class="ct"><div class="ci" style="background:var(--amber-lt);color:var(--amber)"><i class="fa-solid fa-chart-pie"></i></div> Task Status</div>
@@ -667,7 +717,9 @@ a{text-decoration:none;color:inherit}
         <div class="cs">Tasks completed — last 4 weeks</div>
       </div>
     </div>
-    <canvas id="taskTrendChart" height="175"></canvas>
+    <div class="chart-slot trend">
+      <canvas id="taskTrendChart"></canvas>
+    </div>
     <div class="cpills">
       <span class="cpill"><span class="cpill-dot" style="background:var(--green)"></span>Total completed: <%=sCT%></span>
     </div>
@@ -681,7 +733,7 @@ a{text-decoration:none;color:inherit}
 
 <div class="cr2 a6">
   <!-- Leave type donut + approval stats -->
-  <div class="card">
+  <div class="card fill-card">
     <div class="ch">
       <div>
         <div class="ct"><div class="ci" style="background:var(--amber-lt);color:var(--amber)"><i class="fa-solid fa-plane-departure"></i></div> Leave Breakdown</div>
@@ -707,21 +759,23 @@ a{text-decoration:none;color:inherit}
       </div>
     </div>
     <!-- approval mini stats -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
-      <div style="text-align:center;padding:10px;background:var(--green-lt);border:1px solid #bbf7d0;border-radius:9px">
-        <div style="font-size:20px;font-weight:700;color:var(--green)"><%=vLAp%></div>
-        <div style="font-size:10px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Approved</div>
+    <div class="leave-approval-stats">
+      <div class="leave-approval-stat" style="background:var(--green-lt);border:1px solid #bbf7d0">
+        <div class="num" style="color:var(--green)"><%=vLAp%></div>
+        <div class="lbl" style="color:var(--green)">Approved</div>
       </div>
-      <div style="text-align:center;padding:10px;background:var(--amber-lt);border:1px solid #fde68a;border-radius:9px">
-        <div style="font-size:20px;font-weight:700;color:var(--amber)"><%=vLPd%></div>
-        <div style="font-size:10px;color:var(--amber);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Pending</div>
+      <div class="leave-approval-stat" style="background:var(--amber-lt);border:1px solid #fde68a">
+        <div class="num" style="color:var(--amber)"><%=vLPd%></div>
+        <div class="lbl" style="color:var(--amber)">Pending</div>
       </div>
-      <div style="text-align:center;padding:10px;background:var(--red-lt);border:1px solid #fecaca;border-radius:9px">
-        <div style="font-size:20px;font-weight:700;color:var(--red)"><%=vLRj%></div>
-        <div style="font-size:10px;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Rejected</div>
+      <div class="leave-approval-stat" style="background:var(--red-lt);border:1px solid #fecaca">
+        <div class="num" style="color:var(--red)"><%=vLRj%></div>
+        <div class="lbl" style="color:var(--red)">Rejected</div>
       </div>
     </div>
-    <canvas id="leaveTrendChart" height="130"></canvas>
+    <div class="chart-slot leave-trend">
+      <canvas id="leaveTrendChart"></canvas>
+    </div>
   </div>
 </div>
 
@@ -1135,6 +1189,7 @@ new Chart(document.getElementById('taskTrendChart'), {
   },
   options:{
     responsive:true,
+    maintainAspectRatio:false,
     plugins:{ legend:{ display:false } },
     scales:{ x:{ grid:{ display:false } }, y:{ beginAtZero:true, ticks:{ stepSize:1 } } }
   }
@@ -1170,6 +1225,7 @@ new Chart(document.getElementById('leaveTrendChart'), {
   },
   options:{
     responsive:true,
+    maintainAspectRatio:false,
     plugins:{ legend:{ display:false } },
     scales:{ x:{ grid:{ display:false } }, y:{ beginAtZero:true, ticks:{ stepSize:1 } } }
   }

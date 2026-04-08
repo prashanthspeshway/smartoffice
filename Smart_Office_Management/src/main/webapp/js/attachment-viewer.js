@@ -336,15 +336,27 @@
   }
 
   function _renderWord(arrayBuffer) {
-    _loadScript(MAMMOTH_CDN, function(err) {
-      if (err || !global.mammoth) { _error('Word preview library failed to load.'); return; }
-      global.mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
-        .then(function(result) {
-          document.getElementById('av-body').innerHTML =
-            '<div id="av-word-wrap"><div id="av-word-content">' + result.value + '</div></div>';
-        })
-        .catch(function(e){ _error('Could not parse Word document: ' + e.message); });
-    });
+    // Prefer server-side preview (more reliable in restricted networks).
+    var previewUrl = _origUrl ? _origUrl.replace('/taskAttachment?', '/taskAttachmentPreview?') : '';
+    fetch(previewUrl, { credentials:'same-origin' })
+      .then(function(r){
+        if(!r.ok) throw new Error('Server preview unavailable');
+        return r.text();
+      })
+      .then(function(html){
+        document.getElementById('av-body').innerHTML = '<div id="av-word-wrap"><div id="av-word-content">' + html + '</div></div>';
+      })
+      .catch(function(){
+        _loadScript(MAMMOTH_CDN, function(err) {
+          if (err || !global.mammoth) { _error('Word preview unavailable here. Use Download to open.'); return; }
+          global.mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+            .then(function(result) {
+              document.getElementById('av-body').innerHTML =
+                '<div id="av-word-wrap"><div id="av-word-content">' + result.value + '</div></div>';
+            })
+            .catch(function(e){ _error('Could not parse Word document: ' + e.message); });
+        });
+      });
   }
 
   function _renderSheetByIndex(idx) {
@@ -378,25 +390,38 @@
   }
 
   function _renderExcel(arrayBuffer, filename) {
-    _loadScript(XLSX_CDN, function(err) {
-      if (err || !global.XLSX) { _error('Spreadsheet preview library failed to load.'); return; }
-      try {
-        var XLSX = global.XLSX;
-        _xlsWorkbook = XLSX.read(new Uint8Array(arrayBuffer), { type:'array' });
-        _xlsSheets   = _xlsWorkbook.SheetNames;
-        var tabsHtml = _xlsSheets.map(function(name, i){
-          return '<button class="av-sheet-tab' + (i===0?' active':'') + '" onclick="AttachmentViewer._switchSheet(' + i + ')">' + _esc(name) + '</button>';
-        }).join('');
+    // Prefer server-side preview (no CDN dependency).
+    var previewUrl = _origUrl ? _origUrl.replace('/taskAttachment?', '/taskAttachmentPreview?') : '';
+    fetch(previewUrl, { credentials:'same-origin' })
+      .then(function(r){
+        if(!r.ok) throw new Error('Server preview unavailable');
+        return r.text();
+      })
+      .then(function(html){
         document.getElementById('av-body').innerHTML =
-          '<div id="av-sheet-wrap">' +
-            (_xlsSheets.length > 1 ? '<div id="av-sheet-nav">' + tabsHtml + '</div>' : '') +
-            '<div id="av-sheet-table-wrap"></div>' +
-          '</div>';
-        _renderSheetByIndex(0);
-      } catch(e) {
-        _error('Could not parse spreadsheet: ' + e.message);
-      }
-    });
+          '<div id="av-sheet-wrap"><div id="av-sheet-table-wrap">' + html + '</div></div>';
+      })
+      .catch(function(){
+        _loadScript(XLSX_CDN, function(err) {
+          if (err || !global.XLSX) { _error('Spreadsheet preview unavailable here. Use Download to open.'); return; }
+          try {
+            var XLSX = global.XLSX;
+            _xlsWorkbook = XLSX.read(new Uint8Array(arrayBuffer), { type:'array' });
+            _xlsSheets   = _xlsWorkbook.SheetNames;
+            var tabsHtml = _xlsSheets.map(function(name, i){
+              return '<button class="av-sheet-tab' + (i===0?' active':'') + '" onclick="AttachmentViewer._switchSheet(' + i + ')">' + _esc(name) + '</button>';
+            }).join('');
+            document.getElementById('av-body').innerHTML =
+              '<div id="av-sheet-wrap">' +
+                (_xlsSheets.length > 1 ? '<div id="av-sheet-nav">' + tabsHtml + '</div>' : '') +
+                '<div id="av-sheet-table-wrap"></div>' +
+              '</div>';
+            _renderSheetByIndex(0);
+          } catch(e) {
+            _error('Could not parse spreadsheet: ' + e.message);
+          }
+        });
+      });
   }
 
   function _renderCsv(blobUrl) {

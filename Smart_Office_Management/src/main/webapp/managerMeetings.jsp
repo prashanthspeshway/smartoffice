@@ -24,7 +24,33 @@ if (username == null) {
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/smart-office-toast.css">
 <script src="<%=request.getContextPath()%>/js/smart-office-toast.js"></script>
-<style>body{font-family:'Geist',system-ui,sans-serif;}</style>
+<style>
+body{font-family:'Geist',system-ui,sans-serif;}
+
+/* View-all modal responsive cleanup */
+.all-meetings-modal-box{
+	width:min(980px, calc(100vw - 24px));
+	max-height:calc(100dvh - 24px);
+	display:flex;
+	flex-direction:column;
+}
+.all-meetings-modal-content{
+	flex:1;
+	min-height:0;
+	overflow-y:auto;
+	padding:18px;
+}
+@media (max-width: 640px){
+	.all-meetings-modal-box{
+		width:calc(100vw - 10px);
+		max-height:calc(100dvh - 10px);
+		border-radius:12px;
+	}
+	.all-meetings-modal-content{
+		padding:12px;
+	}
+}
+</style>
 </head>
 <body class="bg-slate-100 p-6">
 	<div class="max-w-7xl mx-auto">
@@ -175,7 +201,7 @@ if (username == null) {
 	<div id="allMeetingsModal" 
 		class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
 		onclick="closeAllMeetings()">
-		<div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden"
+		<div class="bg-white rounded-lg shadow-xl overflow-hidden all-meetings-modal-box"
 			onclick="event.stopPropagation()">
 			<div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 flex justify-between items-center">
 				<h3 class="text-lg font-semibold">All Scheduled Meetings</h3>
@@ -183,7 +209,7 @@ if (username == null) {
 					<i class="fa-solid fa-times text-xl"></i>
 				</button>
 			</div>
-			<div id="allMeetingsContent" class="p-6 overflow-y-auto max-h-[calc(80vh-80px)]">
+			<div id="allMeetingsContent" class="all-meetings-modal-content">
 				<div class="flex items-center justify-center py-12">
 					<i class="fa-solid fa-spinner fa-spin text-indigo-600 text-3xl"></i>
 				</div>

@@ -204,6 +204,52 @@ to {
 }
 #exportRangeToast.show { display: block; animation: fadeUp .25s ease; }
 @keyframes fadeUp { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+/* Team attendance header button alignment (mobile) */
+.team-att-head{
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+	gap:12px;
+	margin-bottom:24px;
+}
+.team-att-actions{
+	display:flex;
+	gap:10px;
+	flex-wrap:wrap;
+	justify-content:flex-end;
+}
+.team-att-actions .export-btn{
+	padding:10px 14px;
+	border-radius:10px;
+	font-weight:600;
+	display:inline-flex;
+	align-items:center;
+	gap:7px;
+	font-size:13px;
+	white-space:nowrap;
+}
+@media (max-width: 768px) {
+	body { padding: 14px; }
+	.team-att-head{
+		flex-direction:column;
+		align-items:flex-start;
+		margin-bottom:14px;
+	}
+	.team-att-actions{
+		width:100%;
+		display:grid;
+		grid-template-columns:1fr 1fr;
+		gap:8px;
+	}
+	.team-att-actions form{ display:block; }
+	.team-att-actions .export-btn{
+		width:100%;
+		justify-content:center;
+		padding:9px 10px;
+		font-size:12px;
+	}
+}
 </style>
 </head>
 <body class="bg-slate-100 p-6">
@@ -552,22 +598,22 @@ to {
 
 		<!-- ── Team Attendance ── -->
 		<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-			<div class="flex justify-between items-center mb-6">
+			<div class="team-att-head">
 				<h3
 					class="text-lg font-semibold text-slate-800 flex items-center gap-2">
 					<i class="fa-solid fa-people-group text-indigo-400"></i> Team
 					Attendance (Today)
 				</h3>
-				<div class="flex gap-3">
+				<div class="team-att-actions">
 					<button type="button"
-						class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 text-sm"
+						class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
 						onclick="document.getElementById('exportAttendanceOverlay').classList.add('show')">
 						<i class="fa-solid fa-file-export"></i> Export Attendance
 					</button>
 					<form action="<%=request.getContextPath()%>/exportTeamPerformance"
 						method="get">
 						<button type="submit"
-							class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 text-sm">
+							class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white transition-colors">
 							<i class="fa-solid fa-file-export"></i> Export Performance
 						</button>
 					</form>

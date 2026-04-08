@@ -185,6 +185,21 @@ body.user-iframe-page{min-height:100vh}
 
 .empty{text-align:center;padding:28px;color:var(--text3);font-size:.88rem}
 .empty i{font-size:1.6rem;display:block;margin-bottom:8px;opacity:.4}
+.chart-wrap{position:relative;height:220px}
+.chart-wrap.weekly{height:265px}
+#weeklyAtt{height:100% !important}
+.quick-links{display:flex;flex-direction:column;gap:4px}
+.quick-link{
+  display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:10px;
+  color:var(--text2);text-decoration:none;font-size:.86rem;font-weight:500;
+  border:1px solid transparent;transition:all .15s ease
+}
+.quick-link:hover{background:#f8faff;color:var(--blue);border-color:#dbe4ff}
+.quick-link:focus-visible{outline:2px solid #c7d2fe;outline-offset:1px}
+.recent-wrap{max-height:380px;overflow-y:auto;padding-right:4px}
+.recent-wrap::-webkit-scrollbar{width:8px}
+.recent-wrap::-webkit-scrollbar-thumb{background:#d6dcea;border-radius:999px}
+.recent-wrap::-webkit-scrollbar-track{background:transparent}
 </style>
 </head>
 <body class="user-iframe-page">
@@ -258,7 +273,9 @@ body.user-iframe-page{min-height:100vh}
           <div class="cs">Present vs absent — last 7 days</div></div>
         <span class="badge">You</span>
       </div>
-      <canvas id="weeklyAtt" height="190"></canvas>
+      <div class="chart-wrap weekly">
+        <canvas id="weeklyAtt"></canvas>
+      </div>
       <div class="cpills">
         <span class="cpill"><span class="cpill-dot" style="background:#4f6ef7"></span>Present days</span>
         <span class="cpill"><span class="cpill-dot" style="background:#fca5a5"></span>Absent</span>
@@ -380,9 +397,20 @@ body.user-iframe-page{min-height:100vh}
     <div class="card">
       <h2><i class="fa-solid fa-bolt"></i> Quick links</h2>
       <p class="punch-line" style="margin-bottom:8px;">Jump to common actions from the sidebar:</p>
-      <p class="punch-line"><i class="fa-solid fa-list-check" style="color:var(--violet);width:18px;"></i> Tasks &amp; submissions</p>
-      <p class="punch-line"><i class="fa-solid fa-calendar-xmark" style="color:var(--amber);width:18px;"></i> Apply or track leave</p>
-      <p class="punch-line"><i class="fa-solid fa-calendar-days" style="color:var(--blue);width:18px;"></i> Company calendar</p>
+      <div class="quick-links">
+        <a href="<%=request.getContextPath()%>/user?view=userTasks" class="quick-link"
+           onclick="if (window.parent && typeof window.parent.loadPage === 'function') { window.parent.loadPage(null,'userTasks'); return false; }">
+          <i class="fa-solid fa-list-check" style="color:var(--violet);width:18px;"></i> Tasks &amp; submissions
+        </a>
+        <a href="<%=request.getContextPath()%>/user?view=userLeave" class="quick-link"
+           onclick="if (window.parent && typeof window.parent.loadPage === 'function') { window.parent.loadPage(null,'userLeave'); return false; }">
+          <i class="fa-solid fa-calendar-xmark" style="color:var(--amber);width:18px;"></i> Apply or track leave
+        </a>
+        <a href="<%=request.getContextPath()%>/user?view=calendar.jsp" class="quick-link"
+           onclick="if (window.parent && typeof window.parent.loadPage === 'function') { window.parent.loadPage(null,'calendar.jsp'); return false; }">
+          <i class="fa-solid fa-calendar-days" style="color:var(--blue);width:18px;"></i> Company calendar
+        </a>
+      </div>
     </div>
   </div>
 
@@ -391,21 +419,23 @@ body.user-iframe-page{min-height:100vh}
     <% if (recentActivities == null || recentActivities.isEmpty()) { %>
       <div class="empty"><i class="fa-regular fa-folder-open"></i>No recent tasks or leave activity yet.</div>
     <% } else { %>
-      <ul class="act">
-        <% for (Map<String, String> a : recentActivities) {
-            String kind = a.get("kind");
-            boolean isTask = "task".equals(kind);
-        %>
-        <li>
-          <div class="dot <%= isTask ? "task" : "leave" %>"><i class="fa-solid <%= isTask ? "fa-list-check" : "fa-plane-departure" %>"></i></div>
-          <div>
-            <div class="t"><%= a.get("title") != null ? a.get("title") : "" %></div>
-            <div class="d"><%= a.get("detail") != null ? a.get("detail") : "" %></div>
-            <div class="w"><%= a.get("when") != null ? a.get("when") : "" %></div>
-          </div>
-        </li>
-        <% } %>
-      </ul>
+      <div class="recent-wrap">
+        <ul class="act">
+          <% for (Map<String, String> a : recentActivities) {
+              String kind = a.get("kind");
+              boolean isTask = "task".equals(kind);
+          %>
+          <li>
+            <div class="dot <%= isTask ? "task" : "leave" %>"><i class="fa-solid <%= isTask ? "fa-list-check" : "fa-plane-departure" %>"></i></div>
+            <div>
+              <div class="t"><%= a.get("title") != null ? a.get("title") : "" %></div>
+              <div class="d"><%= a.get("detail") != null ? a.get("detail") : "" %></div>
+              <div class="w"><%= a.get("when") != null ? a.get("when") : "" %></div>
+            </div>
+          </li>
+          <% } %>
+        </ul>
+      </div>
     <% } %>
   </div>
 
@@ -431,8 +461,25 @@ new Chart(document.getElementById('weeklyAtt'), {
   },
   options: {
     responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { top: 0, bottom: 0 } },
     plugins: { legend: { position: 'top' } },
-    scales: { x: { grid: { display: false } }, y: { ticks: { stepSize: 1 }, beginAtZero: true } }
+    scales: {
+      x: { grid: { display: false } },
+      y: {
+        beginAtZero: true,
+        max: 1,
+        grace: 0,
+        ticks: { stepSize: 1, padding: 2 }
+      }
+    },
+    datasets: {
+      bar: {
+        categoryPercentage: 0.72,
+        barPercentage: 0.9,
+        maxBarThickness: 28
+      }
+    }
   }
 });
 

@@ -38,6 +38,9 @@ body.so-shell {
   font-family: var(--so-font);
   color: var(--so-text);
   background: var(--so-bg-page);
+  min-height: 100dvh;
+  height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .so-header {
@@ -85,6 +88,7 @@ body.so-shell {
 
 .so-main {
   background: var(--so-bg-page) !important;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
 }
 
 /* Sidebar: soft charcoal (“light black”), compact width */
@@ -258,6 +262,7 @@ body.user-iframe-page {
   background: var(--so-content-bg) !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
 }
 
 body.user-iframe-page h1,

@@ -36,6 +36,31 @@ body.user-iframe-page { min-height: 100vh; }
 .delete-modal-box {
   animation: popIn 0.25s ease forwards;
 }
+
+/* Full holiday list modal: fit neatly on mobile screens */
+.full-list-modal-box {
+  width: min(980px, calc(100vw - 20px));
+  max-height: calc(100dvh - 20px);
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+}
+.full-list-table-wrap {
+  max-height: min(60vh, calc(100dvh - 290px));
+  overflow: auto;
+}
+@media (max-width: 640px) {
+  .full-list-modal-box {
+    width: calc(100vw - 12px);
+    max-height: calc(100dvh - 12px);
+    margin: 6px;
+    border-radius: 14px;
+    padding: 12px;
+  }
+  .full-list-table-wrap {
+    max-height: calc(100dvh - 300px);
+  }
+}
 </style>
 </head>
 <body class="user-iframe-page min-h-screen">
@@ -177,7 +202,7 @@ body.user-iframe-page { min-height: 100vh; }
      FULL LIST MODAL
 ════════════════════════════════════════════════ -->
 <div id="fullListModal" class="fixed inset-0 bg-black/40 z-[9999] items-center justify-center hidden" onclick="if(event.target===this)closeFullListModal()">
-  <div class="bg-white rounded-xl shadow-xl max-w-3xl w-full mx-4 p-6" onclick="event.stopPropagation()">
+  <div class="bg-white rounded-xl shadow-xl mx-4 full-list-modal-box" onclick="event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
       <div>
         <h3 class="text-lg font-semibold text-slate-800">Holiday List</h3>
@@ -213,7 +238,7 @@ body.user-iframe-page { min-height: 100vh; }
     <div id="fullListMeta" class="text-xs text-slate-500 mb-3"></div>
 
     <div class="border border-slate-200 rounded-lg overflow-hidden">
-      <div class="max-h-[60vh] overflow-auto">
+      <div class="full-list-table-wrap">
         <table class="w-full text-sm">
           <thead class="bg-slate-50 sticky top-0 z-10">
             <tr class="text-slate-600 text-xs font-semibold uppercase tracking-wider">
@@ -228,10 +253,6 @@ body.user-iframe-page { min-height: 100vh; }
           <tbody id="fullListBody"></tbody>
         </table>
       </div>
-    </div>
-
-    <div class="flex justify-end gap-3 mt-4">
-      <button type="button" onclick="closeFullListModal()" class="px-4 py-2.5 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50">Close</button>
     </div>
   </div>
 </div>

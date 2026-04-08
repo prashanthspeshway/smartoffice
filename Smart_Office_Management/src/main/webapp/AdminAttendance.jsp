@@ -65,7 +65,9 @@ body { font-family: 'Geist', system-ui, sans-serif; }
     background: #fff;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
     box-shadow: 0 1px 3px rgba(0,0,0,.05);
 }
 
@@ -223,9 +225,73 @@ tr.row-clickable:hover .row-hint { opacity:1; color:#6366f1; }
 /* Download — indigo */
 .btn-download { background:#4f46e5; color:#fff; }
 .btn-download:hover { background:#4338ca; }
+
+/* ══ Mobile table cleanup ══ */
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+
+    .attendance-card {
+        padding: 14px 12px;
+    }
+
+    .search-input {
+        max-width: 100%;
+    }
+
+    .attendance-table {
+        min-width: 760px;
+        font-size: 13px;
+    }
+
+    .attendance-table th,
+    .attendance-table td {
+        padding: 10px 10px;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .attendance-table th:first-child,
+    .attendance-table td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: #fff;
+    }
+
+    .attendance-table th:first-child {
+        z-index: 3;
+        background: #f1f5f9;
+    }
+
+    .attendance-table td:first-child {
+        min-width: 170px;
+    }
+
+    .avatar-circle {
+        width: 34px;
+        height: 34px;
+        font-size: 12px;
+    }
+
+    .employee-name {
+        font-size: 13px;
+        line-height: 1.2;
+    }
+
+    .row-hint {
+        display: none;
+    }
+
+    .attendance-table td span.px-3.py-1 {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+}
 </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-6">
+<body class="bg-slate-100 min-h-screen p-3 md:p-6">
 
 <div class="max-w-7xl mx-auto">
 

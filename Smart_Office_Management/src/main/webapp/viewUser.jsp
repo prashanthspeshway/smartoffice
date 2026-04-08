@@ -219,9 +219,52 @@ body {
 .grid-card:hover {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
+/* Mobile alignment for Employees table (same pattern as attendance) */
+#listView {
+	overflow-x: auto;
+	overflow-y: hidden;
+	-webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+	body {
+		padding: 12px;
+	}
+
+	#listView table {
+		min-width: 860px;
+	}
+
+	#listView th, #listView td {
+		white-space: nowrap;
+		vertical-align: middle;
+		padding: 10px 10px !important;
+		font-size: 13px !important;
+	}
+
+	#listView th:first-child,
+	#listView td:first-child {
+		position: sticky;
+		left: 0;
+		z-index: 2;
+		background: #fff;
+		min-width: 140px;
+	}
+
+	#listView thead th:first-child {
+		z-index: 3;
+		background: #f8fafc;
+	}
+
+	#listView th:last-child,
+	#listView td:last-child {
+		min-width: 96px;
+	}
+}
 </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-6">
+<body class="bg-slate-100 min-h-screen p-3 md:p-6">
 
 	<div class="max-w-6xl mx-auto">
 		<!-- Header: Title + Action Buttons -->

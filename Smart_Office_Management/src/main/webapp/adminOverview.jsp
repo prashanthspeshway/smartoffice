@@ -338,7 +338,17 @@ Chart.defaults.plugins.legend.labels.padding  = 14;
 var managers  = <%=attrInt(request,"managers",0)%>;
 var employees = <%=attrInt(request,"employees",0)%>;
 
-var weekLabels  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+// Last 7 days labels aligned with DAO series order (today-6 ... today)
+var weekLabels = (function () {
+    var out = [];
+    var now = new Date();
+    for (var i = 6; i >= 0; i--) {
+        var d = new Date(now);
+        d.setDate(now.getDate() - i);
+        out.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
+    }
+    return out;
+})();
 var weekPresent = [<%=attr(request,"weekPresent","0,0,0,0,0,0,0")%>];
 var weekAbsent  = [<%=attr(request,"weekAbsent","0,0,0,0,0,0,0")%>];
 

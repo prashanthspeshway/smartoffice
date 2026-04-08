@@ -99,6 +99,7 @@ body {
 .stat-icon.green  { background: var(--success-light); color: var(--success); }
 .stat-icon.purple { background: var(--purple-light);  color: var(--purple); }
 .stat-num   { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
+.stat-num.time { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .stat-label { font-size: 12px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: .6px; margin-top: 3px; }
 
 /* ── Btn ── */
@@ -212,6 +213,7 @@ body {
     background: var(--accent-light); color: var(--accent);
     padding: 4px 10px; border-radius: var(--radius-full);
     font-size: 12px; font-weight: 600;
+    white-space: nowrap;
 }
 .meta-chip.purple { background: var(--purple-light); color: var(--purple); }
 .meta-chip.green  { background: var(--success-light); color: #15803d; }
@@ -347,6 +349,43 @@ body {
 .anim-2 { animation-delay: .1s; }
 .anim-3 { animation-delay: .15s; }
 .anim-4 { animation-delay: .2s; }
+
+@media (max-width: 768px) {
+    .page { padding: 20px 12px calc(26px + env(safe-area-inset-bottom, 0px)); }
+    .page-header { margin-bottom: 18px; }
+    .page-title { font-size: 42px; }
+    .page-subtitle { font-size: 13px; }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        min-width: 0;
+        padding: 12px 10px;
+        gap: 8px;
+    }
+    .stat-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        font-size: 13px;
+    }
+    .stat-num { font-size: 26px; }
+    .stat-num.time { font-size: 30px; }
+    .stat-label { font-size: 10px; letter-spacing: .35px; }
+
+    .section-header { margin-bottom: 14px; align-items: baseline; }
+    .section-title { font-size: 35px; }
+
+    .meeting-card-top { padding: 14px 14px 12px; }
+    .meeting-card-body { padding: 12px 14px; }
+    .meeting-card-footer { padding: 10px 14px; }
+    .time-badge { font-size: 11px; padding: 4px 9px; white-space: nowrap; }
+    .status-badge { margin-left: 0; }
+}
 </style>
 </head>
 <body>
@@ -389,7 +428,7 @@ body {
         <div class="stat-card anim anim-3">
             <div class="stat-icon purple"><i class="fa-solid fa-clock"></i></div>
             <div>
-                <div class="stat-num"><%= new java.text.SimpleDateFormat("hh:mm a").format(new java.util.Date()) %></div>
+                <div class="stat-num time"><%= new java.text.SimpleDateFormat("hh:mm a").format(new java.util.Date()) %></div>
                 <div class="stat-label">Current Time</div>
             </div>
         </div>
