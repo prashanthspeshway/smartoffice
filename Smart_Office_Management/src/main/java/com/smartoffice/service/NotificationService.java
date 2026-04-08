@@ -1,6 +1,7 @@
 package com.smartoffice.service;
 
 import com.smartoffice.utils.DBConnectionUtil;
+import com.smartoffice.realtime.LiveUpdates;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,6 +29,8 @@ public class NotificationService {
 		} catch (Exception e) {
 			System.err.println("[NotificationService] Failed to notify " + recipientEmail + ": " + e.getMessage());
 		}
+		// Push live event (if the recipient is connected via WebSocket).
+		LiveUpdates.pushNotification(recipientEmail.trim(), type, message, createdBy);
 	}
 
 	public static void notifyMany(List<String> recipientEmails, String createdBy, String type, String message) {
@@ -49,6 +52,14 @@ public class NotificationService {
 			ps.executeBatch();
 		} catch (Exception e) {
 			System.err.println("[NotificationService] Failed batch notify: " + e.getMessage());
+		}
+		// Push live events per recipient.
+		for (String email : recipientEmails) {
+			if (email == null || email.trim().isEmpty())
+				continue;
+			if (email.trim().equalsIgnoreCase(createdBy))
+				continue;
+			LiveUpdates.pushNotification(email.trim(), type, message, createdBy);
 		}
 	}
 

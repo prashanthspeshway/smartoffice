@@ -3,6 +3,7 @@ package com.smartoffice.controller;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -71,14 +72,25 @@ public class AssignTaskServlet extends HttpServlet {
 
 			String attachmentName = null;
 			byte[] attachmentBytes = null;
+			Part filePart = null;
 			try {
-				Part filePart = request.getPart("attachment");
+				filePart = request.getPart("attachment");
 				if (filePart != null && filePart.getSize() > 0 && filePart.getSubmittedFileName() != null
 						&& !filePart.getSubmittedFileName().isEmpty()) {
 					attachmentName = filePart.getSubmittedFileName();
-					attachmentBytes = filePart.getInputStream().readAllBytes();
+					try (InputStream in = filePart.getInputStream()) {
+						attachmentBytes = in.readAllBytes();
+					}
 				}
 			} catch (Exception ignore) {
+			} finally {
+				// Important on Windows: release the temp upload file immediately.
+				if (filePart != null) {
+					try {
+						filePart.delete();
+					} catch (Exception ignored) {
+					}
+				}
 			}
 
 			java.sql.Date deadlineDate = null;

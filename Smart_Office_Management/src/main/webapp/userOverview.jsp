@@ -58,6 +58,30 @@ String todayStatus = request.getAttribute("todayStatus") != null ? (String) requ
 java.sql.Timestamp pi = (java.sql.Timestamp) request.getAttribute("punchIn");
 java.sql.Timestamp po = (java.sql.Timestamp) request.getAttribute("punchOut");
 
+String workHourLabels = (String) request.getAttribute("workHourLabels");
+String workHourData = (String) request.getAttribute("workHourData");
+String avgWorkHoursToday = request.getAttribute("avgWorkHoursToday") != null ? String.valueOf(request.getAttribute("avgWorkHoursToday")) : "0";
+if (workHourLabels == null) workHourLabels = "'Mon','Tue','Wed','Thu','Fri','Sat','Sun'";
+if (workHourData == null)   workHourData = "0,0,0,0,0,0,0";
+
+String breakLabels = (String) request.getAttribute("breakLabels");
+String breakData = (String) request.getAttribute("breakData");
+int breakTotalMinutes7d = request.getAttribute("breakTotalMinutes7d") != null ? (Integer) request.getAttribute("breakTotalMinutes7d") : 0;
+if (breakLabels == null) breakLabels = "'Mon','Tue','Wed','Thu','Fri','Sat','Sun'";
+if (breakData == null)   breakData = "0,0,0,0,0,0,0";
+
+String taskTrendLabels = (String) request.getAttribute("taskTrendLabels");
+String taskTrendAssignedData = (String) request.getAttribute("taskTrendAssignedData");
+String taskTrendCompletedData = (String) request.getAttribute("taskTrendCompletedData");
+if (taskTrendLabels == null)        taskTrendLabels = "'Wk 1','Wk 2','Wk 3','Wk 4'";
+if (taskTrendAssignedData == null)  taskTrendAssignedData = "0,0,0,0";
+if (taskTrendCompletedData == null) taskTrendCompletedData = "0,0,0,0";
+
+String leaveTrendLabels = (String) request.getAttribute("leaveTrendLabels");
+String leaveTrendData = (String) request.getAttribute("leaveTrendData");
+if (leaveTrendLabels == null) leaveTrendLabels = "''";
+if (leaveTrendData == null)   leaveTrendData = "0";
+
 @SuppressWarnings("unchecked")
 List<Map<String, String>> recentActivities = (List<Map<String, String>>) request.getAttribute("recentActivities");
 
@@ -97,8 +121,10 @@ body.user-iframe-page{min-height:100vh}
 .hero .date{font-size:clamp(0.72rem,1vw + 0.55rem,0.8rem);opacity:.85;margin-top:10px;display:flex;align-items:center;gap:8px;position:relative;z-index:1}
 .hero .date i{opacity:.7}
 
-.krow{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:22px}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;box-shadow:var(--shadow-sm)}
+.krow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px;align-items:stretch}
+@media(max-width:950px){.krow{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:520px){.krow{grid-template-columns:1fr;}}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;min-height:104px}
 .kpi .ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:10px}
 .kpi .ico.bl{background:#eef2ff;color:var(--blue)}
 .kpi .ico.am{background:#fffbeb;color:var(--amber)}
@@ -218,7 +244,7 @@ body.user-iframe-page{min-height:100vh}
         <div class="ins-lbl">On-time punch (week)</div>
         <div class="ins-val" style="color:var(--amber)"><%= onTimePunchPct %>%</div>
         <div class="ins-bar"><div class="ins-fill" style="width:<%=onTimePunchPct%>%;background:var(--amber)"></div></div>
-        <div style="font-size:11px;color:var(--text3);margin-top:4px">Before 9am vs all punch-ins this week</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">10:00–10:30am vs all punch-ins this week</div>
       </div>
     </div>
   </div>
@@ -253,6 +279,65 @@ body.user-iframe-page{min-height:100vh}
     </div>
   </div>
 
+  <div class="cr2">
+    <div class="card">
+      <div class="ch">
+        <div>
+          <div class="ct"><div class="ci" style="background:#f0fdf4;color:var(--green)"><i class="fa-solid fa-business-time"></i></div> Work hours</div>
+          <div class="cs">Average hours worked per day — last 7 days</div>
+        </div>
+        <span class="badge gr">Avg today: <%= avgWorkHoursToday %>h</span>
+      </div>
+      <canvas id="workHoursLine" height="190"></canvas>
+      <div class="cpills">
+        <span class="cpill"><span class="cpill-dot" style="background:#22c55e"></span>Hours/day</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch">
+        <div>
+          <div class="ct"><div class="ci" style="background:#f5f3ff;color:var(--violet)"><i class="fa-solid fa-mug-hot"></i></div> Break time</div>
+          <div class="cs">Minutes on break — last 7 days</div>
+        </div>
+        <span class="badge">Total: <%= breakTotalMinutes7d %>m</span>
+      </div>
+      <canvas id="breakBar" height="190"></canvas>
+      <div class="cpills">
+        <span class="cpill"><span class="cpill-dot" style="background:#8b5cf6"></span>Break minutes</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cr2">
+    <div class="card">
+      <div class="ch">
+        <div>
+          <div class="ct"><div class="ci" style="background:#eef2ff;color:var(--blue)"><i class="fa-solid fa-chart-line"></i></div> Task trend</div>
+          <div class="cs">Assigned vs completed — last 4 weeks</div>
+        </div>
+      </div>
+      <canvas id="taskTrendLine" height="190"></canvas>
+      <div class="cpills">
+        <span class="cpill"><span class="cpill-dot" style="background:#4f6ef7"></span>Assigned</span>
+        <span class="cpill"><span class="cpill-dot" style="background:#22c55e"></span>Completed</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch">
+        <div>
+          <div class="ct"><div class="ci" style="background:#fffbeb;color:var(--amber)"><i class="fa-solid fa-chart-column"></i></div> Leave trend</div>
+          <div class="cs">Leave requests per month — last 6 months</div>
+        </div>
+      </div>
+      <canvas id="leaveTrendLine" height="190"></canvas>
+      <div class="cpills">
+        <span class="cpill"><span class="cpill-dot" style="background:#f59e0b"></span>Requests/month</span>
+      </div>
+    </div>
+  </div>
+
   <div class="crw">
     <div class="card">
       <div class="ch">
@@ -277,9 +362,9 @@ body.user-iframe-page{min-height:100vh}
       </div>
       <canvas id="leaveDonut" height="165"></canvas>
       <div class="cpills">
-        <% if (vLS > 0) { %><span class="cpill"><span class="cpill-dot" style="background:#ef4444"></span>Sick: <%=vLS%></span><% } %>
-        <% if (vLA > 0) { %><span class="cpill"><span class="cpill-dot" style="background:#22c55e"></span>Annual: <%=vLA%></span><% } %>
-        <% if (vLP > 0) { %><span class="cpill"><span class="cpill-dot" style="background:#f59e0b"></span>Personal: <%=vLP%></span><% } %>
+        <span class="cpill"><span class="cpill-dot" style="background:#ef4444"></span>Sick: <%=vLS%></span>
+        <span class="cpill"><span class="cpill-dot" style="background:#22c55e"></span>Earned: <%=vLA%></span>
+        <span class="cpill"><span class="cpill-dot" style="background:#f59e0b"></span>Casual: <%=vLP%></span>
       </div>
     </div>
   </div>
@@ -367,7 +452,7 @@ new Chart(document.getElementById('taskPie'), {
 new Chart(document.getElementById('punchBar'), {
   type: 'bar',
   data: {
-    labels: ['Before 8am','8–9am','9–10am','10–11am','After 11am'],
+    labels: ['Before 10am','10–11am','11–12pm','12–1pm','After 1pm'],
     datasets: [{
       label: 'Days',
       data: [<%= vP0 %>, <%= vP1 %>, <%= vP2 %>, <%= vP3 %>, <%= vP4 %>],
@@ -385,14 +470,109 @@ new Chart(document.getElementById('punchBar'), {
 new Chart(document.getElementById('leaveDonut'), {
   type: 'doughnut',
   data: {
-    labels: ['Sick','Annual','Personal','Maternity','Other'],
+    labels: ['Sick','Earned','Casual'],
     datasets: [{
-      data: [<%= vLS %>, <%= vLA %>, <%= vLP %>, <%= vLM %>, <%= vLO %>],
-      backgroundColor: ['#ef4444','#22c55e','#f59e0b','#ec4899','#8b5cf6'],
+      data: [<%= vLS %>, <%= vLA %>, <%= vLP %>],
+      backgroundColor: ['#ef4444','#22c55e','#f59e0b'],
       borderWidth: 2, borderColor: '#fff', hoverOffset: 6
     }]
   },
   options: { responsive: true, cutout: '58%', plugins: { legend: { position: 'bottom' } } }
+});
+
+new Chart(document.getElementById('workHoursLine'), {
+  type: 'line',
+  data: {
+    labels: [<%= workHourLabels %>],
+    datasets: [{
+      label: 'Avg hours',
+      data: [<%= workHourData %>],
+      borderColor: '#22c55e',
+      backgroundColor: 'rgba(34,197,94,.18)',
+      tension: 0.35,
+      fill: true,
+      pointRadius: 3,
+      pointBackgroundColor: '#22c55e'
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+  }
+});
+
+new Chart(document.getElementById('breakBar'), {
+  type: 'bar',
+  data: {
+    labels: [<%= breakLabels %>],
+    datasets: [{
+      label: 'Minutes',
+      data: [<%= breakData %>],
+      backgroundColor: '#8b5cf6',
+      borderRadius: 6,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+  }
+});
+
+new Chart(document.getElementById('taskTrendLine'), {
+  type: 'line',
+  data: {
+    labels: [<%= taskTrendLabels %>],
+    datasets: [
+      {
+        label: 'Assigned',
+        data: [<%= taskTrendAssignedData %>],
+        borderColor: '#4f6ef7',
+        backgroundColor: 'rgba(79,110,247,.15)',
+        tension: 0.35,
+        fill: true,
+        pointRadius: 3
+      },
+      {
+        label: 'Completed',
+        data: [<%= taskTrendCompletedData %>],
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34,197,94,.10)',
+        tension: 0.35,
+        fill: true,
+        pointRadius: 3
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+  }
+});
+
+new Chart(document.getElementById('leaveTrendLine'), {
+  type: 'line',
+  data: {
+    labels: [<%= leaveTrendLabels %>],
+    datasets: [{
+      label: 'Requests',
+      data: [<%= leaveTrendData %>],
+      borderColor: '#f59e0b',
+      backgroundColor: 'rgba(245,158,11,.18)',
+      tension: 0.35,
+      fill: true,
+      pointRadius: 3,
+      pointBackgroundColor: '#f59e0b'
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+  }
 });
 </script>
 </body>

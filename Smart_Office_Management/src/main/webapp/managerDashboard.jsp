@@ -304,6 +304,50 @@ try {
 			.catch(function() {});
 	}
 	window.updateBadge = updateBadge;
+
+	// ── WebSocket live updates ──
+	(function initLiveUpdates() {
+		var ctx = '<%=request.getContextPath()%>';
+		var proto = (location.protocol === 'https:') ? 'wss://' : 'ws://';
+		var wsUrl = proto + location.host + ctx + '/ws/live';
+		var backoffMs = 1000;
+		var maxBackoff = 15000;
+		var ws;
+
+		function safeJsonParse(s) { try { return JSON.parse(s); } catch (e) { return null; } }
+		function refreshIfOn(viewPrefix) {
+			var frame = document.getElementById('contentFrame');
+			if (!frame || !frame.src) return;
+			if (frame.src.indexOf('/' + viewPrefix) !== -1 || frame.src.endsWith('/' + viewPrefix) || frame.src.indexOf(viewPrefix) !== -1) {
+				try { frame.contentWindow.location.reload(); } catch (e) { frame.src = frame.src; }
+			}
+		}
+		function maybeRefreshForType(type) {
+			var t = String(type || '').toUpperCase();
+			if (t === 'TASK') refreshIfOn('managerTasks');
+			if (t === 'LEAVE') refreshIfOn('managerLeave');
+			if (t === 'MEETING') refreshIfOn('managerMeetings');
+			refreshIfOn('managerOverview');
+		}
+
+		function connect() {
+			try { ws = new WebSocket(wsUrl); } catch (e) { scheduleReconnect(); return; }
+			ws.onopen = function() { backoffMs = 1000; };
+			ws.onclose = function() { scheduleReconnect(); };
+			ws.onerror = function() { try { ws.close(); } catch (e) {} };
+			ws.onmessage = function(ev) {
+				var data = safeJsonParse(ev.data);
+				if (!data || data.kind !== 'notification') return;
+				updateBadge();
+				maybeRefreshForType(data.type);
+			};
+		}
+		function scheduleReconnect() {
+			setTimeout(connect, backoffMs);
+			backoffMs = Math.min(maxBackoff, Math.round(backoffMs * 1.6));
+		}
+		connect();
+	})();
 	document.addEventListener('DOMContentLoaded', function() {
 		var mt = document.getElementById('managerMobileNavToggle');
 		var mo = document.getElementById('managerNavOverlay');
@@ -336,21 +380,7 @@ try {
 		updateBadge();
 		setInterval(updateBadge, 90000);
 	});
-	
-	setInterval(function() {
-	    fetch('NotificationServlet')
-	        .then(response => response.json())
-	        .then(data => {
-	            if (data.length > 0) {
-	                let container = document.getElementById("notificationBox");
-	                container.innerHTML = "";
-
-	                data.forEach(n => {
-	                    container.innerHTML += `<p>${n.message}</p>`;
-	                });
-	            }
-	        });
-	}, 500); // every 5 seconds
+	// NOTE: removed aggressive 500ms polling; live updates come via WebSocket now.
 
 	/* showToast: js/smart-office-toast.js */
 

@@ -239,6 +239,47 @@ window.updateBadge = updateBadge;
 
 // showToast: global from js/smart-office-toast.js
 
+// ── WebSocket live updates ──
+(function initLiveUpdates() {
+    var ctx = '<%= ctxPath %>';
+    var proto = (location.protocol === 'https:') ? 'wss://' : 'ws://';
+    var wsUrl = proto + location.host + ctx + '/ws/live';
+    var backoffMs = 1000;
+    var maxBackoff = 15000;
+    var ws;
+
+    function safeJsonParse(s) { try { return JSON.parse(s); } catch (e) { return null; } }
+
+    function maybeRefreshForType(type) {
+        var frame = document.getElementById('contentFrame');
+        if (!frame || !frame.src) return;
+        var src = frame.src;
+        // refresh only the relevant view so user sees updates without a full page reload
+        if (type === 'TASK' && src.indexOf('/userTasks') !== -1) frame.contentWindow.location.reload();
+        if (type === 'LEAVE' && src.indexOf('/userLeave') !== -1) frame.contentWindow.location.reload();
+        if (type === 'MEETING' && src.indexOf('/userMeetings') !== -1) frame.contentWindow.location.reload();
+        if (src.indexOf('/userOverview') !== -1) frame.contentWindow.location.reload();
+    }
+
+    function connect() {
+        try { ws = new WebSocket(wsUrl); } catch (e) { scheduleReconnect(); return; }
+        ws.onopen = function() { backoffMs = 1000; };
+        ws.onclose = function() { scheduleReconnect(); };
+        ws.onerror = function() { try { ws.close(); } catch (e) {} };
+        ws.onmessage = function(ev) {
+            var data = safeJsonParse(ev.data);
+            if (!data || data.kind !== 'notification') return;
+            updateBadge();
+            if (data.type) maybeRefreshForType(String(data.type).toUpperCase());
+        };
+    }
+    function scheduleReconnect() {
+        setTimeout(connect, backoffMs);
+        backoffMs = Math.min(maxBackoff, Math.round(backoffMs * 1.6));
+    }
+    connect();
+})();
+
 // ── Tab/view name → route mapping ──
 var VIEW_MAP = {
     'userOverview':  'userOverview',
@@ -336,20 +377,7 @@ document.onkeydown = function(e) {
     return (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase()))) ? false : true;
 };
 
-setInterval(function() {
-    fetch('NotificationServlet')
-        .then(response => response.json())
-        .then(data => {
-            if (data.length > 0) {
-                let container = document.getElementById("notificationBox");
-                container.innerHTML = "";
-
-                data.forEach(n => {
-                    container.innerHTML += `<p>${n.message}</p>`;
-                });
-            }
-        });
-}, 500); // every 5 seconds
+// NOTE: removed aggressive 500ms polling; live updates come via WebSocket now.
 
 </script>
 </body>

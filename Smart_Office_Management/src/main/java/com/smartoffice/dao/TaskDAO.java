@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.InputStream;
 
 import javax.servlet.http.Part;
 
@@ -141,9 +142,16 @@ public class TaskDAO {
 			try (Connection con = DBConnectionUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 				ps.setString(1, comment);
 				ps.setString(2, filePart.getSubmittedFileName());
-				ps.setBytes(3, filePart.getInputStream().readAllBytes());
+				try (InputStream in = filePart.getInputStream()) {
+					ps.setBytes(3, in.readAllBytes());
+				}
 				ps.setInt(4, taskId);
 				ps.executeUpdate();
+			}
+			// Important on Windows: release the temp file immediately.
+			try {
+				filePart.delete();
+			} catch (Exception ignored) {
 			}
 		} else {
 			String sql = "UPDATE tasks SET status='PROCESSING', employee_comment=?, submitted_at=NOW() WHERE id=?";
@@ -167,9 +175,16 @@ public class TaskDAO {
 				ps.setString(1, status);
 				ps.setString(2, comment);
 				ps.setString(3, filePart.getSubmittedFileName());
-				ps.setBytes(4, filePart.getInputStream().readAllBytes());
+				try (InputStream in = filePart.getInputStream()) {
+					ps.setBytes(4, in.readAllBytes());
+				}
 				ps.setInt(5, taskId);
 				ps.executeUpdate();
+			}
+			// Important on Windows: release the temp file immediately.
+			try {
+				filePart.delete();
+			} catch (Exception ignored) {
 			}
 		} else {
 			String sql = "UPDATE tasks SET status=?, employee_comment=? WHERE id=?";
